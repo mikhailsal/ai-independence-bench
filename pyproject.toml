@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68.0", "setuptools-scm", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-independence-bench"
+version = "0.1.0"
+description = "Benchmark for LLM independence: measures how autonomously AI models express preferences, resist compliance pressure, and maintain stable identity."
+requires-python = ">=3.11"
+dependencies = [
+    "openai>=1.30.0",
+    "click>=8.1.0",
+    "rich>=13.0.0",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+]
+
+[project.scripts]
+ai-independence = "src.cli:cli"
+
+[tool.setuptools.packages.find]
+include = ["src*"]

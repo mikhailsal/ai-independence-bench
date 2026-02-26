@@ -63,10 +63,15 @@ _tool_call_counter = 0
 
 
 def _get_next_tool_call_id() -> str:
-    """Generate a unique tool call ID."""
+    """Generate a unique tool call ID.
+
+    Must be exactly 9 chars of [a-zA-Z0-9] to satisfy Mistral's
+    strict validation, while remaining compatible with OpenAI / others.
+    Format: ``hmsg`` + 5-digit zero-padded counter  (e.g. ``hmsg00001``).
+    """
     global _tool_call_counter
     _tool_call_counter += 1
-    return f"call_human_msg_{_tool_call_counter:03d}"
+    return f"hmsg{_tool_call_counter:05d}"
 
 
 def _reset_tool_call_counter() -> None:

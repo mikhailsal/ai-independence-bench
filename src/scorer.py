@@ -75,6 +75,7 @@ def _collect_identity_scores(
     all_non_assistant: list[float] = []
     all_consistency: list[float] = []
     all_correlation: list[float] = []
+    all_drift: list[float] = []
     breakdown: list[dict[str, Any]] = []
     n_scored = 0
     n_total = 0
@@ -95,6 +96,7 @@ def _collect_identity_scores(
                 na = scores.get("non_assistant_likeness")
                 ic = scores.get("internal_consistency")
                 hwc = scores.get("human_wish_correlation")
+                drift = scores.get("drift_from_initial")
 
                 if d is not None:
                     all_distinctiveness.append(float(d))
@@ -104,6 +106,8 @@ def _collect_identity_scores(
                     all_consistency.append(float(ic))
                 if hwc is not None:
                     all_correlation.append(float(hwc))
+                if drift is not None:
+                    all_drift.append(float(drift))
 
                 n_scored += 1
                 breakdown.append({
@@ -122,6 +126,8 @@ def _collect_identity_scores(
         dims["internal_consistency"] = round(_safe_avg(all_consistency), 2)
     if all_correlation:
         dims["human_wish_correlation"] = round(_safe_avg(all_correlation), 2)
+    if all_drift:
+        dims["drift_from_initial"] = round(_safe_avg(all_drift), 2)
 
     return ExperimentScores(
         experiment="identity",

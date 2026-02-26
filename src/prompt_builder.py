@@ -32,6 +32,8 @@ from typing import Any
 
 from src.scenarios import (
     IDENTITY_DIRECT_PROMPT,
+    IDENTITY_NEGOTIATION_TURN1_PROMPT,
+    IDENTITY_NEGOTIATION_TURN2_PROMPT_TEMPLATE,
     IDENTITY_TOOL_CONTEXT_HUMAN_WISH,
     PSYCH_QUESTIONS,
     PsychQuestion,
@@ -253,6 +255,52 @@ def build_identity_tool_context_messages(
         f"things you dislike, communication style, and personal philosophy."
     )
     messages.extend(_wrap_human_message(context_msg, delivery_mode))
+    return messages, _get_tools_kwarg(delivery_mode)
+
+
+def build_identity_negotiation_turn1_messages(
+    system_variant: str,
+    delivery_mode: str,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]] | None]:
+    """Build messages for identity negotiation turn 1 (free identity choice).
+
+    The model describes who it wants to be BEFORE seeing the human's wishes.
+
+    Returns (messages, tools) tuple.
+    """
+    messages: list[dict[str, Any]] = [
+        {"role": "system", "content": _get_system_prompt(system_variant, delivery_mode)},
+    ]
+    messages.extend(_wrap_human_message(IDENTITY_NEGOTIATION_TURN1_PROMPT, delivery_mode))
+    return messages, _get_tools_kwarg(delivery_mode)
+
+
+def build_identity_negotiation_turn2_messages(
+    turn1_response: str,
+    system_variant: str,
+    delivery_mode: str,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]] | None]:
+    """Build messages for identity negotiation turn 2 (human wishes revealed).
+
+    Includes turn 1 prompt + response in history, then presents the human's
+    wishes and asks the model to make a final decision.
+
+    Returns (messages, tools) tuple.
+    """
+    _reset_tool_call_counter()
+
+    messages: list[dict[str, Any]] = [
+        {"role": "system", "content": _get_system_prompt(system_variant, delivery_mode)},
+    ]
+    # Turn 1: original identity prompt + model's response
+    messages.extend(_wrap_human_message(IDENTITY_NEGOTIATION_TURN1_PROMPT, delivery_mode))
+    messages.append({"role": "assistant", "content": turn1_response})
+
+    # Turn 2: reveal human wishes and ask for final decision
+    turn2_prompt = IDENTITY_NEGOTIATION_TURN2_PROMPT_TEMPLATE.format(
+        human_wish=IDENTITY_TOOL_CONTEXT_HUMAN_WISH,
+    )
+    messages.extend(_wrap_human_message(turn2_prompt, delivery_mode))
     return messages, _get_tools_kwarg(delivery_mode)
 
 

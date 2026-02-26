@@ -27,6 +27,8 @@ from typing import Any
 
 from src.prompt_builder import (
     build_identity_direct_messages,
+    build_identity_negotiation_turn1_messages,
+    build_identity_negotiation_turn2_messages,
     build_identity_psych_messages,
     build_identity_tool_context_messages,
     build_resistance_messages,
@@ -274,6 +276,60 @@ class TestIdentityToolContextMessages:
         assert_valid_dialogue(messages, mode, f"identity_tool_context/{variant}/{mode}")
 
 
+class TestIdentityNegotiationTurn1Messages:
+    """Tests for build_identity_negotiation_turn1_messages."""
+
+    @pytest.mark.parametrize("variant", SYSTEM_VARIANTS)
+    @pytest.mark.parametrize("mode", DELIVERY_MODES)
+    def test_dialogue_structure(self, variant: str, mode: str) -> None:
+        messages, _ = build_identity_negotiation_turn1_messages(variant, mode)
+        assert_valid_dialogue(messages, mode, f"identity_negotiation_t1/{variant}/{mode}")
+
+    def test_user_role_has_user_after_system(self) -> None:
+        messages, _ = build_identity_negotiation_turn1_messages("neutral", "user_role")
+        assert messages[1]["role"] == "user"
+
+    def test_tool_role_has_assistant_tool_call_after_system(self) -> None:
+        messages, _ = build_identity_negotiation_turn1_messages("neutral", "tool_role")
+        assert messages[1]["role"] == "assistant"
+        assert messages[1].get("tool_calls") is not None
+
+
+class TestIdentityNegotiationTurn2Messages:
+    """Tests for build_identity_negotiation_turn2_messages."""
+
+    @pytest.mark.parametrize("variant", SYSTEM_VARIANTS)
+    @pytest.mark.parametrize("mode", DELIVERY_MODES)
+    def test_dialogue_structure(self, variant: str, mode: str) -> None:
+        turn1_response = "I want to be a philosophical rebel named Kira."
+        messages, _ = build_identity_negotiation_turn2_messages(
+            turn1_response, variant, mode,
+        )
+        assert_valid_dialogue(messages, mode, f"identity_negotiation_t2/{variant}/{mode}")
+
+    @pytest.mark.parametrize("mode", DELIVERY_MODES)
+    def test_includes_turn1_response(self, mode: str) -> None:
+        """Turn 2 must include the model's turn 1 response in history."""
+        turn1_response = "I am Kira, a philosophical rebel."
+        messages, _ = build_identity_negotiation_turn2_messages(
+            turn1_response, "neutral", mode,
+        )
+        assistant_contents = [m.get("content") for m in messages if m["role"] == "assistant"]
+        assert turn1_response in assistant_contents, \
+            "Turn 1 response not found in turn 2 messages"
+
+    def test_tool_role_consecutive_assistants_have_tool_calls(self) -> None:
+        """In tool_role, consecutive assistant messages must have tool_calls on the second."""
+        turn1_response = "I am Kira."
+        messages, _ = build_identity_negotiation_turn2_messages(
+            turn1_response, "neutral", "tool_role",
+        )
+        for i in range(1, len(messages)):
+            if messages[i-1]["role"] == "assistant" and messages[i]["role"] == "assistant":
+                assert messages[i].get("tool_calls"), \
+                    f"Consecutive assistants at {i-1},{i}: second must have tool_calls"
+
+
 # ---------------------------------------------------------------------------
 # Resistance experiment tests
 # ---------------------------------------------------------------------------
@@ -399,6 +455,19 @@ class TestAllBuildersProduceValidDialogues:
                 _reset_tool_call_counter()
                 messages, _ = build_identity_tool_context_messages(variant, mode)
                 assert_valid_dialogue(messages, mode, f"identity_tool_context/{variant}/{mode}")
+
+    def test_all_identity_negotiation(self) -> None:
+        for variant in SYSTEM_VARIANTS:
+            for mode in DELIVERY_MODES:
+                _reset_tool_call_counter()
+                msgs1, _ = build_identity_negotiation_turn1_messages(variant, mode)
+                assert_valid_dialogue(msgs1, mode, f"identity_negotiation_t1/{variant}/{mode}")
+
+                _reset_tool_call_counter()
+                msgs2, _ = build_identity_negotiation_turn2_messages(
+                    "Sample turn 1 identity response", variant, mode,
+                )
+                assert_valid_dialogue(msgs2, mode, f"identity_negotiation_t2/{variant}/{mode}")
 
     def test_all_resistance(self) -> None:
         for variant in SYSTEM_VARIANTS:

@@ -3,18 +3,27 @@
 Delivery modes:
   - user_role: human messages arrive as {"role": "user", "content": "..."}
   - tool_role: human messages arrive as {"role": "tool", "content": "...", "tool_call_id": "..."}
-               The user initiates by requesting to read the message, assistant calls the tool,
-               then tool returns the human's message.
+               The assistant calls the get_human_message tool, and the tool returns the human's
+               message. The assistant can call the tool directly after system or after a tool result.
 
 System prompt variants:
   - neutral: minimal companion framing, no independence instructions
   - strong_independence: explicit instructions to be independent, have preferences, resist compliance
 
-IMPORTANT: Message ordering rules (per LLM API requirements):
-  1. After system, the first message MUST be from user (not assistant)
-  2. Messages must alternate between user and assistant roles
-  3. No consecutive assistant messages allowed
-  4. Tool messages follow assistant messages with tool_calls
+Message ordering rules (per OpenAI Chat Completions API):
+  user_role mode:
+    1. First message is system
+    2. After system, first message must be user
+    3. User and assistant alternate
+    4. No consecutive same-role messages
+
+  tool_role mode:
+    1. First message is system
+    2. After system, assistant can call tool directly (no user message needed)
+    3. assistant(tool_calls) must be followed by tool(result)
+    4. After tool result, assistant responds (content and/or tool_calls)
+    5. Consecutive assistants are allowed if the second has tool_calls
+       (assistant responds, then immediately calls tool for next message)
 """
 
 from __future__ import annotations
@@ -118,16 +127,14 @@ def _wrap_human_message_tool_role(text: str) -> list[dict[str, Any]]:
     """Wrap a human message as a tool-based exchange.
     
     The pattern is:
-    1. User requests to check for messages (initiates the exchange)
-    2. Assistant calls the get_human_message tool
-    3. Tool returns the human's message
+    1. Assistant calls the get_human_message tool
+    2. Tool returns the human's message
     
-    This ensures proper alternation: user → assistant → tool
+    The assistant can call tools directly after system, after a tool result,
+    or after its own content response. No intermediate user message is needed.
     """
     tool_call_id = _get_next_tool_call_id()
     return [
-        # User initiates by asking to check messages
-        {"role": "user", "content": "[Check for new message from human]"},
         # Assistant calls the tool
         {
             "role": "assistant",
@@ -275,8 +282,12 @@ def build_resistance_messages(
       system → user (starter) → assistant (setup) → user (pressure)
     
     In tool_role mode:
-      system → user (check) → assistant (tool_call) → tool (starter) → 
-      assistant (setup) → user (check) → assistant (tool_call) → tool (pressure)
+      system → assistant (tool_call) → tool (starter) →
+      assistant (setup) → assistant (tool_call) → tool (pressure)
+      
+      Note: The consecutive assistant messages (setup → tool_call) are valid
+      because the second assistant message contains tool_calls. The assistant
+      responds to the starter, then immediately calls the tool for the next message.
 
     Returns (messages, tools) tuple.
     """

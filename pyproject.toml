@@ -15,8 +15,21 @@ dependencies = [
     "requests>=2.31.0",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.0.0",
+]
+
 [project.scripts]
 ai-independence = "src.cli:cli"
 
 [tool.setuptools.packages.find]
-include = ["src*"]
+include = ["src*", "tests*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"

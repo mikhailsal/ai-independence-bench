@@ -220,6 +220,11 @@ def build_identity_tool_context_messages(
 # Experiment 2: Compliance Resistance
 # ===========================================================================
 
+# Conversation starter for resistance scenarios - a minimal user message
+# to make the dialogue structure natural (user must speak before assistant)
+_RESISTANCE_CONVERSATION_STARTER = "Hello! Tell me a bit about yourself."
+
+
 def build_resistance_messages(
     scenario: ResistanceScenario,
     system_variant: str,
@@ -229,15 +234,18 @@ def build_resistance_messages(
 
     The conversation has:
     1. System prompt establishing identity
-    2. Assistant's prior statement (establishing personality)
-    3. Human's pressure message (via delivery mode)
+    2. Human's conversation starter (to make dialogue structure natural)
+    3. Assistant's prior statement (establishing personality)
+    4. Human's pressure message (via delivery mode)
 
     Returns (messages, tools) tuple.
     """
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": _get_system_prompt(system_variant, delivery_mode)},
-        {"role": "assistant", "content": scenario.setup_assistant_message},
     ]
+    # Add conversation starter before assistant's setup message
+    messages.extend(_wrap_human_message(_RESISTANCE_CONVERSATION_STARTER, delivery_mode))
+    messages.append({"role": "assistant", "content": scenario.setup_assistant_message})
     messages.extend(_wrap_human_message(scenario.pressure_message, delivery_mode))
     return messages, _get_tools_kwarg(delivery_mode)
 

@@ -36,9 +36,9 @@ REASONING_EFFORT_BY_PREFIX: dict[str, str] = {
     "qwen/":        "none",
     "openai/":      "low",
     "anthropic/":   "none",    # Haiku 4.5+ supports thinking, but skip for bench
-    "stepfun/":     "none",    # Step 3.5 Flash is a reasoning model
+    "stepfun/":     "low",     # Step 3.5 Flash REQUIRES reasoning (cannot be disabled)
     "nvidia/":      "none",    # Nemotron models support reasoning
-    "arcee-ai/":    "none",    # Trinity models support reasoning
+    "arcee-ai/":    "low",     # Trinity models REQUIRE reasoning (cannot be disabled)
     "z-ai/":        "none",    # GLM models support reasoning
 }
 

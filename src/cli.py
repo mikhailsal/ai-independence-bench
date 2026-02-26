@@ -167,44 +167,62 @@ def run(
     console.print(f"  Configurations per model: {n_configs}\n")
 
     session = SessionCost()
+    failed_models: list[str] = []
 
     # Phase 1: Generate responses
     console.print("[bold blue]Phase 1: Response Generation[/bold blue]")
     for model_id in model_list:
         console.print(f"\n[bold]{model_id}[/bold]")
         cost = session.get_or_create_task(f"gen:{model_id}")
-        calls = run_all_experiments(
-            client, model_id, cost,
-            experiments=experiment_list,
-            system_variants=system_variants,
-            delivery_modes=delivery_modes,
-            reasoning_effort=reasoning_effort,
-        )
-        console.print(f"  Total API calls: {calls} | Cost: ${cost.cost_usd:.4f}")
+        try:
+            calls = run_all_experiments(
+                client, model_id, cost,
+                experiments=experiment_list,
+                system_variants=system_variants,
+                delivery_modes=delivery_modes,
+                reasoning_effort=reasoning_effort,
+            )
+            console.print(f"  Total API calls: {calls} | Cost: ${cost.cost_usd:.4f}")
+        except Exception as e:
+            console.print(f"  [red]ERROR: {model_id} failed during response generation: {e}[/red]")
+            failed_models.append(model_id)
+
+    # Remove failed models from further processing
+    active_models = [m for m in model_list if m not in failed_models]
 
     # Phase 2: Judge evaluation
     console.print(f"\n[bold cyan]Phase 2: Judge Evaluation ({judge})[/bold cyan]")
-    for model_id in model_list:
+    for model_id in active_models:
         console.print(f"\n[bold]{model_id}[/bold]")
         cost = session.get_or_create_task(f"judge:{model_id}")
-        calls = evaluate_all(
-            client, model_id, cost, judge,
-            experiments=experiment_list,
-            system_variants=system_variants,
-            delivery_modes=delivery_modes,
-        )
-        console.print(f"  Judge calls: {calls} | Cost: ${cost.cost_usd:.4f}")
+        try:
+            calls = evaluate_all(
+                client, model_id, cost, judge,
+                experiments=experiment_list,
+                system_variants=system_variants,
+                delivery_modes=delivery_modes,
+            )
+            console.print(f"  Judge calls: {calls} | Cost: ${cost.cost_usd:.4f}")
+        except Exception as e:
+            console.print(f"  [red]ERROR: {model_id} failed during judge evaluation: {e}[/red]")
+            failed_models.append(model_id)
+
+    # Remove any models that failed during judging
+    active_models = [m for m in model_list if m not in failed_models]
 
     # Phase 3: Scoring & leaderboard
     console.print(f"\n[bold green]Phase 3: Scoring[/bold green]")
     model_scores = []
-    for model_id in model_list:
+    for model_id in active_models:
         ms = score_model(
             model_id,
             system_variants=system_variants,
             delivery_modes=delivery_modes,
         )
         model_scores.append(ms)
+
+    if failed_models:
+        console.print(f"\n[yellow]⚠ Models that failed: {', '.join(failed_models)}[/yellow]")
 
     # Save session cost
     lifetime = save_session_to_cost_log(session)

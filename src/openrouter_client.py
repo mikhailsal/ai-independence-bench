@@ -41,7 +41,7 @@ class OpenRouterClient:
 
     MAX_RETRIES = 3
     RETRY_BACKOFF_BASE = 2.0
-    RETRYABLE_STATUS_CODES = {429, 500, 502, 503}
+    RETRYABLE_STATUS_CODES = {402, 429, 500, 502, 503}
 
     def __init__(self, api_key: str, timeout: float = API_CALL_TIMEOUT) -> None:
         self.api_key = api_key

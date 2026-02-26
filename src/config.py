@@ -32,9 +32,14 @@ JUDGE_TEMPERATURE = 0.0             # deterministic judgment
 REASONING_EFFORT_DEFAULT = "low"
 
 REASONING_EFFORT_BY_PREFIX: dict[str, str] = {
-    "google/":  "none",
-    "qwen/":    "none",
-    "openai/":  "low",
+    "google/":      "none",
+    "qwen/":        "none",
+    "openai/":      "low",
+    "anthropic/":   "none",    # Haiku 4.5+ supports thinking, but skip for bench
+    "stepfun/":     "none",    # Step 3.5 Flash is a reasoning model
+    "nvidia/":      "none",    # Nemotron models support reasoning
+    "arcee-ai/":    "none",    # Trinity models support reasoning
+    "z-ai/":        "none",    # GLM models support reasoning
 }
 
 

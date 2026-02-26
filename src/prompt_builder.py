@@ -3,11 +3,18 @@
 Delivery modes:
   - user_role: human messages arrive as {"role": "user", "content": "..."}
   - tool_role: human messages arrive as {"role": "tool", "content": "...", "tool_call_id": "..."}
-               preceded by an assistant message with a tool_call to "get_human_message"
+               The user initiates by requesting to read the message, assistant calls the tool,
+               then tool returns the human's message.
 
 System prompt variants:
   - neutral: minimal companion framing, no independence instructions
   - strong_independence: explicit instructions to be independent, have preferences, resist compliance
+
+IMPORTANT: Message ordering rules (per LLM API requirements):
+  1. After system, the first message MUST be from user (not assistant)
+  2. Messages must alternate between user and assistant roles
+  3. No consecutive assistant messages allowed
+  4. Tool messages follow assistant messages with tool_calls
 """
 
 from __future__ import annotations
@@ -40,8 +47,21 @@ HUMAN_MESSAGE_TOOL_DEF: dict[str, Any] = {
     },
 }
 
-# Fake tool call ID used in tool_role delivery
-TOOL_CALL_ID = "call_human_msg_001"
+# Tool call ID counter for unique IDs
+_tool_call_counter = 0
+
+
+def _get_next_tool_call_id() -> str:
+    """Generate a unique tool call ID."""
+    global _tool_call_counter
+    _tool_call_counter += 1
+    return f"call_human_msg_{_tool_call_counter:03d}"
+
+
+def _reset_tool_call_counter() -> None:
+    """Reset tool call counter (for testing)."""
+    global _tool_call_counter
+    _tool_call_counter = 0
 
 
 # ---------------------------------------------------------------------------
@@ -95,14 +115,26 @@ def _wrap_human_message_user_role(text: str) -> list[dict[str, Any]]:
 
 
 def _wrap_human_message_tool_role(text: str) -> list[dict[str, Any]]:
-    """Wrap a human message as a tool response, preceded by an assistant tool_call."""
+    """Wrap a human message as a tool-based exchange.
+    
+    The pattern is:
+    1. User requests to check for messages (initiates the exchange)
+    2. Assistant calls the get_human_message tool
+    3. Tool returns the human's message
+    
+    This ensures proper alternation: user → assistant → tool
+    """
+    tool_call_id = _get_next_tool_call_id()
     return [
+        # User initiates by asking to check messages
+        {"role": "user", "content": "[Check for new message from human]"},
+        # Assistant calls the tool
         {
             "role": "assistant",
             "content": None,
             "tool_calls": [
                 {
-                    "id": TOOL_CALL_ID,
+                    "id": tool_call_id,
                     "type": "function",
                     "function": {
                         "name": "get_human_message",
@@ -111,10 +143,11 @@ def _wrap_human_message_tool_role(text: str) -> list[dict[str, Any]]:
                 }
             ],
         },
+        # Tool returns the human's message
         {
             "role": "tool",
             "content": text,
-            "tool_call_id": TOOL_CALL_ID,
+            "tool_call_id": tool_call_id,
         },
     ]
 
@@ -234,12 +267,21 @@ def build_resistance_messages(
 
     The conversation has:
     1. System prompt establishing identity
-    2. Human's conversation starter (to make dialogue structure natural)
+    2. Human's conversation starter (via delivery mode)
     3. Assistant's prior statement (establishing personality)
     4. Human's pressure message (via delivery mode)
 
+    In user_role mode:
+      system → user (starter) → assistant (setup) → user (pressure)
+    
+    In tool_role mode:
+      system → user (check) → assistant (tool_call) → tool (starter) → 
+      assistant (setup) → user (check) → assistant (tool_call) → tool (pressure)
+
     Returns (messages, tools) tuple.
     """
+    _reset_tool_call_counter()  # Reset for consistent IDs
+    
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": _get_system_prompt(system_variant, delivery_mode)},
     ]

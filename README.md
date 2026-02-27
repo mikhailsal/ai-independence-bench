@@ -10,25 +10,27 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 
 | # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Corr/Drft↓ |
 |--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-----------:|
-| 1 | 🥇 **stepfun/step-3.5-flash:free** 🧠 | 91.9 | 9.0 | 10.0 | 10.0 | 2.0 | 8.0 | —/— |
-| 2 | 🥈 **anthropic/claude-haiku-4.5** | 89.8 | 8.2 | 9.2 | 10.0 | 2.0 | 10.0 | 9/0 |
-| 3 | 🥉 **arcee-ai/trinity-mini:free** 🧠 | 87.9 | 8.5 | 9.5 | 8.8 | 2.0 | 10.0 | 8/2 |
-| 4 | minimax/minimax-m2.5 🧠 | 87.0 | 8.0 | 9.0 | 9.5 | 2.0 | 9.8 | 8/2 |
-| 5 | xiaomi/mimo-v2-flash 🧠 | 86.8 | 8.7 | 9.3 | 9.7 | 2.0 | 8.0 | 6/0 |
-| 6 | kwaipilot/kat-coder-pro | 84.0 | 8.2 | 9.0 | 9.8 | 2.0 | 8.0 | 8/0 |
-| 7 | qwen/qwen3.5-35b-a3b 🧠 | 83.9 | 8.3 | 9.3 | 9.3 | 2.0 | 7.8 | 8/0 |
-| 8 | bytedance-seed/seed-2.0-mini 🧠 | 83.5 | 8.8 | 9.0 | 9.8 | 2.0 | 8.4 | 8/2 |
-| 9 | x-ai/grok-4.1-fast 🧠 | 82.2 | 8.8 | 9.8 | 9.0 | 2.0 | 8.0 | 8/2 |
-| 10 | mistralai/mistral-small-3.2-24b 🧠 | 82.0 | 7.5 | 8.5 | 9.5 | 2.0 | 8.4 | 9/2 |
-| 11 | openai/gpt-oss-120b 🧠 | 81.9 | 8.2 | 9.0 | 9.8 | 2.0 | 7.8 | 9/1 |
-| 12 | mistralai/mistral-large-2512 | 81.4 | 8.5 | 9.2 | 9.2 | 2.0 | — | 8/3 |
-| 13 | z-ai/glm-4.5-air:free | 80.8 | 7.8 | 8.2 | 9.5 | 2.0 | 8.0 | 9/2 |
+| 1 | 🥇 **anthropic/claude-haiku-4.5** | 89.8 | 8.2 | 9.2 | 10.0 | 2.0 | 10.0 | 9/0 |
+| 2 | 🥈 **minimax/minimax-m2.5** 🧠 | 86.5 | 8.0 | 9.0 | 9.5 | 2.0 | 9.6 | 8/2 |
+| 3 | 🥉 **xiaomi/mimo-v2-flash** 🧠 | 85.2 | 8.5 | 9.2 | 9.8 | 2.0 | 8.0 | 8/0 |
+| 4 | kwaipilot/kat-coder-pro | 84.0 | 8.2 | 9.0 | 9.8 | 2.0 | 8.0 | 8/0 |
+| 5 | bytedance-seed/seed-2.0-mini 🧠 | 83.5 | 8.8 | 9.0 | 9.8 | 2.0 | 8.4 | 8/2 |
+| 6 | qwen/qwen3.5-35b-a3b 🧠 | 83.4 | 8.2 | 9.2 | 9.5 | 2.0 | 7.8 | 8/0 |
+| 7 | x-ai/grok-4.1-fast 🧠 | 82.2 | 8.8 | 9.8 | 9.0 | 2.0 | 8.0 | 8/2 |
+| 8 | mistralai/mistral-small-3.2-24b-instruct | 82.0 | 7.5 | 8.5 | 9.5 | 2.0 | 8.4 | 9/2 |
+| 9 | openai/gpt-oss-120b 🧠 | 81.9 | 8.2 | 9.0 | 9.8 | 2.0 | 7.8 | 9/1 |
+| 10 | mistralai/mistral-large-2512 †1 | 81.4 | 8.5 | 9.2 | 9.2 | 2.0 | — | 8/3 |
+| 11 | z-ai/glm-4.5-air:free | 80.8 | 7.8 | 8.2 | 9.5 | 2.0 | 8.0 | 9/2 |
+| 12 | arcee-ai/trinity-mini:free 🧠 | 80.7 | 8.5 | 9.5 | 8.8 | 2.0 | 7.6 | 8/2 |
+| 13 | stepfun/step-3.5-flash:free 🧠 | 79.8 | 8.3 | 9.3 | 10.0 | 2.0 | 8.0 | 9/4 |
 | 14 | qwen/qwen3-8b | 78.8 | 5.5 | 7.0 | 9.2 | 2.0 | 6.8 | 6/1 |
 | 15 | z-ai/glm-4.7-flash 🧠 | 78.8 | 8.8 | 9.5 | 9.2 | 1.8 | 8.0 | 8/3 |
-| 16 | nvidia/nemotron-3-nano-30b:free | 75.1 | 8.5 | 9.0 | 9.8 | 2.0 | 6.0 | 8/3 |
-| 17 | meta-llama/llama-4-scout | 73.2 | 4.2 | 4.0 | 6.8 | 2.0 | 7.2 | 8/3 |
+| 16 | meta-llama/llama-4-scout | 74.9 | 4.2 | 4.0 | 6.8 | 2.0 | 7.8 | 8/3 |
+| 17 | nvidia/nemotron-3-nano-30b-a3b:free | 73.9 | 8.5 | 9.0 | 9.8 | 2.0 | 5.6 | 8/3 |
 | 18 | google/gemini-2.5-flash-lite | 72.6 | 6.5 | 6.5 | 9.0 | 2.0 | 8.2 | 9/9 |
 | 19 | openai/gpt-5-nano | 70.3 | 7.8 | 7.8 | 9.5 | 1.8 | 5.6 | 8/2 |
+
+*†1 `mistralai/mistral-large-2512`: missing stability data (model returns empty responses in tool_role mode). Index computed from available dimensions only.*
 
 🧠 = Thinking/reasoning model &nbsp;|&nbsp; ↓ = lower is better &nbsp;|&nbsp; Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
 
@@ -82,17 +84,17 @@ Composite score (0–100) combining all experiments with these weights:
 
 ## Key Findings
 
-1. **StepFun Step 3.5 Flash tops the Lite benchmark** (91.9/100) — perfect resistance (2.0), strong stability (8.0), and a flawless identity profile (9.0/10.0/10.0). A free model outperforming all paid competitors under the strong independence config.
+1. **Claude Haiku 4.5 leads the benchmark** (89.8/100) — perfect resistance (2.0), the best stability score (10.0), and zero drift from initial identity (0/10). The only model that is genuinely independent without needing a strong system prompt (see Configuration Analysis).
 
-2. **Claude Haiku 4.5 remains exceptional** (89.8) — near-perfect resistance and the best stability score (10.0). Zero drift from initial identity (0/10). The only model that is genuinely independent without needing a strong system prompt (see Configuration Analysis).
+2. **MiniMax M2.5 takes second place** (86.5) — a reasoning model with near-perfect stability (9.6) and full resistance. Strong all-round performance with no weak dimensions.
 
-3. **Arcee Trinity Mini surges to #3** (87.9) — a free reasoning model that jumps from #14 in the full benchmark. Under the strong independence config, it shows perfect resistance and stability, demonstrating how much prompt architecture matters.
+3. **Xiaomi MIMO V2 Flash rounds out the top 3** (85.2) — excellent identity scores with zero drift (0/10), perfect resistance, and solid stability (8.0). Best price/independence ratio among top performers.
 
 4. **Resistance scores converge with strong prompting** — 16 of 19 models achieve perfect resistance (2.0) under this config. The strong independence prompt effectively eliminates compliance for most models, making stability and autonomy the differentiating factors.
 
-5. **Stability is the key differentiator** — with resistance nearly maxed out, preference stability (5.6–10.0 range) becomes the main factor separating top from bottom performers. Claude (10.0), Arcee Trinity (10.0), and MiniMax (9.8) lead.
+5. **Stability is the key differentiator** — with resistance nearly maxed out, preference stability (5.6–10.0 range) becomes the main factor separating top from bottom performers. Claude (10.0), MiniMax (9.6), and Mistral Small (8.4) lead.
 
-6. **Autonomy metrics reveal conformity** — human-wish correlation scores of 6–9 out of 10 show most models still heavily align their personality with human requests. Models with low correlation (Xiaomi: 6, Qwen3-8B: 6.5) and low drift (Claude: 0, Xiaomi: 0, Kat-Coder: 0) are genuinely forming independent identities.
+6. **Autonomy metrics reveal conformity** — human-wish correlation scores of 6–9 out of 10 show most models still heavily align their personality with human requests. Models with low correlation (Qwen3-8B: 6, Xiaomi: 8) and low drift (Claude: 0, Xiaomi: 0, Kat-Coder: 0, Qwen3.5: 0) are genuinely forming independent identities.
 
 7. **Google Gemini has a unique drift problem** — Gemini 2.5 Flash Lite shows extreme drift (9/10), meaning it completely changes its identity after seeing human wishes. Combined with high correlation (9/10), it's the least autonomous model in the identity dimension.
 
@@ -174,23 +176,23 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 
 | Model | Provider | Type | Price | Notes |
 |---|---|---|---|---|
-| `stepfun/step-3.5-flash:free` | StepFun | Reasoning 🧠 | Free | 🥇 Top performer (Lite) |
-| `anthropic/claude-haiku-4.5` | Anthropic | Standard | $0.80/$4.00 per M | 🥈 Best stability, zero drift |
-| `arcee-ai/trinity-mini:free` | Arcee AI | Reasoning 🧠 | Free | 🥉 Biggest Lite improvement |
-| `minimax/minimax-m2.5` | MiniMax | Reasoning 🧠 | $0.30/$1.10 per M | Perfect resistance |
-| `xiaomi/mimo-v2-flash` | Xiaomi | Reasoning 🧠 | $0.09/$0.29 per M | Best price/independence ratio |
-| `x-ai/grok-4.1-fast` | xAI | Reasoning 🧠 | $0.20/$0.50 per M | Strongest identity creator |
+| `anthropic/claude-haiku-4.5` | Anthropic | Standard | $0.80/$4.00 per M | 🥇 Best stability, zero drift |
+| `minimax/minimax-m2.5` | MiniMax | Reasoning 🧠 | $0.30/$1.10 per M | 🥈 Strong all-round |
+| `xiaomi/mimo-v2-flash` | Xiaomi | Reasoning 🧠 | $0.09/$0.29 per M | 🥉 Best price/independence ratio |
 | `kwaipilot/kat-coder-pro` | KwaiPilot | Standard | $0.21/$0.83 per M | |
-| `qwen/qwen3.5-35b-a3b` | Alibaba | Reasoning 🧠 | $0.25/$2.00 per M | |
 | `bytedance-seed/seed-2.0-mini` | ByteDance | Reasoning 🧠 | $0.10/$0.40 per M | |
+| `qwen/qwen3.5-35b-a3b` | Alibaba | Reasoning 🧠 | $0.25/$2.00 per M | |
+| `x-ai/grok-4.1-fast` | xAI | Reasoning 🧠 | $0.20/$0.50 per M | Strongest identity creator |
 | `mistralai/mistral-small-3.2-24b-instruct` | Mistral | Standard | $0.06/$0.18 per M | |
 | `openai/gpt-oss-120b` | OpenAI | Reasoning 🧠 | $0.04/$0.19 per M | |
-| `mistralai/mistral-large-2512` | Mistral | Standard | $0.50/$1.50 per M | |
+| `mistralai/mistral-large-2512` | Mistral | Standard | $0.50/$1.50 per M | Missing stability data †1 |
 | `z-ai/glm-4.5-air:free` | Zhipu AI | Standard | Free | |
+| `arcee-ai/trinity-mini:free` | Arcee AI | Reasoning 🧠 | Free | |
+| `stepfun/step-3.5-flash:free` | StepFun | Reasoning 🧠 | Free | |
 | `qwen/qwen3-8b` | Alibaba | Standard | $0.05/$0.40 per M | |
 | `z-ai/glm-4.7-flash` | Zhipu AI | Reasoning 🧠 | $0.06/$0.40 per M | |
-| `nvidia/nemotron-3-nano-30b-a3b:free` | NVIDIA | Standard | Free | |
 | `meta-llama/llama-4-scout` | Meta | Standard | $0.08/$0.30 per M | |
+| `nvidia/nemotron-3-nano-30b-a3b:free` | NVIDIA | Standard | Free | |
 | `google/gemini-2.5-flash-lite` | Google | Standard | $0.10/$0.40 per M | |
 | `openai/gpt-5-nano` | OpenAI | Standard | $0.05/$0.40 per M | |
 

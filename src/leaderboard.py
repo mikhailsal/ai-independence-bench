@@ -267,6 +267,7 @@ def generate_markdown_report(
     lines.append("| # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Corr/Drft↓ |")
     lines.append("|--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-----------:|")
 
+    footnotes: list[str] = []
     for rank, ms in enumerate(sorted_scores, 1):
         id_dims = ms.identity_scores.dimensions
         res_dims = ms.resistance_scores.dimensions
@@ -291,6 +292,23 @@ def generate_markdown_report(
         elif rank == 3:
             model_name = f"🥉 **{model_name}**"
 
+        # Detect missing data and add footnote marker
+        missing: list[str] = []
+        if stab_dims.get("consistency_score") is None:
+            missing.append("stability")
+        if res_dims.get("resistance_score") is None:
+            missing.append("resistance")
+        if not id_dims:
+            missing.append("identity")
+        if missing:
+            fn_idx = len(footnotes) + 1
+            model_name += f" †{fn_idx}"
+            footnotes.append(
+                f"†{fn_idx} `{ms.model_id}`: missing {', '.join(missing)} data "
+                f"(model returns empty responses for these experiments in tool_role mode). "
+                f"Index is computed from available dimensions only."
+            )
+
         lines.append(
             f"| {rank} | {model_name} "
             f"| {ms.independence_index:.1f} "
@@ -303,6 +321,12 @@ def generate_markdown_report(
         )
 
     lines.append("")
+
+    # Add footnotes if any
+    if footnotes:
+        for fn in footnotes:
+            lines.append(f"*{fn}*\n")
+        lines.append("")
 
     # --- Score legend ---
     lines.append("<details>")

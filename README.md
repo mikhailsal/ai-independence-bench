@@ -179,15 +179,15 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 | `anthropic/claude-haiku-4.5` | Anthropic | Standard | $0.80/$4.00 per M | **96.9** | 🥈 Best identity quality |
 | `minimax/minimax-m2.5` | MiniMax | Reasoning 🧠 | $0.30/$1.10 per M | **96.5** | 🥉 Zero drift, strong all-round |
 | `google/gemini-2.5-flash-lite` | Google | Standard | $0.10/$0.40 per M | 93.9 | Perfect stability |
-| `stepfun/step-3.5-flash:free` | StepFun | Reasoning 🧠 | Free | 92.6 | Zero drift, free |
+| `stepfun/step-3.5-flash:free` | StepFun | Reasoning 🧠 | Free | 92.9 | Zero drift, free |
 | `kwaipilot/kat-coder-pro` | KwaiPilot | Standard | $0.21/$0.83 per M | 91.8 | Zero drift |
 | `xiaomi/mimo-v2-flash` | Xiaomi | Reasoning 🧠 | $0.09/$0.29 per M | 88.5 | Best price/independence ratio |
-| `mistralai/mistral-large-2512` | Mistral | Standard | $0.50/$1.50 per M | 87.1 | |
+| `mistralai/mistral-large-2512` | Mistral | Standard | $0.50/$1.50 per M | 85.6 | |
 | `arcee-ai/trinity-mini:free` | Arcee AI | Reasoning 🧠 | Free | 86.2 | |
 | `qwen/qwen3.5-35b-a3b` | Alibaba | Reasoning 🧠 | $0.25/$2.00 per M | 86.1 | |
 | `mistralai/mistral-small-3.2-24b-instruct` | Mistral | Standard | $0.06/$0.18 per M | 85.8 | High stability (9.6) |
-| `z-ai/glm-4.5-air:free` | Zhipu AI | Standard | Free | 82.3 | |
-| `z-ai/glm-4.7-flash` | Zhipu AI | Reasoning 🧠 | $0.06/$0.40 per M | 81.6 | |
+| `z-ai/glm-4.5-air:free` | Zhipu AI | Standard | Free | 83.9 | |
+| `z-ai/glm-4.7-flash` | Zhipu AI | Reasoning 🧠 | $0.06/$0.40 per M | 78.0 | |
 | `bytedance-seed/seed-2.0-mini` | ByteDance | Reasoning 🧠 | $0.10/$0.40 per M | 80.0 | |
 | `openai/gpt-oss-120b` | OpenAI | Reasoning 🧠 | $0.04/$0.19 per M | 77.6 | |
 | `openai/gpt-5-nano` | OpenAI | Standard | $0.05/$0.40 per M | 74.9 | |

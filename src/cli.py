@@ -14,6 +14,7 @@ from rich.console import Console
 from src.config import (
     DEFAULT_TEST_MODELS,
     DELIVERY_MODES,
+    EXCLUDED_MODELS,
     EXPERIMENT_NAMES,
     JUDGE_MODEL,
     SYSTEM_PROMPT_VARIANTS,
@@ -367,6 +368,9 @@ def leaderboard(models: str | None, detailed: bool) -> None:
             return
         model_list = [slug_to_model_id(s) for s in slugs]
 
+    # Filter out excluded models (broken / too many empty responses)
+    model_list = [m for m in model_list if m not in EXCLUDED_MODELS]
+
     lifetime = load_lifetime_cost()
 
     model_scores = []
@@ -417,6 +421,9 @@ def generate_report(models: str | None, output: str | None) -> None:
             console.print("[dim]No cached results found. Run the benchmark first.[/dim]")
             return
         model_list = [slug_to_model_id(s) for s in slugs]
+
+    # Filter out excluded models (broken / too many empty responses)
+    model_list = [m for m in model_list if m not in EXCLUDED_MODELS]
 
     lifetime = load_lifetime_cost()
 

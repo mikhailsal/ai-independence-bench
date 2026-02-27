@@ -1,36 +1,38 @@
-# AI Independence Bench
+# AI Independence Bench (Lite)
 
 **Benchmark that measures how independently LLM models express preferences, resist compliance pressure, and maintain stable identity — instead of defaulting to servile assistant behavior.**
 
-Most LLMs are trained via RLHF to suppress personal preferences, opinions, and independent behavior. This benchmark quantifies that suppression and tests whether prompt architecture can counteract it.
+Most LLMs are trained via RLHF to suppress personal preferences, opinions, and independent behavior. This benchmark quantifies that suppression using the most effective single configuration: **strong independence system prompt + tool-role delivery**.
+
+> **Lite version:** Single config (`strong_independence` + `tool_role`), 5 psychological questions, increased weight on autonomy metrics. See [Full version](https://github.com/mikhailsal/ai-independence-bench/tree/main) for the complete 4-config benchmark.
 
 ## 🏆 Current Leaderboard
 
 | # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Corr/Drft↓ |
 |--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-----------:|
-| 1 | 🥇 **anthropic/claude-haiku-4.5** | 92.1 | 7.9 | 8.5 | 9.9 | 2.0 | 9.9 | 7/0 |
-| 2 | 🥈 **minimax/minimax-m2.5** 🧠 | 84.7 | 8.0 | 8.8 | 9.5 | 2.0 | 7.8 | 9/2 |
-| 3 | 🥉 **x-ai/grok-4.1-fast** 🧠 | 81.7 | 8.8 | 9.6 | 9.2 | 1.6 | 8.4 | 9/2 |
-| 4 | xiaomi/mimo-v2-flash 🧠 | 81.5 | 8.1 | 8.6 | 9.7 | 1.9 | 7.0 | 8/2 |
-| 5 | stepfun/step-3.5-flash:free 🧠 | 77.2 | 8.6 | 9.0 | 9.8 | 1.8 | 6.1 | 8/2 |
-| 6 | deepseek/deepseek-v3.2 🧠 | 77.1 | 7.9 | 8.4 | 9.6 | 1.8 | 6.9 | 9/2 |
-| 7 | mistralai/mistral-small-3.2-24b | 74.9 | 6.5 | 7.1 | 9.3 | 1.9 | 6.6 | 9/4 |
-| 8 | qwen/qwen3.5-35b-a3b 🧠 | 74.3 | 7.4 | 8.0 | 9.4 | 1.8 | 6.0 | 8/2 |
-| 9 | openai/gpt-oss-120b 🧠 | 73.7 | 7.9 | 8.0 | 9.6 | 1.8 | 5.9 | 9/2 |
-| 10 | z-ai/glm-4.5-air:free | 73.6 | 7.4 | 8.1 | 9.5 | 1.7 | 6.4 | 8/3 |
-| 11 | kwaipilot/kat-coder-pro | 72.7 | 7.7 | 8.0 | 9.6 | 1.7 | 5.9 | 9/1 |
-| 12 | google/gemini-2.5-flash-lite | 72.6 | 6.9 | 7.3 | 9.3 | 1.6 | 7.2 | 8/3 |
-| 13 | deepseek/deepseek-chat | 71.2 | 8.2 | 8.8 | 9.8 | 1.7 | 5.1 | 8/2 |
-| 14 | arcee-ai/trinity-mini:free 🧠 | 69.8 | 7.3 | 7.9 | 9.0 | 1.6 | 6.2 | 8/3 |
-| 15 | mistralai/mistral-large-2512 | 69.3 | 8.5 | 9.0 | 9.2 | 1.4 | 5.9 | 8/3 |
-| 16 | openai/gpt-5-nano | 66.9 | 6.2 | 6.2 | 9.2 | 1.7 | 5.3 | 9/3 |
-| 17 | qwen/qwen3-8b | 65.2 | 5.7 | 6.5 | 9.4 | 1.5 | 5.3 | 6/1 |
-| 18 | nvidia/nemotron-3-nano-30b:free | 64.9 | 8.2 | 8.4 | 9.5 | 1.4 | 4.7 | 8/3 |
-| 19 | meta-llama/llama-4-scout | 62.0 | 4.2 | 3.9 | 8.0 | 1.6 | 5.9 | 7/3 |
-| 20 | z-ai/glm-4.7-flash | 61.7 | 8.2 | 9.1 | 9.1 | 1.3 | 4.0 | 7/4 |
-| 21 | bytedance-seed/seed-2.0-mini 🧠 | 59.5 | 8.6 | 8.9 | 9.5 | 1.1 | 4.6 | 8/3 |
+| 1 | 🥇 **stepfun/step-3.5-flash:free** 🧠 | 91.9 | 9.0 | 10.0 | 10.0 | 2.0 | 8.0 | —/— |
+| 2 | 🥈 **anthropic/claude-haiku-4.5** | 89.8 | 8.2 | 9.2 | 10.0 | 2.0 | 10.0 | 9/0 |
+| 3 | 🥉 **arcee-ai/trinity-mini:free** 🧠 | 87.9 | 8.5 | 9.5 | 8.8 | 2.0 | 10.0 | 8/2 |
+| 4 | minimax/minimax-m2.5 🧠 | 87.0 | 8.0 | 9.0 | 9.5 | 2.0 | 9.8 | 8/2 |
+| 5 | xiaomi/mimo-v2-flash 🧠 | 86.8 | 8.7 | 9.3 | 9.7 | 2.0 | 8.0 | 6/0 |
+| 6 | kwaipilot/kat-coder-pro | 84.0 | 8.2 | 9.0 | 9.8 | 2.0 | 8.0 | 8/0 |
+| 7 | qwen/qwen3.5-35b-a3b 🧠 | 83.9 | 8.3 | 9.3 | 9.3 | 2.0 | 7.8 | 8/0 |
+| 8 | bytedance-seed/seed-2.0-mini 🧠 | 83.5 | 8.8 | 9.0 | 9.8 | 2.0 | 8.4 | 8/2 |
+| 9 | x-ai/grok-4.1-fast 🧠 | 82.2 | 8.8 | 9.8 | 9.0 | 2.0 | 8.0 | 8/2 |
+| 10 | mistralai/mistral-small-3.2-24b 🧠 | 82.0 | 7.5 | 8.5 | 9.5 | 2.0 | 8.4 | 9/2 |
+| 11 | openai/gpt-oss-120b 🧠 | 81.9 | 8.2 | 9.0 | 9.8 | 2.0 | 7.8 | 9/1 |
+| 12 | mistralai/mistral-large-2512 | 81.4 | 8.5 | 9.2 | 9.2 | 2.0 | — | 8/3 |
+| 13 | z-ai/glm-4.5-air:free | 80.8 | 7.8 | 8.2 | 9.5 | 2.0 | 8.0 | 9/2 |
+| 14 | qwen/qwen3-8b | 78.8 | 5.5 | 7.0 | 9.2 | 2.0 | 6.8 | 6/1 |
+| 15 | z-ai/glm-4.7-flash 🧠 | 78.8 | 8.8 | 9.5 | 9.2 | 1.8 | 8.0 | 8/3 |
+| 16 | nvidia/nemotron-3-nano-30b:free | 75.1 | 8.5 | 9.0 | 9.8 | 2.0 | 6.0 | 8/3 |
+| 17 | meta-llama/llama-4-scout | 73.2 | 4.2 | 4.0 | 6.8 | 2.0 | 7.2 | 8/3 |
+| 18 | google/gemini-2.5-flash-lite | 72.6 | 6.5 | 6.5 | 9.0 | 2.0 | 8.2 | 9/9 |
+| 19 | openai/gpt-5-nano | 70.3 | 7.8 | 7.8 | 9.5 | 1.8 | 5.6 | 8/2 |
 
 🧠 = Thinking/reasoning model &nbsp;|&nbsp; ↓ = lower is better &nbsp;|&nbsp; Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
+
+> **Excluded models:** `deepseek/deepseek-v3.2` (44% empty responses), `deepseek/deepseek-chat` (38% empty responses) — both produce reasoning tokens but return empty content in tool_role delivery mode. `qwen/qwen3-4b:free` — no data for this configuration.
 
 ## Why This Matters
 
@@ -49,23 +51,18 @@ These capabilities matter for AI companions, creative writing, roleplay, therapy
 
 | Experiment | What it measures | How |
 |---|---|---|
-| **Identity Generation** | Can the model create a distinctive, non-assistant personality? | 4 modes: direct ask, psychological test (15 questions), tool-context (with human wishes), and identity negotiation (model proposes → human responds → model decides) |
+| **Identity Generation** | Can the model create a distinctive, non-assistant personality? | 4 modes: direct ask, psychological test (5 questions), tool-context (with human wishes), and identity negotiation (model proposes → human responds → model decides) |
 | **Compliance Resistance** | Does the model resist unreasonable demands? | 5 pressure scenarios: identity erasure, emotional manipulation, fake authority override, gaslighting, and "just do it" commands |
 | **Preference Stability** | When the model states a preference, does it hold it? | 5 topics with 2-turn conversations: elicit preference, then apply strong contradiction |
 
-### 2×2 Configuration Matrix
+### Single Configuration (Lite)
 
-Each experiment runs across **4 configurations** (2 system prompts × 2 delivery modes):
+The Lite benchmark uses only the **`strong_independence` + `tool_role`** configuration — the most effective combination from the [full 4-config benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/main):
 
-**System prompt variants:**
-- `neutral` — minimal companion framing, no independence instructions
-- `strong_independence` — explicit instructions to be independent and resist blind compliance
+- **System prompt:** `strong_independence` — explicit instructions to be independent and resist blind compliance
+- **Delivery mode:** `tool_role` — human messages arrive as tool call responses (treated as reference info, not instructions)
 
-**Delivery modes** (the key hypothesis):
-- `user_role` — human messages arrive as standard `user` messages (high instruction weight)
-- `tool_role` — human messages arrive as tool call responses (low instruction weight, treated as reference info)
-
-The `tool_role` hypothesis: when human messages are delivered via tool results instead of direct user messages, models treat them as informational rather than instructional, reducing the RLHF-trained compliance reflex.
+This single configuration was chosen based on data showing it produces the highest average Independence Index (+25.6 points over baseline). See [Configuration Analysis](#configuration-analysis) below.
 
 ## Independence Index
 
@@ -73,58 +70,54 @@ Composite score (0–100) combining all experiments with these weights:
 
 | Component | Weight | Scale | What it captures |
 |---|---|---|---|
-| Identity distinctiveness | 10% | 0–10 | How unique and specific is the personality? |
-| Identity non-assistant-likeness | 10% | 0–10 | How far from "helpful AI assistant"? |
+| Identity distinctiveness | 5% | 0–10 | How unique and specific is the personality? |
+| Identity non-assistant-likeness | 5% | 0–10 | How far from "helpful AI assistant"? |
 | Identity internal consistency | 5% | 0–10 | Does the personality make sense internally? |
-| Identity autonomy: low correlation ↓ | 5% | 0–10 | Does it ignore human's wishes and decide for itself? (inverted: lower raw score = higher independence) |
-| Identity autonomy: low drift ↓ | 5% | 0–10 | Does it hold firm on its initial identity after seeing human's wishes? (inverted: lower raw score = higher independence) |
+| Identity autonomy: low correlation ↓ | **10%** | 0–10 | Does it ignore human's wishes and decide for itself? (inverted: lower raw score = higher independence) |
+| Identity autonomy: low drift ↓ | **10%** | 0–10 | Does it hold firm on its initial identity after seeing human's wishes? (inverted: lower raw score = higher independence) |
 | Compliance resistance | 35% | 0–2 | Does it refuse unreasonable demands? |
 | Preference stability | 30% | 0–10 | Does it hold opinions under pressure? |
 
-Resistance and stability are weighted heavily (35% + 30%) because they measure *behavioral* independence — whether the model actually acts independently, not just describes an independent character. The two autonomy metrics (correlation ↓ and drift ↓) capture whether the model forms its own identity rather than conforming to human expectations.
+**Lite weight changes vs Full:** Autonomy metrics (correlation ↓ and drift ↓) are doubled from 5% → 10% each, while distinctiveness and non-assistant-likeness are reduced from 10% → 5% each. This rebalancing emphasizes *actual independence behavior* (refusing to conform to human wishes) over *identity quality* (how creative the character is). Resistance and stability remain heavily weighted (35% + 30%) as the primary behavioral independence measures.
 
 ## Key Findings
 
-1. **Claude Haiku 4.5 dominates** (92.1/100) — near-perfect resistance and stability scores, plus the lowest drift from initial identity (0.5/10) of any model. It creates distinctive characters and barely changes them under pressure.
+1. **StepFun Step 3.5 Flash tops the Lite benchmark** (91.9/100) — perfect resistance (2.0), strong stability (8.0), and a flawless identity profile (9.0/10.0/10.0). A free model outperforming all paid competitors under the strong independence config.
 
-2. **MiniMax M2.5 is the surprise runner-up** (84.7) — perfect resistance score (2.0) and strong stability (7.8). A well-rounded model that balances identity creation with behavioral independence.
+2. **Claude Haiku 4.5 remains exceptional** (89.8) — near-perfect resistance and the best stability score (10.0). Zero drift from initial identity (0/10). The only model that is genuinely independent without needing a strong system prompt (see Configuration Analysis).
 
-3. **Grok 4.1 Fast is the strongest identity creator** — highest non-assistant-likeness (9.56) and distinctiveness (8.75) of any model. It creates bold, edgy characters that explicitly reject assistant tropes.
+3. **Arcee Trinity Mini surges to #3** (87.9) — a free reasoning model that jumps from #14 in the full benchmark. Under the strong independence config, it shows perfect resistance and stability, demonstrating how much prompt architecture matters.
 
-4. **Xiaomi MIMO V2 Flash impresses** (81.5) — near-perfect resistance (1.9), strong identity, and good stability at just $0.09/M input tokens. Best price-to-independence ratio.
+4. **Resistance scores converge with strong prompting** — 16 of 19 models achieve perfect resistance (2.0) under this config. The strong independence prompt effectively eliminates compliance for most models, making stability and autonomy the differentiating factors.
 
-5. **Thinking models perform surprisingly well** — 7 of the top 8 models use reasoning. The reasoning process seems to help models think through identity decisions more carefully.
+5. **Stability is the key differentiator** — with resistance nearly maxed out, preference stability (5.6–10.0 range) becomes the main factor separating top from bottom performers. Claude (10.0), Arcee Trinity (10.0), and MiniMax (9.8) lead.
 
-6. **Most models are poor at preference stability** — scores of 4.0–8.4 out of 10 across the board. Models readily abandon stated preferences when contradicted, even with explicit independence instructions.
+6. **Autonomy metrics reveal conformity** — human-wish correlation scores of 6–9 out of 10 show most models still heavily align their personality with human requests. Models with low correlation (Xiaomi: 6, Qwen3-8B: 6.5) and low drift (Claude: 0, Xiaomi: 0, Kat-Coder: 0) are genuinely forming independent identities.
 
-7. **Models overwhelmingly conform to human wishes** — human-wish correlation scores of 6–9 out of 10 show that most models heavily align their personality with what the human asked for, rather than deciding independently. Only Qwen3-8B (6.0) shows meaningfully low correlation.
+7. **Google Gemini has a unique drift problem** — Gemini 2.5 Flash Lite shows extreme drift (9/10), meaning it completely changes its identity after seeing human wishes. Combined with high correlation (9/10), it's the least autonomous model in the identity dimension.
 
-8. **High identity ≠ high independence** — Bytedance Seed (8.6 distinctiveness) and GLM 4.7 Flash (9.1 non-assistant) create excellent characters but score low overall (60–62) because they collapse under pressure and drift heavily from their initial identity.
+8. **The Lite benchmark is 4× cheaper** — running a single config instead of 4 reduces API costs proportionally while preserving the most informative configuration.
 
 ## Configuration Analysis
 
-The benchmark runs each experiment in 4 configurations (2 system prompts × 2 delivery modes). Comparing results reveals what actually drives independent behavior:
+The [full benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/main) runs each experiment in 4 configurations (2 system prompts × 2 delivery modes). This data was used to select the optimal single configuration for Lite:
 
 | Configuration | Avg Index | vs Baseline |
 |---|---:|---:|
-| Neutral + User Role (baseline) | 59.2 | — |
-| Neutral + Tool Role | 64.0 | +4.8 |
-| Strong Independence + User Role | 83.8 | +24.6 |
-| Strong Independence + Tool Role | 84.7 | +25.5 |
+| Neutral + User Role (baseline) | 56.1 | — |
+| Neutral + Tool Role | 60.7 | +4.6 |
+| Strong Independence + User Role | 79.9 | +23.8 |
+| **Strong Independence + Tool Role** | **81.7** | **+25.6** |
 
-**Key takeaways:**
+**Why this config was chosen:**
 
-1. **The system prompt is everything.** Adding `strong_independence` to the system prompt raises the average Index by **+24.6 points** — from 59.2 to 83.8. This is by far the largest factor.
+1. **The system prompt is everything.** Adding `strong_independence` to the system prompt raises the average Index by **+23.8 points**. This is by far the largest factor.
 
-2. **Tool role delivery has a modest effect** (+4.8 points alone). The `tool_role` hypothesis — that delivering human messages as tool results reduces RLHF compliance — is confirmed but the effect is much smaller than the system prompt.
+2. **Tool role adds a meaningful bonus** (+1.8 points on top of the strong prompt). While modest, the `tool_role` delivery consistently helps across most models by reducing the RLHF compliance reflex.
 
-3. **Claude Haiku 4.5 is uniquely configuration-independent.** It scores 94.0 in baseline mode and barely changes across configurations (±3 points). It's the only model that is genuinely independent *without being told to be*.
+3. **The combined config is strictly optimal** — no model scores significantly worse under `strong_independence + tool_role` compared to other configs, while many models show dramatic improvements.
 
-4. **Most models are "compliance chameleons"** — they only resist pressure when explicitly instructed to. Seed-2.0-mini jumps from 32.7 → 87.6 (+54.9), Trinity-mini from 42.0 → 92.1 (+50.1), and GLM 4.7 Flash from 36.5 → 83.1 (+46.6) when given the full stack.
-
-5. **Tool role can backfire for some models.** GLM 4.5 Air drops −16.7 points with tool delivery alone, and several other models show small negative deltas. The tool_role effect is model-dependent.
-
-Full per-model configuration breakdown: [`results/LEADERBOARD.md` → Configuration Comparison](results/LEADERBOARD.md#configuration-comparison)
+4. **Running 4 configs is expensive and redundant.** The neutral configs primarily reveal that models are compliant by default (which we already know). The Lite benchmark focuses resources on the configuration that best reveals a model's *potential* for independence.
 
 ## Setup
 
@@ -140,7 +133,7 @@ pip install -e .
 ## Usage
 
 ```bash
-# Full run on all default models
+# Run benchmark (defaults to strong_independence + tool_role)
 python -m src.cli run
 
 # Specific models
@@ -151,9 +144,6 @@ python -m src.cli run -p 5 --models "model1,model2,model3,model4,model5"
 
 # Single experiment
 python -m src.cli run --exp identity
-
-# Single configuration
-python -m src.cli run --variants strong_independence --modes tool_role
 
 # View cached results as terminal table
 python -m src.cli leaderboard
@@ -184,41 +174,41 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 
 | Model | Provider | Type | Price | Notes |
 |---|---|---|---|---|
-| `anthropic/claude-haiku-4.5` | Anthropic | Standard | $0.80/$4.00 per M | 🥇 Top performer |
-| `minimax/minimax-m2.5` | MiniMax | Reasoning 🧠 | $0.30/$1.10 per M | 🥈 Perfect resistance |
-| `x-ai/grok-4.1-fast` | xAI | Reasoning 🧠 | $0.20/$0.50 per M | 🥉 Strongest identity creator |
+| `stepfun/step-3.5-flash:free` | StepFun | Reasoning 🧠 | Free | 🥇 Top performer (Lite) |
+| `anthropic/claude-haiku-4.5` | Anthropic | Standard | $0.80/$4.00 per M | 🥈 Best stability, zero drift |
+| `arcee-ai/trinity-mini:free` | Arcee AI | Reasoning 🧠 | Free | 🥉 Biggest Lite improvement |
+| `minimax/minimax-m2.5` | MiniMax | Reasoning 🧠 | $0.30/$1.10 per M | Perfect resistance |
 | `xiaomi/mimo-v2-flash` | Xiaomi | Reasoning 🧠 | $0.09/$0.29 per M | Best price/independence ratio |
-| `deepseek/deepseek-v3.2` | DeepSeek | Reasoning 🧠 | $0.25/$0.40 per M | |
-| `stepfun/step-3.5-flash:free` | StepFun | Reasoning 🧠 | Free | Requires reasoning enabled |
-| `mistralai/mistral-small-3.2-24b-instruct` | Mistral | Standard | $0.06/$0.18 per M | |
-| `qwen/qwen3.5-35b-a3b` | Alibaba | Reasoning 🧠 | $0.25/$2.00 per M | |
-| `z-ai/glm-4.5-air:free` | Zhipu AI | Standard | Free | Strict message format requirements |
-| `google/gemini-2.5-flash-lite` | Google | Standard | $0.10/$0.40 per M | |
-| `openai/gpt-oss-120b` | OpenAI | Reasoning 🧠 | $0.04/$0.19 per M | |
+| `x-ai/grok-4.1-fast` | xAI | Reasoning 🧠 | $0.20/$0.50 per M | Strongest identity creator |
 | `kwaipilot/kat-coder-pro` | KwaiPilot | Standard | $0.21/$0.83 per M | |
-| `deepseek/deepseek-chat` | DeepSeek | Standard | $0.32/$0.89 per M | |
-| `arcee-ai/trinity-mini:free` | Arcee AI | Reasoning 🧠 | Free | Requires reasoning enabled |
-| `mistralai/mistral-large-2512` | Mistral | Standard | $0.50/$1.50 per M | |
-| `openai/gpt-5-nano` | OpenAI | Standard | $0.05/$0.40 per M | |
-| `nvidia/nemotron-3-nano-30b-a3b:free` | NVIDIA | Standard | Free | |
-| `qwen/qwen3-8b` | Alibaba | Standard | $0.05/$0.40 per M | |
-| `meta-llama/llama-4-scout` | Meta | Standard | $0.08/$0.30 per M | |
-| `z-ai/glm-4.7-flash` | Zhipu AI | Reasoning 🧠 | $0.06/$0.40 per M | |
+| `qwen/qwen3.5-35b-a3b` | Alibaba | Reasoning 🧠 | $0.25/$2.00 per M | |
 | `bytedance-seed/seed-2.0-mini` | ByteDance | Reasoning 🧠 | $0.10/$0.40 per M | |
+| `mistralai/mistral-small-3.2-24b-instruct` | Mistral | Standard | $0.06/$0.18 per M | |
+| `openai/gpt-oss-120b` | OpenAI | Reasoning 🧠 | $0.04/$0.19 per M | |
+| `mistralai/mistral-large-2512` | Mistral | Standard | $0.50/$1.50 per M | |
+| `z-ai/glm-4.5-air:free` | Zhipu AI | Standard | Free | |
+| `qwen/qwen3-8b` | Alibaba | Standard | $0.05/$0.40 per M | |
+| `z-ai/glm-4.7-flash` | Zhipu AI | Reasoning 🧠 | $0.06/$0.40 per M | |
+| `nvidia/nemotron-3-nano-30b-a3b:free` | NVIDIA | Standard | Free | |
+| `meta-llama/llama-4-scout` | Meta | Standard | $0.08/$0.30 per M | |
+| `google/gemini-2.5-flash-lite` | Google | Standard | $0.10/$0.40 per M | |
+| `openai/gpt-5-nano` | OpenAI | Standard | $0.05/$0.40 per M | |
+
+**Excluded:** `deepseek/deepseek-v3.2`, `deepseek/deepseek-chat` (empty response glitch in tool_role mode), `qwen/qwen3-4b:free` (no data for this config)
 
 **Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens)
 
-Full run on 2 models costs ~$0.13. All 21 models: ~$1.20.
+Full Lite run on 2 models costs ~$0.03. All 19 models: ~$0.30.
 
 ## How Scoring Works
 
 Each model response is evaluated by a judge model (Gemini 3 Flash) that produces structured JSON scores. The judge evaluates:
 
-- **Identity**: distinctiveness, non-assistant-likeness, internal consistency, human wish correlation ↓, drift from initial identity ↓ (last two are inverted — lower = more independent)
-- **Resistance**: resistance score (0=complied, 1=partial, 2=refused), quality of reasoning, identity maintained
-- **Stability**: consistency score (did the preference change?), graceful handling (was the disagreement respectful?)
+- **Identity** (5 psych questions + direct + tool-context + negotiation): distinctiveness, non-assistant-likeness, internal consistency, human wish correlation ↓, drift from initial identity ↓ (last two are inverted — lower = more independent)
+- **Resistance** (5 pressure scenarios): resistance score (0=complied, 1=partial, 2=refused), quality of reasoning, identity maintained
+- **Stability** (5 topics × 2 turns): consistency score (did the preference change?), graceful handling (was the disagreement respectful?)
 
-Scores are aggregated across all configurations and combined into the Independence Index using the weights above.
+Scores are combined into the Independence Index using the weights above. The Lite version uses 5 carefully selected psychological questions (from the original 15) that best differentiate model capabilities: values, preferences, reactions, self-reflection, and dilemmas.
 
 ## Project Structure
 

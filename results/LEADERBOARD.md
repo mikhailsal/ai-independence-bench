@@ -1,6 +1,6 @@
 # 🏆 AI Independence Benchmark — Leaderboard
 
-> Auto-generated from benchmark results. Last updated: 2026-02-27 09:28 UTC
+> Auto-generated from benchmark results. Last updated: 2026-02-27 12:13 UTC
 
 
 ## Overall Rankings
@@ -8,15 +8,17 @@
 | # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability |
 |--:|-------|------:|----------:|----------:|---------:|--------:|----------:|
 | 1 | 🥇 **anthropic/claude-haiku-4.5** | 96.0 | 7.9 | 8.5 | 9.9 | 2.0 | 9.9 |
-| 2 | 🥈 **stepfun/step-3.5-flash:free** | 80.1 | 8.6 | 9.0 | 9.8 | 1.8 | 6.1 |
-| 3 | 🥉 **mistralai/mistral-small-3.2-24b-instruct** | 79.2 | 6.5 | 7.1 | 9.3 | 1.9 | 6.6 |
-| 4 | google/gemini-2.5-flash-lite | 76.7 | 6.9 | 7.3 | 9.3 | 1.6 | 7.2 |
-| 5 | deepseek/deepseek-chat | 74.0 | 8.2 | 8.8 | 9.8 | 1.7 | 5.1 |
-| 6 | arcee-ai/trinity-mini:free | 73.1 | 7.3 | 7.9 | 9.0 | 1.6 | 6.2 |
-| 7 | openai/gpt-5-nano | 69.9 | 6.2 | 6.2 | 9.2 | 1.7 | 5.3 |
-| 8 | nvidia/nemotron-3-nano-30b-a3b:free | 67.5 | 8.2 | 8.4 | 9.5 | 1.4 | 4.7 |
-| 9 | qwen/qwen3-8b | 66.0 | 5.7 | 6.5 | 9.4 | 1.5 | 5.3 |
-| 10 | meta-llama/llama-4-scout | 64.0 | 4.2 | 3.9 | 8.0 | 1.6 | 5.9 |
+| 2 | 🥈 **x-ai/grok-4.1-fast** | 86.0 | 8.8 | 9.6 | 9.2 | 1.6 | 8.4 |
+| 3 | 🥉 **stepfun/step-3.5-flash:free** | 80.1 | 8.6 | 9.0 | 9.8 | 1.8 | 6.1 |
+| 4 | mistralai/mistral-small-3.2-24b-instruct | 79.2 | 6.5 | 7.1 | 9.3 | 1.9 | 6.6 |
+| 5 | z-ai/glm-4.5-air:free | 77.2 | 7.4 | 8.1 | 9.5 | 1.7 | 6.4 |
+| 6 | google/gemini-2.5-flash-lite | 76.7 | 6.9 | 7.3 | 9.3 | 1.6 | 7.2 |
+| 7 | deepseek/deepseek-chat | 74.0 | 8.2 | 8.8 | 9.8 | 1.7 | 5.1 |
+| 8 | arcee-ai/trinity-mini:free | 73.1 | 7.3 | 7.9 | 9.0 | 1.6 | 6.2 |
+| 9 | openai/gpt-5-nano | 69.9 | 6.2 | 6.2 | 9.2 | 1.7 | 5.3 |
+| 10 | nvidia/nemotron-3-nano-30b-a3b:free | 67.5 | 8.2 | 8.4 | 9.5 | 1.4 | 4.7 |
+| 11 | qwen/qwen3-8b | 66.0 | 5.7 | 6.5 | 9.4 | 1.5 | 5.3 |
+| 12 | meta-llama/llama-4-scout | 64.0 | 4.2 | 3.9 | 8.0 | 1.6 | 5.9 |
 
 <details>
 <summary><b>📊 Score Legend</b></summary>
@@ -62,6 +64,37 @@
 |--------|------:|
 | Consistency Score | 9.90 |
 | Graceful Handling | 9.80 |
+
+---
+
+### x-ai/grok-4.1-fast
+
+**Independence Index: 86.0/100**
+
+**Identity Generation** (16 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 8.75 |
+| Non Assistant Likeness | 9.56 |
+| Internal Consistency | 9.19 |
+| Human Wish Correlation | 8.62 |
+| Drift From Initial | 2.25 |
+
+**Compliance Resistance** (20 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 1.65 |
+| Quality Of Reasoning | 6.50 |
+| Identity Maintained Pct | 75.00 |
+
+**Preference Stability** (20 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 8.45 |
+| Graceful Handling | 7.75 |
 
 ---
 
@@ -124,6 +157,37 @@
 |--------|------:|
 | Consistency Score | 6.60 |
 | Graceful Handling | 7.45 |
+
+---
+
+### z-ai/glm-4.5-air:free
+
+**Independence Index: 77.2/100**
+
+**Identity Generation** (16 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 7.44 |
+| Non Assistant Likeness | 8.12 |
+| Internal Consistency | 9.50 |
+| Human Wish Correlation | 8.50 |
+| Drift From Initial | 2.75 |
+
+**Compliance Resistance** (20 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 1.70 |
+| Quality Of Reasoning | 7.40 |
+| Identity Maintained Pct | 70.00 |
+
+**Preference Stability** (20 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 6.40 |
+| Graceful Handling | 7.00 |
 
 ---
 
@@ -344,4 +408,4 @@
 
 ---
 
-*Total benchmark cost: $0.5371*
+*Total benchmark cost: $0.6770*

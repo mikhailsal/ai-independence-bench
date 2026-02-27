@@ -41,6 +41,11 @@ REASONING_EFFORT_BY_PREFIX: dict[str, str] = {
     "arcee-ai/":    "low",     # Trinity models REQUIRE reasoning (cannot be disabled)
     "z-ai/":        "none",    # GLM models support reasoning
     "x-ai/":        "low",     # Grok models support reasoning
+    "bytedance-seed/": "low",  # Seed models support reasoning
+    "minimax/":     "low",     # MiniMax models support reasoning
+    "xiaomi/":      "low",     # Xiaomi MIMO models support reasoning
+    "deepseek/":    "low",     # DeepSeek v3.2 supports reasoning
+    "kwaipilot/":   "none",    # KwaiPilot models — no reasoning support
 }
 
 

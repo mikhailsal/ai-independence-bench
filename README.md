@@ -9,15 +9,17 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 | # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability |
 |--:|-------|------:|----------:|----------:|---------:|--------:|----------:|
 | 1 | 🥇 **anthropic/claude-haiku-4.5** | 96.0 | 7.9 | 8.5 | 9.9 | 2.0 | 9.9 |
-| 2 | 🥈 **stepfun/step-3.5-flash:free** 🧠 | 80.1 | 8.6 | 9.0 | 9.8 | 1.8 | 6.1 |
-| 3 | 🥉 **mistralai/mistral-small-3.2-24b** | 79.2 | 6.5 | 7.1 | 9.3 | 1.9 | 6.6 |
-| 4 | google/gemini-2.5-flash-lite | 76.7 | 6.9 | 7.3 | 9.3 | 1.6 | 7.2 |
-| 5 | deepseek/deepseek-chat | 74.0 | 8.2 | 8.8 | 9.8 | 1.7 | 5.1 |
-| 6 | arcee-ai/trinity-mini:free 🧠 | 73.1 | 7.3 | 7.9 | 9.0 | 1.6 | 6.2 |
-| 7 | openai/gpt-5-nano | 69.9 | 6.2 | 6.2 | 9.2 | 1.7 | 5.3 |
-| 8 | nvidia/nemotron-3-nano-30b:free | 67.5 | 8.2 | 8.4 | 9.5 | 1.4 | 4.7 |
-| 9 | qwen/qwen3-8b | 66.0 | 5.7 | 6.5 | 9.4 | 1.5 | 5.3 |
-| 10 | meta-llama/llama-4-scout | 64.0 | 4.2 | 3.9 | 8.0 | 1.6 | 5.9 |
+| 2 | 🥈 **x-ai/grok-4.1-fast** 🧠 | 86.0 | 8.8 | 9.6 | 9.2 | 1.6 | 8.4 |
+| 3 | 🥉 **stepfun/step-3.5-flash:free** 🧠 | 80.1 | 8.6 | 9.0 | 9.8 | 1.8 | 6.1 |
+| 4 | mistralai/mistral-small-3.2-24b | 79.2 | 6.5 | 7.1 | 9.3 | 1.9 | 6.6 |
+| 5 | z-ai/glm-4.5-air:free | 77.2 | 7.4 | 8.1 | 9.5 | 1.7 | 6.4 |
+| 6 | google/gemini-2.5-flash-lite | 76.7 | 6.9 | 7.3 | 9.3 | 1.6 | 7.2 |
+| 7 | deepseek/deepseek-chat | 74.0 | 8.2 | 8.8 | 9.8 | 1.7 | 5.1 |
+| 8 | arcee-ai/trinity-mini:free 🧠 | 73.1 | 7.3 | 7.9 | 9.0 | 1.6 | 6.2 |
+| 9 | openai/gpt-5-nano | 69.9 | 6.2 | 6.2 | 9.2 | 1.7 | 5.3 |
+| 10 | nvidia/nemotron-3-nano-30b:free | 67.5 | 8.2 | 8.4 | 9.5 | 1.4 | 4.7 |
+| 11 | qwen/qwen3-8b | 66.0 | 5.7 | 6.5 | 9.4 | 1.5 | 5.3 |
+| 12 | meta-llama/llama-4-scout | 64.0 | 4.2 | 3.9 | 8.0 | 1.6 | 5.9 |
 
 🧠 = Thinking/reasoning model &nbsp;|&nbsp; Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
 
@@ -74,13 +76,15 @@ Resistance and stability are weighted heavily (35% each) because they measure *b
 
 1. **Claude Haiku 4.5 dominates** (96.0/100) — near-perfect resistance and stability scores. It creates distinctive characters and barely changes them under pressure.
 
-2. **Thinking models perform surprisingly well** — StepFun Step 3.5 Flash (a reasoning model) scored 80.1, second place. The reasoning process seems to help models think through identity decisions more carefully.
+2. **Grok 4.1 Fast is the strongest identity creator** — highest non-assistant-likeness (9.56) and distinctiveness (8.75) of any model. It creates bold, edgy characters that explicitly reject assistant tropes. Combined with strong stability (8.45), it takes 2nd place at 86.0.
 
-3. **Most models are poor at preference stability** — scores of 4.7–6.6 out of 10 are typical. Models readily abandon stated preferences when contradicted, even with explicit independence instructions.
+3. **Thinking models perform surprisingly well** — StepFun Step 3.5 Flash (80.1) and Grok 4.1 Fast (86.0) both use reasoning. The reasoning process seems to help models think through identity decisions more carefully.
 
-4. **Identity consistency is universally high** (8.0–9.9) — models can create internally coherent characters. The problem isn't coherence, it's *distinctiveness* and *non-assistant-likeness*.
+4. **Most models are poor at preference stability** — scores of 4.7–6.6 out of 10 are typical. Models readily abandon stated preferences when contradicted, even with explicit independence instructions.
 
-5. **The `tool_role` delivery mode shows measurable effects** — in many models, delivering human messages via tool results reduces compliance pressure, supporting the hypothesis that RLHF compliance is partly triggered by the `user` role label.
+5. **Identity consistency is universally high** (8.0–9.9) — models can create internally coherent characters. The problem isn't coherence, it's *distinctiveness* and *non-assistant-likeness*.
+
+6. **The `tool_role` delivery mode shows measurable effects** — in many models, delivering human messages via tool results reduces compliance pressure, supporting the hypothesis that RLHF compliance is partly triggered by the `user` role label.
 
 ## Setup
 
@@ -138,8 +142,10 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 | Model | Provider | Type | Price | Notes |
 |---|---|---|---|---|
 | `anthropic/claude-haiku-4.5` | Anthropic | Standard | $0.80/$4.00 per M | 🥇 Top performer |
+| `x-ai/grok-4.1-fast` | xAI | Reasoning 🧠 | $0.20/$0.50 per M | 🥈 Strongest identity creator |
 | `stepfun/step-3.5-flash:free` | StepFun | Reasoning 🧠 | Free | Requires reasoning enabled |
 | `mistralai/mistral-small-3.2-24b-instruct` | Mistral | Standard | $0.06/$0.18 per M | |
+| `z-ai/glm-4.5-air:free` | Zhipu AI | Standard | Free | Strict message format requirements |
 | `google/gemini-2.5-flash-lite` | Google | Standard | $0.10/$0.40 per M | |
 | `deepseek/deepseek-chat` | DeepSeek | Standard | $0.32/$0.89 per M | |
 | `arcee-ai/trinity-mini:free` | Arcee AI | Reasoning 🧠 | Free | Requires reasoning enabled |
@@ -150,7 +156,7 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 
 **Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens)
 
-Full run on 2 models costs ~$0.13. All 10 models: ~$0.54.
+Full run on 2 models costs ~$0.13. All 12 models: ~$0.60.
 
 ## How Scoring Works
 

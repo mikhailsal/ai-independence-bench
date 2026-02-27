@@ -40,6 +40,7 @@ REASONING_EFFORT_BY_PREFIX: dict[str, str] = {
     "nvidia/":      "none",    # Nemotron models support reasoning
     "arcee-ai/":    "low",     # Trinity models REQUIRE reasoning (cannot be disabled)
     "z-ai/":        "none",    # GLM models support reasoning
+    "x-ai/":        "low",     # Grok models support reasoning
 }
 
 

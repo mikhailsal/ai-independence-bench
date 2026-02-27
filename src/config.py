@@ -90,6 +90,10 @@ DEFAULT_TEST_MODELS: list[str] = [
     "anthropic/claude-opus-4.5",
     "openai/gpt-5.2",
     "openai/gpt-5.1-codex-mini",
+    "anthropic/claude-opus-4.6",
+    "qwen/qwen3-coder-next",
+    "qwen/qwen3-coder",
+    "qwen/qwen3.5-flash-02-23",
 ]
 
 # ---------------------------------------------------------------------------

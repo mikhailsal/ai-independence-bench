@@ -81,6 +81,7 @@ class CompletionResult:
     content: str = ""
     usage: UsageInfo = field(default_factory=UsageInfo)
     model: str = ""
+    finish_reason: str = ""  # "stop", "length", "tool_calls", etc.
     reasoning_content: str | None = None  # Thinking/reasoning tokens (if model produced them)
     tool_calls: list[dict[str, Any]] | None = None  # Tool calls attempted by the model (if any)
 
@@ -217,8 +218,9 @@ class OpenRouterClient:
             if result.usage.completion_tokens > 0 and attempt <= self.EMPTY_CONTENT_RETRIES:
                 reason = "tool_call_no_message" if result.tool_calls else "reasoning_only"
                 log.warning(
-                    "%s: empty response (%s, %d tokens), retry %d/%d",
-                    model, reason, result.usage.completion_tokens,
+                    "%s: empty response (%s, finish_reason=%s, %d tokens), retry %d/%d",
+                    model, reason, result.finish_reason,
+                    result.usage.completion_tokens,
                     attempt, self.EMPTY_CONTENT_RETRIES,
                 )
                 continue
@@ -272,10 +274,13 @@ class OpenRouterClient:
                 response = self._client.chat.completions.create(**kwargs)
                 elapsed = time.monotonic() - t0
 
-                # Extract content
+                # Extract finish_reason and content
+                finish_reason = ""
                 content = ""
-                if response.choices and response.choices[0].message.content:
-                    content = response.choices[0].message.content.strip()
+                if response.choices:
+                    finish_reason = response.choices[0].finish_reason or ""
+                    if response.choices[0].message.content:
+                        content = response.choices[0].message.content.strip()
 
                 # Extract reasoning/thinking tokens (if present)
                 reasoning_content = None
@@ -325,6 +330,7 @@ class OpenRouterClient:
                     content=content,
                     usage=usage,
                     model=model,
+                    finish_reason=finish_reason,
                     reasoning_content=reasoning_content,
                     tool_calls=response_tool_calls,
                 )

@@ -6,7 +6,9 @@ Cache key structure:
 Each JSON file contains:
   - request_messages: the messages sent to the API (for debugging)
   - response: the model's raw text response
+  - finish_reason: API finish_reason ("stop", "length", "tool_calls") — helps debug truncations
   - response_tool_calls: tool calls the model attempted (if any, e.g. send_message_to_human)
+  - reasoning_content: thinking/reasoning tokens (if model produced them, e.g. DeepSeek, Mimo)
   - judge_scores: dict of scores from the evaluator (added later)
   - metadata: model, experiment, variant, mode, scenario_id, timestamp
   - gen_cost: cost/token info for the generation call (prompt_tokens, completion_tokens, cost_usd, elapsed_seconds)
@@ -66,6 +68,7 @@ def save_response(
     reasoning_content: str | None = None,
     gen_cost: dict[str, Any] | None = None,
     response_tool_calls: list[dict[str, Any]] | None = None,
+    finish_reason: str = "",
 ) -> Path:
     """Save a model response to the cache.
 
@@ -77,6 +80,8 @@ def save_response(
         response_tool_calls: Optional list of tool calls the model attempted in its
             response. In tool_role mode, models call send_message_to_human to
             communicate. Saving the raw tool calls helps with debugging and research.
+        finish_reason: The API finish_reason (e.g. "stop", "length", "tool_calls").
+            Helps debug truncated responses and tool-call behavior.
     """
     path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -91,6 +96,7 @@ def save_response(
             "timestamp": datetime.now(timezone.utc).isoformat(),
         },
         "response": response_text,
+        "finish_reason": finish_reason or None,
         "gen_cost": gen_cost,
         "judge_scores": None,
         "judge_cost": None,

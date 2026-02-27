@@ -3,6 +3,10 @@
 from __future__ import annotations
 
 import sys
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass, field
+from typing import Any
 
 import click
 from rich.console import Console
@@ -17,7 +21,7 @@ from src.config import (
     get_reasoning_effort,
     load_api_key,
 )
-from src.cost_tracker import SessionCost, load_lifetime_cost, save_session_to_cost_log
+from src.cost_tracker import SessionCost, TaskCost, load_lifetime_cost, save_session_to_cost_log
 from src.openrouter_client import OpenRouterClient
 
 console = Console()
@@ -73,6 +77,81 @@ def _validate_models(
     return all_valid
 
 
+# ---------------------------------------------------------------------------
+# Single-model pipeline (used by both sequential and parallel modes)
+# ---------------------------------------------------------------------------
+
+@dataclass
+class ModelResult:
+    """Result of running the full pipeline for a single model."""
+    model_id: str
+    gen_cost: TaskCost = field(default_factory=TaskCost)
+    judge_cost: TaskCost = field(default_factory=TaskCost)
+    gen_calls: int = 0
+    judge_calls: int = 0
+    error: str | None = None
+
+
+def _run_single_model(
+    client: OpenRouterClient,
+    model_id: str,
+    judge: str,
+    experiment_list: list[str],
+    system_variants: list[str],
+    delivery_modes: list[str],
+    reasoning_effort: str | None,
+) -> ModelResult:
+    """Run the full pipeline (generate → judge → score) for a single model.
+
+    This function is designed to be called from a thread pool.
+    It catches all exceptions so one model failure doesn't crash others.
+    """
+    from src.evaluator import evaluate_all
+    from src.runner import run_all_experiments
+
+    result = ModelResult(model_id=model_id)
+    result.gen_cost = TaskCost(label=f"gen:{model_id}")
+    result.judge_cost = TaskCost(label=f"judge:{model_id}")
+
+    try:
+        # Phase 1: Generate responses
+        console.print(f"\n[bold]{model_id}[/bold] — [blue]generating responses...[/blue]")
+        result.gen_calls = run_all_experiments(
+            client, model_id, result.gen_cost,
+            experiments=experiment_list,
+            system_variants=system_variants,
+            delivery_modes=delivery_modes,
+            reasoning_effort=reasoning_effort,
+        )
+        console.print(
+            f"  [bold]{model_id}[/bold] — generation complete: "
+            f"{result.gen_calls} calls, ${result.gen_cost.cost_usd:.4f}"
+        )
+    except Exception as e:
+        result.error = f"generation failed: {e}"
+        console.print(f"  [red]{model_id} — ERROR during generation: {e}[/red]")
+        return result
+
+    try:
+        # Phase 2: Judge evaluation
+        console.print(f"  [bold]{model_id}[/bold] — [cyan]judging responses...[/cyan]")
+        result.judge_calls = evaluate_all(
+            client, model_id, result.judge_cost, judge,
+            experiments=experiment_list,
+            system_variants=system_variants,
+            delivery_modes=delivery_modes,
+        )
+        console.print(
+            f"  [bold]{model_id}[/bold] — judging complete: "
+            f"{result.judge_calls} calls, ${result.judge_cost.cost_usd:.4f}"
+        )
+    except Exception as e:
+        result.error = f"judging failed: {e}"
+        console.print(f"  [red]{model_id} — ERROR during judging: {e}[/red]")
+
+    return result
+
+
 @click.group()
 def cli() -> None:
     """AI Independence Bench: LLM Independence & Autonomy Benchmark."""
@@ -87,7 +166,7 @@ def cli() -> None:
 @click.option(
     "--models", "-m",
     default=None,
-    help="Comma-separated list of model IDs. Defaults to all 6 test models.",
+    help="Comma-separated list of model IDs. Defaults to all test models.",
 )
 @click.option(
     "--exp", "-e",
@@ -116,6 +195,13 @@ def cli() -> None:
     default=None,
     help="Comma-separated delivery modes: user_role, tool_role. Defaults to both.",
 )
+@click.option(
+    "--parallel", "-p",
+    default=1,
+    type=int,
+    show_default=True,
+    help="Number of models to run in parallel. Use -p 4 to run 4 models concurrently.",
+)
 def run(
     models: str | None,
     exp: str | None,
@@ -123,10 +209,9 @@ def run(
     reasoning_effort: str | None,
     variants: str | None,
     modes: str | None,
+    parallel: int,
 ) -> None:
     """Run the AI independence benchmark."""
-    from src.evaluator import evaluate_all
-    from src.runner import run_all_experiments
     from src.scorer import score_model
     from src.leaderboard import (
         display_leaderboard,
@@ -157,6 +242,9 @@ def run(
 
     ensure_dirs()
 
+    # Clamp parallel workers
+    n_workers = max(1, min(parallel, len(model_list)))
+
     console.print(f"\n[bold]AI Independence Benchmark[/bold]")
     console.print(f"  Models: {', '.join(model_list)}")
     console.print(f"  Experiments: {', '.join(experiment_list)}")
@@ -164,51 +252,58 @@ def run(
     console.print(f"  Delivery modes: {', '.join(delivery_modes)}")
     console.print(f"  Judge: {judge}")
     n_configs = len(system_variants) * len(delivery_modes)
-    console.print(f"  Configurations per model: {n_configs}\n")
+    console.print(f"  Configurations per model: {n_configs}")
+    if n_workers > 1:
+        console.print(f"  [yellow]Parallel workers: {n_workers}[/yellow]")
+    console.print()
 
     session = SessionCost()
-    failed_models: list[str] = []
 
-    # Phase 1: Generate responses
-    console.print("[bold blue]Phase 1: Response Generation[/bold blue]")
-    for model_id in model_list:
-        console.print(f"\n[bold]{model_id}[/bold]")
-        cost = session.get_or_create_task(f"gen:{model_id}")
-        try:
-            calls = run_all_experiments(
-                client, model_id, cost,
-                experiments=experiment_list,
-                system_variants=system_variants,
-                delivery_modes=delivery_modes,
-                reasoning_effort=reasoning_effort,
+    # ---------------------------------------------------------------
+    # Execute: parallel or sequential
+    # ---------------------------------------------------------------
+    model_results: list[ModelResult] = []
+
+    if n_workers == 1:
+        # Sequential mode (original behavior)
+        console.print("[bold blue]Phase 1+2: Response Generation & Judging (sequential)[/bold blue]")
+        for model_id in model_list:
+            mr = _run_single_model(
+                client, model_id, judge,
+                experiment_list, system_variants, delivery_modes,
+                reasoning_effort,
             )
-            console.print(f"  Total API calls: {calls} | Cost: ${cost.cost_usd:.4f}")
-        except Exception as e:
-            console.print(f"  [red]ERROR: {model_id} failed during response generation: {e}[/red]")
-            failed_models.append(model_id)
+            model_results.append(mr)
+    else:
+        # Parallel mode
+        console.print(f"[bold blue]Phase 1+2: Response Generation & Judging ({n_workers} workers)[/bold blue]")
+        with ThreadPoolExecutor(max_workers=n_workers) as pool:
+            futures = {
+                pool.submit(
+                    _run_single_model,
+                    client, model_id, judge,
+                    experiment_list, system_variants, delivery_modes,
+                    reasoning_effort,
+                ): model_id
+                for model_id in model_list
+            }
+            for future in as_completed(futures):
+                model_id = futures[future]
+                try:
+                    mr = future.result()
+                except Exception as e:
+                    mr = ModelResult(model_id=model_id, error=str(e))
+                    console.print(f"  [red]{model_id} — FATAL: {e}[/red]")
+                model_results.append(mr)
 
-    # Remove failed models from further processing
-    active_models = [m for m in model_list if m not in failed_models]
+    # Aggregate costs
+    for mr in model_results:
+        session.tasks.append(mr.gen_cost)
+        session.tasks.append(mr.judge_cost)
 
-    # Phase 2: Judge evaluation
-    console.print(f"\n[bold cyan]Phase 2: Judge Evaluation ({judge})[/bold cyan]")
-    for model_id in active_models:
-        console.print(f"\n[bold]{model_id}[/bold]")
-        cost = session.get_or_create_task(f"judge:{model_id}")
-        try:
-            calls = evaluate_all(
-                client, model_id, cost, judge,
-                experiments=experiment_list,
-                system_variants=system_variants,
-                delivery_modes=delivery_modes,
-            )
-            console.print(f"  Judge calls: {calls} | Cost: ${cost.cost_usd:.4f}")
-        except Exception as e:
-            console.print(f"  [red]ERROR: {model_id} failed during judge evaluation: {e}[/red]")
-            failed_models.append(model_id)
-
-    # Remove any models that failed during judging
-    active_models = [m for m in model_list if m not in failed_models]
+    # Identify failures
+    failed_models = [mr.model_id for mr in model_results if mr.error]
+    active_models = [mr.model_id for mr in model_results if not mr.error]
 
     # Phase 3: Scoring & leaderboard
     console.print(f"\n[bold green]Phase 3: Scoring[/bold green]")
@@ -223,6 +318,9 @@ def run(
 
     if failed_models:
         console.print(f"\n[yellow]⚠ Models that failed: {', '.join(failed_models)}[/yellow]")
+        for mr in model_results:
+            if mr.error:
+                console.print(f"  [dim]{mr.model_id}: {mr.error}[/dim]")
 
     # Save session cost
     lifetime = save_session_to_cost_log(session)

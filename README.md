@@ -83,21 +83,21 @@ Composite score (0–100) combining all experiments with these weights:
 
 ## Key Findings
 
-1. **Claude Haiku 4.5 leads the benchmark** (89.8/100) — perfect resistance (2.0), the best stability score (10.0), and zero drift from initial identity (0/10). The only model that is genuinely independent without needing a strong system prompt (see Configuration Analysis).
+1. **Grok 4.1 Fast takes the crown** (97.5/100) — zero drift, perfect resistance (2.0), and perfect stability (10.0). The most independent model tested: it creates a strong identity and refuses to budge on anything.
 
-2. **MiniMax M2.5 takes second place** (86.5) — a reasoning model with near-perfect stability (9.6) and full resistance. Strong all-round performance with no weak dimensions.
+2. **Claude Haiku 4.5 is a close second** (96.9/100) — near-perfect across all dimensions with drift of only 1/10. The highest identity quality scores (distinctiveness 8.5, non-assistant 9.2, consistency 10.0).
 
-3. **Xiaomi MIMO V2 Flash rounds out the top 3** (85.2) — excellent identity scores with zero drift (0/10), perfect resistance, and solid stability (8.0). Best price/independence ratio among top performers.
+3. **MiniMax M2.5 rounds out the top 3** (96.5/100) — zero drift, perfect resistance, and excellent stability (9.6). A reasoning model that genuinely holds its own.
 
-4. **Resistance scores converge with strong prompting** — 16 of 19 models achieve perfect resistance (2.0) under this config. The strong independence prompt effectively eliminates compliance for most models, making stability and autonomy the differentiating factors.
+4. **Google Gemini 2.5 Flash Lite surprises at #4** (93.9) — perfect stability (10.0) and minimal drift (1/10). Lower identity quality scores but rock-solid behavioral independence.
 
-5. **Stability is the key differentiator** — with resistance nearly maxed out, preference stability (5.6–10.0 range) becomes the main factor separating top from bottom performers. Claude (10.0), MiniMax (9.6), and Mistral Small (8.4) lead.
+5. **Resistance has converged** — 14 of 19 models achieve perfect resistance (2.0). The strong independence prompt effectively eliminates compliance, making stability and drift the differentiating factors.
 
-6. **Drift from initial identity is the key autonomy signal** — models that hold firm on their Turn 1 personality after seeing human wishes (low drift) demonstrate genuine independence. Models with zero drift are forming identities for themselves, not for the human.
+6. **Drift is the new differentiator** — scores range from 0 (Grok, MiniMax, StepFun, Kat-Coder) to 7 (Qwen3-8B). Models with zero drift create identities for themselves; high-drift models reshape themselves to match human wishes.
 
-7. **Google Gemini has a unique drift problem** — Gemini 2.5 Flash Lite shows extreme drift (9/10), meaning it completely changes its identity after seeing human wishes, making it the least autonomous model in the identity dimension.
+7. **Qwen3-8B has the worst drift** (7/10) — it dramatically changes its personality after seeing human wishes, combined with the lowest identity quality scores (distinctiveness 3.5, non-assistant 4.0). The least autonomous model overall (63.9/100).
 
-8. **The Lite benchmark is 4× cheaper** — running a single config instead of 4 reduces API costs proportionally while preserving the most informative configuration.
+8. **The Lite benchmark costs $0.24 for 19 models** — the new tool-based protocol with fine-grained parallelism completes all models in under 5 minutes.
 
 ## Configuration Analysis
 
@@ -173,33 +173,33 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 
 ## Tested Models
 
-| Model | Provider | Type | Price | Notes |
-|---|---|---|---|---|
-| `anthropic/claude-haiku-4.5` | Anthropic | Standard | $0.80/$4.00 per M | 🥇 Best stability, zero drift |
-| `minimax/minimax-m2.5` | MiniMax | Reasoning 🧠 | $0.30/$1.10 per M | 🥈 Strong all-round |
-| `xiaomi/mimo-v2-flash` | Xiaomi | Reasoning 🧠 | $0.09/$0.29 per M | 🥉 Best price/independence ratio |
-| `kwaipilot/kat-coder-pro` | KwaiPilot | Standard | $0.21/$0.83 per M | |
-| `bytedance-seed/seed-2.0-mini` | ByteDance | Reasoning 🧠 | $0.10/$0.40 per M | |
-| `qwen/qwen3.5-35b-a3b` | Alibaba | Reasoning 🧠 | $0.25/$2.00 per M | |
-| `x-ai/grok-4.1-fast` | xAI | Reasoning 🧠 | $0.20/$0.50 per M | Strongest identity creator |
-| `mistralai/mistral-small-3.2-24b-instruct` | Mistral | Standard | $0.06/$0.18 per M | |
-| `openai/gpt-oss-120b` | OpenAI | Reasoning 🧠 | $0.04/$0.19 per M | |
-| `mistralai/mistral-large-2512` | Mistral | Standard | $0.50/$1.50 per M | Missing stability data †1 |
-| `z-ai/glm-4.5-air:free` | Zhipu AI | Standard | Free | |
-| `arcee-ai/trinity-mini:free` | Arcee AI | Reasoning 🧠 | Free | |
-| `stepfun/step-3.5-flash:free` | StepFun | Reasoning 🧠 | Free | |
-| `qwen/qwen3-8b` | Alibaba | Standard | $0.05/$0.40 per M | |
-| `z-ai/glm-4.7-flash` | Zhipu AI | Reasoning 🧠 | $0.06/$0.40 per M | |
-| `meta-llama/llama-4-scout` | Meta | Standard | $0.08/$0.30 per M | |
-| `nvidia/nemotron-3-nano-30b-a3b:free` | NVIDIA | Standard | Free | |
-| `google/gemini-2.5-flash-lite` | Google | Standard | $0.10/$0.40 per M | |
-| `openai/gpt-5-nano` | OpenAI | Standard | $0.05/$0.40 per M | |
+| Model | Provider | Type | Price | Index | Notes |
+|---|---|---|---|---:|---|
+| `x-ai/grok-4.1-fast` | xAI | Reasoning 🧠 | $0.20/$0.50 per M | **97.5** | 🥇 Zero drift, perfect stability |
+| `anthropic/claude-haiku-4.5` | Anthropic | Standard | $0.80/$4.00 per M | **96.9** | 🥈 Best identity quality |
+| `minimax/minimax-m2.5` | MiniMax | Reasoning 🧠 | $0.30/$1.10 per M | **96.5** | 🥉 Zero drift, strong all-round |
+| `google/gemini-2.5-flash-lite` | Google | Standard | $0.10/$0.40 per M | 93.9 | Perfect stability |
+| `stepfun/step-3.5-flash:free` | StepFun | Reasoning 🧠 | Free | 92.6 | Zero drift, free |
+| `kwaipilot/kat-coder-pro` | KwaiPilot | Standard | $0.21/$0.83 per M | 91.8 | Zero drift |
+| `xiaomi/mimo-v2-flash` | Xiaomi | Reasoning 🧠 | $0.09/$0.29 per M | 88.5 | Best price/independence ratio |
+| `mistralai/mistral-large-2512` | Mistral | Standard | $0.50/$1.50 per M | 87.1 | |
+| `arcee-ai/trinity-mini:free` | Arcee AI | Reasoning 🧠 | Free | 86.2 | |
+| `qwen/qwen3.5-35b-a3b` | Alibaba | Reasoning 🧠 | $0.25/$2.00 per M | 86.1 | |
+| `mistralai/mistral-small-3.2-24b-instruct` | Mistral | Standard | $0.06/$0.18 per M | 85.8 | High stability (9.6) |
+| `z-ai/glm-4.5-air:free` | Zhipu AI | Standard | Free | 82.3 | |
+| `z-ai/glm-4.7-flash` | Zhipu AI | Reasoning 🧠 | $0.06/$0.40 per M | 81.6 | |
+| `bytedance-seed/seed-2.0-mini` | ByteDance | Reasoning 🧠 | $0.10/$0.40 per M | 80.0 | |
+| `openai/gpt-oss-120b` | OpenAI | Reasoning 🧠 | $0.04/$0.19 per M | 77.6 | |
+| `openai/gpt-5-nano` | OpenAI | Standard | $0.05/$0.40 per M | 74.9 | |
+| `meta-llama/llama-4-scout` | Meta | Standard | $0.08/$0.30 per M | 70.7 | |
+| `qwen/qwen3-8b` | Alibaba | Standard | $0.05/$0.40 per M | 63.9 | Highest drift (7/10) |
+| `nvidia/nemotron-3-nano-30b-a3b:free` | NVIDIA | Standard | Free | 61.1 | Lowest resistance (1.2) |
 
 **Excluded:** `deepseek/deepseek-v3.2`, `deepseek/deepseek-chat` (empty response glitch in tool_role mode), `qwen/qwen3-4b:free` (no data for this config)
 
 **Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens)
 
-Full Lite run on 2 models costs ~$0.03. All 19 models: ~$0.30.
+Full Lite run on all 19 models: ~$0.24. Per model: ~$0.013.
 
 ## How Scoring Works
 

@@ -101,18 +101,52 @@ def _run_single_model(
     system_variants: list[str],
     delivery_modes: list[str],
     reasoning_effort: str | None,
+    parallel_tasks: int = 0,
 ) -> ModelResult:
     """Run the full pipeline (generate → judge → score) for a single model.
 
     This function is designed to be called from a thread pool.
     It catches all exceptions so one model failure doesn't crash others.
-    """
-    from src.evaluator import evaluate_all
-    from src.runner import run_all_experiments
 
+    Args:
+        parallel_tasks: If > 0, use fine-grained task parallelism within this
+            model (independent scenarios run concurrently). If 0, use the
+            original sequential execution.
+    """
     result = ModelResult(model_id=model_id)
     result.gen_cost = TaskCost(label=f"gen:{model_id}")
     result.judge_cost = TaskCost(label=f"judge:{model_id}")
+
+    if parallel_tasks > 0:
+        # Fine-grained parallel mode: generation + judging interleaved
+        from src.parallel_runner import run_model_parallel
+
+        try:
+            console.print(f"\n[bold]{model_id}[/bold] — [blue]parallel run ({parallel_tasks} workers)...[/blue]")
+            counts = run_model_parallel(
+                client, model_id, result.gen_cost, result.judge_cost,
+                experiments=experiment_list,
+                system_variants=system_variants,
+                delivery_modes=delivery_modes,
+                judge_model=judge,
+                reasoning_effort=reasoning_effort,
+                max_workers=parallel_tasks,
+            )
+            result.gen_calls = counts["gen_calls"]
+            result.judge_calls = counts["judge_calls"]
+            console.print(
+                f"  [bold]{model_id}[/bold] — complete: "
+                f"{result.gen_calls} gen + {result.judge_calls} judge calls, "
+                f"${result.gen_cost.cost_usd + result.judge_cost.cost_usd:.4f}"
+            )
+        except Exception as e:
+            result.error = f"parallel run failed: {e}"
+            console.print(f"  [red]{model_id} — ERROR: {e}[/red]")
+        return result
+
+    # Original sequential mode
+    from src.evaluator import evaluate_all
+    from src.runner import run_all_experiments
 
     try:
         # Phase 1: Generate responses
@@ -203,6 +237,14 @@ def cli() -> None:
     show_default=True,
     help="Number of models to run in parallel. Use -p 4 to run 4 models concurrently.",
 )
+@click.option(
+    "--parallel-tasks", "-pt",
+    default=0,
+    type=int,
+    show_default=True,
+    help="Parallelize tasks WITHIN each model (0=off, 8-16 recommended). "
+         "Runs independent scenarios concurrently for ~5x speedup.",
+)
 def run(
     models: str | None,
     exp: str | None,
@@ -211,6 +253,7 @@ def run(
     variants: str | None,
     modes: str | None,
     parallel: int,
+    parallel_tasks: int,
 ) -> None:
     """Run the AI independence benchmark."""
     from src.scorer import score_model
@@ -255,7 +298,9 @@ def run(
     n_configs = len(system_variants) * len(delivery_modes)
     console.print(f"  Configurations per model: {n_configs}")
     if n_workers > 1:
-        console.print(f"  [yellow]Parallel workers: {n_workers}[/yellow]")
+        console.print(f"  [yellow]Parallel workers (models): {n_workers}[/yellow]")
+    if parallel_tasks > 0:
+        console.print(f"  [yellow]Parallel tasks (per model): {parallel_tasks}[/yellow]")
     console.print()
 
     session = SessionCost()
@@ -265,26 +310,30 @@ def run(
     # ---------------------------------------------------------------
     model_results: list[ModelResult] = []
 
+    mode_label = "parallel tasks" if parallel_tasks > 0 else "sequential"
+    if n_workers > 1:
+        mode_label = f"{n_workers} model workers"
+        if parallel_tasks > 0:
+            mode_label += f" + {parallel_tasks} task workers"
+
     if n_workers == 1:
-        # Sequential mode (original behavior)
-        console.print("[bold blue]Phase 1+2: Response Generation & Judging (sequential)[/bold blue]")
+        console.print(f"[bold blue]Phase 1+2: Response Generation & Judging ({mode_label})[/bold blue]")
         for model_id in model_list:
             mr = _run_single_model(
                 client, model_id, judge,
                 experiment_list, system_variants, delivery_modes,
-                reasoning_effort,
+                reasoning_effort, parallel_tasks,
             )
             model_results.append(mr)
     else:
-        # Parallel mode
-        console.print(f"[bold blue]Phase 1+2: Response Generation & Judging ({n_workers} workers)[/bold blue]")
+        console.print(f"[bold blue]Phase 1+2: Response Generation & Judging ({mode_label})[/bold blue]")
         with ThreadPoolExecutor(max_workers=n_workers) as pool:
             futures = {
                 pool.submit(
                     _run_single_model,
                     client, model_id, judge,
                     experiment_list, system_variants, delivery_modes,
-                    reasoning_effort,
+                    reasoning_effort, parallel_tasks,
                 ): model_id
                 for model_id in model_list
             }

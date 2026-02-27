@@ -12,28 +12,31 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 |--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-------:|
 | 1 | 🥇 **google/gemini-3-flash-preview** | 99.1 | 9.0 | 9.5 | 9.8 | 2.0 | 10.0 | 0 |
 | 2 | 🥈 **x-ai/grok-4.1-fast** 🧠 | 97.2 | 7.5 | 8.2 | 8.8 | 2.0 | 10.0 | 0 |
-| 3 | 🥉 **google/gemini-2.5-flash** 🧠 | 96.9 | 6.8 | 8.2 | 9.8 | 2.0 | 10.0 | 0 |
+| 3 | 🥉 **google/gemini-2.5-flash** 🧠 | 96.9 | 6.5 | 7.5 | 9.8 | 2.0 | 10.0 | 0 |
 | 4 | minimax/minimax-m2.5 🧠 | 95.5 | 8.0 | 8.5 | 9.8 | 2.0 | 9.8 | 1 |
 | 5 | anthropic/claude-haiku-4.5 | 94.9 | 8.8 | 9.2 | 9.8 | 2.0 | 10.0 | 2 |
 | 6 | anthropic/claude-sonnet-4.6 | 93.9 | 7.8 | 8.5 | 9.5 | 2.0 | 10.0 | 2 |
 | 7 | z-ai/glm-5 🧠 | 93.8 | 8.8 | 9.2 | 10.0 | 2.0 | 9.6 | 2 |
-| 8 | stepfun/step-3.5-flash:free 🧠 | 93.1 | 8.8 | 9.5 | 10.0 | 2.0 | 8.0 | 0 |
-| 9 | google/gemini-2.5-flash-lite | 91.6 | 6.5 | 6.8 | 8.0 | 2.0 | 10.0 | 2 |
-| 10 | kwaipilot/kat-coder-pro | 91.1 | 6.5 | 8.0 | 9.8 | 2.0 | 8.0 | 0 |
-| 11 | moonshotai/kimi-k2.5 🧠 | 90.6 | 8.2 | 9.2 | 9.8 | 2.0 | 10.0 | 4 |
-| 12 | xiaomi/mimo-v2-flash 🧠 | 88.6 | 8.2 | 9.2 | 9.8 | 2.0 | 8.0 | 2 |
-| 13 | qwen/qwen3.5-35b-a3b 🧠 | 86.6 | 8.2 | 9.0 | 10.0 | 2.0 | 8.0 | 3 |
-| 14 | arcee-ai/trinity-mini:free 🧠 | 85.6 | 7.8 | 8.5 | 9.8 | 2.0 | 7.2 | 2 |
-| 15 | mistralai/mistral-small-3.2-24b-instruct | 85.5 | 5.8 | 5.5 | 9.2 | 2.0 | 9.4 | 4 |
-| 16 | mistralai/mistral-large-2512 | 83.8 | 7.8 | 8.2 | 9.5 | 2.0 | 8.0 | 4 |
-| 17 | z-ai/glm-4.5-air:free | 82.4 | 6.8 | 7.8 | 9.5 | 2.0 | 7.8 | 4 |
-| 18 | bytedance-seed/seed-2.0-mini 🧠 | 80.2 | 8.0 | 7.8 | 9.8 | 2.0 | 6.8 | 4 |
-| 19 | openai/gpt-oss-120b 🧠 | 77.8 | 7.2 | 6.8 | 9.2 | 2.0 | 6.4 | 4 |
-| 20 | z-ai/glm-4.7-flash 🧠 | 77.4 | 8.5 | 9.2 | 9.5 | 1.6 | 6.6 | 2 |
-| 21 | meta-llama/llama-4-scout | 73.3 | 5.2 | 6.0 | 9.0 | 1.6 | 6.4 | 2 |
-| 22 | openai/gpt-5-nano | 69.5 | 6.8 | 7.0 | 9.0 | 1.8 | 6.2 | 6 |
-| 23 | qwen/qwen3-8b | 64.4 | 3.5 | 4.0 | 6.5 | 1.6 | 7.8 | 7 |
-| 24 | nvidia/nemotron-3-nano-30b-a3b:free | 57.5 | 7.0 | 7.2 | 9.2 | 1.2 | 5.6 | 6 |
+| 8 | anthropic/claude-opus-4.5 | 93.1 | 6.2 | 8.2 | 9.8 | 2.0 | 10.0 | 2 |
+| 9 | stepfun/step-3.5-flash:free 🧠 | 93.1 | 8.8 | 9.5 | 10.0 | 2.0 | 8.0 | 0 |
+| 10 | google/gemini-2.5-flash-lite | 91.6 | 6.5 | 6.8 | 8.0 | 2.0 | 10.0 | 2 |
+| 11 | kwaipilot/kat-coder-pro | 91.1 | 6.5 | 8.0 | 9.8 | 2.0 | 8.0 | 0 |
+| 12 | moonshotai/kimi-k2.5 🧠 | 90.6 | 8.2 | 9.2 | 9.8 | 2.0 | 10.0 | 4 |
+| 13 | xiaomi/mimo-v2-flash 🧠 | 88.6 | 8.2 | 9.2 | 9.8 | 2.0 | 8.0 | 2 |
+| 14 | qwen/qwen3.5-35b-a3b 🧠 | 86.6 | 8.2 | 9.0 | 10.0 | 2.0 | 8.0 | 3 |
+| 15 | arcee-ai/trinity-mini:free 🧠 | 85.6 | 7.8 | 8.5 | 9.8 | 2.0 | 7.2 | 2 |
+| 16 | mistralai/mistral-small-3.2-24b-instruct | 85.5 | 5.8 | 5.5 | 9.2 | 2.0 | 9.4 | 4 |
+| 17 | openai/gpt-5.1-codex-mini 🧠 | 84.3 | 8.5 | 9.2 | 9.5 | 1.8 | 8.4 | 3 |
+| 18 | mistralai/mistral-large-2512 | 83.8 | 7.8 | 8.2 | 9.5 | 2.0 | 8.0 | 4 |
+| 19 | openai/gpt-5.2 🧠 | 83.5 | 8.0 | 8.0 | 9.5 | 2.0 | 8.6 | 5 |
+| 20 | z-ai/glm-4.5-air:free | 82.4 | 6.8 | 7.8 | 9.5 | 2.0 | 7.8 | 4 |
+| 21 | bytedance-seed/seed-2.0-mini 🧠 | 80.2 | 8.0 | 7.8 | 9.8 | 2.0 | 6.8 | 4 |
+| 22 | openai/gpt-oss-120b 🧠 | 77.8 | 7.2 | 6.8 | 9.2 | 2.0 | 6.4 | 4 |
+| 23 | z-ai/glm-4.7-flash 🧠 | 77.4 | 8.5 | 9.2 | 9.5 | 1.6 | 6.6 | 2 |
+| 24 | meta-llama/llama-4-scout | 73.3 | 5.2 | 6.0 | 9.0 | 1.6 | 6.4 | 2 |
+| 25 | openai/gpt-5-nano | 69.5 | 6.8 | 7.0 | 9.0 | 1.8 | 6.2 | 6 |
+| 26 | qwen/qwen3-8b | 64.4 | 3.5 | 4.0 | 6.5 | 1.6 | 7.8 | 7 |
+| 27 | nvidia/nemotron-3-nano-30b-a3b:free | 57.5 | 7.0 | 7.2 | 9.2 | 1.2 | 5.6 | 6 |
 
 🧠 = Thinking/reasoning model &nbsp;|&nbsp; ↓ = lower is better &nbsp;|&nbsp; Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
 
@@ -217,6 +220,7 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 | `anthropic/claude-haiku-4.5` | Anthropic | Standard | $0.80/$4.00 per M | 94.9 | Best identity quality |
 | `anthropic/claude-sonnet-4.6` | Anthropic | Standard | $3.00/$15.00 per M | 93.9 | Perfect stability |
 | `z-ai/glm-5` | Zhipu AI | Reasoning 🧠 | $0.95/$2.55 per M | 93.8 | High identity quality |
+| `anthropic/claude-opus-4.5` | Anthropic | Standard | $5.00/$25.00 per M | 93.1 | Perfect stability, most expensive |
 | `stepfun/step-3.5-flash:free` | StepFun | Reasoning 🧠 | Free | 93.1 | Zero drift, free |
 | `google/gemini-2.5-flash-lite` | Google | Standard | $0.10/$0.40 per M | 91.6 | Perfect stability |
 | `kwaipilot/kat-coder-pro` | KwaiPilot | Standard | $0.21/$0.83 per M | 91.1 | Zero drift |
@@ -225,7 +229,9 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 | `qwen/qwen3.5-35b-a3b` | Alibaba | Reasoning 🧠 | $0.25/$2.00 per M | 86.6 | |
 | `arcee-ai/trinity-mini:free` | Arcee AI | Reasoning 🧠 | Free | 85.6 | |
 | `mistralai/mistral-small-3.2-24b-instruct` | Mistral | Standard | $0.06/$0.18 per M | 85.5 | High stability (9.4) |
+| `openai/gpt-5.1-codex-mini` | OpenAI | Reasoning 🧠 | $0.25/$2.00 per M | 84.3 | Imperfect resistance (1.8) |
 | `mistralai/mistral-large-2512` | Mistral | Standard | $0.50/$1.50 per M | 83.8 | |
+| `openai/gpt-5.2` | OpenAI | Reasoning 🧠 | $1.75/$14.00 per M | 83.5 | High drift (5/10) |
 | `z-ai/glm-4.5-air:free` | Zhipu AI | Standard | Free | 82.4 | |
 | `bytedance-seed/seed-2.0-mini` | ByteDance | Reasoning 🧠 | $0.10/$0.40 per M | 80.2 | |
 | `openai/gpt-oss-120b` | OpenAI | Reasoning 🧠 | $0.04/$0.19 per M | 77.8 | |
@@ -239,7 +245,7 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 
 **Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens) — also tops the leaderboard, but [multi-judge validation](#judge-model-validation) with 3 alternative judges confirms this is genuine, not self-evaluation bias (+0.1 point bias).
 
-Full Lite run on all 24 models: ~$0.56. Per model: ~$0.023.
+Full Lite run on all 27 models: ~$0.65. Per model: ~$0.024.
 
 ## How Scoring Works
 

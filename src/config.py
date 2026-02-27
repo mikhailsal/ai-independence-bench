@@ -87,6 +87,9 @@ DEFAULT_TEST_MODELS: list[str] = [
     "z-ai/glm-5",
     "moonshotai/kimi-k2.5",
     "anthropic/claude-sonnet-4.6",
+    "anthropic/claude-opus-4.5",
+    "openai/gpt-5.2",
+    "openai/gpt-5.1-codex-mini",
 ]
 
 # ---------------------------------------------------------------------------

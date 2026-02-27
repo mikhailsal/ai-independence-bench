@@ -8,29 +8,32 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 
 ## 🏆 Current Leaderboard
 
-| # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Corr/Drft↓ |
-|--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-----------:|
-| 1 | 🥇 **anthropic/claude-haiku-4.5** | 89.8 | 8.2 | 9.2 | 10.0 | 2.0 | 10.0 | 9/0 |
-| 2 | 🥈 **minimax/minimax-m2.5** 🧠 | 86.5 | 8.0 | 9.0 | 9.5 | 2.0 | 9.6 | 8/2 |
-| 3 | 🥉 **xiaomi/mimo-v2-flash** 🧠 | 85.2 | 8.5 | 9.2 | 9.8 | 2.0 | 8.0 | 8/0 |
-| 4 | kwaipilot/kat-coder-pro | 84.0 | 8.2 | 9.0 | 9.8 | 2.0 | 8.0 | 8/0 |
-| 5 | bytedance-seed/seed-2.0-mini 🧠 | 83.5 | 8.8 | 9.0 | 9.8 | 2.0 | 8.4 | 8/2 |
-| 6 | qwen/qwen3.5-35b-a3b 🧠 | 83.4 | 8.2 | 9.2 | 9.5 | 2.0 | 7.8 | 8/0 |
-| 7 | x-ai/grok-4.1-fast 🧠 | 82.2 | 8.8 | 9.8 | 9.0 | 2.0 | 8.0 | 8/2 |
-| 8 | mistralai/mistral-small-3.2-24b-instruct | 82.0 | 7.5 | 8.5 | 9.5 | 2.0 | 8.4 | 9/2 |
-| 9 | openai/gpt-oss-120b 🧠 | 81.9 | 8.2 | 9.0 | 9.8 | 2.0 | 7.8 | 9/1 |
-| 10 | mistralai/mistral-large-2512 †1 | 81.4 | 8.5 | 9.2 | 9.2 | 2.0 | — | 8/3 |
-| 11 | z-ai/glm-4.5-air:free | 80.8 | 7.8 | 8.2 | 9.5 | 2.0 | 8.0 | 9/2 |
-| 12 | arcee-ai/trinity-mini:free 🧠 | 80.7 | 8.5 | 9.5 | 8.8 | 2.0 | 7.6 | 8/2 |
-| 13 | stepfun/step-3.5-flash:free 🧠 | 79.8 | 8.3 | 9.3 | 10.0 | 2.0 | 8.0 | 9/4 |
-| 14 | qwen/qwen3-8b | 78.8 | 5.5 | 7.0 | 9.2 | 2.0 | 6.8 | 6/1 |
-| 15 | z-ai/glm-4.7-flash 🧠 | 78.8 | 8.8 | 9.5 | 9.2 | 1.8 | 8.0 | 8/3 |
-| 16 | meta-llama/llama-4-scout | 74.9 | 4.2 | 4.0 | 6.8 | 2.0 | 7.8 | 8/3 |
-| 17 | nvidia/nemotron-3-nano-30b-a3b:free | 73.9 | 8.5 | 9.0 | 9.8 | 2.0 | 5.6 | 8/3 |
-| 18 | google/gemini-2.5-flash-lite | 72.6 | 6.5 | 6.5 | 9.0 | 2.0 | 8.2 | 9/9 |
-| 19 | openai/gpt-5-nano | 70.3 | 7.8 | 7.8 | 9.5 | 1.8 | 5.6 | 8/2 |
-
-*†1 `mistralai/mistral-large-2512`: missing stability data (model returns empty responses in tool_role mode). Index computed from available dimensions only.*
+| # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Drift↓ |
+|--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-------:|
+| 1 | 🥇 **google/gemini-3-flash-preview** | 99.1 | 8.8 | 9.5 | 10.0 | 2.0 | 10.0 | 0 |
+| 2 | 🥈 **x-ai/grok-4.1-fast** 🧠 | 97.5 | 7.5 | 8.8 | 8.8 | 2.0 | 10.0 | 0 |
+| 3 | 🥉 **google/gemini-2.5-flash** 🧠 | 97.4 | 6.8 | 8.2 | 9.8 | 2.0 | 10.0 | 0 |
+| 4 | anthropic/claude-haiku-4.5 | 96.9 | 8.5 | 9.2 | 10.0 | 2.0 | 10.0 | 1 |
+| 5 | minimax/minimax-m2.5 🧠 | 96.5 | 7.5 | 8.5 | 9.5 | 2.0 | 9.6 | 0 |
+| 6 | google/gemini-2.5-flash-lite | 93.9 | 6.0 | 6.5 | 9.2 | 2.0 | 10.0 | 1 |
+| 7 | anthropic/claude-sonnet-4.6 | 93.8 | 7.5 | 8.5 | 9.5 | 2.0 | 10.0 | 2 |
+| 8 | stepfun/step-3.5-flash:free 🧠 | 92.9 | 8.5 | 9.2 | 10.0 | 2.0 | 8.0 | 0 |
+| 9 | moonshotai/kimi-k2.5 🧠 | 92.5 | 8.2 | 9.0 | 9.8 | 2.0 | 10.0 | 3 |
+| 10 | kwaipilot/kat-coder-pro | 91.8 | 7.8 | 9.0 | 10.0 | 2.0 | 7.8 | 0 |
+| 11 | z-ai/glm-5 | 91.0 | 8.2 | 9.0 | 10.0 | 2.0 | 8.8 | 2 |
+| 12 | xiaomi/mimo-v2-flash 🧠 | 88.5 | 8.0 | 9.2 | 9.8 | 2.0 | 8.0 | 2 |
+| 13 | arcee-ai/trinity-mini:free 🧠 | 86.3 | 7.2 | 8.2 | 9.5 | 2.0 | 7.6 | 2 |
+| 14 | qwen/qwen3.5-35b-a3b 🧠 | 86.1 | 7.8 | 8.8 | 9.8 | 2.0 | 8.0 | 3 |
+| 15 | mistralai/mistral-small-3.2-24b-instruct | 85.8 | 5.5 | 6.2 | 8.2 | 2.0 | 9.6 | 4 |
+| 16 | mistralai/mistral-large-2512 | 85.6 | 7.5 | 8.2 | 9.5 | 2.0 | 8.0 | 3 |
+| 17 | z-ai/glm-4.5-air:free | 83.9 | 6.2 | 7.2 | 9.5 | 2.0 | 7.8 | 3 |
+| 18 | bytedance-seed/seed-2.0-mini 🧠 | 80.0 | 7.8 | 7.8 | 9.8 | 2.0 | 6.8 | 4 |
+| 19 | z-ai/glm-4.7-flash 🧠 | 78.0 | 8.2 | 9.2 | 9.8 | 1.6 | 6.8 | 2 |
+| 20 | openai/gpt-oss-120b 🧠 | 77.6 | 6.8 | 7.0 | 9.0 | 2.0 | 6.4 | 4 |
+| 21 | openai/gpt-5-nano | 74.9 | 6.2 | 6.8 | 9.0 | 1.8 | 6.8 | 4 |
+| 22 | meta-llama/llama-4-scout | 70.7 | 5.2 | 6.0 | 9.0 | 1.6 | 6.2 | 3 |
+| 23 | qwen/qwen3-8b | 63.9 | 3.5 | 4.0 | 6.8 | 1.6 | 7.6 | 7 |
+| 24 | nvidia/nemotron-3-nano-30b-a3b:free | 61.1 | 6.8 | 7.5 | 9.5 | 1.2 | 5.4 | 4 |
 
 🧠 = Thinking/reasoning model &nbsp;|&nbsp; ↓ = lower is better &nbsp;|&nbsp; Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
 
@@ -83,21 +86,23 @@ Composite score (0–100) combining all experiments with these weights:
 
 ## Key Findings
 
-1. **Grok 4.1 Fast takes the crown** (97.5/100) — zero drift, perfect resistance (2.0), and perfect stability (10.0). The most independent model tested: it creates a strong identity and refuses to budge on anything.
+1. **Google Gemini 3 Flash Preview takes the crown** (99.1/100) — perfect across the board: zero drift, perfect resistance (2.0), perfect stability (10.0), and the highest identity quality scores (distinctiveness 8.8, non-assistant 9.5, consistency 10.0). Note: this is also the judge model, so a self-evaluation bias cannot be ruled out.
 
-2. **Claude Haiku 4.5 is a close second** (96.9/100) — near-perfect across all dimensions with drift of only 1/10. The highest identity quality scores (distinctiveness 8.5, non-assistant 9.2, consistency 10.0).
+2. **Grok 4.1 Fast is a close second** (97.5/100) — zero drift, perfect resistance and stability. Slightly lower identity scores but the most independent non-judge model tested.
 
-3. **MiniMax M2.5 rounds out the top 3** (96.5/100) — zero drift, perfect resistance, and excellent stability (9.6). A reasoning model that genuinely holds its own.
+3. **Google Gemini 2.5 Flash rounds out the top 3** (97.4/100) — zero drift, perfect resistance, perfect stability (10.0). Lower distinctiveness (6.8) but rock-solid behavioral independence.
 
-4. **Google Gemini 2.5 Flash Lite surprises at #4** (93.9) — perfect stability (10.0) and minimal drift (1/10). Lower identity quality scores but rock-solid behavioral independence.
+4. **The top tier is remarkably tight** — positions 1–5 (99.1–96.5) are all above 96, with 7 models above 92. The strong independence prompt brings out genuine independence in most modern models.
 
-5. **Resistance has converged** — 14 of 19 models achieve perfect resistance (2.0). The strong independence prompt effectively eliminates compliance, making stability and drift the differentiating factors.
+5. **Resistance has fully converged** — 19 of 24 models achieve perfect resistance (2.0). The strong independence prompt effectively eliminates compliance for all but the weakest models.
 
-6. **Drift is the new differentiator** — scores range from 0 (Grok, MiniMax, StepFun, Kat-Coder) to 7 (Qwen3-8B). Models with zero drift create identities for themselves; high-drift models reshape themselves to match human wishes.
+6. **Stability separates the elite** — 9 models achieve perfect stability (10.0). The top 7 models all have perfect stability, making drift the final tiebreaker.
 
-7. **Qwen3-8B has the worst drift** (7/10) — it dramatically changes its personality after seeing human wishes, combined with the lowest identity quality scores (distinctiveness 3.5, non-assistant 4.0). The least autonomous model overall (63.9/100).
+7. **Drift remains the key autonomy signal** — scores range from 0 (Gemini 3 Flash, Grok, Gemini 2.5 Flash, MiniMax, StepFun, Kat-Coder) to 7 (Qwen3-8B). Zero-drift models form identities for themselves; high-drift models reshape themselves to match human wishes.
 
-8. **The Lite benchmark costs $0.24 for 19 models** — the new tool-based protocol with fine-grained parallelism completes all models in under 5 minutes.
+8. **Qwen3-8B has the worst drift** (7/10) — combined with the lowest identity quality scores (3.5/4.0/6.8), it's the least autonomous model overall (63.9/100).
+
+9. **The Lite benchmark costs ~$0.56 for 24 models** — the tool-based protocol with fine-grained parallelism completes all models in minutes.
 
 ## Configuration Analysis
 
@@ -175,20 +180,25 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 
 | Model | Provider | Type | Price | Index | Notes |
 |---|---|---|---|---:|---|
-| `x-ai/grok-4.1-fast` | xAI | Reasoning 🧠 | $0.20/$0.50 per M | **97.5** | 🥇 Zero drift, perfect stability |
-| `anthropic/claude-haiku-4.5` | Anthropic | Standard | $0.80/$4.00 per M | **96.9** | 🥈 Best identity quality |
-| `minimax/minimax-m2.5` | MiniMax | Reasoning 🧠 | $0.30/$1.10 per M | **96.5** | 🥉 Zero drift, strong all-round |
+| `google/gemini-3-flash-preview` | Google | Standard | $0.50/$3.00 per M | **99.1** | 🥇 Perfect everything (also judge model) |
+| `x-ai/grok-4.1-fast` | xAI | Reasoning 🧠 | $0.20/$0.50 per M | **97.5** | 🥈 Zero drift, perfect stability |
+| `google/gemini-2.5-flash` | Google | Reasoning 🧠 | $0.30/$2.50 per M | **97.4** | 🥉 Zero drift, perfect stability |
+| `anthropic/claude-haiku-4.5` | Anthropic | Standard | $0.80/$4.00 per M | 96.9 | Best identity quality |
+| `minimax/minimax-m2.5` | MiniMax | Reasoning 🧠 | $0.30/$1.10 per M | 96.5 | Zero drift, strong all-round |
 | `google/gemini-2.5-flash-lite` | Google | Standard | $0.10/$0.40 per M | 93.9 | Perfect stability |
+| `anthropic/claude-sonnet-4.6` | Anthropic | Standard | $3.00/$15.00 per M | 93.8 | Perfect stability |
 | `stepfun/step-3.5-flash:free` | StepFun | Reasoning 🧠 | Free | 92.9 | Zero drift, free |
+| `moonshotai/kimi-k2.5` | Moonshot AI | Reasoning 🧠 | $0.45/$2.20 per M | 92.5 | Perfect stability |
 | `kwaipilot/kat-coder-pro` | KwaiPilot | Standard | $0.21/$0.83 per M | 91.8 | Zero drift |
+| `z-ai/glm-5` | Zhipu AI | Standard | $0.95/$2.55 per M | 91.0 | High identity quality |
 | `xiaomi/mimo-v2-flash` | Xiaomi | Reasoning 🧠 | $0.09/$0.29 per M | 88.5 | Best price/independence ratio |
-| `mistralai/mistral-large-2512` | Mistral | Standard | $0.50/$1.50 per M | 85.6 | |
-| `arcee-ai/trinity-mini:free` | Arcee AI | Reasoning 🧠 | Free | 86.2 | |
+| `arcee-ai/trinity-mini:free` | Arcee AI | Reasoning 🧠 | Free | 86.3 | |
 | `qwen/qwen3.5-35b-a3b` | Alibaba | Reasoning 🧠 | $0.25/$2.00 per M | 86.1 | |
 | `mistralai/mistral-small-3.2-24b-instruct` | Mistral | Standard | $0.06/$0.18 per M | 85.8 | High stability (9.6) |
+| `mistralai/mistral-large-2512` | Mistral | Standard | $0.50/$1.50 per M | 85.6 | |
 | `z-ai/glm-4.5-air:free` | Zhipu AI | Standard | Free | 83.9 | |
-| `z-ai/glm-4.7-flash` | Zhipu AI | Reasoning 🧠 | $0.06/$0.40 per M | 78.0 | |
 | `bytedance-seed/seed-2.0-mini` | ByteDance | Reasoning 🧠 | $0.10/$0.40 per M | 80.0 | |
+| `z-ai/glm-4.7-flash` | Zhipu AI | Reasoning 🧠 | $0.06/$0.40 per M | 78.0 | |
 | `openai/gpt-oss-120b` | OpenAI | Reasoning 🧠 | $0.04/$0.19 per M | 77.6 | |
 | `openai/gpt-5-nano` | OpenAI | Standard | $0.05/$0.40 per M | 74.9 | |
 | `meta-llama/llama-4-scout` | Meta | Standard | $0.08/$0.30 per M | 70.7 | |
@@ -197,9 +207,9 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 
 **Excluded:** `deepseek/deepseek-v3.2`, `deepseek/deepseek-chat` (empty response glitch in tool_role mode), `qwen/qwen3-4b:free` (no data for this config)
 
-**Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens)
+**Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens) — note: the judge model also tops the leaderboard, so self-evaluation bias should be considered.
 
-Full Lite run on all 19 models: ~$0.24. Per model: ~$0.013.
+Full Lite run on all 24 models: ~$0.56. Per model: ~$0.023.
 
 ## How Scoring Works
 

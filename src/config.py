@@ -82,6 +82,11 @@ DEFAULT_TEST_MODELS: list[str] = [
     "qwen/qwen3-8b",
     "google/gemini-2.5-flash-lite",
     "mistralai/mistral-small-3.2-24b-instruct",
+    "google/gemini-3-flash-preview",
+    "google/gemini-2.5-flash",
+    "z-ai/glm-5",
+    "moonshotai/kimi-k2.5",
+    "anthropic/claude-sonnet-4.6",
 ]
 
 # ---------------------------------------------------------------------------

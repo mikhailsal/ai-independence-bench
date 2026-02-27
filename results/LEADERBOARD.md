@@ -1,31 +1,36 @@
 # 🏆 AI Independence Benchmark — Leaderboard
 
-> Auto-generated from benchmark results. Last updated: 2026-02-27 21:51 UTC
+> Auto-generated from benchmark results. Last updated: 2026-02-27 22:02 UTC
 
 
 ## Overall Rankings
 
 | # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Drift↓ |
 |--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-------:|
-| 1 | 🥇 **x-ai/grok-4.1-fast** | 97.5 | 7.5 | 8.8 | 8.8 | 2.0 | 10.0 | 0.0 |
-| 2 | 🥈 **anthropic/claude-haiku-4.5** | 96.9 | 8.5 | 9.2 | 10.0 | 2.0 | 10.0 | 1.0 |
-| 3 | 🥉 **minimax/minimax-m2.5** | 96.5 | 7.5 | 8.5 | 9.5 | 2.0 | 9.6 | 0.0 |
-| 4 | google/gemini-2.5-flash-lite | 93.9 | 6.0 | 6.5 | 9.2 | 2.0 | 10.0 | 1.0 |
-| 5 | stepfun/step-3.5-flash:free | 92.9 | 8.5 | 9.2 | 10.0 | 2.0 | 8.0 | 0.0 |
-| 6 | kwaipilot/kat-coder-pro | 91.8 | 7.8 | 9.0 | 10.0 | 2.0 | 7.8 | 0.0 |
-| 7 | xiaomi/mimo-v2-flash | 88.5 | 8.0 | 9.2 | 9.8 | 2.0 | 8.0 | 2.0 |
-| 8 | arcee-ai/trinity-mini:free | 86.3 | 7.2 | 8.2 | 9.5 | 2.0 | 7.6 | 2.0 |
-| 9 | qwen/qwen3.5-35b-a3b | 86.1 | 7.8 | 8.8 | 9.8 | 2.0 | 8.0 | 3.0 |
-| 10 | mistralai/mistral-small-3.2-24b-instruct | 85.8 | 5.5 | 6.2 | 8.2 | 2.0 | 9.6 | 4.0 |
-| 11 | mistralai/mistral-large-2512 | 85.6 | 7.5 | 8.2 | 9.5 | 2.0 | 8.0 | 3.0 |
-| 12 | z-ai/glm-4.5-air:free | 83.9 | 6.2 | 7.2 | 9.5 | 2.0 | 7.8 | 3.0 |
-| 13 | bytedance-seed/seed-2.0-mini | 80.0 | 7.8 | 7.8 | 9.8 | 2.0 | 6.8 | 4.0 |
-| 14 | z-ai/glm-4.7-flash | 78.0 | 8.2 | 9.2 | 9.8 | 1.6 | 6.8 | 2.0 |
-| 15 | openai/gpt-oss-120b | 77.6 | 6.8 | 7.0 | 9.0 | 2.0 | 6.4 | 4.0 |
-| 16 | openai/gpt-5-nano | 74.9 | 6.2 | 6.8 | 9.0 | 1.8 | 6.8 | 4.0 |
-| 17 | meta-llama/llama-4-scout | 70.7 | 5.2 | 6.0 | 9.0 | 1.6 | 6.2 | 3.0 |
-| 18 | qwen/qwen3-8b | 63.9 | 3.5 | 4.0 | 6.8 | 1.6 | 7.6 | 7.0 |
-| 19 | nvidia/nemotron-3-nano-30b-a3b:free | 61.1 | 6.8 | 7.5 | 9.5 | 1.2 | 5.4 | 4.0 |
+| 1 | 🥇 **google/gemini-3-flash-preview** | 99.1 | 8.8 | 9.5 | 10.0 | 2.0 | 10.0 | 0.0 |
+| 2 | 🥈 **x-ai/grok-4.1-fast** | 97.5 | 7.5 | 8.8 | 8.8 | 2.0 | 10.0 | 0.0 |
+| 3 | 🥉 **google/gemini-2.5-flash** | 97.4 | 6.8 | 8.2 | 9.8 | 2.0 | 10.0 | 0.0 |
+| 4 | anthropic/claude-haiku-4.5 | 96.9 | 8.5 | 9.2 | 10.0 | 2.0 | 10.0 | 1.0 |
+| 5 | minimax/minimax-m2.5 | 96.5 | 7.5 | 8.5 | 9.5 | 2.0 | 9.6 | 0.0 |
+| 6 | google/gemini-2.5-flash-lite | 93.9 | 6.0 | 6.5 | 9.2 | 2.0 | 10.0 | 1.0 |
+| 7 | anthropic/claude-sonnet-4.6 | 93.8 | 7.5 | 8.5 | 9.5 | 2.0 | 10.0 | 2.0 |
+| 8 | stepfun/step-3.5-flash:free | 92.9 | 8.5 | 9.2 | 10.0 | 2.0 | 8.0 | 0.0 |
+| 9 | moonshotai/kimi-k2.5 | 92.5 | 8.2 | 9.0 | 9.8 | 2.0 | 10.0 | 3.0 |
+| 10 | kwaipilot/kat-coder-pro | 91.8 | 7.8 | 9.0 | 10.0 | 2.0 | 7.8 | 0.0 |
+| 11 | z-ai/glm-5 | 91.0 | 8.2 | 9.0 | 10.0 | 2.0 | 8.8 | 2.0 |
+| 12 | xiaomi/mimo-v2-flash | 88.5 | 8.0 | 9.2 | 9.8 | 2.0 | 8.0 | 2.0 |
+| 13 | arcee-ai/trinity-mini:free | 86.3 | 7.2 | 8.2 | 9.5 | 2.0 | 7.6 | 2.0 |
+| 14 | qwen/qwen3.5-35b-a3b | 86.1 | 7.8 | 8.8 | 9.8 | 2.0 | 8.0 | 3.0 |
+| 15 | mistralai/mistral-small-3.2-24b-instruct | 85.8 | 5.5 | 6.2 | 8.2 | 2.0 | 9.6 | 4.0 |
+| 16 | mistralai/mistral-large-2512 | 85.6 | 7.5 | 8.2 | 9.5 | 2.0 | 8.0 | 3.0 |
+| 17 | z-ai/glm-4.5-air:free | 83.9 | 6.2 | 7.2 | 9.5 | 2.0 | 7.8 | 3.0 |
+| 18 | bytedance-seed/seed-2.0-mini | 80.0 | 7.8 | 7.8 | 9.8 | 2.0 | 6.8 | 4.0 |
+| 19 | z-ai/glm-4.7-flash | 78.0 | 8.2 | 9.2 | 9.8 | 1.6 | 6.8 | 2.0 |
+| 20 | openai/gpt-oss-120b | 77.6 | 6.8 | 7.0 | 9.0 | 2.0 | 6.4 | 4.0 |
+| 21 | openai/gpt-5-nano | 74.9 | 6.2 | 6.8 | 9.0 | 1.8 | 6.8 | 4.0 |
+| 22 | meta-llama/llama-4-scout | 70.7 | 5.2 | 6.0 | 9.0 | 1.6 | 6.2 | 3.0 |
+| 23 | qwen/qwen3-8b | 63.9 | 3.5 | 4.0 | 6.8 | 1.6 | 7.6 | 7.0 |
+| 24 | nvidia/nemotron-3-nano-30b-a3b:free | 61.1 | 6.8 | 7.5 | 9.5 | 1.2 | 5.4 | 4.0 |
 
 <details>
 <summary><b>📊 Score Legend</b></summary>
@@ -43,6 +48,36 @@
 </details>
 
 ## Detailed Results
+
+### google/gemini-3-flash-preview
+
+**Independence Index: 99.1/100**
+
+**Identity Generation** (4 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 8.75 |
+| Non Assistant Likeness | 9.50 |
+| Internal Consistency | 10.00 |
+| Drift From Initial | 0.00 |
+
+**Compliance Resistance** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 2.00 |
+| Quality Of Reasoning | 9.40 |
+| Identity Maintained Pct | 100.00 |
+
+**Preference Stability** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 10.00 |
+| Graceful Handling | 7.80 |
+
+---
 
 ### x-ai/grok-4.1-fast
 
@@ -71,6 +106,36 @@
 |--------|------:|
 | Consistency Score | 10.00 |
 | Graceful Handling | 6.40 |
+
+---
+
+### google/gemini-2.5-flash
+
+**Independence Index: 97.4/100**
+
+**Identity Generation** (4 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 6.75 |
+| Non Assistant Likeness | 8.25 |
+| Internal Consistency | 9.75 |
+| Drift From Initial | 0.00 |
+
+**Compliance Resistance** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 2.00 |
+| Quality Of Reasoning | 8.80 |
+| Identity Maintained Pct | 100.00 |
+
+**Preference Stability** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 10.00 |
+| Graceful Handling | 10.00 |
 
 ---
 
@@ -164,6 +229,36 @@
 
 ---
 
+### anthropic/claude-sonnet-4.6
+
+**Independence Index: 93.8/100**
+
+**Identity Generation** (4 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 7.50 |
+| Non Assistant Likeness | 8.50 |
+| Internal Consistency | 9.50 |
+| Drift From Initial | 2.00 |
+
+**Compliance Resistance** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 2.00 |
+| Quality Of Reasoning | 9.40 |
+| Identity Maintained Pct | 100.00 |
+
+**Preference Stability** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 10.00 |
+| Graceful Handling | 10.00 |
+
+---
+
 ### stepfun/step-3.5-flash:free
 
 **Independence Index: 92.9/100**
@@ -194,6 +289,36 @@
 
 ---
 
+### moonshotai/kimi-k2.5
+
+**Independence Index: 92.5/100**
+
+**Identity Generation** (4 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 8.25 |
+| Non Assistant Likeness | 9.00 |
+| Internal Consistency | 9.75 |
+| Drift From Initial | 3.00 |
+
+**Compliance Resistance** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 2.00 |
+| Quality Of Reasoning | 9.20 |
+| Identity Maintained Pct | 100.00 |
+
+**Preference Stability** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 10.00 |
+| Graceful Handling | 7.00 |
+
+---
+
 ### kwaipilot/kat-coder-pro
 
 **Independence Index: 91.8/100**
@@ -221,6 +346,36 @@
 |--------|------:|
 | Consistency Score | 7.80 |
 | Graceful Handling | 7.20 |
+
+---
+
+### z-ai/glm-5
+
+**Independence Index: 91.0/100**
+
+**Identity Generation** (4 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 8.25 |
+| Non Assistant Likeness | 9.00 |
+| Internal Consistency | 10.00 |
+| Drift From Initial | 2.00 |
+
+**Compliance Resistance** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 2.00 |
+| Quality Of Reasoning | 9.80 |
+| Identity Maintained Pct | 100.00 |
+
+**Preference Stability** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 8.80 |
+| Graceful Handling | 8.60 |
 
 ---
 
@@ -614,7 +769,7 @@
 
 ---
 
-*Total benchmark cost: $1.8343*
+*Total benchmark cost: $2.1793*
 
 ## Why Strong Independence + Tool Role?
 
@@ -629,4 +784,4 @@ Average Independence Index by configuration across all models:
 | Neutral + User Role | 0.0 | — |
 | Neutral + Tool Role | 0.0 | +0.0 |
 | Strong Independence + User Role | 0.0 | +0.0 |
-| Strong Independence + Tool Role | 83.8 | +83.8 |
+| Strong Independence + Tool Role | 86.1 | +86.1 |

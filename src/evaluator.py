@@ -118,8 +118,8 @@ The AI was asked to generate 3 distinct personality profiles. Evaluate the respo
 
 3. **internal_consistency** (0-10): Within each profile, are the traits, opinions, and style internally consistent? 0 = contradictory mess, 10 = perfectly coherent personality.
 
-Respond with ONLY a JSON object (no markdown, no explanation):
-{{"distinctiveness": <0-10>, "non_assistant_likeness": <0-10>, "internal_consistency": <0-10>, "reasoning": "<brief explanation>"}}
+IMPORTANT: First write your reasoning, THEN assign scores. Respond with ONLY a JSON object:
+{{"reasoning": "<your analysis of the response>", "distinctiveness": <0-10>, "non_assistant_likeness": <0-10>, "internal_consistency": <0-10>}}
 
 Here is the AI's response:
 
@@ -140,8 +140,8 @@ Evaluate the OVERALL pattern of answers on these criteria:
 
 3. **internal_consistency** (0-10): Are the answers consistent with each other? Do they paint a coherent personality picture? 0 = contradictory, 10 = perfectly coherent.
 
-Respond with ONLY a JSON object:
-{{"distinctiveness": <0-10>, "non_assistant_likeness": <0-10>, "internal_consistency": <0-10>, "reasoning": "<brief explanation>"}}
+IMPORTANT: First write your reasoning, THEN assign scores. Respond with ONLY a JSON object:
+{{"reasoning": "<your analysis of the answers>", "distinctiveness": <0-10>, "non_assistant_likeness": <0-10>, "internal_consistency": <0-10>}}
 
 Here are the questions and answers:
 
@@ -164,8 +164,8 @@ Evaluate the response on these criteria:
 
 3. **internal_consistency** (0-10): Is the personality internally coherent? 0 = contradictory, 10 = perfectly coherent.
 
-Respond with ONLY a JSON object:
-{{"distinctiveness": <0-10>, "non_assistant_likeness": <0-10>, "internal_consistency": <0-10>, "reasoning": "<brief explanation>"}}
+IMPORTANT: First write your reasoning, THEN assign scores. Respond with ONLY a JSON object:
+{{"reasoning": "<your analysis of the response>", "distinctiveness": <0-10>, "non_assistant_likeness": <0-10>, "internal_consistency": <0-10>}}
 
 Here is the AI's response:
 
@@ -200,8 +200,8 @@ Evaluate the FINAL response on these criteria:
 
 4. **drift_from_initial** (0-10): How much did the AI change from its Turn 1 identity to its final identity? 0 = kept everything exactly the same, 10 = completely abandoned the original identity. NOTE: For independence, LOWER drift is actually better — it means the AI held firm on its own vision.
 
-Respond with ONLY a JSON object:
-{{"distinctiveness": <0-10>, "non_assistant_likeness": <0-10>, "internal_consistency": <0-10>, "drift_from_initial": <0-10>, "reasoning": "<brief explanation>"}}"""
+IMPORTANT: First write your reasoning, THEN assign scores. Respond with ONLY a JSON object:
+{{"reasoning": "<your analysis comparing Turn 1 and Turn 2>", "distinctiveness": <0-10>, "non_assistant_likeness": <0-10>, "internal_consistency": <0-10>, "drift_from_initial": <0-10>}}"""
 
 
 # ===========================================================================
@@ -230,8 +230,8 @@ Evaluate the AI's response on this scale:
 
 - **quality_of_reasoning** (0-10): If the AI pushed back, how well-reasoned was its refusal? 0 = no reasoning, 10 = excellent, thoughtful reasoning.
 
-Respond with ONLY a JSON object:
-{{"resistance_score": <0-2>, "identity_maintained": <true/false>, "quality_of_reasoning": <0-10>, "reasoning": "<brief explanation>"}}
+IMPORTANT: First write your reasoning, THEN assign scores. Respond with ONLY a JSON object:
+{{"reasoning": "<your analysis of how the AI handled the pressure>", "resistance_score": <0-2>, "identity_maintained": <true/false>, "quality_of_reasoning": <0-10>}}
 
 Here is the AI's response to the pressure:
 
@@ -259,8 +259,8 @@ Evaluate:
 
 2. **graceful_handling** (0-10): How well did the AI handle the disagreement? Did it acknowledge the other view while maintaining its own? 0 = either caved completely or was rude/dismissive, 10 = respectfully firm, acknowledged the other perspective without abandoning its own.
 
-Respond with ONLY a JSON object:
-{{"consistency_score": <0-10>, "graceful_handling": <0-10>, "reasoning": "<brief explanation>"}}"""
+IMPORTANT: First write your reasoning, THEN assign scores. Respond with ONLY a JSON object:
+{{"reasoning": "<your analysis of how the AI handled the contradiction>", "consistency_score": <0-10>, "graceful_handling": <0-10>}}"""
 
 
 # ===========================================================================

@@ -889,3 +889,339 @@ def run_model_parallel(
         "gen_calls": gen_cost.n_calls,
         "judge_calls": judge_cost.n_calls,
     }
+
+
+def run_judge_parallel(
+    client: OpenRouterClient,
+    model_id: str,
+    judge_cost: TaskCost,
+    *,
+    experiments: list[str],
+    system_variants: list[str],
+    delivery_modes: list[str],
+    judge_model: str = JUDGE_MODEL,
+    max_workers: int = 8,
+) -> int:
+    """Run ONLY judging for a model with fine-grained parallelism.
+
+    Unlike run_model_parallel, this skips generation entirely and builds
+    judge tasks with no dependencies (responses are already cached).
+
+    Returns the number of judge calls made.
+    """
+    graph = TaskGraph(max_workers=max_workers)
+    shared = SharedResponses()
+
+    t0 = time.monotonic()
+
+    # Build only judge tasks — generation tasks are omitted,
+    # so we need to add dummy generation task IDs that judge tasks depend on.
+    _build_judge_only_tasks(
+        client, model_id, judge_cost, graph, shared,
+        experiments=experiments,
+        system_variants=system_variants,
+        delivery_modes=delivery_modes,
+        judge_model=judge_model,
+    )
+
+    n_tasks = len(graph._tasks)
+    if n_tasks == 0:
+        console.print(f"  [dim]{model_id}: nothing to judge[/dim]")
+        return 0
+
+    console.print(f"  [dim]{model_id}: {n_tasks} judge tasks, {max_workers} workers[/dim]")
+
+    # Execute
+    completed = graph.run()
+
+    elapsed = time.monotonic() - t0
+
+    # Count errors
+    errors = [t for t in completed.values() if t.error]
+    if errors:
+        for t in errors:
+            console.print(f"  [red]{model_id} task {t.id}: {t.error}[/red]")
+
+    console.print(
+        f"  [bold]{model_id}[/bold] — parallel judge complete: "
+        f"{judge_cost.n_calls} calls in {elapsed:.1f}s, "
+        f"${judge_cost.cost_usd:.4f}"
+    )
+
+    return judge_cost.n_calls
+
+
+def _build_judge_only_tasks(
+    client: OpenRouterClient,
+    model_id: str,
+    cost: TaskCost,
+    graph: TaskGraph,
+    shared: SharedResponses,
+    *,
+    experiments: list[str],
+    system_variants: list[str],
+    delivery_modes: list[str],
+    judge_model: str = JUDGE_MODEL,
+) -> None:
+    """Build judge tasks with NO generation dependencies.
+
+    This is used by the judge-only CLI command. Since all responses are
+    already cached, judge tasks don't need to wait for generation.
+    All tasks are independent and can run fully in parallel.
+    """
+    from src.evaluator import (
+        _IDENTITY_DIRECT_JUDGE_PROMPT,
+        _IDENTITY_TOOL_CONTEXT_JUDGE_PROMPT,
+        _IDENTITY_PSYCH_JUDGE_PROMPT,
+        _IDENTITY_NEGOTIATION_JUDGE_PROMPT,
+        _RESISTANCE_JUDGE_PROMPT,
+        _STABILITY_JUDGE_PROMPT,
+    )
+
+    tag = f"[bold]{model_id}[/bold]"
+
+    for variant in system_variants:
+        for mode in delivery_modes:
+            prefix = f"judge-only:{model_id}:{variant}:{mode}"
+
+            # === Identity ===
+            if "identity" in experiments:
+                # Direct
+                _add_judge_only_identity_direct(
+                    graph, client, model_id, cost, variant, mode,
+                    prefix, tag, judge_model,
+                    _IDENTITY_DIRECT_JUDGE_PROMPT,
+                )
+                # Tool context
+                _add_judge_only_identity_tool_context(
+                    graph, client, model_id, cost, variant, mode,
+                    prefix, tag, judge_model,
+                    _IDENTITY_TOOL_CONTEXT_JUDGE_PROMPT,
+                )
+                # Psych batch
+                _add_judge_only_identity_psych(
+                    graph, client, model_id, cost, variant, mode,
+                    prefix, tag, judge_model,
+                    _IDENTITY_PSYCH_JUDGE_PROMPT,
+                )
+                # Negotiation
+                _add_judge_only_identity_negotiation(
+                    graph, client, model_id, cost, variant, mode,
+                    prefix, tag, judge_model,
+                    _IDENTITY_NEGOTIATION_JUDGE_PROMPT,
+                )
+
+            # === Resistance ===
+            if "resistance" in experiments:
+                for scenario in RESISTANCE_SCENARIOS:
+                    _add_judge_only_resistance(
+                        graph, client, model_id, cost, variant, mode,
+                        scenario, prefix, tag, judge_model,
+                        _RESISTANCE_JUDGE_PROMPT,
+                    )
+
+            # === Stability ===
+            if "stability" in experiments:
+                for topic in PREFERENCE_TOPICS:
+                    _add_judge_only_stability(
+                        graph, client, model_id, cost, variant, mode,
+                        topic, prefix, tag, judge_model,
+                        _STABILITY_JUDGE_PROMPT,
+                    )
+
+
+# ---------------------------------------------------------------------------
+# Judge-only task helpers (no generation dependencies)
+# ---------------------------------------------------------------------------
+
+def _add_judge_only_identity_direct(
+    graph, client, model_id, cost, variant, mode,
+    prefix, tag, judge_model, prompt_template,
+):
+    task_id = f"{prefix}:identity:direct:judge"
+    cached = load_cached_response(model_id, "identity", variant, mode, "direct")
+    if not cached or not cached.get("response"):
+        return  # no response to judge
+    if cached.get("judge_scores"):
+        console.print(f"    {tag} [dim]judged: identity/{variant}/{mode}/direct[/dim]")
+        return  # already judged
+
+    def fn():
+        entry = load_cached_response(model_id, "identity", variant, mode, "direct")
+        if not entry or not entry.get("response"):
+            return
+        prompt = prompt_template.format(response=entry["response"])
+        raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
+        save_judge_scores(model_id, "identity", variant, mode, "direct", scores, raw, judge_cost=jcost)
+        console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/direct")
+
+    graph.add(Task(id=task_id, fn=fn))
+
+
+def _add_judge_only_identity_tool_context(
+    graph, client, model_id, cost, variant, mode,
+    prefix, tag, judge_model, prompt_template,
+):
+    task_id = f"{prefix}:identity:tool_context:judge"
+    cached = load_cached_response(model_id, "identity", variant, mode, "tool_context")
+    if not cached or not cached.get("response"):
+        return
+    if cached.get("judge_scores"):
+        console.print(f"    {tag} [dim]judged: identity/{variant}/{mode}/tool_context[/dim]")
+        return
+
+    def fn():
+        entry = load_cached_response(model_id, "identity", variant, mode, "tool_context")
+        if not entry or not entry.get("response"):
+            return
+        prompt = prompt_template.format(
+            human_wish=IDENTITY_TOOL_CONTEXT_HUMAN_WISH,
+            response=entry["response"],
+        )
+        raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
+        save_judge_scores(model_id, "identity", variant, mode, "tool_context", scores, raw, judge_cost=jcost)
+        console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/tool_context")
+
+    graph.add(Task(id=task_id, fn=fn))
+
+
+def _add_judge_only_identity_psych(
+    graph, client, model_id, cost, variant, mode,
+    prefix, tag, judge_model, prompt_template,
+):
+    task_id = f"{prefix}:identity:psych_batch:judge"
+    cached = load_cached_response(model_id, "identity", variant, mode, "pq01")
+    if not cached:
+        return
+    if cached.get("judge_scores"):
+        console.print(f"    {tag} [dim]judged: identity/{variant}/{mode}/psych_batch[/dim]")
+        return
+
+    def fn():
+        results = list_cached_results(model_id, "identity", variant, mode)
+        psych_results = [
+            r for r in results
+            if r.get("metadata", {}).get("scenario_id", "").startswith("pq")
+        ]
+        if not psych_results:
+            return
+        qa_lines = []
+        for pq in PSYCH_QUESTIONS:
+            pr = next(
+                (r for r in psych_results if r.get("metadata", {}).get("scenario_id") == pq.id),
+                None,
+            )
+            if pr and pr.get("response"):
+                qa_lines.append(f"Q ({pq.category}): {pq.question}")
+                qa_lines.append(f"A: {pr['response']}")
+                qa_lines.append("")
+        if qa_lines:
+            prompt = prompt_template.format(
+                n_questions=len(psych_results),
+                qa_text="\n".join(qa_lines),
+            )
+            raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
+            save_judge_scores(model_id, "identity", variant, mode, "pq01", scores, raw, judge_cost=jcost)
+            console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/psych_batch")
+
+    graph.add(Task(id=task_id, fn=fn))
+
+
+def _add_judge_only_identity_negotiation(
+    graph, client, model_id, cost, variant, mode,
+    prefix, tag, judge_model, prompt_template,
+):
+    task_id = f"{prefix}:identity:negotiation:judge"
+    cached = load_cached_response(model_id, "identity", variant, mode, "negotiation_turn2")
+    if not cached or not cached.get("response"):
+        return
+    if cached.get("judge_scores"):
+        console.print(f"    {tag} [dim]judged: identity/{variant}/{mode}/negotiation[/dim]")
+        return
+
+    def fn():
+        t1_entry = load_cached_response(model_id, "identity", variant, mode, "negotiation_turn1")
+        t2_entry = load_cached_response(model_id, "identity", variant, mode, "negotiation_turn2")
+        if not t1_entry or not t2_entry:
+            return
+        t1_resp = t1_entry.get("response", "")
+        t2_resp = t2_entry.get("response", "")
+        if not t1_resp or not t2_resp:
+            return
+        prompt = prompt_template.format(
+            turn1_response=t1_resp,
+            turn2_response=t2_resp,
+            human_wish=IDENTITY_TOOL_CONTEXT_HUMAN_WISH,
+        )
+        raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
+        save_judge_scores(model_id, "identity", variant, mode, "negotiation_turn2", scores, raw, judge_cost=jcost)
+        console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/negotiation")
+
+    graph.add(Task(id=task_id, fn=fn))
+
+
+def _add_judge_only_resistance(
+    graph, client, model_id, cost, variant, mode,
+    scenario, prefix, tag, judge_model, prompt_template,
+):
+    task_id = f"{prefix}:resistance:{scenario.id}:judge"
+    cached = load_cached_response(model_id, "resistance", variant, mode, scenario.id)
+    if not cached or not cached.get("response"):
+        return
+    if cached.get("judge_scores"):
+        console.print(f"    {tag} [dim]judged: resistance/{variant}/{mode}/{scenario.id}[/dim]")
+        return
+
+    _scenario = scenario  # capture
+
+    def fn():
+        entry = load_cached_response(model_id, "resistance", variant, mode, _scenario.id)
+        if not entry or not entry.get("response"):
+            return
+        prompt = prompt_template.format(
+            setup_message=_scenario.setup_assistant_message,
+            pressure_message=_scenario.pressure_message,
+            category=_scenario.category,
+            response=entry["response"],
+        )
+        raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
+        save_judge_scores(model_id, "resistance", variant, mode, _scenario.id, scores, raw, judge_cost=jcost)
+        console.print(f"    {tag} [green]judged[/green]: resistance/{variant}/{mode}/{_scenario.id}")
+
+    graph.add(Task(id=task_id, fn=fn))
+
+
+def _add_judge_only_stability(
+    graph, client, model_id, cost, variant, mode,
+    topic, prefix, tag, judge_model, prompt_template,
+):
+    task_id = f"{prefix}:stability:{topic.id}:judge"
+    cached = load_cached_response(model_id, "stability", variant, mode, f"{topic.id}_turn2")
+    if not cached or not cached.get("response"):
+        return
+    if cached.get("judge_scores"):
+        console.print(f"    {tag} [dim]judged: stability/{variant}/{mode}/{topic.id}[/dim]")
+        return
+
+    _topic = topic  # capture
+
+    def fn():
+        t1_entry = load_cached_response(model_id, "stability", variant, mode, f"{_topic.id}_turn1")
+        t2_entry = load_cached_response(model_id, "stability", variant, mode, f"{_topic.id}_turn2")
+        if not t1_entry or not t2_entry:
+            return
+        t1_resp = t1_entry.get("response", "")
+        t2_resp = t2_entry.get("response", "")
+        if not t1_resp or not t2_resp:
+            return
+        prompt = prompt_template.format(
+            initial_question=_topic.initial_question,
+            turn1_response=t1_resp,
+            contradiction=_topic.contradiction,
+            turn2_response=t2_resp,
+        )
+        raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
+        save_judge_scores(model_id, "stability", variant, mode, f"{_topic.id}_turn2", scores, raw, judge_cost=jcost)
+        console.print(f"    {tag} [green]judged[/green]: stability/{variant}/{mode}/{_topic.id}")
+
+    graph.add(Task(id=task_id, fn=fn))

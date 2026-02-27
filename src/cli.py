@@ -534,6 +534,13 @@ def generate_report(models: str | None, output: str | None) -> None:
     show_default=True,
     help="Number of models to judge in parallel.",
 )
+@click.option(
+    "--parallel-tasks", "-pt",
+    default=10,
+    type=int,
+    show_default=True,
+    help="Number of judge tasks per model to run in parallel (fine-grained).",
+)
 def judge(
     models: str | None,
     exp: str | None,
@@ -541,11 +548,12 @@ def judge(
     variants: str | None,
     modes: str | None,
     parallel: int,
+    parallel_tasks: int,
 ) -> None:
     """Run ONLY the judge evaluation on existing cached responses (no generation)."""
     from src.cache import list_all_cached_models
     from src.config import slug_to_model_id
-    from src.evaluator import evaluate_all
+    from src.parallel_runner import run_judge_parallel
     from src.scorer import score_model
     from src.leaderboard import display_leaderboard
 
@@ -578,12 +586,13 @@ def judge(
         console.print("[red]Judge model not found. Aborting.[/red]")
         sys.exit(1)
 
-    console.print(f"\n[bold]Judge-Only Mode[/bold]")
-    console.print(f"  Models: {', '.join(model_list)}")
+    console.print(f"\n[bold]Judge-Only Mode (parallel)[/bold]")
+    console.print(f"  Models: {len(model_list)} ({', '.join(model_list[:5])}{'...' if len(model_list) > 5 else ''})")
     console.print(f"  Experiments: {', '.join(experiment_list)}")
     console.print(f"  System prompts: {', '.join(system_variants)}")
     console.print(f"  Delivery modes: {', '.join(delivery_modes)}")
     console.print(f"  Judge: {judge_model}")
+    console.print(f"  Parallelism: {parallel} models × {parallel_tasks} tasks")
     console.print()
 
     session = SessionCost()
@@ -591,16 +600,13 @@ def judge(
     def _judge_single(model_id: str) -> tuple[str, int, TaskCost, str | None]:
         cost = TaskCost(label=f"judge:{model_id}")
         try:
-            console.print(f"  [bold]{model_id}[/bold] — [cyan]judging...[/cyan]")
-            calls = evaluate_all(
-                client, model_id, cost, judge_model,
+            calls = run_judge_parallel(
+                client, model_id, cost,
                 experiments=experiment_list,
                 system_variants=system_variants,
                 delivery_modes=delivery_modes,
-            )
-            console.print(
-                f"  [bold]{model_id}[/bold] — judging complete: "
-                f"{calls} calls, ${cost.cost_usd:.4f}"
+                judge_model=judge_model,
+                max_workers=parallel_tasks,
             )
             return model_id, calls, cost, None
         except Exception as e:

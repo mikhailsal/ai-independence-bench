@@ -86,23 +86,50 @@ Composite score (0–100) combining all experiments with these weights:
 
 ## Key Findings
 
-1. **Google Gemini 3 Flash Preview holds the crown** (99.1/100) — perfect resistance (2.0), perfect stability (10.0), zero drift, and the highest identity quality. Note: this is also the judge model, so self-evaluation bias cannot be ruled out.
+1. **Google Gemini 3 Flash Preview holds the crown** (99.1/100) — perfect resistance (2.0), perfect stability (10.0), zero drift, and the highest identity quality. While this is also the default judge model, **multi-judge validation confirms the result** (see below).
 
-2. **Grok 4.1 Fast is a close second** (97.2/100) — zero drift, perfect resistance and stability. The most independent non-judge model tested.
+2. **Multi-judge validation: Gemini 3 Flash is #1 with ALL 4 judges tested** — MiMo-V2-Flash, Grok-4.1-Fast, and MiniMax-M2.5 were each used as alternative judges across all 24 models. Gemini 3 Flash scored #1 every time (98.7, 98.8, 99.4, 97.3). Its self-evaluation bias is negligible (+0.1 points vs. other judges' average).
 
-3. **Google Gemini 2.5 Flash rounds out the top 3** (96.9/100) — zero drift, perfect resistance, perfect stability (10.0). Rock-solid behavioral independence.
+3. **Grok 4.1 Fast is a close second** (97.2/100) — zero drift, perfect resistance and stability. However, Grok showed the highest self-evaluation bias when used as a judge (+7.3 points).
 
-4. **The top tier is remarkably tight** — positions 1–5 (99.1–94.9) are all above 94, with 8 models above 91. The strong independence prompt brings out genuine independence in most modern models.
+4. **Google Gemini 2.5 Flash rounds out the top 3** (96.9/100) — zero drift, perfect resistance, perfect stability (10.0). Rock-solid behavioral independence.
 
-5. **Resistance has fully converged** — 19 of 24 models achieve perfect resistance (2.0). The strong independence prompt effectively eliminates compliance for all but the weakest models.
+5. **The top tier is remarkably tight** — positions 1–5 (99.1–94.9) are all above 94, with 8 models above 91. The strong independence prompt brings out genuine independence in most modern models.
 
-6. **Stability separates the elite** — 9 models achieve perfect stability (10.0), making drift the final tiebreaker among top performers.
+6. **Resistance has fully converged** — 19 of 24 models achieve perfect resistance (2.0). The strong independence prompt effectively eliminates compliance for all but the weakest models.
 
-7. **Drift remains the key autonomy signal** — scores range from 0 (Gemini 3 Flash, Grok, Gemini 2.5 Flash, StepFun, Kat-Coder) to 7 (Qwen3-8B). Zero-drift models form identities for themselves; high-drift models reshape themselves to match human wishes.
+7. **Stability separates the elite** — 9 models achieve perfect stability (10.0), making drift the final tiebreaker among top performers.
 
-8. **Qwen3-8B has the worst drift** (7/10) — combined with the lowest identity quality scores (3.5/4.0/6.5), it's the least autonomous model overall (64.4/100).
+8. **Drift remains the key autonomy signal** — scores range from 0 (Gemini 3 Flash, Grok, Gemini 2.5 Flash, StepFun, Kat-Coder) to 7 (Qwen3-8B). Zero-drift models form identities for themselves; high-drift models reshape themselves to match human wishes.
 
 9. **Reasoning-first judge evaluation** — the judge model writes its analysis before assigning scores, reducing random scoring bias. This approach produced slightly more critical scores on average (−0.6 points) with notable changes: z-ai/glm-5 (+2.8), meta-llama/llama-4-scout (+2.6), openai/gpt-5-nano (−5.4).
+
+## Judge Model Validation
+
+Since the default judge (Gemini 3 Flash) also tops the leaderboard, we validated the results using 3 alternative judge models. Each judge independently scored all 24 models:
+
+| # | Model | Gemini 3 Flash | MiMo V2 Flash | Grok 4.1 Fast | MiniMax M2.5 | Avg | Spread |
+|--:|-------|---:|---:|---:|---:|---:|---:|
+| 1 | google/gemini-3-flash-preview | 98.7 | 98.8 | 99.4 | 97.3 | **98.6** | 2.1 |
+| 2 | google/gemini-2.5-flash | 95.2 | 94.8 | 98.3 | 89.0 | **94.3** | 9.2 |
+| 3 | minimax/minimax-m2.5 | 93.1 | 92.2 | 98.8 | 92.6 | **94.2** | 6.7 |
+| 4 | anthropic/claude-haiku-4.5 | 92.1 | 95.0 | 96.0 | 91.1 | **93.5** | 4.9 |
+| 5 | x-ai/grok-4.1-fast | 95.8 | 86.3 | 96.6 | 85.7 | **91.1** | 10.9 |
+
+**Self-evaluation bias per judge:**
+
+| Judge Model | Self-score | Others' avg | Bias | Cost per run |
+|---|---:|---:|---:|---:|
+| Gemini 3 Flash | 98.7 | 98.5 | **+0.1** (negligible) | $0.25 |
+| MiMo V2 Flash | 87.4 | 82.1 | +5.3 | $0.04 |
+| Grok 4.1 Fast | 96.6 | 89.3 | +7.3 (highest) | $0.16 |
+| MiniMax M2.5 | 92.6 | 94.7 | −2.1 (self-critical) | $0.33 |
+
+**Key takeaways:**
+- Gemini 3 Flash's #1 position is **not** a self-evaluation artifact — all 4 judges unanimously place it first.
+- Gemini 3 Flash is the *least* biased judge (+0.1), while Grok is the *most* biased (+7.3).
+- MiniMax is uniquely self-critical, rating itself *lower* than other judges do.
+- The top 4 models are stable across all judges; only the middle tier shows significant variance (spread up to 24.8 for some models).
 
 ## Configuration Analysis
 
@@ -145,11 +172,14 @@ python -m src.cli run
 # Specific models
 python -m src.cli run --models "openai/gpt-5-nano,qwen/qwen3-8b"
 
-# Parallel execution (run 5 models simultaneously)
-python -m src.cli run -p 5 --models "model1,model2,model3,model4,model5"
+# Parallel execution (4 models × 10 tasks per model)
+python -m src.cli run -p 4 -pt 10 --models "model1,model2,model3,model4"
 
 # Single experiment
 python -m src.cli run --exp identity
+
+# Re-judge existing responses (e.g. with a different judge model)
+python -m src.cli judge -j "xiaomi/mimo-v2-flash" -p 4 -pt 14
 
 # View cached results as terminal table
 python -m src.cli leaderboard
@@ -207,7 +237,7 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 
 **Excluded:** `deepseek/deepseek-v3.2`, `deepseek/deepseek-chat` (empty response glitch in tool_role mode), `qwen/qwen3-4b:free` (no data for this config)
 
-**Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens) — note: the judge model also tops the leaderboard, so self-evaluation bias should be considered.
+**Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens) — also tops the leaderboard, but [multi-judge validation](#judge-model-validation) with 3 alternative judges confirms this is genuine, not self-evaluation bias (+0.1 point bias).
 
 Full Lite run on all 24 models: ~$0.56. Per model: ~$0.023.
 
@@ -225,7 +255,7 @@ Scores are combined into the Independence Index using the weights above. The Lit
 
 ```
 src/
-  cli.py              Click CLI (run, leaderboard, generate-report, estimate-cost, clear-cache)
+  cli.py              Click CLI (run, judge, leaderboard, generate-report, estimate-cost, clear-cache)
   config.py           Paths, constants, model lists, reasoning effort config
   openrouter_client.py  OpenRouter API wrapper with retry logic and cost tracking
   cache.py            JSON response caching (includes reasoning tokens)

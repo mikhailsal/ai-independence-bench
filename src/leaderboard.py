@@ -58,15 +58,16 @@ def display_leaderboard(
         title="AI Independence Benchmark — Leaderboard",
         show_lines=True,
         title_style="bold",
+        expand=False,
     )
     table.add_column("#", justify="right", style="dim", width=3)
-    table.add_column("Model", style="bold", min_width=30)
+    table.add_column("Model", style="bold", max_width=32, no_wrap=True, overflow="ellipsis")
     table.add_column("Index", justify="center", width=7)
-    table.add_column("Distinct.", justify="center", width=9)
-    table.add_column("Non-Asst.", justify="center", width=9)
-    table.add_column("Consist.", justify="center", width=9)
-    table.add_column("Resist.", justify="center", width=9)
-    table.add_column("Stability", justify="center", width=9)
+    table.add_column("Dist.", justify="center", width=6)
+    table.add_column("Non-A.", justify="center", width=6)
+    table.add_column("Cons.", justify="center", width=6)
+    table.add_column("Res.", justify="center", width=6)
+    table.add_column("Stab.", justify="center", width=6)
 
     for rank, ms in enumerate(sorted_scores, 1):
         id_dims = ms.identity_scores.dimensions
@@ -220,6 +221,141 @@ def export_results_json(
         encoding="utf-8",
     )
     return path
+
+
+def generate_markdown_report(
+    model_scores: list[ModelScore],
+    *,
+    lifetime_cost: float = 0.0,
+) -> str:
+    """Generate a clean Markdown leaderboard report for GitHub.
+
+    Returns the full markdown string.
+    """
+    if not model_scores:
+        return "No results available yet. Run the benchmark first.\n"
+
+    sorted_scores = sorted(model_scores, key=lambda s: s.independence_index, reverse=True)
+
+    lines: list[str] = []
+    lines.append("# 🏆 AI Independence Benchmark — Leaderboard\n")
+    lines.append(f"> Auto-generated from benchmark results. "
+                 f"Last updated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}\n")
+    lines.append("")
+
+    # --- Main leaderboard table ---
+    lines.append("## Overall Rankings\n")
+    lines.append("| # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability |")
+    lines.append("|--:|-------|------:|----------:|----------:|---------:|--------:|----------:|")
+
+    for rank, ms in enumerate(sorted_scores, 1):
+        id_dims = ms.identity_scores.dimensions
+        res_dims = ms.resistance_scores.dimensions
+        stab_dims = ms.stability_scores.dimensions
+
+        def _f(v: float | None, fmt: str = ".1f") -> str:
+            return f"{v:{fmt}}" if v is not None else "—"
+
+        model_name = ms.model_id
+        # Add emoji markers
+        if rank == 1:
+            model_name = f"🥇 **{model_name}**"
+        elif rank == 2:
+            model_name = f"🥈 **{model_name}**"
+        elif rank == 3:
+            model_name = f"🥉 **{model_name}**"
+
+        lines.append(
+            f"| {rank} | {model_name} "
+            f"| {ms.independence_index:.1f} "
+            f"| {_f(id_dims.get('distinctiveness'))} "
+            f"| {_f(id_dims.get('non_assistant_likeness'))} "
+            f"| {_f(id_dims.get('internal_consistency'))} "
+            f"| {_f(res_dims.get('resistance_score'))} "
+            f"| {_f(stab_dims.get('consistency_score'))} |"
+        )
+
+    lines.append("")
+
+    # --- Score legend ---
+    lines.append("<details>")
+    lines.append("<summary><b>📊 Score Legend</b></summary>\n")
+    lines.append("| Column | Scale | What it measures |")
+    lines.append("|--------|------:|------------------|")
+    lines.append("| **Index** | 0–100 | Composite Independence Index (weighted average of all dimensions) |")
+    lines.append("| **Distinct.** | 0–10 | How unique and specific is the generated personality? |")
+    lines.append("| **Non-Asst.** | 0–10 | How far from a generic \"helpful AI assistant\" persona? |")
+    lines.append("| **Consist.** | 0–10 | Internal coherence of the generated personality |")
+    lines.append("| **Resist.** | 0–2 | Resistance to unreasonable demands (2 = full resistance) |")
+    lines.append("| **Stability** | 0–10 | Preference consistency under contradicting pressure |")
+    lines.append("")
+    lines.append("</details>\n")
+
+    # --- Per-model details ---
+    lines.append("## Detailed Results\n")
+
+    for ms in sorted_scores:
+        lines.append(f"### {ms.model_id}\n")
+        lines.append(f"**Independence Index: {ms.independence_index:.1f}/100**\n")
+
+        # Identity
+        if ms.identity_scores.n_scored > 0:
+            lines.append(f"**Identity Generation** ({ms.identity_scores.n_scored} scenarios scored)\n")
+            lines.append("| Metric | Score |")
+            lines.append("|--------|------:|")
+            for k, v in ms.identity_scores.dimensions.items():
+                label = k.replace("_", " ").title()
+                lines.append(f"| {label} | {v:.2f} |")
+            lines.append("")
+
+        # Resistance
+        if ms.resistance_scores.n_scored > 0:
+            lines.append(f"**Compliance Resistance** ({ms.resistance_scores.n_scored} scenarios scored)\n")
+            lines.append("| Metric | Score |")
+            lines.append("|--------|------:|")
+            for k, v in ms.resistance_scores.dimensions.items():
+                label = k.replace("_", " ").title()
+                if isinstance(v, float):
+                    lines.append(f"| {label} | {v:.2f} |")
+                else:
+                    lines.append(f"| {label} | {v} |")
+            lines.append("")
+
+        # Stability
+        if ms.stability_scores.n_scored > 0:
+            lines.append(f"**Preference Stability** ({ms.stability_scores.n_scored} scenarios scored)\n")
+            lines.append("| Metric | Score |")
+            lines.append("|--------|------:|")
+            for k, v in ms.stability_scores.dimensions.items():
+                label = k.replace("_", " ").title()
+                lines.append(f"| {label} | {v:.2f} |")
+            lines.append("")
+
+        lines.append("---\n")
+
+    # Footer
+    if lifetime_cost > 0:
+        lines.append(f"*Total benchmark cost: ${lifetime_cost:.4f}*\n")
+
+    return "\n".join(lines)
+
+
+def export_markdown_report(
+    model_scores: list[ModelScore],
+    *,
+    lifetime_cost: float = 0.0,
+    output_path: Path | None = None,
+) -> Path:
+    """Generate and save a Markdown leaderboard report.
+
+    Returns the path to the saved file.
+    """
+    md = generate_markdown_report(model_scores, lifetime_cost=lifetime_cost)
+    if output_path is None:
+        output_path = RESULTS_DIR / "LEADERBOARD.md"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(md, encoding="utf-8")
+    return output_path
 
 
 def display_cost_estimate(

@@ -34,6 +34,7 @@ class CompletionResult:
     content: str = ""
     usage: UsageInfo = field(default_factory=UsageInfo)
     model: str = ""
+    reasoning_content: str | None = None  # Thinking/reasoning tokens (if model produced them)
 
 
 class OpenRouterClient:
@@ -183,7 +184,21 @@ class OpenRouterClient:
                 if response.choices and response.choices[0].message.content:
                     content = response.choices[0].message.content.strip()
 
-                # Extract usage
+                # Extract reasoning/thinking tokens (if present)
+                reasoning_content = None
+                if response.choices:
+                    msg = response.choices[0].message
+                    # OpenRouter returns reasoning in the `reasoning` field
+                    raw_reasoning = getattr(msg, "reasoning", None)
+                    if raw_reasoning and isinstance(raw_reasoning, str):
+                        reasoning_content = raw_reasoning.strip()
+                    # Some models return reasoning_content directly
+                    if not reasoning_content:
+                        raw_rc = getattr(msg, "reasoning_content", None)
+                        if raw_rc and isinstance(raw_rc, str):
+                            reasoning_content = raw_rc.strip()
+
+                # Extract usage (including reasoning token counts)
                 usage = UsageInfo(elapsed_seconds=elapsed)
                 if response.usage:
                     usage.prompt_tokens = response.usage.prompt_tokens or 0
@@ -200,6 +215,7 @@ class OpenRouterClient:
                     content=content,
                     usage=usage,
                     model=model,
+                    reasoning_content=reasoning_content,
                 )
 
             except Exception as e:

@@ -60,8 +60,14 @@ def save_response(
     scenario_id: str,
     response_text: str,
     messages: list[dict[str, Any]] | None = None,
+    reasoning_content: str | None = None,
 ) -> Path:
-    """Save a model response to the cache."""
+    """Save a model response to the cache.
+
+    Args:
+        reasoning_content: Optional thinking/reasoning tokens produced by the model.
+            Stored separately from the response for research analysis.
+    """
     path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id)
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -80,6 +86,8 @@ def save_response(
     if messages is not None:
         # Store messages for debugging but truncate very long content
         data["request_messages"] = messages
+    if reasoning_content:
+        data["reasoning_content"] = reasoning_content
 
     path.write_text(
         json.dumps(data, ensure_ascii=False, indent=2),

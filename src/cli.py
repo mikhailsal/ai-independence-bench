@@ -287,6 +287,57 @@ def leaderboard(models: str | None, detailed: bool) -> None:
 
 
 # ---------------------------------------------------------------------------
+# generate-report: Markdown leaderboard
+# ---------------------------------------------------------------------------
+
+@cli.command("generate-report")
+@click.option(
+    "--models", "-m",
+    default=None,
+    help="Comma-separated model IDs. Defaults to all cached models.",
+)
+@click.option(
+    "--output", "-o",
+    default=None,
+    type=click.Path(),
+    help="Output path for the Markdown file. Defaults to results/LEADERBOARD.md.",
+)
+def generate_report(models: str | None, output: str | None) -> None:
+    """Generate a Markdown leaderboard report for GitHub."""
+    from pathlib import Path as P
+
+    from src.cache import list_all_cached_models
+    from src.config import slug_to_model_id
+    from src.scorer import score_model
+    from src.leaderboard import export_markdown_report
+
+    if models:
+        model_list = _parse_models(models)
+    else:
+        slugs = list_all_cached_models()
+        if not slugs:
+            console.print("[dim]No cached results found. Run the benchmark first.[/dim]")
+            return
+        model_list = [slug_to_model_id(s) for s in slugs]
+
+    lifetime = load_lifetime_cost()
+
+    model_scores = []
+    for model_id in model_list:
+        ms = score_model(model_id)
+        if ms.identity_scores.n_scored > 0 or ms.resistance_scores.n_scored > 0 or ms.stability_scores.n_scored > 0:
+            model_scores.append(ms)
+
+    if not model_scores:
+        console.print("[dim]No scored results found. Run the benchmark with judge evaluation first.[/dim]")
+        return
+
+    out_path = P(output) if output else None
+    path = export_markdown_report(model_scores, lifetime_cost=lifetime, output_path=out_path)
+    console.print(f"[green]Markdown report saved to: {path}[/green]")
+
+
+# ---------------------------------------------------------------------------
 # estimate-cost
 # ---------------------------------------------------------------------------
 

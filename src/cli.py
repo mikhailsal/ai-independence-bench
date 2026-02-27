@@ -431,7 +431,12 @@ def generate_report(models: str | None, output: str | None) -> None:
         return
 
     out_path = P(output) if output else None
-    path = export_markdown_report(model_scores, lifetime_cost=lifetime, output_path=out_path)
+    path = export_markdown_report(
+        model_scores,
+        lifetime_cost=lifetime,
+        output_path=out_path,
+        model_ids=model_list,
+    )
     console.print(f"[green]Markdown report saved to: {path}[/green]")
 
 

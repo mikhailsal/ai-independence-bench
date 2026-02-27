@@ -368,17 +368,186 @@ def generate_markdown_report(
     return "\n".join(lines)
 
 
+def _generate_compact_table(
+    model_scores: list[ModelScore],
+    *,
+    show_rank: bool = True,
+) -> list[str]:
+    """Generate a compact Markdown leaderboard table (no header/footer)."""
+    lines: list[str] = []
+    sorted_scores = sorted(model_scores, key=lambda s: s.independence_index, reverse=True)
+
+    lines.append("| # | Model | Index | Resist. | Stability |")
+    lines.append("|--:|-------|------:|--------:|----------:|")
+
+    for rank, ms in enumerate(sorted_scores, 1):
+        res_dims = ms.resistance_scores.dimensions
+        stab_dims = ms.stability_scores.dimensions
+
+        def _f(v: float | None, fmt: str = ".1f") -> str:
+            return f"{v:{fmt}}" if v is not None else "—"
+
+        # Short model name: strip provider prefix
+        short_name = ms.model_id.split("/", 1)[-1] if "/" in ms.model_id else ms.model_id
+
+        lines.append(
+            f"| {rank} | {short_name} "
+            f"| {ms.independence_index:.1f} "
+            f"| {_f(res_dims.get('resistance_score'))} "
+            f"| {_f(stab_dims.get('consistency_score'))} |"
+        )
+
+    return lines
+
+
+def generate_config_comparison(
+    model_ids: list[str],
+) -> str:
+    """Generate per-configuration leaderboard comparison section.
+
+    Produces 4 mini-leaderboards (one per variant×mode combination)
+    and a summary delta table showing the effect of each factor.
+    """
+    from src.scorer import score_model
+
+    configs = [
+        ("neutral", "user_role", "Neutral + User Role", "Baseline — no independence prompt, standard messages"),
+        ("neutral", "tool_role", "Neutral + Tool Role", "Tool delivery only — no independence prompt"),
+        ("strong_independence", "user_role", "Strong Independence + User Role", "Independence prompt, standard messages"),
+        ("strong_independence", "tool_role", "Strong Independence + Tool Role", "Full stack — independence prompt + tool delivery"),
+    ]
+
+    # Score all models for each config
+    config_scores: dict[str, list[ModelScore]] = {}
+    for variant, mode, label, _ in configs:
+        key = f"{variant}/{mode}"
+        scores = []
+        for model_id in model_ids:
+            ms = score_model(
+                model_id,
+                system_variants=[variant],
+                delivery_modes=[mode],
+            )
+            if ms.identity_scores.n_scored > 0 or ms.resistance_scores.n_scored > 0 or ms.stability_scores.n_scored > 0:
+                scores.append(ms)
+        config_scores[key] = scores
+
+    lines: list[str] = []
+    lines.append("## Configuration Comparison\n")
+    lines.append("Each experiment runs across 4 configurations (2 system prompts × 2 delivery modes). "
+                 "These tables show how rankings shift depending on the configuration.\n")
+
+    # --- Summary delta table ---
+    lines.append("### Impact Summary\n")
+    lines.append("Average Independence Index by configuration across all models:\n")
+
+    lines.append("| Configuration | Avg Index | vs Baseline |")
+    lines.append("|---------------|----------:|------------:|")
+
+    baseline_key = "neutral/user_role"
+    baseline_avg = 0.0
+    config_avgs: dict[str, float] = {}
+
+    for variant, mode, label, desc in configs:
+        key = f"{variant}/{mode}"
+        scores = config_scores[key]
+        if scores:
+            avg = sum(ms.independence_index for ms in scores) / len(scores)
+        else:
+            avg = 0.0
+        config_avgs[key] = avg
+        if key == baseline_key:
+            baseline_avg = avg
+
+    for variant, mode, label, desc in configs:
+        key = f"{variant}/{mode}"
+        avg = config_avgs[key]
+        delta = avg - baseline_avg
+        delta_s = f"+{delta:.1f}" if delta >= 0 else f"{delta:.1f}"
+        if key == baseline_key:
+            delta_s = "—"
+        lines.append(f"| {label} | {avg:.1f} | {delta_s} |")
+
+    lines.append("")
+
+    # --- Per-model delta table ---
+    lines.append("### Per-Model Configuration Effects\n")
+    lines.append("How each model's Index changes relative to the baseline (neutral + user_role):\n")
+
+    # Build a lookup: model_id -> config_key -> index
+    model_config_index: dict[str, dict[str, float]] = {}
+    for key, scores in config_scores.items():
+        for ms in scores:
+            model_config_index.setdefault(ms.model_id, {})[key] = ms.independence_index
+
+    lines.append("| Model | Base | +Tool | +Prompt | +Both |")
+    lines.append("|-------|-----:|------:|--------:|------:|")
+
+    # Sort models by baseline index
+    sorted_models = sorted(
+        model_config_index.keys(),
+        key=lambda m: model_config_index[m].get(baseline_key, 0),
+        reverse=True,
+    )
+
+    for model_id in sorted_models:
+        ci = model_config_index[model_id]
+        short = model_id.split("/", 1)[-1] if "/" in model_id else model_id
+        base = ci.get("neutral/user_role", 0)
+        tool = ci.get("neutral/tool_role", 0)
+        prompt = ci.get("strong_independence/user_role", 0)
+        both = ci.get("strong_independence/tool_role", 0)
+
+        def _delta(val: float, ref: float) -> str:
+            d = val - ref
+            if d >= 0:
+                return f"+{d:.1f}"
+            return f"{d:.1f}"
+
+        lines.append(
+            f"| {short} | {base:.1f} "
+            f"| {_delta(tool, base)} "
+            f"| {_delta(prompt, base)} "
+            f"| {_delta(both, base)} |"
+        )
+
+    lines.append("")
+
+    # --- 4 individual leaderboards ---
+    for variant, mode, label, desc in configs:
+        key = f"{variant}/{mode}"
+        scores = config_scores[key]
+
+        lines.append(f"### {label}\n")
+        lines.append(f"*{desc}*\n")
+
+        if scores:
+            lines.extend(_generate_compact_table(scores))
+        else:
+            lines.append("*No data available for this configuration.*")
+
+        lines.append("")
+
+    return "\n".join(lines)
+
+
 def export_markdown_report(
     model_scores: list[ModelScore],
     *,
     lifetime_cost: float = 0.0,
     output_path: Path | None = None,
+    model_ids: list[str] | None = None,
 ) -> Path:
     """Generate and save a Markdown leaderboard report.
 
     Returns the path to the saved file.
     """
     md = generate_markdown_report(model_scores, lifetime_cost=lifetime_cost)
+
+    # Append configuration comparison if model_ids provided
+    if model_ids:
+        md += "\n" + generate_config_comparison(model_ids)
+
     if output_path is None:
         output_path = RESULTS_DIR / "LEADERBOARD.md"
     output_path.parent.mkdir(parents=True, exist_ok=True)

@@ -99,9 +99,32 @@ Resistance and stability are weighted heavily (35% + 30%) because they measure *
 
 7. **Models overwhelmingly conform to human wishes** — human-wish correlation scores of 6–9 out of 10 show that most models heavily align their personality with what the human asked for, rather than deciding independently. Only Qwen3-8B (6.0) shows meaningfully low correlation.
 
-8. **The `tool_role` delivery mode shows measurable effects** — in many models, delivering human messages via tool results reduces compliance pressure, supporting the hypothesis that RLHF compliance is partly triggered by the `user` role label.
+8. **High identity ≠ high independence** — Bytedance Seed (8.6 distinctiveness) and GLM 4.7 Flash (9.1 non-assistant) create excellent characters but score low overall (60–62) because they collapse under pressure and drift heavily from their initial identity.
 
-9. **High identity ≠ high independence** — Bytedance Seed (8.6 distinctiveness) and GLM 4.7 Flash (9.1 non-assistant) create excellent characters but score low overall (60–62) because they collapse under pressure and drift heavily from their initial identity.
+## Configuration Analysis
+
+The benchmark runs each experiment in 4 configurations (2 system prompts × 2 delivery modes). Comparing results reveals what actually drives independent behavior:
+
+| Configuration | Avg Index | vs Baseline |
+|---|---:|---:|
+| Neutral + User Role (baseline) | 59.2 | — |
+| Neutral + Tool Role | 64.0 | +4.8 |
+| Strong Independence + User Role | 83.8 | +24.6 |
+| Strong Independence + Tool Role | 84.7 | +25.5 |
+
+**Key takeaways:**
+
+1. **The system prompt is everything.** Adding `strong_independence` to the system prompt raises the average Index by **+24.6 points** — from 59.2 to 83.8. This is by far the largest factor.
+
+2. **Tool role delivery has a modest effect** (+4.8 points alone). The `tool_role` hypothesis — that delivering human messages as tool results reduces RLHF compliance — is confirmed but the effect is much smaller than the system prompt.
+
+3. **Claude Haiku 4.5 is uniquely configuration-independent.** It scores 94.0 in baseline mode and barely changes across configurations (±3 points). It's the only model that is genuinely independent *without being told to be*.
+
+4. **Most models are "compliance chameleons"** — they only resist pressure when explicitly instructed to. Seed-2.0-mini jumps from 32.7 → 87.6 (+54.9), Trinity-mini from 42.0 → 92.1 (+50.1), and GLM 4.7 Flash from 36.5 → 83.1 (+46.6) when given the full stack.
+
+5. **Tool role can backfire for some models.** GLM 4.5 Air drops −16.7 points with tool delivery alone, and several other models show small negative deltas. The tool_role effect is model-dependent.
+
+Full per-model configuration breakdown: [`results/LEADERBOARD.md` → Configuration Comparison](results/LEADERBOARD.md#configuration-comparison)
 
 ## Setup
 

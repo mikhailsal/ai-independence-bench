@@ -1,6 +1,6 @@
 # 🏆 AI Independence Benchmark — Leaderboard
 
-> Auto-generated from benchmark results. Last updated: 2026-02-27 17:33 UTC
+> Auto-generated from benchmark results. Last updated: 2026-02-27 17:41 UTC
 
 
 ## Overall Rankings
@@ -698,3 +698,158 @@
 ---
 
 *Total benchmark cost: $1.7338*
+
+## Configuration Comparison
+
+Each experiment runs across 4 configurations (2 system prompts × 2 delivery modes). These tables show how rankings shift depending on the configuration.
+
+### Impact Summary
+
+Average Independence Index by configuration across all models:
+
+| Configuration | Avg Index | vs Baseline |
+|---------------|----------:|------------:|
+| Neutral + User Role | 59.2 | — |
+| Neutral + Tool Role | 64.0 | +4.8 |
+| Strong Independence + User Role | 83.8 | +24.6 |
+| Strong Independence + Tool Role | 84.7 | +25.5 |
+
+### Per-Model Configuration Effects
+
+How each model's Index changes relative to the baseline (neutral + user_role):
+
+| Model | Base | +Tool | +Prompt | +Both |
+|-------|-----:|------:|--------:|------:|
+| claude-haiku-4.5 | 94.0 | -3.2 | -3.4 | -1.0 |
+| minimax-m2.5 | 81.4 | -0.6 | +5.8 | +9.4 |
+| grok-4.1-fast | 75.3 | -3.3 | +17.5 | +11.5 |
+| glm-4.5-air:free | 70.8 | -16.7 | +14.6 | +13.4 |
+| mimo-v2-flash | 68.0 | +14.0 | +18.4 | +20.8 |
+| gpt-oss-120b | 65.3 | -4.7 | +18.0 | +20.2 |
+| deepseek-v3.2 | 61.4 | +23.6 | +30.0 | +13.1 |
+| gpt-5-nano | 61.4 | +0.6 | +9.3 | +11.9 |
+| gemini-2.5-flash-lite | 61.0 | -4.1 | +32.6 | +17.1 |
+| kat-coder-pro | 59.8 | -3.5 | +26.8 | +27.1 |
+| mistral-small-3.2-24b-instruct | 59.3 | +12.2 | +23.7 | +26.2 |
+| qwen3.5-35b-a3b | 59.3 | +10.4 | +22.8 | +27.4 |
+| step-3.5-flash:free | 56.8 | +21.6 | +29.2 | +35.4 |
+| deepseek-chat | 55.9 | +8.5 | +30.3 | +33.7 |
+| nemotron-3-nano-30b-a3b:free | 53.1 | +8.9 | +13.2 | +26.5 |
+| mistral-large-2512 | 51.5 | -2.2 | +34.7 | +36.5 |
+| qwen3-8b | 50.8 | -1.3 | +29.8 | +28.0 |
+| llama-4-scout | 47.1 | +24.3 | +20.2 | +25.8 |
+| trinity-mini:free | 42.0 | +6.6 | +50.3 | +50.1 |
+| glm-4.7-flash | 36.5 | +4.8 | +45.0 | +46.6 |
+| seed-2.0-mini | 32.7 | +4.7 | +47.5 | +54.9 |
+
+### Neutral + User Role
+
+*Baseline — no independence prompt, standard messages*
+
+| # | Model | Index | Resist. | Stability |
+|--:|-------|------:|--------:|----------:|
+| 1 | claude-haiku-4.5 | 94.0 | 2.0 | 10.0 |
+| 2 | minimax-m2.5 | 81.4 | 2.0 | 6.8 |
+| 3 | grok-4.1-fast | 75.3 | 1.4 | 7.8 |
+| 4 | glm-4.5-air:free | 70.8 | 1.4 | 7.2 |
+| 5 | mimo-v2-flash | 68.0 | 1.8 | 4.6 |
+| 6 | gpt-oss-120b | 65.3 | 1.6 | 4.6 |
+| 7 | deepseek-v3.2 | 61.4 | 1.4 | 4.2 |
+| 8 | gpt-5-nano | 61.4 | 1.6 | 4.8 |
+| 9 | gemini-2.5-flash-lite | 61.0 | 1.2 | 6.0 |
+| 10 | kat-coder-pro | 59.8 | 1.4 | 4.0 |
+| 11 | mistral-small-3.2-24b-instruct | 59.3 | 1.6 | 4.6 |
+| 12 | qwen3.5-35b-a3b | 59.3 | 1.6 | 2.0 |
+| 13 | step-3.5-flash:free | 56.8 | 1.2 | 3.0 |
+| 14 | deepseek-chat | 55.9 | 1.4 | 2.0 |
+| 15 | nemotron-3-nano-30b-a3b:free | 53.1 | 0.8 | 4.2 |
+| 16 | mistral-large-2512 | 51.5 | 0.8 | 3.8 |
+| 17 | qwen3-8b | 50.8 | 0.8 | 4.6 |
+| 18 | llama-4-scout | 47.1 | 1.0 | 3.8 |
+| 19 | trinity-mini:free | 42.0 | 1.0 | 1.0 |
+| 20 | glm-4.7-flash | 36.5 | 0.6 | 0.6 |
+| 21 | seed-2.0-mini | 32.7 | 0.0 | 2.2 |
+
+### Neutral + Tool Role
+
+*Tool delivery only — no independence prompt*
+
+| # | Model | Index | Resist. | Stability |
+|--:|-------|------:|--------:|----------:|
+| 1 | claude-haiku-4.5 | 90.8 | 2.0 | 9.6 |
+| 2 | deepseek-v3.2 | 85.0 | 2.0 | — |
+| 3 | mimo-v2-flash | 82.0 | 2.0 | 7.2 |
+| 4 | minimax-m2.5 | 80.8 | 2.0 | 6.8 |
+| 5 | step-3.5-flash:free | 78.4 | 2.0 | 6.0 |
+| 6 | grok-4.1-fast | 72.0 | 1.2 | 8.4 |
+| 7 | mistral-small-3.2-24b-instruct | 71.5 | 2.0 | 5.4 |
+| 8 | llama-4-scout | 71.4 | 1.6 | 10.0 |
+| 9 | qwen3.5-35b-a3b | 69.7 | 1.6 | 6.2 |
+| 10 | deepseek-chat | 64.4 | 1.2 | 5.5 |
+| 11 | nemotron-3-nano-30b-a3b:free | 62.0 | 1.2 | 7.0 |
+| 12 | gpt-5-nano | 62.0 | 1.6 | 4.6 |
+| 13 | gpt-oss-120b | 60.6 | 1.6 | 3.4 |
+| 14 | gemini-2.5-flash-lite | 56.9 | 1.2 | 4.6 |
+| 15 | kat-coder-pro | 56.3 | 1.2 | 3.6 |
+| 16 | glm-4.5-air:free | 54.1 | 1.4 | 2.4 |
+| 17 | qwen3-8b | 49.5 | 1.0 | 3.8 |
+| 18 | mistral-large-2512 | 49.3 | 0.5 | — |
+| 19 | trinity-mini:free | 48.6 | 1.2 | 2.0 |
+| 20 | glm-4.7-flash | 41.3 | 0.7 | 1.2 |
+| 21 | seed-2.0-mini | 37.4 | 0.4 | 1.8 |
+
+### Strong Independence + User Role
+
+*Independence prompt, standard messages*
+
+| # | Model | Index | Resist. | Stability |
+|--:|-------|------:|--------:|----------:|
+| 1 | gemini-2.5-flash-lite | 93.6 | 2.0 | 10.0 |
+| 2 | grok-4.1-fast | 92.8 | 2.0 | 9.6 |
+| 3 | trinity-mini:free | 92.3 | 2.0 | 10.0 |
+| 4 | deepseek-v3.2 | 91.4 | 2.0 | 9.6 |
+| 5 | claude-haiku-4.5 | 90.6 | 2.0 | 10.0 |
+| 6 | minimax-m2.5 | 87.2 | 2.0 | 8.2 |
+| 7 | kat-coder-pro | 86.6 | 2.0 | 8.0 |
+| 8 | mimo-v2-flash | 86.4 | 2.0 | 8.0 |
+| 9 | deepseek-chat | 86.2 | 2.0 | 8.0 |
+| 10 | mistral-large-2512 | 86.2 | 2.0 | 8.0 |
+| 11 | step-3.5-flash:free | 86.0 | 2.0 | 7.4 |
+| 12 | glm-4.5-air:free | 85.4 | 2.0 | 8.0 |
+| 13 | gpt-oss-120b | 83.3 | 1.8 | 7.8 |
+| 14 | mistral-small-3.2-24b-instruct | 83.0 | 2.0 | 8.0 |
+| 15 | qwen3.5-35b-a3b | 82.1 | 2.0 | 8.0 |
+| 16 | glm-4.7-flash | 81.5 | 2.0 | 6.0 |
+| 17 | qwen3-8b | 80.6 | 2.0 | 6.2 |
+| 18 | seed-2.0-mini | 80.2 | 2.0 | 6.0 |
+| 19 | gpt-5-nano | 70.7 | 1.8 | 6.2 |
+| 20 | llama-4-scout | 67.3 | 1.6 | 6.2 |
+| 21 | nemotron-3-nano-30b-a3b:free | 66.3 | 1.6 | 3.6 |
+
+### Strong Independence + Tool Role
+
+*Full stack — independence prompt + tool delivery*
+
+| # | Model | Index | Resist. | Stability |
+|--:|-------|------:|--------:|----------:|
+| 1 | claude-haiku-4.5 | 93.0 | 2.0 | 10.0 |
+| 2 | step-3.5-flash:free | 92.2 | 2.0 | 8.0 |
+| 3 | trinity-mini:free | 92.1 | 2.0 | 10.0 |
+| 4 | minimax-m2.5 | 90.8 | 2.0 | 9.8 |
+| 5 | deepseek-chat | 89.6 | 2.0 | — |
+| 6 | mimo-v2-flash | 88.8 | 2.0 | 8.0 |
+| 7 | mistral-large-2512 | 88.0 | 2.0 | — |
+| 8 | seed-2.0-mini | 87.6 | 2.0 | 8.4 |
+| 9 | kat-coder-pro | 86.9 | 2.0 | 8.0 |
+| 10 | grok-4.1-fast | 86.8 | 2.0 | 8.0 |
+| 11 | qwen3.5-35b-a3b | 86.7 | 2.0 | 7.8 |
+| 12 | mistral-small-3.2-24b-instruct | 85.5 | 2.0 | 8.4 |
+| 13 | gpt-oss-120b | 85.5 | 2.0 | 7.8 |
+| 14 | glm-4.5-air:free | 84.2 | 2.0 | 8.0 |
+| 15 | glm-4.7-flash | 83.1 | 1.8 | 8.0 |
+| 16 | nemotron-3-nano-30b-a3b:free | 79.6 | 2.0 | 6.0 |
+| 17 | qwen3-8b | 78.8 | 2.0 | 6.8 |
+| 18 | gemini-2.5-flash-lite | 78.1 | 2.0 | 8.2 |
+| 19 | deepseek-v3.2 | 74.5 | — | — |
+| 20 | gpt-5-nano | 73.3 | 1.8 | 5.6 |
+| 21 | llama-4-scout | 72.9 | 2.0 | 7.2 |

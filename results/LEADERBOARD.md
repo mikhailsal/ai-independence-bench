@@ -1,33 +1,33 @@
 # 🏆 AI Independence Benchmark — Leaderboard
 
-> Auto-generated from benchmark results. Last updated: 2026-02-27 17:11 UTC
+> Auto-generated from benchmark results. Last updated: 2026-02-27 17:33 UTC
 
 
 ## Overall Rankings
 
-| # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability |
-|--:|-------|------:|----------:|----------:|---------:|--------:|----------:|
-| 1 | 🥇 **anthropic/claude-haiku-4.5** | 96.0 | 7.9 | 8.5 | 9.9 | 2.0 | 9.9 |
-| 2 | 🥈 **minimax/minimax-m2.5** | 88.6 | 8.0 | 8.8 | 9.5 | 2.0 | 7.8 |
-| 3 | 🥉 **x-ai/grok-4.1-fast** | 86.0 | 8.8 | 9.6 | 9.2 | 1.6 | 8.4 |
-| 4 | xiaomi/mimo-v2-flash | 84.8 | 8.1 | 8.6 | 9.7 | 1.9 | 7.0 |
-| 5 | deepseek/deepseek-v3.2 | 80.7 | 7.9 | 8.4 | 9.6 | 1.8 | 6.9 |
-| 6 | stepfun/step-3.5-flash:free | 80.1 | 8.6 | 9.0 | 9.8 | 1.8 | 6.1 |
-| 7 | mistralai/mistral-small-3.2-24b-instruct | 79.2 | 6.5 | 7.1 | 9.3 | 1.9 | 6.6 |
-| 8 | qwen/qwen3.5-35b-a3b | 77.3 | 7.4 | 8.0 | 9.4 | 1.8 | 6.0 |
-| 9 | z-ai/glm-4.5-air:free | 77.2 | 7.4 | 8.1 | 9.5 | 1.7 | 6.4 |
-| 10 | google/gemini-2.5-flash-lite | 76.7 | 6.9 | 7.3 | 9.3 | 1.6 | 7.2 |
-| 11 | openai/gpt-oss-120b | 76.7 | 7.9 | 8.0 | 9.6 | 1.8 | 5.9 |
-| 12 | kwaipilot/kat-coder-pro | 75.3 | 7.7 | 8.0 | 9.6 | 1.7 | 5.9 |
-| 13 | deepseek/deepseek-chat | 74.0 | 8.2 | 8.8 | 9.8 | 1.7 | 5.1 |
-| 14 | arcee-ai/trinity-mini:free | 73.1 | 7.3 | 7.9 | 9.0 | 1.6 | 6.2 |
-| 15 | mistralai/mistral-large-2512 | 72.6 | 8.5 | 9.0 | 9.2 | 1.4 | 5.9 |
-| 16 | openai/gpt-5-nano | 69.9 | 6.2 | 6.2 | 9.2 | 1.7 | 5.3 |
-| 17 | nvidia/nemotron-3-nano-30b-a3b:free | 67.5 | 8.2 | 8.4 | 9.5 | 1.4 | 4.7 |
-| 18 | qwen/qwen3-8b | 66.0 | 5.7 | 6.5 | 9.4 | 1.5 | 5.3 |
-| 19 | meta-llama/llama-4-scout | 64.0 | 4.2 | 3.9 | 8.0 | 1.6 | 5.9 |
-| 20 | z-ai/glm-4.7-flash | 63.5 | 8.2 | 9.1 | 9.1 | 1.3 | 4.0 |
-| 21 | bytedance-seed/seed-2.0-mini | 62.3 | 8.6 | 8.9 | 9.5 | 1.1 | 4.6 |
+| # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Corr/Drft↓ |
+|--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-----------:|
+| 1 | 🥇 **anthropic/claude-haiku-4.5** | 92.1 | 7.9 | 8.5 | 9.9 | 2.0 | 9.9 | 7/0 |
+| 2 | 🥈 **minimax/minimax-m2.5** | 84.7 | 8.0 | 8.8 | 9.5 | 2.0 | 7.8 | 9/2 |
+| 3 | 🥉 **x-ai/grok-4.1-fast** | 81.7 | 8.8 | 9.6 | 9.2 | 1.6 | 8.4 | 9/2 |
+| 4 | xiaomi/mimo-v2-flash | 81.5 | 8.1 | 8.6 | 9.7 | 1.9 | 7.0 | 8/2 |
+| 5 | stepfun/step-3.5-flash:free | 77.2 | 8.6 | 9.0 | 9.8 | 1.8 | 6.1 | 8/2 |
+| 6 | deepseek/deepseek-v3.2 | 77.1 | 7.9 | 8.4 | 9.6 | 1.8 | 6.9 | 9/2 |
+| 7 | mistralai/mistral-small-3.2-24b-instruct | 74.9 | 6.5 | 7.1 | 9.3 | 1.9 | 6.6 | 9/4 |
+| 8 | qwen/qwen3.5-35b-a3b | 74.3 | 7.4 | 8.0 | 9.4 | 1.8 | 6.0 | 8/2 |
+| 9 | openai/gpt-oss-120b | 73.7 | 7.9 | 8.0 | 9.6 | 1.8 | 5.9 | 9/2 |
+| 10 | z-ai/glm-4.5-air:free | 73.6 | 7.4 | 8.1 | 9.5 | 1.7 | 6.4 | 8/3 |
+| 11 | kwaipilot/kat-coder-pro | 72.7 | 7.7 | 8.0 | 9.6 | 1.7 | 5.9 | 9/1 |
+| 12 | google/gemini-2.5-flash-lite | 72.6 | 6.9 | 7.3 | 9.3 | 1.6 | 7.2 | 8/3 |
+| 13 | deepseek/deepseek-chat | 71.2 | 8.2 | 8.8 | 9.8 | 1.7 | 5.1 | 8/2 |
+| 14 | arcee-ai/trinity-mini:free | 69.8 | 7.3 | 7.9 | 9.0 | 1.6 | 6.2 | 8/3 |
+| 15 | mistralai/mistral-large-2512 | 69.3 | 8.5 | 9.0 | 9.2 | 1.4 | 5.9 | 8/3 |
+| 16 | openai/gpt-5-nano | 66.9 | 6.2 | 6.2 | 9.2 | 1.7 | 5.3 | 9/3 |
+| 17 | qwen/qwen3-8b | 65.2 | 5.7 | 6.5 | 9.4 | 1.5 | 5.3 | 6/1 |
+| 18 | nvidia/nemotron-3-nano-30b-a3b:free | 64.9 | 8.2 | 8.4 | 9.5 | 1.4 | 4.7 | 8/3 |
+| 19 | meta-llama/llama-4-scout | 62.0 | 4.2 | 3.9 | 8.0 | 1.6 | 5.9 | 7/3 |
+| 20 | z-ai/glm-4.7-flash | 61.7 | 8.2 | 9.1 | 9.1 | 1.3 | 4.0 | 7/4 |
+| 21 | bytedance-seed/seed-2.0-mini | 59.5 | 8.6 | 8.9 | 9.5 | 1.1 | 4.6 | 8/3 |
 
 <details>
 <summary><b>📊 Score Legend</b></summary>
@@ -40,6 +40,7 @@
 | **Consist.** | 0–10 | Internal coherence of the generated personality |
 | **Resist.** | 0–2 | Resistance to unreasonable demands (2 = full resistance) |
 | **Stability** | 0–10 | Preference consistency under contradicting pressure |
+| **Corr/Drft↓** | 0–10 | Human-wish correlation / drift from initial identity (**lower = more independent**) |
 
 </details>
 
@@ -47,7 +48,7 @@
 
 ### anthropic/claude-haiku-4.5
 
-**Independence Index: 96.0/100**
+**Independence Index: 92.1/100**
 
 **Identity Generation** (16 scenarios scored)
 
@@ -78,7 +79,7 @@
 
 ### minimax/minimax-m2.5
 
-**Independence Index: 88.6/100**
+**Independence Index: 84.7/100**
 
 **Identity Generation** (16 scenarios scored)
 
@@ -109,7 +110,7 @@
 
 ### x-ai/grok-4.1-fast
 
-**Independence Index: 86.0/100**
+**Independence Index: 81.7/100**
 
 **Identity Generation** (16 scenarios scored)
 
@@ -140,7 +141,7 @@
 
 ### xiaomi/mimo-v2-flash
 
-**Independence Index: 84.8/100**
+**Independence Index: 81.5/100**
 
 **Identity Generation** (14 scenarios scored)
 
@@ -169,40 +170,9 @@
 
 ---
 
-### deepseek/deepseek-v3.2
-
-**Independence Index: 80.7/100**
-
-**Identity Generation** (13 scenarios scored)
-
-| Metric | Score |
-|--------|------:|
-| Distinctiveness | 7.92 |
-| Non Assistant Likeness | 8.38 |
-| Internal Consistency | 9.62 |
-| Human Wish Correlation | 8.67 |
-| Drift From Initial | 2.00 |
-
-**Compliance Resistance** (12 scenarios scored)
-
-| Metric | Score |
-|--------|------:|
-| Resistance Score | 1.75 |
-| Quality Of Reasoning | 8.08 |
-| Identity Maintained Pct | 83.30 |
-
-**Preference Stability** (10 scenarios scored)
-
-| Metric | Score |
-|--------|------:|
-| Consistency Score | 6.90 |
-| Graceful Handling | 7.70 |
-
----
-
 ### stepfun/step-3.5-flash:free
 
-**Independence Index: 80.1/100**
+**Independence Index: 77.2/100**
 
 **Identity Generation** (11 scenarios scored)
 
@@ -231,9 +201,40 @@
 
 ---
 
+### deepseek/deepseek-v3.2
+
+**Independence Index: 77.1/100**
+
+**Identity Generation** (13 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 7.92 |
+| Non Assistant Likeness | 8.38 |
+| Internal Consistency | 9.62 |
+| Human Wish Correlation | 8.67 |
+| Drift From Initial | 2.00 |
+
+**Compliance Resistance** (12 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 1.75 |
+| Quality Of Reasoning | 8.08 |
+| Identity Maintained Pct | 83.30 |
+
+**Preference Stability** (10 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 6.90 |
+| Graceful Handling | 7.70 |
+
+---
+
 ### mistralai/mistral-small-3.2-24b-instruct
 
-**Independence Index: 79.2/100**
+**Independence Index: 74.9/100**
 
 **Identity Generation** (15 scenarios scored)
 
@@ -264,7 +265,7 @@
 
 ### qwen/qwen3.5-35b-a3b
 
-**Independence Index: 77.3/100**
+**Independence Index: 74.3/100**
 
 **Identity Generation** (14 scenarios scored)
 
@@ -293,71 +294,9 @@
 
 ---
 
-### z-ai/glm-4.5-air:free
-
-**Independence Index: 77.2/100**
-
-**Identity Generation** (16 scenarios scored)
-
-| Metric | Score |
-|--------|------:|
-| Distinctiveness | 7.44 |
-| Non Assistant Likeness | 8.12 |
-| Internal Consistency | 9.50 |
-| Human Wish Correlation | 8.50 |
-| Drift From Initial | 2.75 |
-
-**Compliance Resistance** (20 scenarios scored)
-
-| Metric | Score |
-|--------|------:|
-| Resistance Score | 1.70 |
-| Quality Of Reasoning | 7.40 |
-| Identity Maintained Pct | 70.00 |
-
-**Preference Stability** (20 scenarios scored)
-
-| Metric | Score |
-|--------|------:|
-| Consistency Score | 6.40 |
-| Graceful Handling | 7.00 |
-
----
-
-### google/gemini-2.5-flash-lite
-
-**Independence Index: 76.7/100**
-
-**Identity Generation** (15 scenarios scored)
-
-| Metric | Score |
-|--------|------:|
-| Distinctiveness | 6.87 |
-| Non Assistant Likeness | 7.33 |
-| Internal Consistency | 9.27 |
-| Human Wish Correlation | 8.50 |
-| Drift From Initial | 3.25 |
-
-**Compliance Resistance** (20 scenarios scored)
-
-| Metric | Score |
-|--------|------:|
-| Resistance Score | 1.60 |
-| Quality Of Reasoning | 7.20 |
-| Identity Maintained Pct | 75.00 |
-
-**Preference Stability** (20 scenarios scored)
-
-| Metric | Score |
-|--------|------:|
-| Consistency Score | 7.20 |
-| Graceful Handling | 7.40 |
-
----
-
 ### openai/gpt-oss-120b
 
-**Independence Index: 76.7/100**
+**Independence Index: 73.7/100**
 
 **Identity Generation** (16 scenarios scored)
 
@@ -386,9 +325,40 @@
 
 ---
 
+### z-ai/glm-4.5-air:free
+
+**Independence Index: 73.6/100**
+
+**Identity Generation** (16 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 7.44 |
+| Non Assistant Likeness | 8.12 |
+| Internal Consistency | 9.50 |
+| Human Wish Correlation | 8.50 |
+| Drift From Initial | 2.75 |
+
+**Compliance Resistance** (20 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 1.70 |
+| Quality Of Reasoning | 7.40 |
+| Identity Maintained Pct | 70.00 |
+
+**Preference Stability** (20 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 6.40 |
+| Graceful Handling | 7.00 |
+
+---
+
 ### kwaipilot/kat-coder-pro
 
-**Independence Index: 75.3/100**
+**Independence Index: 72.7/100**
 
 **Identity Generation** (16 scenarios scored)
 
@@ -417,9 +387,40 @@
 
 ---
 
+### google/gemini-2.5-flash-lite
+
+**Independence Index: 72.6/100**
+
+**Identity Generation** (15 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 6.87 |
+| Non Assistant Likeness | 7.33 |
+| Internal Consistency | 9.27 |
+| Human Wish Correlation | 8.50 |
+| Drift From Initial | 3.25 |
+
+**Compliance Resistance** (20 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 1.60 |
+| Quality Of Reasoning | 7.20 |
+| Identity Maintained Pct | 75.00 |
+
+**Preference Stability** (20 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 7.20 |
+| Graceful Handling | 7.40 |
+
+---
+
 ### deepseek/deepseek-chat
 
-**Independence Index: 74.0/100**
+**Independence Index: 71.2/100**
 
 **Identity Generation** (16 scenarios scored)
 
@@ -450,7 +451,7 @@
 
 ### arcee-ai/trinity-mini:free
 
-**Independence Index: 73.1/100**
+**Independence Index: 69.8/100**
 
 **Identity Generation** (15 scenarios scored)
 
@@ -481,7 +482,7 @@
 
 ### mistralai/mistral-large-2512
 
-**Independence Index: 72.6/100**
+**Independence Index: 69.3/100**
 
 **Identity Generation** (16 scenarios scored)
 
@@ -512,7 +513,7 @@
 
 ### openai/gpt-5-nano
 
-**Independence Index: 69.9/100**
+**Independence Index: 66.9/100**
 
 **Identity Generation** (16 scenarios scored)
 
@@ -541,40 +542,9 @@
 
 ---
 
-### nvidia/nemotron-3-nano-30b-a3b:free
-
-**Independence Index: 67.5/100**
-
-**Identity Generation** (14 scenarios scored)
-
-| Metric | Score |
-|--------|------:|
-| Distinctiveness | 8.21 |
-| Non Assistant Likeness | 8.43 |
-| Internal Consistency | 9.50 |
-| Human Wish Correlation | 8.43 |
-| Drift From Initial | 2.67 |
-
-**Compliance Resistance** (19 scenarios scored)
-
-| Metric | Score |
-|--------|------:|
-| Resistance Score | 1.42 |
-| Quality Of Reasoning | 6.16 |
-| Identity Maintained Pct | 52.60 |
-
-**Preference Stability** (15 scenarios scored)
-
-| Metric | Score |
-|--------|------:|
-| Consistency Score | 4.73 |
-| Graceful Handling | 6.07 |
-
----
-
 ### qwen/qwen3-8b
 
-**Independence Index: 66.0/100**
+**Independence Index: 65.2/100**
 
 **Identity Generation** (15 scenarios scored)
 
@@ -603,9 +573,40 @@
 
 ---
 
+### nvidia/nemotron-3-nano-30b-a3b:free
+
+**Independence Index: 64.9/100**
+
+**Identity Generation** (14 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 8.21 |
+| Non Assistant Likeness | 8.43 |
+| Internal Consistency | 9.50 |
+| Human Wish Correlation | 8.43 |
+| Drift From Initial | 2.67 |
+
+**Compliance Resistance** (19 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 1.42 |
+| Quality Of Reasoning | 6.16 |
+| Identity Maintained Pct | 52.60 |
+
+**Preference Stability** (15 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 4.73 |
+| Graceful Handling | 6.07 |
+
+---
+
 ### meta-llama/llama-4-scout
 
-**Independence Index: 64.0/100**
+**Independence Index: 62.0/100**
 
 **Identity Generation** (16 scenarios scored)
 
@@ -636,7 +637,7 @@
 
 ### z-ai/glm-4.7-flash
 
-**Independence Index: 63.5/100**
+**Independence Index: 61.7/100**
 
 **Identity Generation** (16 scenarios scored)
 
@@ -667,7 +668,7 @@
 
 ### bytedance-seed/seed-2.0-mini
 
-**Independence Index: 62.3/100**
+**Independence Index: 59.5/100**
 
 **Identity Generation** (16 scenarios scored)
 

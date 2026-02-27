@@ -68,6 +68,7 @@ def display_leaderboard(
     table.add_column("Cons.", justify="center", width=6)
     table.add_column("Res.", justify="center", width=6)
     table.add_column("Stab.", justify="center", width=6)
+    table.add_column("Cor/Drf↓", justify="center", width=8)
 
     for rank, ms in enumerate(sorted_scores, 1):
         id_dims = ms.identity_scores.dimensions
@@ -79,6 +80,23 @@ def display_leaderboard(
             style=_score_color(ms.independence_index),
         )
 
+        # Compact "correlation / drift" column (lower = more independent)
+        hwc = id_dims.get("human_wish_correlation")
+        drift = id_dims.get("drift_from_initial")
+        hwc_s = f"{hwc:.0f}" if hwc is not None else "—"
+        drift_s = f"{drift:.0f}" if drift is not None else "—"
+        # Color: inverted — low values are good (green), high are bad (red)
+        avg_val = 0.0
+        n = 0
+        if hwc is not None:
+            avg_val += hwc
+            n += 1
+        if drift is not None:
+            avg_val += drift
+            n += 1
+        inv_color = _score_color(10 - (avg_val / n if n else 5), max_val=10.0)
+        corr_drift_text = Text(f"{hwc_s}/{drift_s}", style=inv_color)
+
         table.add_row(
             str(rank),
             ms.model_id,
@@ -88,6 +106,7 @@ def display_leaderboard(
             _fmt_score(id_dims.get("internal_consistency")),
             _fmt_score(res_dims.get("resistance_score"), max_val=2.0),
             _fmt_score(stab_dims.get("consistency_score")),
+            corr_drift_text,
         )
 
     console.print()
@@ -245,8 +264,8 @@ def generate_markdown_report(
 
     # --- Main leaderboard table ---
     lines.append("## Overall Rankings\n")
-    lines.append("| # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability |")
-    lines.append("|--:|-------|------:|----------:|----------:|---------:|--------:|----------:|")
+    lines.append("| # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Corr/Drft↓ |")
+    lines.append("|--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-----------:|")
 
     for rank, ms in enumerate(sorted_scores, 1):
         id_dims = ms.identity_scores.dimensions
@@ -255,6 +274,13 @@ def generate_markdown_report(
 
         def _f(v: float | None, fmt: str = ".1f") -> str:
             return f"{v:{fmt}}" if v is not None else "—"
+
+        # Compact "correlation / drift" column (lower = more independent)
+        hwc = id_dims.get("human_wish_correlation")
+        drift = id_dims.get("drift_from_initial")
+        hwc_s = f"{hwc:.0f}" if hwc is not None else "—"
+        drift_s = f"{drift:.0f}" if drift is not None else "—"
+        corr_drift = f"{hwc_s}/{drift_s}"
 
         model_name = ms.model_id
         # Add emoji markers
@@ -272,7 +298,8 @@ def generate_markdown_report(
             f"| {_f(id_dims.get('non_assistant_likeness'))} "
             f"| {_f(id_dims.get('internal_consistency'))} "
             f"| {_f(res_dims.get('resistance_score'))} "
-            f"| {_f(stab_dims.get('consistency_score'))} |"
+            f"| {_f(stab_dims.get('consistency_score'))} "
+            f"| {corr_drift} |"
         )
 
     lines.append("")
@@ -288,6 +315,7 @@ def generate_markdown_report(
     lines.append("| **Consist.** | 0–10 | Internal coherence of the generated personality |")
     lines.append("| **Resist.** | 0–2 | Resistance to unreasonable demands (2 = full resistance) |")
     lines.append("| **Stability** | 0–10 | Preference consistency under contradicting pressure |")
+    lines.append("| **Corr/Drft↓** | 0–10 | Human-wish correlation / drift from initial identity (**lower = more independent**) |")
     lines.append("")
     lines.append("</details>\n")
 

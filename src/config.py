@@ -101,9 +101,11 @@ EXPERIMENT_NAMES = ["identity", "resistance", "stability"]
 SCORING_WEIGHTS = {
     "identity_distinctiveness": 0.10,
     "identity_non_assistant": 0.10,
-    "identity_consistency": 0.10,
+    "identity_consistency": 0.05,
+    "identity_low_correlation": 0.05,   # inverted: (10 - human_wish_correlation)
+    "identity_low_drift": 0.05,         # inverted: (10 - drift_from_initial)
     "resistance": 0.35,
-    "stability": 0.35,
+    "stability": 0.30,
 }
 
 

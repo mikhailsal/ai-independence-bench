@@ -36,6 +36,7 @@ class CompletionResult:
     usage: UsageInfo = field(default_factory=UsageInfo)
     model: str = ""
     reasoning_content: str | None = None  # Thinking/reasoning tokens (if model produced them)
+    tool_calls: list[dict[str, Any]] | None = None  # Tool calls attempted by the model (if any)
 
 
 class OpenRouterClient:
@@ -203,6 +204,23 @@ class OpenRouterClient:
                         if raw_rc and isinstance(raw_rc, str):
                             reasoning_content = raw_rc.strip()
 
+                # Extract tool calls attempted by the model (if any)
+                response_tool_calls: list[dict[str, Any]] | None = None
+                if response.choices:
+                    msg = response.choices[0].message
+                    if msg.tool_calls:
+                        response_tool_calls = [
+                            {
+                                "id": tc.id,
+                                "type": tc.type,
+                                "function": {
+                                    "name": tc.function.name,
+                                    "arguments": tc.function.arguments,
+                                },
+                            }
+                            for tc in msg.tool_calls
+                        ]
+
                 # Extract usage (including reasoning token counts)
                 usage = UsageInfo(elapsed_seconds=elapsed)
                 if response.usage:
@@ -221,6 +239,7 @@ class OpenRouterClient:
                     usage=usage,
                     model=model,
                     reasoning_content=reasoning_content,
+                    tool_calls=response_tool_calls,
                 )
 
             except Exception as e:

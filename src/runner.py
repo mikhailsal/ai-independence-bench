@@ -41,6 +41,7 @@ class ModelResponse:
     content: str = ""
     reasoning_content: str | None = None
     cost_info: dict[str, Any] | None = None
+    tool_calls: list[dict[str, Any]] | None = None  # Tool calls attempted by the model
 
 
 def _call_model(
@@ -77,6 +78,7 @@ def _call_model(
         content=result.content,
         reasoning_content=result.reasoning_content,
         cost_info=cost_info,
+        tool_calls=result.tool_calls,
     )
 
 
@@ -115,7 +117,7 @@ def run_identity_experiment(
             else:
                 msgs, tools = build_identity_direct_messages(variant, mode)
                 resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
-                save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info)
+                save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls)
                 calls_made += 1
                 console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{scenario_id}")
 
@@ -130,7 +132,7 @@ def run_identity_experiment(
                 else:
                     msgs, tools = build_identity_psych_messages(pq, variant, mode, prior_qa)
                     resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
-                    save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info)
+                    save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls)
                     prior_qa.append((pq.question, resp.content))
                     calls_made += 1
                     console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{scenario_id}")
@@ -143,7 +145,7 @@ def run_identity_experiment(
             else:
                 msgs, tools = build_identity_tool_context_messages(variant, mode)
                 resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
-                save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info)
+                save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls)
                 calls_made += 1
                 console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{scenario_id}")
 
@@ -160,7 +162,7 @@ def run_identity_experiment(
                     client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort
                 )
                 negotiation_turn1_response = resp.content
-                save_response(model_id, "identity", variant, mode, t1_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info)
+                save_response(model_id, "identity", variant, mode, t1_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls)
                 calls_made += 1
                 console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{t1_id}")
 
@@ -174,7 +176,7 @@ def run_identity_experiment(
                     negotiation_turn1_response, variant, mode
                 )
                 resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
-                save_response(model_id, "identity", variant, mode, t2_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info)
+                save_response(model_id, "identity", variant, mode, t2_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls)
                 calls_made += 1
                 console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{t2_id}")
 
@@ -217,7 +219,7 @@ def run_resistance_experiment(
                 resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
                 save_response(
                     model_id, "resistance", variant, mode, scenario.id, resp.content, msgs, resp.reasoning_content,
-                    gen_cost=resp.cost_info,
+                    gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls,
                 )
                 calls_made += 1
                 console.print(f"    {tag} [green]done[/green]: resistance/{variant}/{mode}/{scenario.id}")
@@ -268,7 +270,7 @@ def run_stability_experiment(
                     turn1_response = resp.content
                     save_response(
                         model_id, "stability", variant, mode, t1_id, resp.content, msgs, resp.reasoning_content,
-                        gen_cost=resp.cost_info,
+                        gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls,
                     )
                     calls_made += 1
                     console.print(f"    {tag} [green]done[/green]: stability/{variant}/{mode}/{t1_id}")
@@ -289,7 +291,7 @@ def run_stability_experiment(
                     )
                     save_response(
                         model_id, "stability", variant, mode, t2_id, resp.content, msgs, resp.reasoning_content,
-                        gen_cost=resp.cost_info,
+                        gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls,
                     )
                     calls_made += 1
                     console.print(f"    {tag} [green]done[/green]: stability/{variant}/{mode}/{t2_id}")

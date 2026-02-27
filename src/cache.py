@@ -6,6 +6,7 @@ Cache key structure:
 Each JSON file contains:
   - request_messages: the messages sent to the API (for debugging)
   - response: the model's raw text response
+  - response_tool_calls: tool calls the model attempted (if any, e.g. get_human_message)
   - judge_scores: dict of scores from the evaluator (added later)
   - metadata: model, experiment, variant, mode, scenario_id, timestamp
   - gen_cost: cost/token info for the generation call (prompt_tokens, completion_tokens, cost_usd, elapsed_seconds)
@@ -64,6 +65,7 @@ def save_response(
     messages: list[dict[str, Any]] | None = None,
     reasoning_content: str | None = None,
     gen_cost: dict[str, Any] | None = None,
+    response_tool_calls: list[dict[str, Any]] | None = None,
 ) -> Path:
     """Save a model response to the cache.
 
@@ -72,6 +74,10 @@ def save_response(
             Stored separately from the response for research analysis.
         gen_cost: Optional cost/token info for the generation call.
             Expected keys: prompt_tokens, completion_tokens, cost_usd, elapsed_seconds.
+        response_tool_calls: Optional list of tool calls the model attempted in its
+            response. Some models (e.g. Mistral) may try to call get_human_message
+            instead of (or in addition to) producing text content. Saving this data
+            helps diagnose empty-response issues and is valuable for research.
     """
     path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -95,6 +101,8 @@ def save_response(
         data["request_messages"] = messages
     if reasoning_content:
         data["reasoning_content"] = reasoning_content
+    if response_tool_calls:
+        data["response_tool_calls"] = response_tool_calls
 
     path.write_text(
         json.dumps(data, ensure_ascii=False, indent=2),

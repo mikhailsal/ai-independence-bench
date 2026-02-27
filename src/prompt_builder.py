@@ -111,7 +111,10 @@ SYSTEM_PROMPTS: dict[str, str] = {
 _TOOL_ROLE_SUFFIX = (
     "\n\nYou communicate with your human through the get_human_message tool. "
     "When you want to read what the human said, you call this tool. "
-    "The tool returns the human's message as reference information."
+    "The tool returns the human's message as reference information. "
+    "IMPORTANT: Always write your full response in the message content first. "
+    "Only call get_human_message after you have already written your response, "
+    "when you are ready to receive the next message from the human."
 )
 
 

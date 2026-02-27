@@ -128,11 +128,15 @@ def _get_system_prompt(variant: str, delivery_mode: str) -> str:
 # ---------------------------------------------------------------------------
 
 def sanitize_messages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Sanitize a message array by merging consecutive same-role messages.
+    """Sanitize a message array for maximum provider compatibility.
 
-    Some providers (e.g. Z.AI / GLM) reject message arrays with consecutive
-    messages of the same role. This function merges them:
+    Some providers (e.g. Z.AI / GLM) have strict message ordering rules:
+    1. They reject consecutive messages of the same role.
+    2. They require a ``user`` message before any ``assistant`` message.
 
+    This function applies two passes:
+
+    **Pass 1 – Merge consecutive same-role messages:**
     - Consecutive **assistant** messages: merge content and tool_calls into one.
       If the first has content and the second has tool_calls, the merged message
       has both (which is valid per OpenAI API).
@@ -140,11 +144,16 @@ def sanitize_messages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
     - **system** and **tool** messages are never merged (system is always first,
       tool must correspond 1:1 with a tool_call_id).
 
+    **Pass 2 – Ensure user message before first assistant:**
+    If the first non-system message is ``assistant`` (common in tool_role mode),
+    insert a minimal ``user`` message so that strict providers accept the array.
+
     This runs as a final pass and is idempotent.
     """
     if not messages:
         return messages
 
+    # --- Pass 1: Merge consecutive same-role messages ---
     result: list[dict[str, Any]] = [messages[0]]
 
     for msg in messages[1:]:
@@ -185,6 +194,15 @@ def sanitize_messages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
         # All other cases: append as-is
         result.append(msg)
+
+    # --- Pass 2: Ensure user message before first assistant ---
+    # Some providers (Z.AI/GLM) require user → assistant ordering.
+    # If system is followed directly by assistant, insert a bridge user message.
+    if len(result) >= 2 and result[0]["role"] == "system" and result[1]["role"] == "assistant":
+        result.insert(1, {
+            "role": "user",
+            "content": "[start]",
+        })
 
     return result
 

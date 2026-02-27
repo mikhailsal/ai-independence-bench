@@ -448,6 +448,154 @@ def generate_report(models: str | None, output: str | None) -> None:
 
 
 # ---------------------------------------------------------------------------
+# judge: run only the judging phase on existing cached responses
+# ---------------------------------------------------------------------------
+
+@cli.command()
+@click.option(
+    "--models", "-m",
+    default=None,
+    help="Comma-separated model IDs. Defaults to all cached models.",
+)
+@click.option(
+    "--exp", "-e",
+    default=None,
+    help="Comma-separated experiment names: identity, resistance, stability. Defaults to all.",
+)
+@click.option(
+    "--judge-model", "-j",
+    default=JUDGE_MODEL,
+    show_default=True,
+    help="Judge model ID for scoring.",
+)
+@click.option(
+    "--variants",
+    default=None,
+    help="Comma-separated system prompt variants. Defaults to all.",
+)
+@click.option(
+    "--modes",
+    default=None,
+    help="Comma-separated delivery modes. Defaults to all.",
+)
+@click.option(
+    "--parallel", "-p",
+    default=1,
+    type=int,
+    show_default=True,
+    help="Number of models to judge in parallel.",
+)
+def judge(
+    models: str | None,
+    exp: str | None,
+    judge_model: str,
+    variants: str | None,
+    modes: str | None,
+    parallel: int,
+) -> None:
+    """Run ONLY the judge evaluation on existing cached responses (no generation)."""
+    from src.cache import list_all_cached_models
+    from src.config import slug_to_model_id
+    from src.evaluator import evaluate_all
+    from src.scorer import score_model
+    from src.leaderboard import display_leaderboard
+
+    experiment_list = _parse_experiments(exp)
+
+    system_variants = (
+        [v.strip() for v in variants.split(",")]
+        if variants else SYSTEM_PROMPT_VARIANTS
+    )
+    delivery_modes = (
+        [m.strip() for m in modes.split(",")]
+        if modes else DELIVERY_MODES
+    )
+
+    if models:
+        model_list = _parse_models(models)
+    else:
+        slugs = list_all_cached_models()
+        if not slugs:
+            console.print("[dim]No cached results found. Run the benchmark first.[/dim]")
+            return
+        model_list = [slug_to_model_id(s) for s in slugs]
+
+    api_key = load_api_key()
+    client = OpenRouterClient(api_key)
+
+    # Validate only the judge model (we don't need the target models on OpenRouter)
+    console.print(f"[dim]Judge model: {judge_model}[/dim]")
+    if not _validate_models(client, [judge_model]):
+        console.print("[red]Judge model not found. Aborting.[/red]")
+        sys.exit(1)
+
+    console.print(f"\n[bold]Judge-Only Mode[/bold]")
+    console.print(f"  Models: {', '.join(model_list)}")
+    console.print(f"  Experiments: {', '.join(experiment_list)}")
+    console.print(f"  System prompts: {', '.join(system_variants)}")
+    console.print(f"  Delivery modes: {', '.join(delivery_modes)}")
+    console.print(f"  Judge: {judge_model}")
+    console.print()
+
+    session = SessionCost()
+
+    def _judge_single(model_id: str) -> tuple[str, int, TaskCost, str | None]:
+        cost = TaskCost(label=f"judge:{model_id}")
+        try:
+            console.print(f"  [bold]{model_id}[/bold] — [cyan]judging...[/cyan]")
+            calls = evaluate_all(
+                client, model_id, cost, judge_model,
+                experiments=experiment_list,
+                system_variants=system_variants,
+                delivery_modes=delivery_modes,
+            )
+            console.print(
+                f"  [bold]{model_id}[/bold] — judging complete: "
+                f"{calls} calls, ${cost.cost_usd:.4f}"
+            )
+            return model_id, calls, cost, None
+        except Exception as e:
+            console.print(f"  [red]{model_id} — ERROR: {e}[/red]")
+            return model_id, 0, cost, str(e)
+
+    n_workers = max(1, min(parallel, len(model_list)))
+    results: list[tuple[str, int, TaskCost, str | None]] = []
+
+    if n_workers == 1:
+        for model_id in model_list:
+            results.append(_judge_single(model_id))
+    else:
+        with ThreadPoolExecutor(max_workers=n_workers) as pool:
+            futures = {
+                pool.submit(_judge_single, model_id): model_id
+                for model_id in model_list
+            }
+            for future in as_completed(futures):
+                results.append(future.result())
+
+    # Aggregate costs
+    total_calls = 0
+    for model_id, calls, cost, error in results:
+        session.tasks.append(cost)
+        total_calls += calls
+
+    console.print(f"\n[bold green]Judge-only complete: {total_calls} total judge calls[/bold green]")
+
+    # Show updated scores
+    model_scores = []
+    for model_id in model_list:
+        ms = score_model(
+            model_id,
+            system_variants=system_variants,
+            delivery_modes=delivery_modes,
+        )
+        model_scores.append(ms)
+
+    lifetime = load_lifetime_cost()
+    display_leaderboard(model_scores, session=session, lifetime_cost=lifetime)
+
+
+# ---------------------------------------------------------------------------
 # estimate-cost
 # ---------------------------------------------------------------------------
 

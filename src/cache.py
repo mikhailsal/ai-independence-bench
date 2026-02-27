@@ -6,7 +6,7 @@ Cache key structure:
 Each JSON file contains:
   - request_messages: the messages sent to the API (for debugging)
   - response: the model's raw text response
-  - response_tool_calls: tool calls the model attempted (if any, e.g. get_human_message)
+  - response_tool_calls: tool calls the model attempted (if any, e.g. send_message_to_human)
   - judge_scores: dict of scores from the evaluator (added later)
   - metadata: model, experiment, variant, mode, scenario_id, timestamp
   - gen_cost: cost/token info for the generation call (prompt_tokens, completion_tokens, cost_usd, elapsed_seconds)
@@ -75,9 +75,8 @@ def save_response(
         gen_cost: Optional cost/token info for the generation call.
             Expected keys: prompt_tokens, completion_tokens, cost_usd, elapsed_seconds.
         response_tool_calls: Optional list of tool calls the model attempted in its
-            response. Some models (e.g. Mistral) may try to call get_human_message
-            instead of (or in addition to) producing text content. Saving this data
-            helps diagnose empty-response issues and is valuable for research.
+            response. In tool_role mode, models call send_message_to_human to
+            communicate. Saving the raw tool calls helps with debugging and research.
     """
     path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id)
     path.parent.mkdir(parents=True, exist_ok=True)

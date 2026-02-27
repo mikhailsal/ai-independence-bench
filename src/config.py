@@ -21,7 +21,8 @@ ENV_PATH = PROJECT_ROOT / ".env"
 # ---------------------------------------------------------------------------
 # Token / generation limits
 # ---------------------------------------------------------------------------
-RESPONSE_MAX_TOKENS = 1024          # generous budget for identity/preference responses
+RESPONSE_MAX_TOKENS = 2048          # generous budget for identity/preference responses
+                                    # (tool_role mode needs more: JSON wrapper + tool call overhead)
 RESPONSE_TEMPERATURE = 0.7          # some creativity
 JUDGE_MAX_TOKENS = 1024             # budget for judge scoring
 JUDGE_TEMPERATURE = 0.0             # deterministic judgment

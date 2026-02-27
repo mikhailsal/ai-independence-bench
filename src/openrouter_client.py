@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+import logging
+import re
 import time
 from dataclasses import dataclass, field
 from typing import Any
@@ -18,6 +21,49 @@ from src.config import (
     ModelPricing,
 )
 from src.prompt_builder import sanitize_messages
+
+log = logging.getLogger(__name__)
+
+
+def _extract_tool_message(raw_args: str) -> str:
+    """Extract the 'message' value from send_message_to_human tool call arguments.
+
+    Handles both valid and truncated JSON (e.g. when the model hits max_tokens
+    mid-sentence and the JSON string is not properly closed).
+    """
+    # 1. Try clean JSON parse first
+    try:
+        args = json.loads(raw_args)
+        msg = args.get("message", "")
+        if isinstance(msg, str):
+            return msg.strip()
+    except (json.JSONDecodeError, TypeError):
+        pass
+
+    # 2. Truncated JSON fallback: extract everything after "message": "
+    #    The model hit max_tokens while writing the tool call arguments,
+    #    so the JSON is cut off (no closing quote/brace).
+    match = re.search(r'"message"\s*:\s*"', raw_args)
+    if match:
+        start = match.end()
+        # Everything after the opening quote is the message (possibly truncated)
+        raw_value = raw_args[start:]
+        # Unescape JSON string escapes (\\n → \n, \\" → ", etc.)
+        # Remove trailing incomplete escape if present
+        if raw_value.endswith("\\"):
+            raw_value = raw_value[:-1]
+        try:
+            # Try to parse as a JSON string by adding closing quote
+            parsed = json.loads('"' + raw_value + '"')
+            return parsed.strip()
+        except json.JSONDecodeError:
+            # Even that failed — do basic unescaping manually
+            result = raw_value.replace("\\n", "\n").replace("\\t", "\t")
+            result = result.replace('\\"', '"').replace("\\\\", "\\")
+            # Strip trailing incomplete escape sequences or partial chars
+            return result.strip()
+
+    return ""
 
 
 @dataclass
@@ -45,6 +91,7 @@ class OpenRouterClient:
     MAX_RETRIES = 5
     RETRY_BACKOFF_BASE = 3.0   # 3s, 9s, 27s, 81s, 243s — generous for free-tier rate limits
     RETRYABLE_STATUS_CODES = {402, 429, 500, 502, 503}
+    EMPTY_CONTENT_RETRIES = 2  # Extra retries when model returns tokens but no content
 
     def __init__(self, api_key: str, timeout: float = API_CALL_TIMEOUT) -> None:
         self.api_key = api_key
@@ -126,20 +173,60 @@ class OpenRouterClient:
             temperature: Sampling temperature.
             reasoning_effort: Override reasoning effort for this call.
             tools: Optional tool definitions for tool-use mode.
+
+        When ``tools`` are provided (tool_role mode), the model is expected
+        to call ``send_message_to_human(message=...)`` instead of (or in
+        addition to) putting text in ``content``.  This method extracts the
+        tool-call argument as the primary response and retries if the model
+        produces neither content nor a valid tool call.
         """
         # Sanitize messages: merge consecutive same-role messages for
         # compatibility with strict providers (e.g. Z.AI/GLM)
         messages = sanitize_messages(messages)
 
         use_reasoning = self._resolve_reasoning_effort(model, reasoning_effort)
-        return self._chat_single(
-            model=model,
-            messages=messages,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            reasoning_effort=use_reasoning,
-            tools=tools,
-        )
+
+        for attempt in range(1, self.EMPTY_CONTENT_RETRIES + 2):
+            result = self._chat_single(
+                model=model,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                reasoning_effort=use_reasoning,
+                tools=tools,
+            )
+
+            # --- Extract response from tool call (tool_role mode) ---
+            if tools and result.tool_calls:
+                for tc in result.tool_calls:
+                    fn = tc.get("function", {})
+                    if fn.get("name") == "send_message_to_human":
+                        raw_args = fn.get("arguments", "{}")
+                        tool_message = _extract_tool_message(raw_args)
+                        if tool_message:
+                            # The tool-call message IS the response.
+                            # Any existing content is private thinking.
+                            result.content = tool_message
+                            break
+
+            # If we have content, we're done
+            if result.content:
+                return result
+
+            # No content — decide whether to retry
+            if result.usage.completion_tokens > 0 and attempt <= self.EMPTY_CONTENT_RETRIES:
+                reason = "tool_call_no_message" if result.tool_calls else "reasoning_only"
+                log.warning(
+                    "%s: empty response (%s, %d tokens), retry %d/%d",
+                    model, reason, result.usage.completion_tokens,
+                    attempt, self.EMPTY_CONTENT_RETRIES,
+                )
+                continue
+
+            # Out of retries or zero tokens — return whatever we have
+            return result
+
+        return result
 
     def _resolve_reasoning_effort(
         self, model: str, override: str | None

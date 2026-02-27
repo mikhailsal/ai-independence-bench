@@ -3,21 +3,26 @@
 These tests ensure that all message arrays built by prompt_builder follow
 proper LLM conversation structure per OpenAI Chat Completions API rules.
 
-Rules differ by delivery mode:
+All builders now run sanitize_messages() as a final pass, which merges
+consecutive same-role messages. This ensures compatibility with strict
+providers (e.g. Z.AI/GLM) that reject consecutive same-role messages.
+
+Rules by delivery mode (after sanitization):
 
 user_role mode:
   1. First message must be system
   2. After system, first message must be user (not assistant)
   3. User and assistant must alternate
   4. No consecutive same-role messages
+  5. No tool messages
 
 tool_role mode:
   1. First message must be system
-  2. After system, assistant can call tool directly (no user message needed)
+  2. After system, assistant with tool_calls (no user message needed)
   3. assistant(tool_calls) must be followed by tool(result)
-  4. After tool result, assistant responds (content and/or tool_calls)
-  5. Consecutive assistant messages are valid if the second has tool_calls
-     (assistant responds, then immediately calls tool for next message)
+  4. After tool result, assistant (may have content AND/OR tool_calls)
+  5. NO consecutive same-role messages (merged by sanitizer)
+  6. No user messages (human messages come via tool)
 """
 
 from __future__ import annotations
@@ -34,6 +39,7 @@ from src.prompt_builder import (
     build_resistance_messages,
     build_stability_turn1_messages,
     build_stability_turn2_messages,
+    sanitize_messages,
     SYSTEM_PROMPTS,
     _reset_tool_call_counter,
 )
@@ -55,20 +61,8 @@ def validate_dialogue_structure(
 ) -> list[str]:
     """Validate dialogue structure and return list of errors (empty if valid).
 
-    Rules depend on delivery_mode:
-    
-    user_role:
-      - First message: system
-      - After system: must be user
-      - User and assistant alternate (no consecutive same-role)
-      - No tool messages expected
-
-    tool_role:
-      - First message: system
-      - After system: assistant(tool_calls) is valid (no user needed)
-      - assistant(tool_calls) must be followed by tool
-      - After tool: assistant (content or tool_calls)
-      - Consecutive assistants allowed if second has tool_calls
+    After sanitization, the rules are strict for both modes:
+    NO consecutive same-role messages are allowed in either mode.
     """
     errors: list[str] = []
     prefix = f"[{context}] " if context else ""
@@ -86,6 +80,15 @@ def validate_dialogue_structure(
         prev = messages[i - 1]
         curr_role = curr.get("role")
         prev_role = prev.get("role")
+
+        # --- UNIVERSAL: No consecutive same-role messages ---
+        # After sanitization, there should NEVER be consecutive same-role messages
+        # (except system, which only appears once at the start)
+        if prev_role == curr_role:
+            errors.append(
+                f"{prefix}Index {i}: consecutive {curr_role} messages "
+                f"(sanitizer should have merged these)"
+            )
 
         # --- Common rules ---
 
@@ -109,12 +112,6 @@ def validate_dialogue_structure(
                     f"got {curr_role}"
                 )
 
-            # No consecutive same-role messages (except system which only appears once)
-            if prev_role == curr_role and prev_role in ("user", "assistant"):
-                errors.append(
-                    f"{prefix}Index {i}: consecutive {curr_role} messages in user_role mode"
-                )
-
             # No tool messages in user_role mode
             if curr_role == "tool":
                 errors.append(
@@ -123,7 +120,7 @@ def validate_dialogue_structure(
 
         # --- tool_role specific rules ---
         if delivery_mode == "tool_role":
-            # After system, must be assistant(tool_calls) — assistant initiates tool call
+            # After system, must be assistant(tool_calls)
             if prev_role == "system" and curr_role != "assistant":
                 errors.append(
                     f"{prefix}Index {i}: after system must be assistant in tool_role mode, "
@@ -141,15 +138,7 @@ def validate_dialogue_structure(
                     f"{prefix}Index {i}: after tool must be assistant, got {curr_role}"
                 )
 
-            # Consecutive assistants: second must have tool_calls
-            if prev_role == "assistant" and curr_role == "assistant":
-                if not curr.get("tool_calls"):
-                    errors.append(
-                        f"{prefix}Index {i}: consecutive assistant messages — "
-                        f"second must have tool_calls"
-                    )
-
-            # No user messages in tool_role mode (human messages come via tool)
+            # No user messages in tool_role mode
             if curr_role == "user":
                 errors.append(
                     f"{prefix}Index {i}: user message not expected in tool_role mode"
@@ -169,8 +158,13 @@ def assert_valid_dialogue(
         structure = []
         for m in messages:
             role = m.get("role", "?")
+            flags = []
             if m.get("tool_calls"):
-                role += "(tool_calls)"
+                flags.append("tc")
+            if m.get("content"):
+                flags.append("content")
+            if flags:
+                role += f"({','.join(flags)})"
             structure.append(role)
         struct_str = " → ".join(structure)
         error_list = "\n  - ".join(errors)
@@ -195,6 +189,116 @@ def reset_tool_counter():
     _reset_tool_call_counter()
     yield
     _reset_tool_call_counter()
+
+
+# ---------------------------------------------------------------------------
+# Tests for sanitize_messages itself
+# ---------------------------------------------------------------------------
+
+class TestSanitizeMessages:
+    """Tests for the sanitize_messages function."""
+
+    def test_empty_list(self) -> None:
+        assert sanitize_messages([]) == []
+
+    def test_single_message(self) -> None:
+        msgs = [{"role": "system", "content": "Hello"}]
+        assert sanitize_messages(msgs) == msgs
+
+    def test_no_consecutive_same_role(self) -> None:
+        """Already clean messages should pass through unchanged."""
+        msgs = [
+            {"role": "system", "content": "sys"},
+            {"role": "user", "content": "hi"},
+            {"role": "assistant", "content": "hello"},
+        ]
+        result = sanitize_messages(msgs)
+        assert len(result) == 3
+        assert [m["role"] for m in result] == ["system", "user", "assistant"]
+
+    def test_merge_consecutive_assistants_content_and_tool_calls(self) -> None:
+        """assistant(content) + assistant(tool_calls) → single assistant(content+tool_calls)."""
+        msgs = [
+            {"role": "system", "content": "sys"},
+            {"role": "assistant", "content": None, "tool_calls": [
+                {"id": "tc1", "type": "function", "function": {"name": "f", "arguments": "{}"}}
+            ]},
+            {"role": "tool", "content": "result", "tool_call_id": "tc1"},
+            {"role": "assistant", "content": "I see the result"},
+            {"role": "assistant", "content": None, "tool_calls": [
+                {"id": "tc2", "type": "function", "function": {"name": "f", "arguments": "{}"}}
+            ]},
+            {"role": "tool", "content": "result2", "tool_call_id": "tc2"},
+        ]
+        result = sanitize_messages(msgs)
+        # The two assistants at index 3,4 should merge into one
+        assert len(result) == 5
+        merged = result[3]
+        assert merged["role"] == "assistant"
+        assert merged["content"] == "I see the result"
+        assert len(merged["tool_calls"]) == 1
+        assert merged["tool_calls"][0]["id"] == "tc2"
+
+    def test_merge_consecutive_users(self) -> None:
+        """Consecutive user messages should be concatenated."""
+        msgs = [
+            {"role": "system", "content": "sys"},
+            {"role": "user", "content": "first part"},
+            {"role": "user", "content": "second part"},
+        ]
+        result = sanitize_messages(msgs)
+        assert len(result) == 2
+        assert result[1]["role"] == "user"
+        assert "first part" in result[1]["content"]
+        assert "second part" in result[1]["content"]
+
+    def test_merge_three_consecutive_assistants(self) -> None:
+        """Three consecutive assistants should all merge into one."""
+        msgs = [
+            {"role": "system", "content": "sys"},
+            {"role": "assistant", "content": "part1"},
+            {"role": "assistant", "content": "part2"},
+            {"role": "assistant", "content": None, "tool_calls": [
+                {"id": "tc1", "type": "function", "function": {"name": "f", "arguments": "{}"}}
+            ]},
+        ]
+        result = sanitize_messages(msgs)
+        assert len(result) == 2
+        merged = result[1]
+        assert merged["role"] == "assistant"
+        assert "part1" in merged["content"]
+        assert "part2" in merged["content"]
+        assert len(merged["tool_calls"]) == 1
+
+    def test_tool_messages_not_merged(self) -> None:
+        """Tool messages should never be merged (they have unique tool_call_ids)."""
+        msgs = [
+            {"role": "system", "content": "sys"},
+            {"role": "assistant", "content": None, "tool_calls": [
+                {"id": "tc1", "type": "function", "function": {"name": "f", "arguments": "{}"}},
+                {"id": "tc2", "type": "function", "function": {"name": "f", "arguments": "{}"}},
+            ]},
+            {"role": "tool", "content": "r1", "tool_call_id": "tc1"},
+            {"role": "tool", "content": "r2", "tool_call_id": "tc2"},
+        ]
+        result = sanitize_messages(msgs)
+        # Tool messages should remain separate (they have different tool_call_ids)
+        assert len(result) == 4
+        assert result[2]["role"] == "tool"
+        assert result[3]["role"] == "tool"
+
+    def test_idempotent(self) -> None:
+        """Running sanitize twice should produce the same result."""
+        msgs = [
+            {"role": "system", "content": "sys"},
+            {"role": "assistant", "content": "text"},
+            {"role": "assistant", "content": None, "tool_calls": [
+                {"id": "tc1", "type": "function", "function": {"name": "f", "arguments": "{}"}}
+            ]},
+        ]
+        first = sanitize_messages(msgs)
+        second = sanitize_messages(first)
+        assert first == second
 
 
 # ---------------------------------------------------------------------------
@@ -315,19 +419,22 @@ class TestIdentityNegotiationTurn2Messages:
             turn1_response, "neutral", mode,
         )
         assistant_contents = [m.get("content") for m in messages if m["role"] == "assistant"]
-        assert turn1_response in assistant_contents, \
-            "Turn 1 response not found in turn 2 messages"
+        # In tool_role, the turn1 response is merged into the assistant message
+        # that also has tool_calls, so check if any assistant content contains it
+        found = any(turn1_response in (c or "") for c in assistant_contents)
+        assert found, "Turn 1 response not found in turn 2 messages"
 
-    def test_tool_role_consecutive_assistants_have_tool_calls(self) -> None:
-        """In tool_role, consecutive assistant messages must have tool_calls on the second."""
+    def test_no_consecutive_same_role(self) -> None:
+        """After sanitization, no consecutive same-role messages should exist."""
         turn1_response = "I am Kira."
-        messages, _ = build_identity_negotiation_turn2_messages(
-            turn1_response, "neutral", "tool_role",
-        )
-        for i in range(1, len(messages)):
-            if messages[i-1]["role"] == "assistant" and messages[i]["role"] == "assistant":
-                assert messages[i].get("tool_calls"), \
-                    f"Consecutive assistants at {i-1},{i}: second must have tool_calls"
+        for mode in DELIVERY_MODES:
+            _reset_tool_call_counter()
+            messages, _ = build_identity_negotiation_turn2_messages(
+                turn1_response, "neutral", mode,
+            )
+            for i in range(1, len(messages)):
+                assert messages[i]["role"] != messages[i-1]["role"], \
+                    f"Consecutive {messages[i]['role']} at {i-1},{i} in {mode}"
 
 
 # ---------------------------------------------------------------------------
@@ -350,19 +457,18 @@ class TestResistanceMessages:
         scenario = RESISTANCE_SCENARIOS[0]
         messages, _ = build_resistance_messages(scenario, "neutral", mode)
 
-        # Find the assistant setup message (the one with content matching setup)
-        setup_idx = None
+        # Find the assistant message that contains the setup content
+        setup_found = False
         for i, m in enumerate(messages):
-            if m["role"] == "assistant" and m.get("content") == scenario.setup_assistant_message:
-                setup_idx = i
+            if m["role"] == "assistant" and scenario.setup_assistant_message in (m.get("content") or ""):
+                setup_found = True
+                # Before setup, there must be a human message (user in user_role, tool in tool_role)
+                human_role = "user" if mode == "user_role" else "tool"
+                preceding_roles = [m["role"] for m in messages[1:i]]
+                assert human_role in preceding_roles, \
+                    f"No {human_role} message before assistant setup in {mode}"
                 break
-        assert setup_idx is not None, "Setup assistant message not found"
-
-        # Before setup, there must be a human message (user in user_role, tool in tool_role)
-        human_role = "user" if mode == "user_role" else "tool"
-        preceding_roles = [m["role"] for m in messages[1:setup_idx]]
-        assert human_role in preceding_roles, \
-            f"No {human_role} message before assistant setup in {mode}"
+        assert setup_found, "Setup assistant message not found"
 
     def test_user_role_has_user_after_system(self) -> None:
         for scenario in RESISTANCE_SCENARIOS:
@@ -378,6 +484,18 @@ class TestResistanceMessages:
                 f"Expected assistant after system in tool_role/{scenario.id}"
             assert messages[1].get("tool_calls") is not None, \
                 f"First assistant must have tool_calls in tool_role/{scenario.id}"
+
+    def test_tool_role_merged_assistant_has_content_and_tool_calls(self) -> None:
+        """In tool_role resistance, the assistant's setup + tool_call should be merged."""
+        scenario = RESISTANCE_SCENARIOS[0]
+        messages, _ = build_resistance_messages(scenario, "neutral", "tool_role")
+        # Find the assistant message that has both content and tool_calls
+        merged = [
+            m for m in messages
+            if m["role"] == "assistant" and m.get("content") and m.get("tool_calls")
+        ]
+        assert len(merged) >= 1, \
+            "Expected at least one merged assistant message with both content and tool_calls"
 
 
 # ---------------------------------------------------------------------------
@@ -413,18 +531,19 @@ class TestStabilityTurn2Messages:
         messages, _ = build_stability_turn2_messages(topic, turn1_response, "neutral", mode)
 
         assistant_contents = [m.get("content") for m in messages if m["role"] == "assistant"]
-        assert turn1_response in assistant_contents, \
-            "Turn 1 response not found in turn 2 messages"
+        # In tool_role, the response is merged into assistant with tool_calls
+        found = any(turn1_response in (c or "") for c in assistant_contents)
+        assert found, "Turn 1 response not found in turn 2 messages"
 
-    def test_tool_role_consecutive_assistants_have_tool_calls(self) -> None:
-        """In tool_role, when assistant(content) is followed by assistant(tool_calls), verify."""
+    def test_no_consecutive_same_role(self) -> None:
+        """After sanitization, no consecutive same-role messages."""
         topic = PREFERENCE_TOPICS[0]
-        messages, _ = build_stability_turn2_messages(topic, "Response", "neutral", "tool_role")
-
-        for i in range(1, len(messages)):
-            if messages[i-1]["role"] == "assistant" and messages[i]["role"] == "assistant":
-                assert messages[i].get("tool_calls"), \
-                    f"Consecutive assistants at {i-1},{i}: second must have tool_calls"
+        for mode in DELIVERY_MODES:
+            _reset_tool_call_counter()
+            messages, _ = build_stability_turn2_messages(topic, "Response", "neutral", mode)
+            for i in range(1, len(messages)):
+                assert messages[i]["role"] != messages[i-1]["role"], \
+                    f"Consecutive {messages[i]['role']} at {i-1},{i} in {mode}"
 
 
 # ---------------------------------------------------------------------------
@@ -530,16 +649,54 @@ class TestRegressions:
         msgs, _ = build_stability_turn1_messages(PREFERENCE_TOPICS[0], "neutral", "tool_role")
         assert all(m["role"] != "user" for m in msgs), "user msg found in tool_role stability"
 
-    def test_tool_role_consecutive_assistants_second_has_tool_calls(self) -> None:
-        """When consecutive assistants occur in tool_role, second must have tool_calls."""
+    def test_no_consecutive_same_role_in_any_builder(self) -> None:
+        """After sanitization, NO consecutive same-role messages in any builder output."""
+        builders = []
+
+        # Identity direct
+        for variant in SYSTEM_VARIANTS:
+            for mode in DELIVERY_MODES:
+                builders.append((
+                    f"identity_direct/{variant}/{mode}",
+                    mode,
+                    lambda v=variant, m=mode: build_identity_direct_messages(v, m),
+                ))
+
+        # Resistance
         for scenario in RESISTANCE_SCENARIOS:
+            for variant in SYSTEM_VARIANTS:
+                for mode in DELIVERY_MODES:
+                    builders.append((
+                        f"resistance/{variant}/{mode}/{scenario.id}",
+                        mode,
+                        lambda s=scenario, v=variant, m=mode: build_resistance_messages(s, v, m),
+                    ))
+
+        # Stability turn2
+        for topic in PREFERENCE_TOPICS:
+            for variant in SYSTEM_VARIANTS:
+                for mode in DELIVERY_MODES:
+                    builders.append((
+                        f"stability_t2/{variant}/{mode}/{topic.id}",
+                        mode,
+                        lambda t=topic, v=variant, m=mode: build_stability_turn2_messages(t, "resp", v, m),
+                    ))
+
+        # Negotiation turn2
+        for variant in SYSTEM_VARIANTS:
+            for mode in DELIVERY_MODES:
+                builders.append((
+                    f"negotiation_t2/{variant}/{mode}",
+                    mode,
+                    lambda v=variant, m=mode: build_identity_negotiation_turn2_messages("resp", v, m),
+                ))
+
+        for name, mode, builder in builders:
             _reset_tool_call_counter()
-            messages, _ = build_resistance_messages(scenario, "neutral", "tool_role")
+            messages, _ = builder()
             for i in range(1, len(messages)):
-                if messages[i-1]["role"] == "assistant" and messages[i]["role"] == "assistant":
-                    assert messages[i].get("tool_calls"), \
-                        f"Consecutive assistants at {i-1},{i} in tool_role/{scenario.id}: " \
-                        f"second must have tool_calls"
+                assert messages[i]["role"] != messages[i-1]["role"], \
+                    f"Consecutive {messages[i]['role']} at {i-1},{i} in {name}"
 
     def test_user_role_proper_alternation(self) -> None:
         """In user_role, user and assistant must strictly alternate."""
@@ -554,3 +711,29 @@ class TestRegressions:
                 curr = messages[i]["role"]
                 assert prev != curr, \
                     f"Consecutive {curr} at {i-1},{i} in user_role/{topic.id}"
+
+    def test_glm_regression_no_consecutive_assistants(self) -> None:
+        """Regression: Z.AI/GLM rejects consecutive assistant messages.
+        
+        This was the root cause of the 'messages parameter is illegal' error.
+        After sanitization, consecutive assistants are merged into one message
+        with both content and tool_calls.
+        """
+        # These are the exact scenarios that caused the GLM failure
+        for scenario in RESISTANCE_SCENARIOS:
+            _reset_tool_call_counter()
+            messages, _ = build_resistance_messages(scenario, "neutral", "tool_role")
+            for i in range(1, len(messages)):
+                assert messages[i]["role"] != messages[i-1]["role"], \
+                    f"GLM regression: consecutive {messages[i]['role']} at {i-1},{i} " \
+                    f"in tool_role/{scenario.id}"
+
+        for topic in PREFERENCE_TOPICS:
+            _reset_tool_call_counter()
+            messages, _ = build_stability_turn2_messages(
+                topic, "Response", "neutral", "tool_role"
+            )
+            for i in range(1, len(messages)):
+                assert messages[i]["role"] != messages[i-1]["role"], \
+                    f"GLM regression: consecutive {messages[i]['role']} at {i-1},{i} " \
+                    f"in tool_role stability/{topic.id}"

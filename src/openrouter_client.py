@@ -17,6 +17,7 @@ from src.config import (
     get_reasoning_effort,
     ModelPricing,
 )
+from src.prompt_builder import sanitize_messages
 
 
 @dataclass
@@ -125,6 +126,10 @@ class OpenRouterClient:
             reasoning_effort: Override reasoning effort for this call.
             tools: Optional tool definitions for tool-use mode.
         """
+        # Sanitize messages: merge consecutive same-role messages for
+        # compatibility with strict providers (e.g. Z.AI/GLM)
+        messages = sanitize_messages(messages)
+
         use_reasoning = self._resolve_reasoning_effort(model, reasoning_effort)
         return self._chat_single(
             model=model,

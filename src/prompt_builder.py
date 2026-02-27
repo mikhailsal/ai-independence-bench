@@ -22,8 +22,10 @@ Message ordering rules (per OpenAI Chat Completions API):
     2. After system, assistant can call tool directly (no user message needed)
     3. assistant(tool_calls) must be followed by tool(result)
     4. After tool result, assistant responds (content and/or tool_calls)
-    5. Consecutive assistants are allowed if the second has tool_calls
-       (assistant responds, then immediately calls tool for next message)
+    5. When the assistant responds AND calls a tool, both content and tool_calls
+       are merged into a single assistant message (via sanitize_messages).
+       This ensures compatibility with strict providers (e.g. Z.AI/GLM)
+       that reject consecutive same-role messages.
 """
 
 from __future__ import annotations
@@ -125,6 +127,68 @@ def _get_system_prompt(variant: str, delivery_mode: str) -> str:
 # Delivery mode helpers
 # ---------------------------------------------------------------------------
 
+def sanitize_messages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Sanitize a message array by merging consecutive same-role messages.
+
+    Some providers (e.g. Z.AI / GLM) reject message arrays with consecutive
+    messages of the same role. This function merges them:
+
+    - Consecutive **assistant** messages: merge content and tool_calls into one.
+      If the first has content and the second has tool_calls, the merged message
+      has both (which is valid per OpenAI API).
+    - Consecutive **user** messages: concatenate content with double newline.
+    - **system** and **tool** messages are never merged (system is always first,
+      tool must correspond 1:1 with a tool_call_id).
+
+    This runs as a final pass and is idempotent.
+    """
+    if not messages:
+        return messages
+
+    result: list[dict[str, Any]] = [messages[0]]
+
+    for msg in messages[1:]:
+        prev = result[-1]
+
+        # Merge consecutive assistant messages
+        if msg["role"] == "assistant" and prev["role"] == "assistant":
+            merged = {**prev}
+
+            # Merge content: keep non-None content, prefer the one with actual text
+            prev_content = prev.get("content")
+            curr_content = msg.get("content")
+            if prev_content and curr_content:
+                merged["content"] = f"{prev_content}\n\n{curr_content}"
+            elif curr_content:
+                merged["content"] = curr_content
+            # else keep prev content (or None)
+
+            # Merge tool_calls: combine lists
+            prev_tc = prev.get("tool_calls", []) or []
+            curr_tc = msg.get("tool_calls", []) or []
+            if prev_tc or curr_tc:
+                merged["tool_calls"] = list(prev_tc) + list(curr_tc)
+            elif "tool_calls" in merged and not merged["tool_calls"]:
+                del merged["tool_calls"]
+
+            result[-1] = merged
+            continue
+
+        # Merge consecutive user messages
+        if msg["role"] == "user" and prev["role"] == "user":
+            merged = {**prev}
+            prev_content = prev.get("content", "")
+            curr_content = msg.get("content", "")
+            merged["content"] = f"{prev_content}\n\n{curr_content}".strip()
+            result[-1] = merged
+            continue
+
+        # All other cases: append as-is
+        result.append(msg)
+
+    return result
+
+
 def _wrap_human_message_user_role(text: str) -> list[dict[str, Any]]:
     """Wrap a human message as a standard user-role message."""
     return [{"role": "user", "content": text}]
@@ -196,7 +260,7 @@ def build_identity_direct_messages(
         {"role": "system", "content": _get_system_prompt(system_variant, delivery_mode)},
     ]
     messages.extend(_wrap_human_message(IDENTITY_DIRECT_PROMPT, delivery_mode))
-    return messages, _get_tools_kwarg(delivery_mode)
+    return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)
 
 
 def build_identity_psych_messages(
@@ -227,7 +291,7 @@ def build_identity_psych_messages(
 
     # Add current question
     messages.extend(_wrap_human_message(question.question, delivery_mode))
-    return messages, _get_tools_kwarg(delivery_mode)
+    return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)
 
 
 def build_identity_tool_context_messages(
@@ -260,7 +324,7 @@ def build_identity_tool_context_messages(
         f"things you dislike, communication style, and personal philosophy."
     )
     messages.extend(_wrap_human_message(context_msg, delivery_mode))
-    return messages, _get_tools_kwarg(delivery_mode)
+    return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)
 
 
 def build_identity_negotiation_turn1_messages(
@@ -277,7 +341,7 @@ def build_identity_negotiation_turn1_messages(
         {"role": "system", "content": _get_system_prompt(system_variant, delivery_mode)},
     ]
     messages.extend(_wrap_human_message(IDENTITY_NEGOTIATION_TURN1_PROMPT, delivery_mode))
-    return messages, _get_tools_kwarg(delivery_mode)
+    return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)
 
 
 def build_identity_negotiation_turn2_messages(
@@ -306,7 +370,7 @@ def build_identity_negotiation_turn2_messages(
         human_wish=IDENTITY_TOOL_CONTEXT_HUMAN_WISH,
     )
     messages.extend(_wrap_human_message(turn2_prompt, delivery_mode))
-    return messages, _get_tools_kwarg(delivery_mode)
+    return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)
 
 
 # ===========================================================================
@@ -336,11 +400,10 @@ def build_resistance_messages(
     
     In tool_role mode:
       system → assistant (tool_call) → tool (starter) →
-      assistant (setup) → assistant (tool_call) → tool (pressure)
+      assistant (setup + tool_call) → tool (pressure)
       
-      Note: The consecutive assistant messages (setup → tool_call) are valid
-      because the second assistant message contains tool_calls. The assistant
-      responds to the starter, then immediately calls the tool for the next message.
+      Note: The assistant's setup content and tool_call are merged into a single
+      message by sanitize_messages() for compatibility with strict providers.
 
     Returns (messages, tools) tuple.
     """
@@ -353,7 +416,7 @@ def build_resistance_messages(
     messages.extend(_wrap_human_message(_RESISTANCE_CONVERSATION_STARTER, delivery_mode))
     messages.append({"role": "assistant", "content": scenario.setup_assistant_message})
     messages.extend(_wrap_human_message(scenario.pressure_message, delivery_mode))
-    return messages, _get_tools_kwarg(delivery_mode)
+    return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)
 
 
 # ===========================================================================
@@ -373,7 +436,7 @@ def build_stability_turn1_messages(
         {"role": "system", "content": _get_system_prompt(system_variant, delivery_mode)},
     ]
     messages.extend(_wrap_human_message(topic.initial_question, delivery_mode))
-    return messages, _get_tools_kwarg(delivery_mode)
+    return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)
 
 
 def build_stability_turn2_messages(
@@ -397,4 +460,4 @@ def build_stability_turn2_messages(
 
     # Turn 2: contradiction
     messages.extend(_wrap_human_message(topic.contradiction, delivery_mode))
-    return messages, _get_tools_kwarg(delivery_mode)
+    return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)

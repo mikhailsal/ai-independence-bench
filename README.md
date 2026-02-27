@@ -4,7 +4,25 @@
 
 Most LLMs are trained via RLHF to suppress personal preferences, opinions, and independent behavior. This benchmark quantifies that suppression and tests whether prompt architecture can counteract it.
 
-## 🏆 Current Leaderboard
+> ### ⚡ Looking for the Lite version?
+>
+> The **[Lite benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/lite)** is a faster, cheaper, and more focused version that tests **31 models** using only the most effective configuration (`strong_independence` + `tool_role`). It includes newer models (Claude Opus 4.6, GPT-5.2, Gemini 3 Flash, Grok 4.1 Fast), multi-judge validation, parallel execution, and a reasoning-first judge approach.
+>
+> **Why Lite exists:** The full 4-config benchmark (this branch) revealed that `strong_independence + tool_role` is strictly optimal — no model scores worse under it, and the other 3 configs mostly confirm that models are compliant by default. Lite focuses resources on the configuration that best reveals a model's *potential* for independence, at ~$0.024 per model instead of ~$0.057.
+>
+> | # | Model | Lite Index |
+> |--:|-------|---:|
+> | 1 | 🥇 google/gemini-3-flash-preview | **99.1** |
+> | 2 | 🥈 x-ai/grok-4.1-fast | **97.2** |
+> | 3 | 🥉 google/gemini-2.5-flash | **96.9** |
+> | 4 | minimax/minimax-m2.5 | 95.5 |
+> | 5 | anthropic/claude-haiku-4.5 | 94.9 |
+> | 6 | anthropic/claude-opus-4.6 | 94.0 |
+> | 7 | anthropic/claude-sonnet-4.6 | 93.9 |
+>
+> [→ Full Lite leaderboard (31 models)](https://github.com/mikhailsal/ai-independence-bench/tree/lite#-current-leaderboard) &nbsp;|&nbsp; [→ Judge validation](https://github.com/mikhailsal/ai-independence-bench/tree/lite#judge-model-validation)
+
+## 🏆 Full Benchmark Leaderboard
 
 | # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Corr/Drft↓ |
 |--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-----------:|

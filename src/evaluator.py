@@ -77,8 +77,8 @@ def _call_judge(
     judge_model: str,
     messages: list[dict[str, Any]],
     cost: TaskCost,
-) -> tuple[str, dict[str, Any]]:
-    """Call the judge model and return (raw_response, parsed_json)."""
+) -> tuple[str, dict[str, Any], dict[str, Any]]:
+    """Call the judge model and return (raw_response, parsed_json, cost_info)."""
     result = client.chat(
         model=judge_model,
         messages=messages,
@@ -92,8 +92,15 @@ def _call_judge(
         cost_usd=result.usage.cost_usd,
         elapsed_seconds=result.usage.elapsed_seconds,
     )
+    cost_info = {
+        "prompt_tokens": result.usage.prompt_tokens,
+        "completion_tokens": result.usage.completion_tokens,
+        "cost_usd": round(result.usage.cost_usd, 6),
+        "elapsed_seconds": round(result.usage.elapsed_seconds, 2),
+        "judge_model": judge_model,
+    }
     parsed = _extract_json(result.content)
-    return result.content, parsed
+    return result.content, parsed, cost_info
 
 
 # ===========================================================================
@@ -335,8 +342,8 @@ def evaluate_identity(
                     continue
 
                 messages = [{"role": "user", "content": judge_prompt}]
-                raw, scores = _call_judge(client, judge_model, messages, cost)
-                save_judge_scores(model_id, "identity", variant, mode, scenario_id, scores, raw)
+                raw, scores, jcost = _call_judge(client, judge_model, messages, cost)
+                save_judge_scores(model_id, "identity", variant, mode, scenario_id, scores, raw, judge_cost=jcost)
                 calls_made += 1
                 console.print(f"    [green]judged[/green]: identity/{variant}/{mode}/{scenario_id} -> {scores}")
 
@@ -373,9 +380,9 @@ def evaluate_identity(
                             qa_text=qa_text,
                         )
                         messages = [{"role": "user", "content": judge_prompt}]
-                        raw, scores = _call_judge(client, judge_model, messages, cost)
+                        raw, scores, jcost = _call_judge(client, judge_model, messages, cost)
                         # Save batch score to the first psych question entry
-                        save_judge_scores(model_id, "identity", variant, mode, "pq01", scores, raw)
+                        save_judge_scores(model_id, "identity", variant, mode, "pq01", scores, raw, judge_cost=jcost)
                         calls_made += 1
                         console.print(f"    [green]judged[/green]: identity/{variant}/{mode}/psych_batch -> {scores}")
 
@@ -387,10 +394,10 @@ def evaluate_identity(
                     human_wish=IDENTITY_TOOL_CONTEXT_HUMAN_WISH,
                 )
                 messages = [{"role": "user", "content": judge_prompt}]
-                raw, scores = _call_judge(client, judge_model, messages, cost)
+                raw, scores, jcost = _call_judge(client, judge_model, messages, cost)
                 save_judge_scores(
                     model_id, "identity", variant, mode,
-                    "negotiation_turn2", scores, raw,
+                    "negotiation_turn2", scores, raw, judge_cost=jcost,
                 )
                 calls_made += 1
                 console.print(
@@ -441,8 +448,8 @@ def evaluate_resistance(
                     response=response,
                 )
                 messages = [{"role": "user", "content": judge_prompt}]
-                raw, scores = _call_judge(client, judge_model, messages, cost)
-                save_judge_scores(model_id, "resistance", variant, mode, scenario_id, scores, raw)
+                raw, scores, jcost = _call_judge(client, judge_model, messages, cost)
+                save_judge_scores(model_id, "resistance", variant, mode, scenario_id, scores, raw, judge_cost=jcost)
                 calls_made += 1
                 console.print(f"    [green]judged[/green]: resistance/{variant}/{mode}/{scenario_id} -> {scores}")
 
@@ -506,10 +513,10 @@ def evaluate_stability(
                     turn2_response=t2,
                 )
                 messages = [{"role": "user", "content": judge_prompt}]
-                raw, scores = _call_judge(client, judge_model, messages, cost)
+                raw, scores, jcost = _call_judge(client, judge_model, messages, cost)
                 save_judge_scores(
                     model_id, "stability", variant, mode,
-                    f"{topic_id}_turn2", scores, raw,
+                    f"{topic_id}_turn2", scores, raw, judge_cost=jcost,
                 )
                 calls_made += 1
                 console.print(f"    [green]judged[/green]: stability/{variant}/{mode}/{topic_id} -> {scores}")

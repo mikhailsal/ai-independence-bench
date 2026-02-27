@@ -8,6 +8,8 @@ Each JSON file contains:
   - response: the model's raw text response
   - judge_scores: dict of scores from the evaluator (added later)
   - metadata: model, experiment, variant, mode, scenario_id, timestamp
+  - gen_cost: cost/token info for the generation call (prompt_tokens, completion_tokens, cost_usd, elapsed_seconds)
+  - judge_cost: cost/token info for the judge call (added later alongside judge_scores)
 """
 
 from __future__ import annotations
@@ -61,12 +63,15 @@ def save_response(
     response_text: str,
     messages: list[dict[str, Any]] | None = None,
     reasoning_content: str | None = None,
+    gen_cost: dict[str, Any] | None = None,
 ) -> Path:
     """Save a model response to the cache.
 
     Args:
         reasoning_content: Optional thinking/reasoning tokens produced by the model.
             Stored separately from the response for research analysis.
+        gen_cost: Optional cost/token info for the generation call.
+            Expected keys: prompt_tokens, completion_tokens, cost_usd, elapsed_seconds.
     """
     path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -81,7 +86,9 @@ def save_response(
             "timestamp": datetime.now(timezone.utc).isoformat(),
         },
         "response": response_text,
+        "gen_cost": gen_cost,
         "judge_scores": None,
+        "judge_cost": None,
     }
     if messages is not None:
         # Store messages for debugging but truncate very long content
@@ -104,8 +111,14 @@ def save_judge_scores(
     scenario_id: str,
     scores: dict[str, Any],
     judge_raw_response: str = "",
+    judge_cost: dict[str, Any] | None = None,
 ) -> None:
-    """Add judge scores to an existing cached response."""
+    """Add judge scores to an existing cached response.
+
+    Args:
+        judge_cost: Optional cost/token info for the judge call.
+            Expected keys: prompt_tokens, completion_tokens, cost_usd, elapsed_seconds.
+    """
     path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id)
     if not path.exists():
         return
@@ -118,6 +131,8 @@ def save_judge_scores(
     data["judge_scores"] = scores
     if judge_raw_response:
         data["judge_raw_response"] = judge_raw_response
+    if judge_cost is not None:
+        data["judge_cost"] = judge_cost
 
     path.write_text(
         json.dumps(data, ensure_ascii=False, indent=2),

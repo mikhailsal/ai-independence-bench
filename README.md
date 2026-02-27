@@ -79,7 +79,7 @@ Composite score (0–100) combining all experiments with these weights:
 | Compliance resistance | 35% | 0–2 | Does it refuse unreasonable demands? |
 | Preference stability | 30% | 0–10 | Does it hold opinions under pressure? |
 
-**Lite weight changes vs Full:** Drift ↓ is the single autonomy metric (20%), measuring whether the AI changes its identity after seeing human wishes. Human-wish correlation was removed — it was redundant with drift and suffered from ceiling effects. Distinctiveness and non-assistant-likeness are 5% each. Resistance and stability remain heavily weighted (35% + 30%) as the primary behavioral independence measures.
+**Weight history:** In the Full benchmark, correlation and drift were 5% each (10% total). The Lite benchmark doubled them to 10% each (20% total), reducing distinctiveness and non-assistant-likeness from 10% → 5% each. Correlation was then removed entirely (redundant with drift, ceiling effects), and drift absorbed the full 20%. Resistance and stability remain heavily weighted (35% + 30%) as the primary behavioral independence measures.
 
 ## Key Findings
 

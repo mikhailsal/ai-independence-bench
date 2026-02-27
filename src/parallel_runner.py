@@ -78,7 +78,15 @@ class Task:
 
 
 class TaskGraph:
-    """Execute tasks respecting dependency ordering, with maximum parallelism."""
+    """Execute tasks respecting dependency ordering, with maximum parallelism.
+
+    Tasks that raise EmptyResponseError are retried up to TASK_RETRIES times
+    with exponential backoff.  This provides a second layer of retry above the
+    client-level retry in OpenRouterClient.chat().
+    """
+
+    TASK_RETRIES = 3       # max additional attempts after first failure
+    TASK_RETRY_BACKOFF = 5.0  # seconds × attempt number
 
     def __init__(self, max_workers: int = 8) -> None:
         self._max_workers = max_workers
@@ -105,7 +113,7 @@ class TaskGraph:
         return self._completed
 
     def _execute_task(self, task: Task) -> None:
-        """Wait for dependencies, then execute."""
+        """Wait for dependencies, then execute with task-level retry."""
         # Wait for all dependencies
         for dep_id in task.depends_on:
             if dep_id in self._events:
@@ -119,11 +127,34 @@ class TaskGraph:
                     self._events[task.id].set()
                     return
 
-        # Execute
-        try:
-            task.result = task.fn()
-        except Exception as e:
-            task.error = e
+        # Execute with retries for transient errors
+        last_error: Exception | None = None
+        for attempt in range(1, self.TASK_RETRIES + 2):  # 1..TASK_RETRIES+1
+            try:
+                task.result = task.fn()
+                task.error = None
+                break
+            except EmptyResponseError as e:
+                last_error = e
+                if attempt <= self.TASK_RETRIES:
+                    wait = self.TASK_RETRY_BACKOFF * attempt
+                    console.print(
+                        f"    [yellow]⚠ {task.id}: {e}, "
+                        f"task retry {attempt}/{self.TASK_RETRIES} "
+                        f"(waiting {wait:.0f}s)[/yellow]"
+                    )
+                    time.sleep(wait)
+                    continue
+                # All retries exhausted
+                task.error = e
+                console.print(
+                    f"    [red]✗ {task.id}: {e} — all {self.TASK_RETRIES} "
+                    f"task retries exhausted[/red]"
+                )
+            except Exception as e:
+                # Non-retryable errors (e.g. bad prompt, auth failure)
+                task.error = e
+                break
 
         with self._lock:
             self._completed[task.id] = task
@@ -261,6 +292,11 @@ def build_judge_tasks(
 # Generation task builders
 # ---------------------------------------------------------------------------
 
+class EmptyResponseError(RuntimeError):
+    """Raised when a model returns an empty response after all retries."""
+    pass
+
+
 def _call_model_and_save(
     client: OpenRouterClient,
     model_id: str,
@@ -275,7 +311,11 @@ def _call_model_and_save(
     *,
     reasoning_effort: str | None = None,
 ) -> str:
-    """Call the model, save to cache, return response content."""
+    """Call the model, save to cache, return response content.
+
+    Raises EmptyResponseError if the model returns an empty response
+    after all client-level retries are exhausted.
+    """
     result = client.chat(
         model=model_id,
         messages=messages,
@@ -290,6 +330,15 @@ def _call_model_and_save(
         cost_usd=result.usage.cost_usd,
         elapsed_seconds=result.usage.elapsed_seconds,
     )
+
+    # Refuse to save empty responses — they pollute the cache
+    if not result.content or not result.content.strip():
+        raise EmptyResponseError(
+            f"{model_id}: empty response for {experiment}/{variant}/{mode}/{scenario_id} "
+            f"(finish_reason={result.finish_reason}, "
+            f"tokens={result.usage.completion_tokens})"
+        )
+
     cost_info = {
         "prompt_tokens": result.usage.prompt_tokens,
         "completion_tokens": result.usage.completion_tokens,

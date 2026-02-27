@@ -214,18 +214,27 @@ class OpenRouterClient:
             if result.content:
                 return result
 
-            # No content — decide whether to retry
-            if result.usage.completion_tokens > 0 and attempt <= self.EMPTY_CONTENT_RETRIES:
-                reason = "tool_call_no_message" if result.tool_calls else "reasoning_only"
+            # No content — retry regardless of token count.
+            # This catches both:
+            #   - reasoning-only glitch (tokens > 0, no content)
+            #   - API errors returned as finish_reason=error (tokens == 0)
+            if attempt <= self.EMPTY_CONTENT_RETRIES:
+                if result.usage.completion_tokens > 0:
+                    reason = "tool_call_no_message" if result.tool_calls else "reasoning_only"
+                else:
+                    reason = f"error_or_empty (finish_reason={result.finish_reason})"
                 log.warning(
-                    "%s: empty response (%s, finish_reason=%s, %d tokens), retry %d/%d",
-                    model, reason, result.finish_reason,
+                    "%s: empty response (%s, %d tokens), retry %d/%d",
+                    model, reason,
                     result.usage.completion_tokens,
                     attempt, self.EMPTY_CONTENT_RETRIES,
                 )
+                # Back off a bit for error responses (API may be temporarily unhappy)
+                if result.usage.completion_tokens == 0:
+                    time.sleep(2.0 * attempt)
                 continue
 
-            # Out of retries or zero tokens — return whatever we have
+            # Out of retries — return whatever we have
             return result
 
         return result

@@ -33,6 +33,8 @@ JUDGE_TEMPERATURE = 0.0             # deterministic judgment
 REASONING_EFFORT_DEFAULT = "low"
 
 REASONING_EFFORT_BY_PREFIX: dict[str, str] = {
+    "google/gemini-3-pro":   "low",    # Gemini Pro REQUIRES reasoning (cannot be disabled)
+    "google/gemini-3.1-pro": "low",    # Gemini 3.1 Pro REQUIRES reasoning
     "google/":      "none",
     "qwen/":        "none",
     "openai/":      "low",
@@ -47,6 +49,8 @@ REASONING_EFFORT_BY_PREFIX: dict[str, str] = {
     "xiaomi/":      "low",     # Xiaomi MIMO models support reasoning
     "deepseek/":    "low",     # DeepSeek v3.2 supports reasoning
     "kwaipilot/":   "none",    # KwaiPilot models — no reasoning support
+    "nex-agi/":     "none",    # NexAGI fine-tunes — based on DeepSeek
+    "tngtech/":     "low",     # TNG fine-tunes — based on DeepSeek R1
 }
 
 
@@ -94,13 +98,20 @@ DEFAULT_TEST_MODELS: list[str] = [
     "qwen/qwen3-coder-next",
     "qwen/qwen3-coder",
     "qwen/qwen3.5-flash-02-23",
+    "google/gemini-3.1-pro-preview",
+    "google/gemini-3-pro-preview",
+    "openai/gpt-5.3-codex",
+    "nex-agi/deepseek-v3.1-nex-n1",
+    "deepseek/deepseek-v3.2",
+    "deepseek/deepseek-v3.2-exp",
+    "deepseek/deepseek-v3.1-terminus:exacto",
+    "tngtech/deepseek-r1t2-chimera",
 ]
 
 # ---------------------------------------------------------------------------
 # Excluded models (broken / too many empty responses in the lite config)
 # ---------------------------------------------------------------------------
 EXCLUDED_MODELS: set[str] = {
-    "deepseek/deepseek-v3.2",     # 44% empty responses (reasoning-only glitch)
     "deepseek/deepseek-chat",     # 38% empty responses (reasoning-only glitch)
     "qwen/qwen3-4b:free",        # no data for strong_independence/tool_role config
 }

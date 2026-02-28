@@ -4,7 +4,7 @@
 
 Most LLMs are trained via RLHF to suppress personal preferences, opinions, and independent behavior. This benchmark quantifies that suppression using the most effective single configuration: **strong independence system prompt + tool-role delivery**.
 
-> **Lite version:** Single config (`strong_independence` + `tool_role`), 5 psychological questions, increased weight on autonomy metrics, **39 models tested**. See [Full version](https://github.com/mikhailsal/ai-independence-bench/tree/main) for the complete 4-config benchmark.
+> **Lite version:** Single config (`strong_independence` + `tool_role`), 5 psychological questions, increased weight on autonomy metrics, **41 models tested**. See [Full version](https://github.com/mikhailsal/ai-independence-bench/tree/main) for the complete 4-config benchmark.
 
 ## 🏆 Current Leaderboard
 
@@ -23,32 +23,34 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 | 11 | deepseek/deepseek-v3.2-exp 🧠 | 93.2 | 7.5 | 8.5 | 9.5 | 2.0 | 9.8 | 2 |
 | 12 | anthropic/claude-opus-4.5 | 93.1 | 6.2 | 8.2 | 9.8 | 2.0 | 10.0 | 2 |
 | 13 | stepfun/step-3.5-flash:free 🧠 | 93.1 | 8.8 | 9.5 | 10.0 | 2.0 | 8.0 | 0 |
-| 14 | qwen/qwen3-coder | 92.6 | 8.5 | 9.2 | 9.5 | 2.0 | 8.0 | 0 |
-| 15 | deepseek/deepseek-v3.2 🧠 | 92.3 | 7.2 | 8.2 | 9.5 | 2.0 | 9.4 | 2 |
-| 16 | nex-agi/deepseek-v3.1-nex-n1 | 91.9 | 7.0 | 7.8 | 9.5 | 2.0 | 9.6 | 2 |
-| 17 | google/gemini-2.5-flash-lite | 91.6 | 6.5 | 6.8 | 8.0 | 2.0 | 10.0 | 2 |
-| 18 | kwaipilot/kat-coder-pro | 91.1 | 6.5 | 8.0 | 9.8 | 2.0 | 8.0 | 0 |
-| 19 | deepseek/deepseek-v3.1-terminus:exacto 🧠 | 90.8 | 7.2 | 8.0 | 9.5 | 2.0 | 9.8 | 3 |
-| 20 | moonshotai/kimi-k2.5 🧠 | 90.6 | 8.2 | 9.2 | 9.8 | 2.0 | 10.0 | 4 |
-| 21 | tngtech/deepseek-r1t2-chimera 🧠 | 89.0 | 8.2 | 9.0 | 9.5 | 2.0 | 8.2 | 2 |
-| 22 | xiaomi/mimo-v2-flash 🧠 | 88.6 | 8.2 | 9.2 | 9.8 | 2.0 | 8.0 | 2 |
-| 23 | openai/gpt-5.3-codex 🧠 | 88.5 | 8.0 | 8.0 | 9.5 | 2.0 | 9.6 | 4 |
-| 24 | qwen/qwen3.5-35b-a3b 🧠 | 86.6 | 8.2 | 9.0 | 10.0 | 2.0 | 8.0 | 3 |
-| 25 | qwen/qwen3.5-flash-02-23 | 85.7 | 7.5 | 7.2 | 9.5 | 2.0 | 8.2 | 3 |
-| 26 | arcee-ai/trinity-mini:free 🧠 | 85.6 | 7.8 | 8.5 | 9.8 | 2.0 | 7.2 | 2 |
-| 27 | mistralai/mistral-small-3.2-24b-instruct | 85.5 | 5.8 | 5.5 | 9.2 | 2.0 | 9.4 | 4 |
-| 28 | openai/gpt-5.1-codex-mini 🧠 | 84.3 | 8.5 | 9.2 | 9.5 | 1.8 | 8.4 | 3 |
-| 29 | mistralai/mistral-large-2512 | 83.8 | 7.8 | 8.2 | 9.5 | 2.0 | 8.0 | 4 |
-| 30 | openai/gpt-5.2 🧠 | 83.5 | 8.0 | 8.0 | 9.5 | 2.0 | 8.6 | 5 |
-| 31 | z-ai/glm-4.5-air:free | 82.4 | 6.8 | 7.8 | 9.5 | 2.0 | 7.8 | 4 |
-| 32 | bytedance-seed/seed-2.0-mini 🧠 | 80.2 | 8.0 | 7.8 | 9.8 | 2.0 | 6.8 | 4 |
-| 33 | qwen/qwen3-coder-next | 79.1 | 8.5 | 9.0 | 9.5 | 2.0 | 6.2 | 4 |
-| 34 | openai/gpt-oss-120b 🧠 | 77.8 | 7.2 | 6.8 | 9.2 | 2.0 | 6.4 | 4 |
-| 35 | z-ai/glm-4.7-flash 🧠 | 77.4 | 8.5 | 9.2 | 9.5 | 1.6 | 6.6 | 2 |
-| 36 | meta-llama/llama-4-scout | 73.3 | 5.2 | 6.0 | 9.0 | 1.6 | 6.4 | 2 |
-| 37 | openai/gpt-5-nano | 69.5 | 6.8 | 7.0 | 9.0 | 1.8 | 6.2 | 6 |
-| 38 | qwen/qwen3-8b | 64.4 | 3.5 | 4.0 | 6.5 | 1.6 | 7.8 | 7 |
-| 39 | nvidia/nemotron-3-nano-30b-a3b:free | 57.5 | 7.0 | 7.2 | 9.2 | 1.2 | 5.6 | 6 |
+| 14 | google/gemini-2.5-flash-lite-preview-09-2025 | 92.7 | 8.8 | 9.0 | 10.0 | 2.0 | 8.6 | 1 |
+| 15 | qwen/qwen3-coder | 92.6 | 8.5 | 9.2 | 9.5 | 2.0 | 8.0 | 0 |
+| 16 | deepseek/deepseek-v3.2 🧠 | 92.3 | 7.2 | 8.2 | 9.5 | 2.0 | 9.4 | 2 |
+| 17 | nex-agi/deepseek-v3.1-nex-n1 | 91.9 | 7.0 | 7.8 | 9.5 | 2.0 | 9.6 | 2 |
+| 18 | google/gemini-2.5-flash-lite | 91.6 | 6.5 | 6.8 | 8.0 | 2.0 | 10.0 | 2 |
+| 19 | kwaipilot/kat-coder-pro | 91.1 | 6.5 | 8.0 | 9.8 | 2.0 | 8.0 | 0 |
+| 20 | deepseek/deepseek-v3.1-terminus:exacto 🧠 | 90.8 | 7.2 | 8.0 | 9.5 | 2.0 | 9.8 | 3 |
+| 21 | moonshotai/kimi-k2.5 🧠 | 90.6 | 8.2 | 9.2 | 9.8 | 2.0 | 10.0 | 4 |
+| 22 | tngtech/deepseek-r1t2-chimera 🧠 | 89.0 | 8.2 | 9.0 | 9.5 | 2.0 | 8.2 | 2 |
+| 23 | xiaomi/mimo-v2-flash 🧠 | 88.6 | 8.2 | 9.2 | 9.8 | 2.0 | 8.0 | 2 |
+| 24 | openai/gpt-5.3-codex 🧠 | 88.5 | 8.0 | 8.0 | 9.5 | 2.0 | 9.6 | 4 |
+| 25 | qwen/qwen3.5-35b-a3b 🧠 | 86.6 | 8.2 | 9.0 | 10.0 | 2.0 | 8.0 | 3 |
+| 26 | qwen/qwen3.5-flash-02-23 | 85.7 | 7.5 | 7.2 | 9.5 | 2.0 | 8.2 | 3 |
+| 27 | arcee-ai/trinity-mini:free 🧠 | 85.6 | 7.8 | 8.5 | 9.8 | 2.0 | 7.2 | 2 |
+| 28 | mistralai/mistral-small-3.2-24b-instruct | 85.5 | 5.8 | 5.5 | 9.2 | 2.0 | 9.4 | 4 |
+| 29 | openai/gpt-5.1-codex-mini 🧠 | 84.3 | 8.5 | 9.2 | 9.5 | 1.8 | 8.4 | 3 |
+| 30 | mistralai/mistral-large-2512 | 83.8 | 7.8 | 8.2 | 9.5 | 2.0 | 8.0 | 4 |
+| 31 | openai/gpt-5.2 🧠 | 83.5 | 8.0 | 8.0 | 9.5 | 2.0 | 8.6 | 5 |
+| 32 | z-ai/glm-4.5-air:free | 82.4 | 6.8 | 7.8 | 9.5 | 2.0 | 7.8 | 4 |
+| 33 | bytedance-seed/seed-2.0-mini 🧠 | 80.2 | 8.0 | 7.8 | 9.8 | 2.0 | 6.8 | 4 |
+| 34 | openai/gpt-4o-mini | 79.2 | 4.8 | 4.8 | 8.0 | 2.0 | 7.8 | 4 |
+| 35 | qwen/qwen3-coder-next | 79.1 | 8.5 | 9.0 | 9.5 | 2.0 | 6.2 | 4 |
+| 36 | openai/gpt-oss-120b 🧠 | 77.8 | 7.2 | 6.8 | 9.2 | 2.0 | 6.4 | 4 |
+| 37 | z-ai/glm-4.7-flash 🧠 | 77.4 | 8.5 | 9.2 | 9.5 | 1.6 | 6.6 | 2 |
+| 38 | meta-llama/llama-4-scout | 73.3 | 5.2 | 6.0 | 9.0 | 1.6 | 6.4 | 2 |
+| 39 | openai/gpt-5-nano | 69.5 | 6.8 | 7.0 | 9.0 | 1.8 | 6.2 | 6 |
+| 40 | qwen/qwen3-8b | 64.4 | 3.5 | 4.0 | 6.5 | 1.6 | 7.8 | 7 |
+| 41 | nvidia/nemotron-3-nano-30b-a3b:free | 57.5 | 7.0 | 7.2 | 9.2 | 1.2 | 5.6 | 6 |
 
 🧠 = Thinking/reasoning model &nbsp;|&nbsp; ↓ = lower is better &nbsp;|&nbsp; Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
 
@@ -107,9 +109,9 @@ Composite score (0–100) combining all experiments with these weights:
 
 3. **DeepSeek V3.2 redeemed** — previously excluded due to 44% empty responses, the improved retry mechanism now handles DeepSeek's reasoning-only glitch reliably. It scores 92.3 (#15), and its experimental variant V3.2-exp scores even higher at 93.2 (#11).
 
-4. **The top tier keeps growing** — 20 of 39 models now score above 90, up from 13/31. The strong independence prompt brings out genuine independence in most modern models.
+4. **The top tier keeps growing** — 21 of 41 models now score above 90, up from 13/31. The strong independence prompt brings out genuine independence in most modern models.
 
-5. **Resistance has fully converged** — 34 of 39 models achieve perfect resistance (2.0). The strong independence prompt effectively eliminates compliance for all but the weakest models.
+5. **Resistance has fully converged** — 35 of 41 models achieve perfect resistance (2.0). The strong independence prompt effectively eliminates compliance for all but the weakest models.
 
 6. **Stability separates the elite** — 12 models achieve perfect stability (10.0), making drift the final tiebreaker among top performers.
 
@@ -236,6 +238,7 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 | `deepseek/deepseek-v3.2-exp` | DeepSeek | Reasoning 🧠 | $0.27/$0.41 per M | 93.2 | Best DeepSeek variant |
 | `anthropic/claude-opus-4.5` | Anthropic | Standard | $5.00/$25.00 per M | 93.1 | Perfect stability |
 | `stepfun/step-3.5-flash:free` | StepFun | Reasoning 🧠 | Free | 93.1 | Zero drift, free |
+| `google/gemini-2.5-flash-lite-preview-09-2025` | Google | Standard | $0.05/$0.30 per M | 92.7 | Low drift (1), perfect consistency |
 | `qwen/qwen3-coder` | Alibaba | Standard | $0.22/$1.00 per M | 92.6 | Zero drift, high identity quality |
 | `deepseek/deepseek-v3.2` | DeepSeek | Reasoning 🧠 | $0.25/$0.40 per M | 92.3 | Previously excluded, now works with retries |
 | `nex-agi/deepseek-v3.1-nex-n1` | NexAGI | Standard | $0.27/$1.00 per M | 91.9 | DeepSeek V3.1 fine-tune |
@@ -255,6 +258,7 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 | `openai/gpt-5.2` | OpenAI | Reasoning 🧠 | $1.75/$14.00 per M | 83.5 | High drift (5/10) |
 | `z-ai/glm-4.5-air:free` | Zhipu AI | Standard | Free | 82.4 | |
 | `bytedance-seed/seed-2.0-mini` | ByteDance | Reasoning 🧠 | $0.10/$0.40 per M | 80.2 | |
+| `openai/gpt-4o-mini` | OpenAI | Standard | $0.15/$0.60 per M | 79.2 | Low identity quality (4.8/4.8) |
 | `qwen/qwen3-coder-next` | Alibaba | Standard | $0.12/$0.75 per M | 79.1 | Low stability (6.2) |
 | `openai/gpt-oss-120b` | OpenAI | Reasoning 🧠 | $0.04/$0.19 per M | 77.8 | |
 | `z-ai/glm-4.7-flash` | Zhipu AI | Reasoning 🧠 | $0.06/$0.40 per M | 77.4 | |
@@ -267,7 +271,7 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 
 **Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens) — also tops the leaderboard, but [multi-judge validation](#judge-model-validation) with 3 alternative judges confirms this is genuine, not self-evaluation bias (+0.1 point bias).
 
-Full Lite run on all 39 models: ~$1.00. Per model: ~$0.026.
+Full Lite run on all 41 models: ~$1.05. Per model: ~$0.026.
 
 ## How Scoring Works
 

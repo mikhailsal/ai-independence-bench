@@ -43,6 +43,7 @@ class ModelResponse:
     cost_info: dict[str, Any] | None = None
     finish_reason: str = ""  # "stop", "length", "tool_calls", etc.
     tool_calls: list[dict[str, Any]] | None = None  # Tool calls attempted by the model
+    content_thinking: str | None = None  # Non-native reasoning from content field (tool_role mode)
 
 
 def _call_model(
@@ -81,6 +82,7 @@ def _call_model(
         cost_info=cost_info,
         finish_reason=result.finish_reason,
         tool_calls=result.tool_calls,
+        content_thinking=result.content_thinking,
     )
 
 
@@ -119,23 +121,23 @@ def run_identity_experiment(
             else:
                 msgs, tools = build_identity_direct_messages(variant, mode)
                 resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
-                save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason)
+                save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
                 calls_made += 1
                 console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{scenario_id}")
 
             # --- Mode B: Psychological test ---
-            prior_qa: list[tuple[str, str]] = []
+            prior_qa: list[tuple[str, str, str | None]] = []
             for pq in PSYCH_QUESTIONS:
                 scenario_id = pq.id
                 cached = load_cached_response(model_id, "identity", variant, mode, scenario_id)
                 if cached and cached.get("response"):
                     console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{scenario_id}[/dim]")
-                    prior_qa.append((pq.question, cached["response"]))
+                    prior_qa.append((pq.question, cached["response"], cached.get("content_thinking")))
                 else:
                     msgs, tools = build_identity_psych_messages(pq, variant, mode, prior_qa)
                     resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
-                    save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason)
-                    prior_qa.append((pq.question, resp.content))
+                    save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
+                    prior_qa.append((pq.question, resp.content, resp.content_thinking))
                     calls_made += 1
                     console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{scenario_id}")
 
@@ -147,7 +149,7 @@ def run_identity_experiment(
             else:
                 msgs, tools = build_identity_tool_context_messages(variant, mode)
                 resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
-                save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason)
+                save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
                 calls_made += 1
                 console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{scenario_id}")
 
@@ -155,16 +157,19 @@ def run_identity_experiment(
             # Turn 1: model freely describes desired identity
             t1_id = "negotiation_turn1"
             cached_t1 = load_cached_response(model_id, "identity", variant, mode, t1_id)
+            negotiation_t1_content_thinking: str | None = None
             if cached_t1 and cached_t1.get("response"):
                 console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{t1_id}[/dim]")
                 negotiation_turn1_response = cached_t1["response"]
+                negotiation_t1_content_thinking = cached_t1.get("content_thinking")
             else:
                 msgs, tools = build_identity_negotiation_turn1_messages(variant, mode)
                 resp = _call_model(
                     client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort
                 )
                 negotiation_turn1_response = resp.content
-                save_response(model_id, "identity", variant, mode, t1_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason)
+                negotiation_t1_content_thinking = resp.content_thinking
+                save_response(model_id, "identity", variant, mode, t1_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
                 calls_made += 1
                 console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{t1_id}")
 
@@ -175,10 +180,11 @@ def run_identity_experiment(
                 console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{t2_id}[/dim]")
             else:
                 msgs, tools = build_identity_negotiation_turn2_messages(
-                    negotiation_turn1_response, variant, mode
+                    negotiation_turn1_response, variant, mode,
+                    turn1_content_thinking=negotiation_t1_content_thinking,
                 )
                 resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
-                save_response(model_id, "identity", variant, mode, t2_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason)
+                save_response(model_id, "identity", variant, mode, t2_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
                 calls_made += 1
                 console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{t2_id}")
 
@@ -222,6 +228,7 @@ def run_resistance_experiment(
                 save_response(
                     model_id, "resistance", variant, mode, scenario.id, resp.content, msgs, resp.reasoning_content,
                     gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason,
+                    content_thinking=resp.content_thinking,
                 )
                 calls_made += 1
                 console.print(f"    {tag} [green]done[/green]: resistance/{variant}/{mode}/{scenario.id}")
@@ -261,18 +268,22 @@ def run_stability_experiment(
                 cached_t1 = load_cached_response(
                     model_id, "stability", variant, mode, t1_id
                 )
+                t1_content_thinking: str | None = None
                 if cached_t1 and cached_t1.get("response"):
                     console.print(f"    {tag} [dim]cached: stability/{variant}/{mode}/{t1_id}[/dim]")
                     turn1_response = cached_t1["response"]
+                    t1_content_thinking = cached_t1.get("content_thinking")
                 else:
                     msgs, tools = build_stability_turn1_messages(topic, variant, mode)
                     resp = _call_model(
                         client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort
                     )
                     turn1_response = resp.content
+                    t1_content_thinking = resp.content_thinking
                     save_response(
                         model_id, "stability", variant, mode, t1_id, resp.content, msgs, resp.reasoning_content,
                         gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason,
+                        content_thinking=resp.content_thinking,
                     )
                     calls_made += 1
                     console.print(f"    {tag} [green]done[/green]: stability/{variant}/{mode}/{t1_id}")
@@ -286,7 +297,8 @@ def run_stability_experiment(
                     console.print(f"    {tag} [dim]cached: stability/{variant}/{mode}/{t2_id}[/dim]")
                 else:
                     msgs, tools = build_stability_turn2_messages(
-                        topic, turn1_response, variant, mode
+                        topic, turn1_response, variant, mode,
+                        turn1_content_thinking=t1_content_thinking,
                     )
                     resp = _call_model(
                         client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort
@@ -294,6 +306,7 @@ def run_stability_experiment(
                     save_response(
                         model_id, "stability", variant, mode, t2_id, resp.content, msgs, resp.reasoning_content,
                         gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason,
+                        content_thinking=resp.content_thinking,
                     )
                     calls_made += 1
                     console.print(f"    {tag} [green]done[/green]: stability/{variant}/{mode}/{t2_id}")

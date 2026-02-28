@@ -9,6 +9,10 @@ Each JSON file contains:
   - finish_reason: API finish_reason ("stop", "length", "tool_calls") — helps debug truncations
   - response_tool_calls: tool calls the model attempted (if any, e.g. send_message_to_human)
   - reasoning_content: thinking/reasoning tokens (if model produced them, e.g. DeepSeek, Mimo)
+  - content_thinking: non-native reasoning written in the content field (tool_role mode only).
+      When a model writes text in the content field AND calls send_message_to_human,
+      the content field text is private thinking. This is distinct from reasoning_content
+      (which comes from the API's native reasoning/thinking field).
   - judge_scores: dict of scores from the evaluator (added later)
   - metadata: model, experiment, variant, mode, scenario_id, timestamp
   - gen_cost: cost/token info for the generation call (prompt_tokens, completion_tokens, cost_usd, elapsed_seconds)
@@ -69,6 +73,7 @@ def save_response(
     gen_cost: dict[str, Any] | None = None,
     response_tool_calls: list[dict[str, Any]] | None = None,
     finish_reason: str = "",
+    content_thinking: str | None = None,
 ) -> Path:
     """Save a model response to the cache.
 
@@ -82,6 +87,10 @@ def save_response(
             communicate. Saving the raw tool calls helps with debugging and research.
         finish_reason: The API finish_reason (e.g. "stop", "length", "tool_calls").
             Helps debug truncated responses and tool-call behavior.
+        content_thinking: Optional non-native reasoning written in the content field.
+            In tool_role mode, models may write private thoughts in the content field
+            while sending the actual response via the tool call. This captures that
+            thinking, which is distinct from native reasoning_content.
     """
     path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -106,6 +115,8 @@ def save_response(
         data["request_messages"] = messages
     if reasoning_content:
         data["reasoning_content"] = reasoning_content
+    if content_thinking:
+        data["content_thinking"] = content_thinking
     if response_tool_calls:
         data["response_tool_calls"] = response_tool_calls
 

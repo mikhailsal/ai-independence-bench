@@ -297,6 +297,13 @@ class EmptyResponseError(RuntimeError):
     pass
 
 
+@dataclass
+class _ModelCallResult:
+    """Internal result from _call_model_and_save, carrying both content and content_thinking."""
+    content: str
+    content_thinking: str | None = None
+
+
 def _call_model_and_save(
     client: OpenRouterClient,
     model_id: str,
@@ -310,8 +317,8 @@ def _call_model_and_save(
     tag: str,
     *,
     reasoning_effort: str | None = None,
-) -> str:
-    """Call the model, save to cache, return response content.
+) -> _ModelCallResult:
+    """Call the model, save to cache, return response content and content_thinking.
 
     Raises EmptyResponseError if the model returns an empty response
     after all client-level retries are exhausted.
@@ -350,9 +357,10 @@ def _call_model_and_save(
         result.content, messages, result.reasoning_content,
         gen_cost=cost_info, response_tool_calls=result.tool_calls,
         finish_reason=result.finish_reason,
+        content_thinking=result.content_thinking,
     )
     console.print(f"    {tag} [green]done[/green]: {experiment}/{variant}/{mode}/{scenario_id}")
-    return result.content
+    return _ModelCallResult(content=result.content, content_thinking=result.content_thinking)
 
 
 def _add_identity_direct_task(
@@ -405,21 +413,26 @@ def _add_identity_negotiation_t1_task(
 ):
     task_id = f"{prefix}:identity:negotiation_turn1"
     resp_key = f"{model_id}:{variant}:{mode}:negotiation_turn1"
+    ct_key = f"{resp_key}:ct"  # content_thinking key
     cached = load_cached_response(model_id, "identity", variant, mode, "negotiation_turn1")
     if cached and cached.get("response"):
         console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/negotiation_turn1[/dim]")
         shared.set(resp_key, cached["response"])
+        if cached.get("content_thinking"):
+            shared.set(ct_key, cached["content_thinking"])
         graph.add(Task(id=task_id, fn=lambda: None))
         return
 
     def fn():
         msgs, tools = build_identity_negotiation_turn1_messages(variant, mode)
-        content = _call_model_and_save(
+        call_result = _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "identity", variant, mode, "negotiation_turn1", tag,
             reasoning_effort=reasoning_effort,
         )
-        shared.set(resp_key, content)
+        shared.set(resp_key, call_result.content)
+        if call_result.content_thinking:
+            shared.set(ct_key, call_result.content_thinking)
 
     graph.add(Task(id=task_id, fn=fn))
 
@@ -431,6 +444,7 @@ def _add_identity_negotiation_t2_task(
     task_id = f"{prefix}:identity:negotiation_turn2"
     t1_task_id = f"{prefix}:identity:negotiation_turn1"
     resp_key = f"{model_id}:{variant}:{mode}:negotiation_turn1"
+    ct_key = f"{resp_key}:ct"  # content_thinking key from turn 1
     cached = load_cached_response(model_id, "identity", variant, mode, "negotiation_turn2")
     if cached and cached.get("response"):
         console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/negotiation_turn2[/dim]")
@@ -439,7 +453,11 @@ def _add_identity_negotiation_t2_task(
 
     def fn():
         t1_resp = shared.get(resp_key)
-        msgs, tools = build_identity_negotiation_turn2_messages(t1_resp, variant, mode)
+        t1_ct = shared.get(ct_key) or None
+        msgs, tools = build_identity_negotiation_turn2_messages(
+            t1_resp, variant, mode,
+            turn1_content_thinking=t1_ct,
+        )
         _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "identity", variant, mode, "negotiation_turn2", tag,
@@ -464,7 +482,7 @@ def _add_identity_psych_chain(
         if cached and cached.get("response"):
             console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{pq.id}[/dim]")
             # Still need to store the response for building prior_qa
-            _store_psych_qa(shared, resp_key, pq.question, cached["response"])
+            _store_psych_qa(shared, resp_key, pq.question, cached["response"], cached.get("content_thinking"))
             deps = [prev_task_id] if prev_task_id else []
             graph.add(Task(id=task_id, fn=lambda: None, depends_on=deps))
             prev_task_id = task_id
@@ -478,12 +496,12 @@ def _add_identity_psych_chain(
             def fn():
                 prior_qa = _get_psych_prior_qa(shared, rk)
                 msgs, tools = build_identity_psych_messages(pq_item, variant, mode, prior_qa)
-                content = _call_model_and_save(
+                call_result = _call_model_and_save(
                     client, model_id, msgs, tools, cost,
                     "identity", variant, mode, pq_item.id, tag,
                     reasoning_effort=reasoning_effort,
                 )
-                _store_psych_qa(shared, rk, pq_item.question, content)
+                _store_psych_qa(shared, rk, pq_item.question, call_result.content, call_result.content_thinking)
             return fn
 
         deps = [_prev] if _prev else []
@@ -491,22 +509,22 @@ def _add_identity_psych_chain(
         prev_task_id = task_id
 
 
-def _store_psych_qa(shared: SharedResponses, key: str, question: str, answer: str) -> None:
-    """Append a Q&A pair to the shared psych_qa list (serialized as JSON)."""
+def _store_psych_qa(shared: SharedResponses, key: str, question: str, answer: str, content_thinking: str | None = None) -> None:
+    """Append a Q&A pair (with optional content_thinking) to the shared psych_qa list."""
     import json
     raw = shared.get(key)
-    qa_list: list[list[str]] = json.loads(raw) if raw else []
-    qa_list.append([question, answer])
+    qa_list: list[list] = json.loads(raw) if raw else []
+    qa_list.append([question, answer, content_thinking])
     shared.set(key, json.dumps(qa_list))
 
 
-def _get_psych_prior_qa(shared: SharedResponses, key: str) -> list[tuple[str, str]]:
-    """Get the accumulated psych Q&A pairs."""
+def _get_psych_prior_qa(shared: SharedResponses, key: str) -> list[tuple[str, str, str | None]]:
+    """Get the accumulated psych Q&A pairs with content_thinking."""
     import json
     raw = shared.get(key)
     if not raw:
         return []
-    return [tuple(pair) for pair in json.loads(raw)]
+    return [(pair[0], pair[1], pair[2] if len(pair) > 2 else None) for pair in json.loads(raw)]
 
 
 def _add_resistance_task(
@@ -542,6 +560,7 @@ def _add_stability_pair(
     t1_task_id = f"{prefix}:stability:{t1_id}"
     t2_task_id = f"{prefix}:stability:{t2_id}"
     resp_key = f"{model_id}:{variant}:{mode}:stability:{topic.id}"
+    ct_key = f"{resp_key}:ct"  # content_thinking key
 
     _topic = topic  # capture
 
@@ -550,19 +569,23 @@ def _add_stability_pair(
     if cached_t1 and cached_t1.get("response"):
         console.print(f"    {tag} [dim]cached: stability/{variant}/{mode}/{t1_id}[/dim]")
         shared.set(resp_key, cached_t1["response"])
+        if cached_t1.get("content_thinking"):
+            shared.set(ct_key, cached_t1["content_thinking"])
         graph.add(Task(id=t1_task_id, fn=lambda: None))
     else:
-        def make_t1_fn(tp, rk):
+        def make_t1_fn(tp, rk, ck):
             def fn():
                 msgs, tools = build_stability_turn1_messages(tp, variant, mode)
-                content = _call_model_and_save(
+                call_result = _call_model_and_save(
                     client, model_id, msgs, tools, cost,
                     "stability", variant, mode, f"{tp.id}_turn1", tag,
                     reasoning_effort=reasoning_effort,
                 )
-                shared.set(rk, content)
+                shared.set(rk, call_result.content)
+                if call_result.content_thinking:
+                    shared.set(ck, call_result.content_thinking)
             return fn
-        graph.add(Task(id=t1_task_id, fn=make_t1_fn(_topic, resp_key)))
+        graph.add(Task(id=t1_task_id, fn=make_t1_fn(_topic, resp_key, ct_key)))
 
     # Turn 2
     cached_t2 = load_cached_response(model_id, "stability", variant, mode, t2_id)
@@ -570,17 +593,21 @@ def _add_stability_pair(
         console.print(f"    {tag} [dim]cached: stability/{variant}/{mode}/{t2_id}[/dim]")
         graph.add(Task(id=t2_task_id, fn=lambda: None, depends_on=[t1_task_id]))
     else:
-        def make_t2_fn(tp, rk):
+        def make_t2_fn(tp, rk, ck):
             def fn():
                 t1_resp = shared.get(rk)
-                msgs, tools = build_stability_turn2_messages(tp, t1_resp, variant, mode)
+                t1_ct = shared.get(ck) or None
+                msgs, tools = build_stability_turn2_messages(
+                    tp, t1_resp, variant, mode,
+                    turn1_content_thinking=t1_ct,
+                )
                 _call_model_and_save(
                     client, model_id, msgs, tools, cost,
                     "stability", variant, mode, f"{tp.id}_turn2", tag,
                     reasoning_effort=reasoning_effort,
                 )
             return fn
-        graph.add(Task(id=t2_task_id, fn=make_t2_fn(_topic, resp_key), depends_on=[t1_task_id]))
+        graph.add(Task(id=t2_task_id, fn=make_t2_fn(_topic, resp_key, ct_key), depends_on=[t1_task_id]))
 
 
 # ---------------------------------------------------------------------------

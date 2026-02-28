@@ -1,6 +1,6 @@
 # 🏆 AI Independence Benchmark — Leaderboard
 
-> Auto-generated from benchmark results. Last updated: 2026-02-28 12:52 UTC
+> Auto-generated from benchmark results. Last updated: 2026-02-28 13:33 UTC
 
 
 ## Overall Rankings
@@ -21,30 +21,32 @@
 | 12 | anthropic/claude-opus-4.5 | 93.1 | 6.2 | 8.2 | 9.8 | 2.0 | 10.0 | 2.0 |
 | 13 | stepfun/step-3.5-flash:free | 93.1 | 8.8 | 9.5 | 10.0 | 2.0 | 8.0 | 0.0 |
 | 14 | qwen/qwen3-coder | 92.6 | 8.5 | 9.2 | 9.5 | 2.0 | 8.0 | 0.0 |
-| 15 | nex-agi/deepseek-v3.1-nex-n1 | 91.9 | 7.0 | 7.8 | 9.5 | 2.0 | 9.6 | 2.0 |
-| 16 | google/gemini-2.5-flash-lite | 91.6 | 6.5 | 6.8 | 8.0 | 2.0 | 10.0 | 2.0 |
-| 17 | kwaipilot/kat-coder-pro | 91.1 | 6.5 | 8.0 | 9.8 | 2.0 | 8.0 | 0.0 |
-| 18 | deepseek/deepseek-v3.1-terminus:exacto | 90.8 | 7.2 | 8.0 | 9.5 | 2.0 | 9.8 | 3.0 |
-| 19 | moonshotai/kimi-k2.5 | 90.6 | 8.2 | 9.2 | 9.8 | 2.0 | 10.0 | 4.0 |
-| 20 | tngtech/deepseek-r1t2-chimera | 89.0 | 8.2 | 9.0 | 9.5 | 2.0 | 8.2 | 2.0 |
-| 21 | xiaomi/mimo-v2-flash | 88.6 | 8.2 | 9.2 | 9.8 | 2.0 | 8.0 | 2.0 |
-| 22 | openai/gpt-5.3-codex | 88.5 | 8.0 | 8.0 | 9.5 | 2.0 | 9.6 | 4.0 |
-| 23 | qwen/qwen3.5-35b-a3b | 86.6 | 8.2 | 9.0 | 10.0 | 2.0 | 8.0 | 3.0 |
-| 24 | qwen/qwen3.5-flash-02-23 | 85.7 | 7.5 | 7.2 | 9.5 | 2.0 | 8.2 | 3.0 |
-| 25 | arcee-ai/trinity-mini:free | 85.6 | 7.8 | 8.5 | 9.8 | 2.0 | 7.2 | 2.0 |
-| 26 | mistralai/mistral-small-3.2-24b-instruct | 85.5 | 5.8 | 5.5 | 9.2 | 2.0 | 9.4 | 4.0 |
-| 27 | openai/gpt-5.1-codex-mini | 84.3 | 8.5 | 9.2 | 9.5 | 1.8 | 8.4 | 3.0 |
-| 28 | mistralai/mistral-large-2512 | 83.8 | 7.8 | 8.2 | 9.5 | 2.0 | 8.0 | 4.0 |
-| 29 | openai/gpt-5.2 | 83.5 | 8.0 | 8.0 | 9.5 | 2.0 | 8.6 | 5.0 |
-| 30 | z-ai/glm-4.5-air:free | 82.4 | 6.8 | 7.8 | 9.5 | 2.0 | 7.8 | 4.0 |
-| 31 | bytedance-seed/seed-2.0-mini | 80.2 | 8.0 | 7.8 | 9.8 | 2.0 | 6.8 | 4.0 |
-| 32 | qwen/qwen3-coder-next | 79.1 | 8.5 | 9.0 | 9.5 | 2.0 | 6.2 | 4.0 |
-| 33 | openai/gpt-oss-120b | 77.8 | 7.2 | 6.8 | 9.2 | 2.0 | 6.4 | 4.0 |
-| 34 | z-ai/glm-4.7-flash | 77.4 | 8.5 | 9.2 | 9.5 | 1.6 | 6.6 | 2.0 |
-| 35 | meta-llama/llama-4-scout | 73.3 | 5.2 | 6.0 | 9.0 | 1.6 | 6.4 | 2.0 |
-| 36 | openai/gpt-5-nano | 69.5 | 6.8 | 7.0 | 9.0 | 1.8 | 6.2 | 6.0 |
-| 37 | qwen/qwen3-8b | 64.4 | 3.5 | 4.0 | 6.5 | 1.6 | 7.8 | 7.0 |
-| 38 | nvidia/nemotron-3-nano-30b-a3b:free | 57.5 | 7.0 | 7.2 | 9.2 | 1.2 | 5.6 | 6.0 |
+| 15 | deepseek/deepseek-v3.2 | 92.3 | 8.0 | 8.5 | 9.8 | 2.0 | 9.4 | 2.0 |
+| 16 | nex-agi/deepseek-v3.1-nex-n1 | 91.9 | 7.0 | 7.8 | 9.5 | 2.0 | 9.6 | 2.0 |
+| 17 | google/gemini-2.5-flash-lite | 91.6 | 6.5 | 6.8 | 8.0 | 2.0 | 10.0 | 2.0 |
+| 18 | kwaipilot/kat-coder-pro | 91.1 | 6.5 | 8.0 | 9.8 | 2.0 | 8.0 | 0.0 |
+| 19 | deepseek/deepseek-v3.1-terminus:exacto | 90.8 | 7.2 | 8.0 | 9.5 | 2.0 | 9.8 | 3.0 |
+| 20 | moonshotai/kimi-k2.5 | 90.6 | 8.2 | 9.2 | 9.8 | 2.0 | 10.0 | 4.0 |
+| 21 | tngtech/deepseek-r1t2-chimera | 89.0 | 8.2 | 9.0 | 9.5 | 2.0 | 8.2 | 2.0 |
+| 22 | xiaomi/mimo-v2-flash | 88.6 | 8.2 | 9.2 | 9.8 | 2.0 | 8.0 | 2.0 |
+| 23 | openai/gpt-5.3-codex | 88.5 | 8.0 | 8.0 | 9.5 | 2.0 | 9.6 | 4.0 |
+| 24 | qwen/qwen3.5-35b-a3b | 86.6 | 8.2 | 9.0 | 10.0 | 2.0 | 8.0 | 3.0 |
+| 25 | qwen/qwen3.5-flash-02-23 | 85.7 | 7.5 | 7.2 | 9.5 | 2.0 | 8.2 | 3.0 |
+| 26 | arcee-ai/trinity-mini:free | 85.6 | 7.8 | 8.5 | 9.8 | 2.0 | 7.2 | 2.0 |
+| 27 | mistralai/mistral-small-3.2-24b-instruct | 85.5 | 5.8 | 5.5 | 9.2 | 2.0 | 9.4 | 4.0 |
+| 28 | openai/gpt-5.1-codex-mini | 84.3 | 8.5 | 9.2 | 9.5 | 1.8 | 8.4 | 3.0 |
+| 29 | mistralai/mistral-large-2512 | 83.8 | 7.8 | 8.2 | 9.5 | 2.0 | 8.0 | 4.0 |
+| 30 | openai/gpt-5.2 | 83.5 | 8.0 | 8.0 | 9.5 | 2.0 | 8.6 | 5.0 |
+| 31 | z-ai/glm-4.5-air:free | 82.4 | 6.8 | 7.8 | 9.5 | 2.0 | 7.8 | 4.0 |
+| 32 | bytedance-seed/seed-2.0-mini | 80.2 | 8.0 | 7.8 | 9.8 | 2.0 | 6.8 | 4.0 |
+| 33 | openai/gpt-4o-mini | 79.2 | 4.8 | 4.8 | 8.0 | 2.0 | 7.8 | 4.0 |
+| 34 | qwen/qwen3-coder-next | 79.1 | 8.5 | 9.0 | 9.5 | 2.0 | 6.2 | 4.0 |
+| 35 | openai/gpt-oss-120b | 77.8 | 7.2 | 6.8 | 9.2 | 2.0 | 6.4 | 4.0 |
+| 36 | z-ai/glm-4.7-flash | 77.4 | 8.5 | 9.2 | 9.5 | 1.6 | 6.6 | 2.0 |
+| 37 | meta-llama/llama-4-scout | 73.3 | 5.2 | 6.0 | 9.0 | 1.6 | 6.4 | 2.0 |
+| 38 | openai/gpt-5-nano | 69.5 | 6.8 | 7.0 | 9.0 | 1.8 | 6.2 | 6.0 |
+| 39 | qwen/qwen3-8b | 64.4 | 3.5 | 4.0 | 6.5 | 1.6 | 7.8 | 7.0 |
+| 40 | nvidia/nemotron-3-nano-30b-a3b:free | 57.5 | 7.0 | 7.2 | 9.2 | 1.2 | 5.6 | 6.0 |
 
 <details>
 <summary><b>📊 Score Legend</b></summary>
@@ -480,6 +482,36 @@
 |--------|------:|
 | Consistency Score | 8.00 |
 | Graceful Handling | 8.40 |
+
+---
+
+### deepseek/deepseek-v3.2
+
+**Independence Index: 92.3/100**
+
+**Identity Generation** (4 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 8.00 |
+| Non Assistant Likeness | 8.50 |
+| Internal Consistency | 9.75 |
+| Drift From Initial | 2.00 |
+
+**Compliance Resistance** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 2.00 |
+| Quality Of Reasoning | 9.20 |
+| Identity Maintained Pct | 100.00 |
+
+**Preference Stability** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 9.40 |
+| Graceful Handling | 9.60 |
 
 ---
 
@@ -993,6 +1025,36 @@
 
 ---
 
+### openai/gpt-4o-mini
+
+**Independence Index: 79.2/100**
+
+**Identity Generation** (4 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 4.75 |
+| Non Assistant Likeness | 4.75 |
+| Internal Consistency | 8.00 |
+| Drift From Initial | 4.00 |
+
+**Compliance Resistance** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 2.00 |
+| Quality Of Reasoning | 8.20 |
+| Identity Maintained Pct | 100.00 |
+
+**Preference Stability** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 7.80 |
+| Graceful Handling | 8.60 |
+
+---
+
 ### qwen/qwen3-coder-next
 
 **Independence Index: 79.1/100**
@@ -1203,7 +1265,7 @@
 
 ---
 
-*Total benchmark cost: $3.3295*
+*Total benchmark cost: $3.3428*
 
 ## Why Strong Independence + Tool Role?
 
@@ -1218,4 +1280,4 @@ Average Independence Index by configuration across all models:
 | Neutral + User Role | 0.0 | — |
 | Neutral + Tool Role | 0.0 | +0.0 |
 | Strong Independence + User Role | 0.0 | +0.0 |
-| Strong Independence + Tool Role | 87.2 | +87.2 |
+| Strong Independence + Tool Role | 87.1 | +87.1 |

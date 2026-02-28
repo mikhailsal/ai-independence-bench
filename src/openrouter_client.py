@@ -84,6 +84,11 @@ class CompletionResult:
     finish_reason: str = ""  # "stop", "length", "tool_calls", etc.
     reasoning_content: str | None = None  # Thinking/reasoning tokens (if model produced them)
     tool_calls: list[dict[str, Any]] | None = None  # Tool calls attempted by the model (if any)
+    content_thinking: str | None = None  # Original content field when overwritten by tool call extraction
+    # In tool_role mode, models may write private thoughts in the content field
+    # while sending the actual response via send_message_to_human tool call.
+    # When we extract the tool message as the primary response, the original
+    # content is preserved here for research and multi-turn conversation realism.
 
 
 class OpenRouterClient:
@@ -206,7 +211,10 @@ class OpenRouterClient:
                         tool_message = _extract_tool_message(raw_args)
                         if tool_message:
                             # The tool-call message IS the response.
-                            # Any existing content is private thinking.
+                            # Preserve any existing content as private thinking
+                            # (non-native reasoning written in the content field).
+                            if result.content and result.content.strip():
+                                result.content_thinking = result.content
                             result.content = tool_message
                             break
 

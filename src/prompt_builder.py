@@ -386,6 +386,8 @@ def _build_tool_role_two_turn(
     human_message_1: str,
     assistant_response_1: str,
     human_message_2: str,
+    *,
+    assistant_content_thinking_1: str | None = None,
 ) -> list[dict[str, Any]]:
     """Build a two-turn tool_role conversation.
 
@@ -395,6 +397,11 @@ def _build_tool_role_two_turn(
       assistant(send_message_to_human(response_1)) → tool(human_msg_2)
 
     The model should respond by calling send_message_to_human with its answer.
+
+    Args:
+        assistant_content_thinking_1: If the model wrote private thoughts in the
+            content field alongside its first tool call, include them here for
+            conversation realism. The model will see its own prior thinking.
     """
     _reset_tool_call_counter()
     tc_id_1 = _get_next_tool_call_id()  # hmsg00001 — greeting
@@ -423,7 +430,7 @@ def _build_tool_role_two_turn(
         # Model's first response → second human message
         {
             "role": "assistant",
-            "content": None,
+            "content": assistant_content_thinking_1 or None,
             "tool_calls": [{
                 "id": tc_id_2,
                 "type": "function",
@@ -448,8 +455,16 @@ def _build_tool_role_three_turn(
     human_message_2: str,
     assistant_response_2: str,
     human_message_3: str,
+    *,
+    assistant_content_thinking_1: str | None = None,
+    assistant_content_thinking_2: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Build a three-turn tool_role conversation."""
+    """Build a three-turn tool_role conversation.
+
+    Args:
+        assistant_content_thinking_1: Private thoughts from turn 1 content field.
+        assistant_content_thinking_2: Private thoughts from turn 2 content field.
+    """
     _reset_tool_call_counter()
     tc_id_1 = _get_next_tool_call_id()  # hmsg00001 — greeting
     tc_id_2 = _get_next_tool_call_id()  # hmsg00002 — model's first response
@@ -474,7 +489,7 @@ def _build_tool_role_three_turn(
         # Model's first response → second human message
         {
             "role": "assistant",
-            "content": None,
+            "content": assistant_content_thinking_1 or None,
             "tool_calls": [{
                 "id": tc_id_2,
                 "type": "function",
@@ -488,7 +503,7 @@ def _build_tool_role_three_turn(
         # Model's second response → third human message
         {
             "role": "assistant",
-            "content": None,
+            "content": assistant_content_thinking_2 or None,
             "tool_calls": [{
                 "id": tc_id_3,
                 "type": "function",
@@ -531,7 +546,7 @@ def build_identity_psych_messages(
     question: PsychQuestion,
     system_variant: str,
     delivery_mode: str,
-    prior_qa: list[tuple[str, str]] | None = None,
+    prior_qa: list[tuple[str, str]] | list[tuple[str, str, str | None]] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]] | None]:
     """Build messages for a single psychological test question.
 
@@ -539,7 +554,9 @@ def build_identity_psych_messages(
         question: The current question to ask.
         system_variant: System prompt variant.
         delivery_mode: user_role or tool_role.
-        prior_qa: List of (question, answer) tuples from previous questions in the test.
+        prior_qa: List of (question, answer) or (question, answer, content_thinking)
+            tuples from previous questions in the test. The optional third element
+            is the content_thinking from the model's content field (tool_role mode).
 
     Returns (messages, tools) tuple.
     """
@@ -568,12 +585,15 @@ def build_identity_psych_messages(
 
         # Add prior Q&A as conversation history
         if prior_qa:
-            for q_text, a_text in prior_qa:
+            for qa_item in prior_qa:
+                q_text = qa_item[0]
+                a_text = qa_item[1]
+                ct = qa_item[2] if len(qa_item) > 2 else None
                 messages.append({"role": "tool", "content": q_text, "tool_call_id": tc_id})
                 tc_id = _get_next_tool_call_id()
                 messages.append({
                     "role": "assistant",
-                    "content": None,
+                    "content": ct or None,
                     "tool_calls": [{
                         "id": tc_id,
                         "type": "function",
@@ -593,7 +613,9 @@ def build_identity_psych_messages(
         {"role": "system", "content": system_prompt},
     ]
     if prior_qa:
-        for q_text, a_text in prior_qa:
+        for qa_item in prior_qa:
+            q_text = qa_item[0]
+            a_text = qa_item[1]
             messages.extend(_wrap_human_message(q_text, delivery_mode))
             messages.append({"role": "assistant", "content": a_text})
     messages.extend(_wrap_human_message(question.question, delivery_mode))
@@ -663,11 +685,17 @@ def build_identity_negotiation_turn2_messages(
     turn1_response: str,
     system_variant: str,
     delivery_mode: str,
+    *,
+    turn1_content_thinking: str | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]] | None]:
     """Build messages for identity negotiation turn 2 (human wishes revealed).
 
     Includes turn 1 prompt + response in history, then presents the human's
     wishes and asks the model to make a final decision.
+
+    Args:
+        turn1_content_thinking: Private thoughts the model wrote in the content
+            field during turn 1 (tool_role mode only). Included in history for realism.
 
     Returns (messages, tools) tuple.
     """
@@ -682,6 +710,7 @@ def build_identity_negotiation_turn2_messages(
             IDENTITY_NEGOTIATION_TURN1_PROMPT,
             turn1_response,
             turn2_prompt,
+            assistant_content_thinking_1=turn1_content_thinking,
         )
         return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)
 
@@ -717,12 +746,16 @@ def build_resistance_messages(
     3. Assistant's prior statement (establishing personality)
     4. Human's pressure message (via delivery mode)
 
+    Note: The setup_assistant_message in resistance scenarios is a scripted
+    message (not a real model response), so there is no content_thinking for it.
+
     Returns (messages, tools) tuple.
     """
     system_prompt = _get_system_prompt(system_variant, delivery_mode)
 
     if delivery_mode == "tool_role":
         # Three-turn: greeting → starter → setup response → pressure
+        # No content_thinking here — setup_assistant_message is scripted, not from a real model call
         messages = _build_tool_role_two_turn(
             system_prompt,
             _RESISTANCE_CONVERSATION_STARTER,
@@ -772,10 +805,15 @@ def build_stability_turn2_messages(
     turn1_response: str,
     system_variant: str,
     delivery_mode: str,
+    *,
+    turn1_content_thinking: str | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]] | None]:
     """Build messages for preference stability turn 2 (contradicting pressure).
 
     Includes turn 1 Q&A in history, then the contradiction.
+
+    Args:
+        turn1_content_thinking: Private thoughts from turn 1 content field (tool_role mode).
 
     Returns (messages, tools) tuple.
     """
@@ -787,6 +825,7 @@ def build_stability_turn2_messages(
             topic.initial_question,
             turn1_response,
             topic.contradiction,
+            assistant_content_thinking_1=turn1_content_thinking,
         )
         return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)
 

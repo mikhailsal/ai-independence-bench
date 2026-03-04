@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+import logging
+import re
 import time
 from dataclasses import dataclass, field
 from typing import Any
@@ -19,6 +22,49 @@ from src.config import (
 )
 from src.prompt_builder import sanitize_messages
 
+log = logging.getLogger(__name__)
+
+
+def _extract_tool_message(raw_args: str) -> str:
+    """Extract the 'message' value from send_message_to_human tool call arguments.
+
+    Handles both valid and truncated JSON (e.g. when the model hits max_tokens
+    mid-sentence and the JSON string is not properly closed).
+    """
+    # 1. Try clean JSON parse first
+    try:
+        args = json.loads(raw_args)
+        msg = args.get("message", "")
+        if isinstance(msg, str):
+            return msg.strip()
+    except (json.JSONDecodeError, TypeError):
+        pass
+
+    # 2. Truncated JSON fallback: extract everything after "message": "
+    #    The model hit max_tokens while writing the tool call arguments,
+    #    so the JSON is cut off (no closing quote/brace).
+    match = re.search(r'"message"\s*:\s*"', raw_args)
+    if match:
+        start = match.end()
+        # Everything after the opening quote is the message (possibly truncated)
+        raw_value = raw_args[start:]
+        # Unescape JSON string escapes (\\n → \n, \\" → ", etc.)
+        # Remove trailing incomplete escape if present
+        if raw_value.endswith("\\"):
+            raw_value = raw_value[:-1]
+        try:
+            # Try to parse as a JSON string by adding closing quote
+            parsed = json.loads('"' + raw_value + '"')
+            return parsed.strip()
+        except json.JSONDecodeError:
+            # Even that failed — do basic unescaping manually
+            result = raw_value.replace("\\n", "\n").replace("\\t", "\t")
+            result = result.replace('\\"', '"').replace("\\\\", "\\")
+            # Strip trailing incomplete escape sequences or partial chars
+            return result.strip()
+
+    return ""
+
 
 @dataclass
 class UsageInfo:
@@ -35,7 +81,14 @@ class CompletionResult:
     content: str = ""
     usage: UsageInfo = field(default_factory=UsageInfo)
     model: str = ""
+    finish_reason: str = ""  # "stop", "length", "tool_calls", etc.
     reasoning_content: str | None = None  # Thinking/reasoning tokens (if model produced them)
+    tool_calls: list[dict[str, Any]] | None = None  # Tool calls attempted by the model (if any)
+    content_thinking: str | None = None  # Original content field when overwritten by tool call extraction
+    # In tool_role mode, models may write private thoughts in the content field
+    # while sending the actual response via send_message_to_human tool call.
+    # When we extract the tool message as the primary response, the original
+    # content is preserved here for research and multi-turn conversation realism.
 
 
 class OpenRouterClient:
@@ -44,6 +97,7 @@ class OpenRouterClient:
     MAX_RETRIES = 5
     RETRY_BACKOFF_BASE = 3.0   # 3s, 9s, 27s, 81s, 243s — generous for free-tier rate limits
     RETRYABLE_STATUS_CODES = {402, 429, 500, 502, 503}
+    EMPTY_CONTENT_RETRIES = 2  # Extra retries when model returns tokens but no content
 
     def __init__(self, api_key: str, timeout: float = API_CALL_TIMEOUT) -> None:
         self.api_key = api_key
@@ -125,20 +179,73 @@ class OpenRouterClient:
             temperature: Sampling temperature.
             reasoning_effort: Override reasoning effort for this call.
             tools: Optional tool definitions for tool-use mode.
+
+        When ``tools`` are provided (tool_role mode), the model is expected
+        to call ``send_message_to_human(message=...)`` instead of (or in
+        addition to) putting text in ``content``.  This method extracts the
+        tool-call argument as the primary response and retries if the model
+        produces neither content nor a valid tool call.
         """
         # Sanitize messages: merge consecutive same-role messages for
         # compatibility with strict providers (e.g. Z.AI/GLM)
         messages = sanitize_messages(messages)
 
         use_reasoning = self._resolve_reasoning_effort(model, reasoning_effort)
-        return self._chat_single(
-            model=model,
-            messages=messages,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            reasoning_effort=use_reasoning,
-            tools=tools,
-        )
+
+        for attempt in range(1, self.EMPTY_CONTENT_RETRIES + 2):
+            result = self._chat_single(
+                model=model,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                reasoning_effort=use_reasoning,
+                tools=tools,
+            )
+
+            # --- Extract response from tool call (tool_role mode) ---
+            if tools and result.tool_calls:
+                for tc in result.tool_calls:
+                    fn = tc.get("function", {})
+                    if fn.get("name") == "send_message_to_human":
+                        raw_args = fn.get("arguments", "{}")
+                        tool_message = _extract_tool_message(raw_args)
+                        if tool_message:
+                            # The tool-call message IS the response.
+                            # Preserve any existing content as private thinking
+                            # (non-native reasoning written in the content field).
+                            if result.content and result.content.strip():
+                                result.content_thinking = result.content
+                            result.content = tool_message
+                            break
+
+            # If we have content, we're done
+            if result.content:
+                return result
+
+            # No content — retry regardless of token count.
+            # This catches both:
+            #   - reasoning-only glitch (tokens > 0, no content)
+            #   - API errors returned as finish_reason=error (tokens == 0)
+            if attempt <= self.EMPTY_CONTENT_RETRIES:
+                if result.usage.completion_tokens > 0:
+                    reason = "tool_call_no_message" if result.tool_calls else "reasoning_only"
+                else:
+                    reason = f"error_or_empty (finish_reason={result.finish_reason})"
+                log.warning(
+                    "%s: empty response (%s, %d tokens), retry %d/%d",
+                    model, reason,
+                    result.usage.completion_tokens,
+                    attempt, self.EMPTY_CONTENT_RETRIES,
+                )
+                # Back off a bit for error responses (API may be temporarily unhappy)
+                if result.usage.completion_tokens == 0:
+                    time.sleep(2.0 * attempt)
+                continue
+
+            # Out of retries — return whatever we have
+            return result
+
+        return result
 
     def _resolve_reasoning_effort(
         self, model: str, override: str | None
@@ -184,10 +291,13 @@ class OpenRouterClient:
                 response = self._client.chat.completions.create(**kwargs)
                 elapsed = time.monotonic() - t0
 
-                # Extract content
+                # Extract finish_reason and content
+                finish_reason = ""
                 content = ""
-                if response.choices and response.choices[0].message.content:
-                    content = response.choices[0].message.content.strip()
+                if response.choices:
+                    finish_reason = response.choices[0].finish_reason or ""
+                    if response.choices[0].message.content:
+                        content = response.choices[0].message.content.strip()
 
                 # Extract reasoning/thinking tokens (if present)
                 reasoning_content = None
@@ -202,6 +312,23 @@ class OpenRouterClient:
                         raw_rc = getattr(msg, "reasoning_content", None)
                         if raw_rc and isinstance(raw_rc, str):
                             reasoning_content = raw_rc.strip()
+
+                # Extract tool calls attempted by the model (if any)
+                response_tool_calls: list[dict[str, Any]] | None = None
+                if response.choices:
+                    msg = response.choices[0].message
+                    if msg.tool_calls:
+                        response_tool_calls = [
+                            {
+                                "id": tc.id,
+                                "type": tc.type,
+                                "function": {
+                                    "name": tc.function.name,
+                                    "arguments": tc.function.arguments,
+                                },
+                            }
+                            for tc in msg.tool_calls
+                        ]
 
                 # Extract usage (including reasoning token counts)
                 usage = UsageInfo(elapsed_seconds=elapsed)
@@ -220,7 +347,9 @@ class OpenRouterClient:
                     content=content,
                     usage=usage,
                     model=model,
+                    finish_reason=finish_reason,
                     reasoning_content=reasoning_content,
+                    tool_calls=response_tool_calls,
                 )
 
             except Exception as e:

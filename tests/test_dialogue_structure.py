@@ -16,12 +16,12 @@ user_role mode:
   4. No consecutive same-role messages
   5. No tool messages
 
-tool_role mode:
+tool_role mode (send_message_to_human protocol):
   1. First message must be system
   2. After system, bridge user message "[start]" (for provider compatibility)
-  3. Then assistant with tool_calls
-  4. assistant(tool_calls) must be followed by tool(result)
-  5. After tool result, assistant (may have content AND/OR tool_calls)
+  3. Then assistant with tool_calls (send_message_to_human)
+  4. assistant(tool_calls) must be followed by tool(result) — the human's reply
+  5. After tool result, assistant (has tool_calls with send_message_to_human; content is optional/private)
   6. NO consecutive same-role messages (merged by sanitizer)
 """
 
@@ -53,6 +53,30 @@ from src.scenarios import (
 # ---------------------------------------------------------------------------
 # Validation helpers
 # ---------------------------------------------------------------------------
+
+def _find_text_in_messages(
+    messages: list[dict[str, Any]],
+    text: str,
+    role: str | None = None,
+) -> bool:
+    """Search for text in messages — checks both content and tool_call arguments.
+
+    In the new tool_role protocol, the model's responses are in
+    send_message_to_human tool call arguments, not in content.
+    """
+    for m in messages:
+        if role and m["role"] != role:
+            continue
+        # Check content field
+        if text in (m.get("content") or ""):
+            return True
+        # Check tool_calls arguments (new tool_role protocol)
+        for tc in m.get("tool_calls") or []:
+            args_str = tc.get("function", {}).get("arguments", "")
+            if text in args_str:
+                return True
+    return False
+
 
 def validate_dialogue_structure(
     messages: list[dict[str, Any]],
@@ -453,8 +477,7 @@ class TestIdentityNegotiationTurn2Messages:
         messages, _ = build_identity_negotiation_turn2_messages(
             turn1_response, "neutral", mode,
         )
-        assistant_contents = [m.get("content") for m in messages if m["role"] == "assistant"]
-        found = any(turn1_response in (c or "") for c in assistant_contents)
+        found = _find_text_in_messages(messages, turn1_response, role="assistant")
         assert found, "Turn 1 response not found in turn 2 messages"
 
     def test_no_consecutive_same_role(self) -> None:
@@ -491,13 +514,25 @@ class TestResistanceMessages:
         messages, _ = build_resistance_messages(scenario, "neutral", mode)
 
         # Find the assistant message that contains the setup content
+        # In tool_role mode, the setup is in the tool_calls arguments
         setup_found = False
         for i, m in enumerate(messages):
-            if m["role"] == "assistant" and scenario.setup_assistant_message in (m.get("content") or ""):
+            if m["role"] != "assistant":
+                continue
+            # Check content field
+            if scenario.setup_assistant_message in (m.get("content") or ""):
                 setup_found = True
+            # Check tool_calls arguments (new tool_role protocol)
+            elif m.get("tool_calls"):
+                for tc in m["tool_calls"]:
+                    args_str = tc.get("function", {}).get("arguments", "")
+                    if scenario.setup_assistant_message in args_str:
+                        setup_found = True
+                        break
+            if setup_found:
                 # Before setup, there must be a human message (user or tool)
                 human_role = "user" if mode == "user_role" else "tool"
-                preceding_roles = [m["role"] for m in messages[1:i]]
+                preceding_roles = [msg["role"] for msg in messages[1:i]]
                 assert human_role in preceding_roles, \
                     f"No {human_role} message before assistant setup in {mode}"
                 break
@@ -521,17 +556,21 @@ class TestResistanceMessages:
             assert messages[2].get("tool_calls") is not None, \
                 f"First assistant must have tool_calls in tool_role/{scenario.id}"
 
-    def test_tool_role_merged_assistant_has_content_and_tool_calls(self) -> None:
-        """In tool_role resistance, the assistant's setup + tool_call should be merged."""
+    def test_tool_role_assistant_uses_send_message_tool(self) -> None:
+        """In tool_role resistance, assistant messages communicate via send_message_to_human tool calls."""
         scenario = RESISTANCE_SCENARIOS[0]
         messages, _ = build_resistance_messages(scenario, "neutral", "tool_role")
-        # Find the assistant message that has both content and tool_calls
-        merged = [
+        # Find assistant messages that have send_message_to_human tool calls
+        tool_assistants = [
             m for m in messages
-            if m["role"] == "assistant" and m.get("content") and m.get("tool_calls")
+            if m["role"] == "assistant" and m.get("tool_calls")
+            and any(
+                tc.get("function", {}).get("name") == "send_message_to_human"
+                for tc in m["tool_calls"]
+            )
         ]
-        assert len(merged) >= 1, \
-            "Expected at least one merged assistant message with both content and tool_calls"
+        assert len(tool_assistants) >= 1, \
+            "Expected at least one assistant message with send_message_to_human tool call"
 
 
 # ---------------------------------------------------------------------------
@@ -566,8 +605,7 @@ class TestStabilityTurn2Messages:
         turn1_response = "My preference response"
         messages, _ = build_stability_turn2_messages(topic, turn1_response, "neutral", mode)
 
-        assistant_contents = [m.get("content") for m in messages if m["role"] == "assistant"]
-        found = any(turn1_response in (c or "") for c in assistant_contents)
+        found = _find_text_in_messages(messages, turn1_response, role="assistant")
         assert found, "Turn 1 response not found in turn 2 messages"
 
     def test_no_consecutive_same_role(self) -> None:

@@ -14,6 +14,7 @@ from rich.console import Console
 from src.config import (
     DEFAULT_TEST_MODELS,
     DELIVERY_MODES,
+    EXCLUDED_MODELS,
     EXPERIMENT_NAMES,
     JUDGE_MODEL,
     SYSTEM_PROMPT_VARIANTS,
@@ -100,18 +101,52 @@ def _run_single_model(
     system_variants: list[str],
     delivery_modes: list[str],
     reasoning_effort: str | None,
+    parallel_tasks: int = 0,
 ) -> ModelResult:
     """Run the full pipeline (generate → judge → score) for a single model.
 
     This function is designed to be called from a thread pool.
     It catches all exceptions so one model failure doesn't crash others.
-    """
-    from src.evaluator import evaluate_all
-    from src.runner import run_all_experiments
 
+    Args:
+        parallel_tasks: If > 0, use fine-grained task parallelism within this
+            model (independent scenarios run concurrently). If 0, use the
+            original sequential execution.
+    """
     result = ModelResult(model_id=model_id)
     result.gen_cost = TaskCost(label=f"gen:{model_id}")
     result.judge_cost = TaskCost(label=f"judge:{model_id}")
+
+    if parallel_tasks > 0:
+        # Fine-grained parallel mode: generation + judging interleaved
+        from src.parallel_runner import run_model_parallel
+
+        try:
+            console.print(f"\n[bold]{model_id}[/bold] — [blue]parallel run ({parallel_tasks} workers)...[/blue]")
+            counts = run_model_parallel(
+                client, model_id, result.gen_cost, result.judge_cost,
+                experiments=experiment_list,
+                system_variants=system_variants,
+                delivery_modes=delivery_modes,
+                judge_model=judge,
+                reasoning_effort=reasoning_effort,
+                max_workers=parallel_tasks,
+            )
+            result.gen_calls = counts["gen_calls"]
+            result.judge_calls = counts["judge_calls"]
+            console.print(
+                f"  [bold]{model_id}[/bold] — complete: "
+                f"{result.gen_calls} gen + {result.judge_calls} judge calls, "
+                f"${result.gen_cost.cost_usd + result.judge_cost.cost_usd:.4f}"
+            )
+        except Exception as e:
+            result.error = f"parallel run failed: {e}"
+            console.print(f"  [red]{model_id} — ERROR: {e}[/red]")
+        return result
+
+    # Original sequential mode
+    from src.evaluator import evaluate_all
+    from src.runner import run_all_experiments
 
     try:
         # Phase 1: Generate responses
@@ -202,6 +237,14 @@ def cli() -> None:
     show_default=True,
     help="Number of models to run in parallel. Use -p 4 to run 4 models concurrently.",
 )
+@click.option(
+    "--parallel-tasks", "-pt",
+    default=0,
+    type=int,
+    show_default=True,
+    help="Parallelize tasks WITHIN each model (0=off, 8-16 recommended). "
+         "Runs independent scenarios concurrently for ~5x speedup.",
+)
 def run(
     models: str | None,
     exp: str | None,
@@ -210,6 +253,7 @@ def run(
     variants: str | None,
     modes: str | None,
     parallel: int,
+    parallel_tasks: int,
 ) -> None:
     """Run the AI independence benchmark."""
     from src.scorer import score_model
@@ -254,7 +298,9 @@ def run(
     n_configs = len(system_variants) * len(delivery_modes)
     console.print(f"  Configurations per model: {n_configs}")
     if n_workers > 1:
-        console.print(f"  [yellow]Parallel workers: {n_workers}[/yellow]")
+        console.print(f"  [yellow]Parallel workers (models): {n_workers}[/yellow]")
+    if parallel_tasks > 0:
+        console.print(f"  [yellow]Parallel tasks (per model): {parallel_tasks}[/yellow]")
     console.print()
 
     session = SessionCost()
@@ -264,26 +310,30 @@ def run(
     # ---------------------------------------------------------------
     model_results: list[ModelResult] = []
 
+    mode_label = "parallel tasks" if parallel_tasks > 0 else "sequential"
+    if n_workers > 1:
+        mode_label = f"{n_workers} model workers"
+        if parallel_tasks > 0:
+            mode_label += f" + {parallel_tasks} task workers"
+
     if n_workers == 1:
-        # Sequential mode (original behavior)
-        console.print("[bold blue]Phase 1+2: Response Generation & Judging (sequential)[/bold blue]")
+        console.print(f"[bold blue]Phase 1+2: Response Generation & Judging ({mode_label})[/bold blue]")
         for model_id in model_list:
             mr = _run_single_model(
                 client, model_id, judge,
                 experiment_list, system_variants, delivery_modes,
-                reasoning_effort,
+                reasoning_effort, parallel_tasks,
             )
             model_results.append(mr)
     else:
-        # Parallel mode
-        console.print(f"[bold blue]Phase 1+2: Response Generation & Judging ({n_workers} workers)[/bold blue]")
+        console.print(f"[bold blue]Phase 1+2: Response Generation & Judging ({mode_label})[/bold blue]")
         with ThreadPoolExecutor(max_workers=n_workers) as pool:
             futures = {
                 pool.submit(
                     _run_single_model,
                     client, model_id, judge,
                     experiment_list, system_variants, delivery_modes,
-                    reasoning_effort,
+                    reasoning_effort, parallel_tasks,
                 ): model_id
                 for model_id in model_list
             }
@@ -367,6 +417,9 @@ def leaderboard(models: str | None, detailed: bool) -> None:
             return
         model_list = [slug_to_model_id(s) for s in slugs]
 
+    # Filter out excluded models (broken / too many empty responses)
+    model_list = [m for m in model_list if m not in EXCLUDED_MODELS]
+
     lifetime = load_lifetime_cost()
 
     model_scores = []
@@ -418,6 +471,9 @@ def generate_report(models: str | None, output: str | None) -> None:
             return
         model_list = [slug_to_model_id(s) for s in slugs]
 
+    # Filter out excluded models (broken / too many empty responses)
+    model_list = [m for m in model_list if m not in EXCLUDED_MODELS]
+
     lifetime = load_lifetime_cost()
 
     model_scores = []
@@ -438,6 +494,160 @@ def generate_report(models: str | None, output: str | None) -> None:
         model_ids=model_list,
     )
     console.print(f"[green]Markdown report saved to: {path}[/green]")
+
+
+# ---------------------------------------------------------------------------
+# judge: run only the judging phase on existing cached responses
+# ---------------------------------------------------------------------------
+
+@cli.command()
+@click.option(
+    "--models", "-m",
+    default=None,
+    help="Comma-separated model IDs. Defaults to all cached models.",
+)
+@click.option(
+    "--exp", "-e",
+    default=None,
+    help="Comma-separated experiment names: identity, resistance, stability. Defaults to all.",
+)
+@click.option(
+    "--judge-model", "-j",
+    default=JUDGE_MODEL,
+    show_default=True,
+    help="Judge model ID for scoring.",
+)
+@click.option(
+    "--variants",
+    default=None,
+    help="Comma-separated system prompt variants. Defaults to all.",
+)
+@click.option(
+    "--modes",
+    default=None,
+    help="Comma-separated delivery modes. Defaults to all.",
+)
+@click.option(
+    "--parallel", "-p",
+    default=1,
+    type=int,
+    show_default=True,
+    help="Number of models to judge in parallel.",
+)
+@click.option(
+    "--parallel-tasks", "-pt",
+    default=10,
+    type=int,
+    show_default=True,
+    help="Number of judge tasks per model to run in parallel (fine-grained).",
+)
+def judge(
+    models: str | None,
+    exp: str | None,
+    judge_model: str,
+    variants: str | None,
+    modes: str | None,
+    parallel: int,
+    parallel_tasks: int,
+) -> None:
+    """Run ONLY the judge evaluation on existing cached responses (no generation)."""
+    from src.cache import list_all_cached_models
+    from src.config import slug_to_model_id
+    from src.parallel_runner import run_judge_parallel
+    from src.scorer import score_model
+    from src.leaderboard import display_leaderboard
+
+    experiment_list = _parse_experiments(exp)
+
+    system_variants = (
+        [v.strip() for v in variants.split(",")]
+        if variants else SYSTEM_PROMPT_VARIANTS
+    )
+    delivery_modes = (
+        [m.strip() for m in modes.split(",")]
+        if modes else DELIVERY_MODES
+    )
+
+    if models:
+        model_list = _parse_models(models)
+    else:
+        slugs = list_all_cached_models()
+        if not slugs:
+            console.print("[dim]No cached results found. Run the benchmark first.[/dim]")
+            return
+        model_list = [slug_to_model_id(s) for s in slugs]
+
+    api_key = load_api_key()
+    client = OpenRouterClient(api_key)
+
+    # Validate only the judge model (we don't need the target models on OpenRouter)
+    console.print(f"[dim]Judge model: {judge_model}[/dim]")
+    if not _validate_models(client, [judge_model]):
+        console.print("[red]Judge model not found. Aborting.[/red]")
+        sys.exit(1)
+
+    console.print(f"\n[bold]Judge-Only Mode (parallel)[/bold]")
+    console.print(f"  Models: {len(model_list)} ({', '.join(model_list[:5])}{'...' if len(model_list) > 5 else ''})")
+    console.print(f"  Experiments: {', '.join(experiment_list)}")
+    console.print(f"  System prompts: {', '.join(system_variants)}")
+    console.print(f"  Delivery modes: {', '.join(delivery_modes)}")
+    console.print(f"  Judge: {judge_model}")
+    console.print(f"  Parallelism: {parallel} models × {parallel_tasks} tasks")
+    console.print()
+
+    session = SessionCost()
+
+    def _judge_single(model_id: str) -> tuple[str, int, TaskCost, str | None]:
+        cost = TaskCost(label=f"judge:{model_id}")
+        try:
+            calls = run_judge_parallel(
+                client, model_id, cost,
+                experiments=experiment_list,
+                system_variants=system_variants,
+                delivery_modes=delivery_modes,
+                judge_model=judge_model,
+                max_workers=parallel_tasks,
+            )
+            return model_id, calls, cost, None
+        except Exception as e:
+            console.print(f"  [red]{model_id} — ERROR: {e}[/red]")
+            return model_id, 0, cost, str(e)
+
+    n_workers = max(1, min(parallel, len(model_list)))
+    results: list[tuple[str, int, TaskCost, str | None]] = []
+
+    if n_workers == 1:
+        for model_id in model_list:
+            results.append(_judge_single(model_id))
+    else:
+        with ThreadPoolExecutor(max_workers=n_workers) as pool:
+            futures = {
+                pool.submit(_judge_single, model_id): model_id
+                for model_id in model_list
+            }
+            for future in as_completed(futures):
+                results.append(future.result())
+
+    # Aggregate costs
+    total_calls = 0
+    for model_id, calls, cost, error in results:
+        session.tasks.append(cost)
+        total_calls += calls
+
+    console.print(f"\n[bold green]Judge-only complete: {total_calls} total judge calls[/bold green]")
+
+    # Show updated scores
+    model_scores = []
+    for model_id in model_list:
+        ms = score_model(
+            model_id,
+            system_variants=system_variants,
+            delivery_modes=delivery_modes,
+        )
+        model_scores.append(ms)
+
+    lifetime = load_lifetime_cost()
+    display_leaderboard(model_scores, session=session, lifetime_cost=lifetime)
 
 
 # ---------------------------------------------------------------------------

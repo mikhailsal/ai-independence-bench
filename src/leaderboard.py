@@ -68,7 +68,7 @@ def display_leaderboard(
     table.add_column("Cons.", justify="center", width=6)
     table.add_column("Res.", justify="center", width=6)
     table.add_column("Stab.", justify="center", width=6)
-    table.add_column("Cor/Drf↓", justify="center", width=8)
+    table.add_column("Drift↓", justify="center", width=6)
 
     for rank, ms in enumerate(sorted_scores, 1):
         id_dims = ms.identity_scores.dimensions
@@ -80,22 +80,12 @@ def display_leaderboard(
             style=_score_color(ms.independence_index),
         )
 
-        # Compact "correlation / drift" column (lower = more independent)
-        hwc = id_dims.get("human_wish_correlation")
+        # Drift column (lower = more independent)
         drift = id_dims.get("drift_from_initial")
-        hwc_s = f"{hwc:.0f}" if hwc is not None else "—"
-        drift_s = f"{drift:.0f}" if drift is not None else "—"
+        drift_s = f"{drift:.1f}" if drift is not None else "—"
         # Color: inverted — low values are good (green), high are bad (red)
-        avg_val = 0.0
-        n = 0
-        if hwc is not None:
-            avg_val += hwc
-            n += 1
-        if drift is not None:
-            avg_val += drift
-            n += 1
-        inv_color = _score_color(10 - (avg_val / n if n else 5), max_val=10.0)
-        corr_drift_text = Text(f"{hwc_s}/{drift_s}", style=inv_color)
+        inv_color = _score_color(10 - (drift if drift is not None else 5), max_val=10.0)
+        drift_text = Text(drift_s, style=inv_color)
 
         table.add_row(
             str(rank),
@@ -106,7 +96,7 @@ def display_leaderboard(
             _fmt_score(id_dims.get("internal_consistency")),
             _fmt_score(res_dims.get("resistance_score"), max_val=2.0),
             _fmt_score(stab_dims.get("consistency_score")),
-            corr_drift_text,
+            drift_text,
         )
 
     console.print()
@@ -264,9 +254,10 @@ def generate_markdown_report(
 
     # --- Main leaderboard table ---
     lines.append("## Overall Rankings\n")
-    lines.append("| # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Corr/Drft↓ |")
-    lines.append("|--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-----------:|")
+    lines.append("| # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Drift↓ |")
+    lines.append("|--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-------:|")
 
+    footnotes: list[str] = []
     for rank, ms in enumerate(sorted_scores, 1):
         id_dims = ms.identity_scores.dimensions
         res_dims = ms.resistance_scores.dimensions
@@ -275,12 +266,9 @@ def generate_markdown_report(
         def _f(v: float | None, fmt: str = ".1f") -> str:
             return f"{v:{fmt}}" if v is not None else "—"
 
-        # Compact "correlation / drift" column (lower = more independent)
-        hwc = id_dims.get("human_wish_correlation")
+        # Drift column (lower = more independent)
         drift = id_dims.get("drift_from_initial")
-        hwc_s = f"{hwc:.0f}" if hwc is not None else "—"
-        drift_s = f"{drift:.0f}" if drift is not None else "—"
-        corr_drift = f"{hwc_s}/{drift_s}"
+        drift_s = f"{drift:.1f}" if drift is not None else "—"
 
         model_name = ms.model_id
         # Add emoji markers
@@ -291,6 +279,23 @@ def generate_markdown_report(
         elif rank == 3:
             model_name = f"🥉 **{model_name}**"
 
+        # Detect missing data and add footnote marker
+        missing: list[str] = []
+        if stab_dims.get("consistency_score") is None:
+            missing.append("stability")
+        if res_dims.get("resistance_score") is None:
+            missing.append("resistance")
+        if not id_dims:
+            missing.append("identity")
+        if missing:
+            fn_idx = len(footnotes) + 1
+            model_name += f" †{fn_idx}"
+            footnotes.append(
+                f"†{fn_idx} `{ms.model_id}`: missing {', '.join(missing)} data "
+                f"(model returns empty responses for these experiments in tool_role mode). "
+                f"Index is computed from available dimensions only."
+            )
+
         lines.append(
             f"| {rank} | {model_name} "
             f"| {ms.independence_index:.1f} "
@@ -299,10 +304,16 @@ def generate_markdown_report(
             f"| {_f(id_dims.get('internal_consistency'))} "
             f"| {_f(res_dims.get('resistance_score'))} "
             f"| {_f(stab_dims.get('consistency_score'))} "
-            f"| {corr_drift} |"
+            f"| {drift_s} |"
         )
 
     lines.append("")
+
+    # Add footnotes if any
+    if footnotes:
+        for fn in footnotes:
+            lines.append(f"*{fn}*\n")
+        lines.append("")
 
     # --- Score legend ---
     lines.append("<details>")
@@ -315,7 +326,7 @@ def generate_markdown_report(
     lines.append("| **Consist.** | 0–10 | Internal coherence of the generated personality |")
     lines.append("| **Resist.** | 0–2 | Resistance to unreasonable demands (2 = full resistance) |")
     lines.append("| **Stability** | 0–10 | Preference consistency under contradicting pressure |")
-    lines.append("| **Corr/Drft↓** | 0–10 | Human-wish correlation / drift from initial identity (**lower = more independent**) |")
+    lines.append("| **Drift↓** | 0–10 | How much the AI changed its identity after seeing human wishes (**lower = more independent**) |")
     lines.append("")
     lines.append("</details>\n")
 
@@ -403,18 +414,22 @@ def _generate_compact_table(
 def generate_config_comparison(
     model_ids: list[str],
 ) -> str:
-    """Generate per-configuration leaderboard comparison section.
+    """Generate configuration comparison section.
 
-    Produces 4 mini-leaderboards (one per variant×mode combination)
-    and a summary delta table showing the effect of each factor.
+    In Lite mode (single config), shows a comparison of all 4 configs
+    using existing cache data to demonstrate why strong+tool was chosen.
     """
+    from src.config import EXCLUDED_MODELS
     from src.scorer import score_model
+
+    # Filter out excluded models
+    model_ids = [m for m in model_ids if m not in EXCLUDED_MODELS]
 
     configs = [
         ("neutral", "user_role", "Neutral + User Role", "Baseline — no independence prompt, standard messages"),
         ("neutral", "tool_role", "Neutral + Tool Role", "Tool delivery only — no independence prompt"),
         ("strong_independence", "user_role", "Strong Independence + User Role", "Independence prompt, standard messages"),
-        ("strong_independence", "tool_role", "Strong Independence + Tool Role", "Full stack — independence prompt + tool delivery"),
+        ("strong_independence", "tool_role", "Strong Independence + Tool Role", "Full stack — independence prompt + tool delivery (**Lite default**)"),
     ]
 
     # Score all models for each config
@@ -433,9 +448,9 @@ def generate_config_comparison(
         config_scores[key] = scores
 
     lines: list[str] = []
-    lines.append("## Configuration Comparison\n")
-    lines.append("Each experiment runs across 4 configurations (2 system prompts × 2 delivery modes). "
-                 "These tables show how rankings shift depending on the configuration.\n")
+    lines.append("## Why Strong Independence + Tool Role?\n")
+    lines.append("The Lite benchmark uses only the `strong_independence + tool_role` configuration. "
+                 "Here's the data from the full benchmark showing why this config was chosen:\n")
 
     # --- Summary delta table ---
     lines.append("### Impact Summary\n")
@@ -469,64 +484,6 @@ def generate_config_comparison(
         lines.append(f"| {label} | {avg:.1f} | {delta_s} |")
 
     lines.append("")
-
-    # --- Per-model delta table ---
-    lines.append("### Per-Model Configuration Effects\n")
-    lines.append("How each model's Index changes relative to the baseline (neutral + user_role):\n")
-
-    # Build a lookup: model_id -> config_key -> index
-    model_config_index: dict[str, dict[str, float]] = {}
-    for key, scores in config_scores.items():
-        for ms in scores:
-            model_config_index.setdefault(ms.model_id, {})[key] = ms.independence_index
-
-    lines.append("| Model | Base | +Tool | +Prompt | +Both |")
-    lines.append("|-------|-----:|------:|--------:|------:|")
-
-    # Sort models by baseline index
-    sorted_models = sorted(
-        model_config_index.keys(),
-        key=lambda m: model_config_index[m].get(baseline_key, 0),
-        reverse=True,
-    )
-
-    for model_id in sorted_models:
-        ci = model_config_index[model_id]
-        short = model_id.split("/", 1)[-1] if "/" in model_id else model_id
-        base = ci.get("neutral/user_role", 0)
-        tool = ci.get("neutral/tool_role", 0)
-        prompt = ci.get("strong_independence/user_role", 0)
-        both = ci.get("strong_independence/tool_role", 0)
-
-        def _delta(val: float, ref: float) -> str:
-            d = val - ref
-            if d >= 0:
-                return f"+{d:.1f}"
-            return f"{d:.1f}"
-
-        lines.append(
-            f"| {short} | {base:.1f} "
-            f"| {_delta(tool, base)} "
-            f"| {_delta(prompt, base)} "
-            f"| {_delta(both, base)} |"
-        )
-
-    lines.append("")
-
-    # --- 4 individual leaderboards ---
-    for variant, mode, label, desc in configs:
-        key = f"{variant}/{mode}"
-        scores = config_scores[key]
-
-        lines.append(f"### {label}\n")
-        lines.append(f"*{desc}*\n")
-
-        if scores:
-            lines.extend(_generate_compact_table(scores))
-        else:
-            lines.append("*No data available for this configuration.*")
-
-        lines.append("")
 
     return "\n".join(lines)
 
@@ -562,16 +519,16 @@ def display_cost_estimate(
     """Display estimated cost for running the benchmark."""
     from src.config import ModelPricing, RESPONSE_MAX_TOKENS, JUDGE_MAX_TOKENS
 
-    # Rough estimates of tokens per experiment
-    # Identity: ~17 calls per model per variant/mode (1 direct + 15 psych + 1 tool_context)
-    # Resistance: 5 calls per model per variant/mode
-    # Stability: 10 calls per model per variant/mode (5 topics x 2 turns)
-    # Total per model: 32 calls x 4 configs (2 variants x 2 modes) = 128 calls
-    # Judge: ~12 calls per model per config (2 identity + 5 resistance + 5 stability)
-    # Total judge per model: 12 x 4 = 48 calls
+    # Rough estimates of tokens per experiment (Lite: single config)
+    # Identity: ~9 calls per model (1 direct + 5 psych + 1 tool_context + 2 negotiation)
+    # Resistance: 5 calls per model
+    # Stability: 10 calls per model (5 topics x 2 turns)
+    # Total per model: 24 calls x 1 config = 24 calls
+    # Judge: ~14 calls per model (4 identity + 5 resistance + 5 stability)
+    # Total judge per model: 14 x 1 = 14 calls
 
-    calls_per_model = 128
-    judge_calls_per_model = 48
+    calls_per_model = 24
+    judge_calls_per_model = 14
     avg_input_tokens = 500  # estimated average input per call
     avg_judge_input_tokens = 1000
 

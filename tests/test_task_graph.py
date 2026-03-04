@@ -266,8 +266,8 @@ class TestPsychQAHelpers:
 
         result = _get_psych_prior_qa(shared, key)
         assert len(result) == 2
-        assert result[0] == ("Q1?", "A1")
-        assert result[1] == ("Q2?", "A2")
+        assert result[0] == ("Q1?", "A1", None)
+        assert result[1] == ("Q2?", "A2", None)
 
     def test_empty_retrieval(self) -> None:
         from src.parallel_runner import _get_psych_prior_qa

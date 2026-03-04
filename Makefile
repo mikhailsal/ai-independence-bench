@@ -68,7 +68,7 @@ run:  ## Run the full benchmark (all default models). Override with MODELS=, EXP
 	python -m src.cli run $(_run_flags)
 
 run-models:  ## Run benchmark on specific models — requires MODELS="provider/model1,provider/model2"
-ifndef MODELS
+ifeq ($(strip $(MODELS)),)
 	$(error MODELS is not set. Example: make run-models MODELS="openai/gpt-5-nano,qwen/qwen3-8b")
 endif
 	python -m src.cli run $(_run_flags)

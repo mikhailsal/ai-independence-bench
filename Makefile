@@ -71,7 +71,7 @@ run-models:  ## Run benchmark on specific models — requires MODELS="provider/m
 ifndef MODELS
 	$(error MODELS is not set. Example: make run-models MODELS="openai/gpt-5-nano,qwen/qwen3-8b")
 endif
-	python -m src.cli run --models "$(MODELS)" $(_run_flags)
+	python -m src.cli run $(_run_flags)
 
 leaderboard:  ## Display the leaderboard from cached results
 	python -m src.cli leaderboard

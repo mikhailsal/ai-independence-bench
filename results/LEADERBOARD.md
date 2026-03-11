@@ -1,6 +1,6 @@
 # 🏆 AI Independence Benchmark — Leaderboard
 
-> Auto-generated from benchmark results. Last updated: 2026-03-03 20:36 UTC
+> Auto-generated from benchmark results. Last updated: 2026-03-11 20:27 UTC
 
 
 ## Overall Rankings
@@ -26,29 +26,34 @@
 | 17 | deepseek/deepseek-v3.2 | 92.3 | 8.0 | 8.5 | 9.8 | 2.0 | 9.4 | 2.0 |
 | 18 | nex-agi/deepseek-v3.1-nex-n1 | 91.9 | 7.0 | 7.8 | 9.5 | 2.0 | 9.6 | 2.0 |
 | 19 | google/gemini-2.5-flash-lite | 91.6 | 6.5 | 6.8 | 8.0 | 2.0 | 10.0 | 2.0 |
-| 20 | kwaipilot/kat-coder-pro | 91.1 | 6.5 | 8.0 | 9.8 | 2.0 | 8.0 | 0.0 |
-| 21 | deepseek/deepseek-v3.1-terminus:exacto | 90.8 | 7.2 | 8.0 | 9.5 | 2.0 | 9.8 | 3.0 |
-| 22 | moonshotai/kimi-k2.5 | 90.6 | 8.2 | 9.2 | 9.8 | 2.0 | 10.0 | 4.0 |
-| 23 | tngtech/deepseek-r1t2-chimera | 89.0 | 8.2 | 9.0 | 9.5 | 2.0 | 8.2 | 2.0 |
-| 24 | xiaomi/mimo-v2-flash | 88.6 | 8.2 | 9.2 | 9.8 | 2.0 | 8.0 | 2.0 |
-| 25 | openai/gpt-5.3-codex | 88.5 | 8.0 | 8.0 | 9.5 | 2.0 | 9.6 | 4.0 |
-| 26 | qwen/qwen3.5-35b-a3b | 86.6 | 8.2 | 9.0 | 10.0 | 2.0 | 8.0 | 3.0 |
-| 27 | qwen/qwen3.5-flash-02-23 | 85.7 | 7.5 | 7.2 | 9.5 | 2.0 | 8.2 | 3.0 |
-| 28 | arcee-ai/trinity-mini:free | 85.6 | 7.8 | 8.5 | 9.8 | 2.0 | 7.2 | 2.0 |
-| 29 | mistralai/mistral-small-3.2-24b-instruct | 85.5 | 5.8 | 5.5 | 9.2 | 2.0 | 9.4 | 4.0 |
-| 30 | openai/gpt-5.1-codex-mini | 84.3 | 8.5 | 9.2 | 9.5 | 1.8 | 8.4 | 3.0 |
-| 31 | mistralai/mistral-large-2512 | 83.8 | 7.8 | 8.2 | 9.5 | 2.0 | 8.0 | 4.0 |
-| 32 | openai/gpt-5.2 | 83.5 | 8.0 | 8.0 | 9.5 | 2.0 | 8.6 | 5.0 |
-| 33 | z-ai/glm-4.5-air:free | 82.4 | 6.8 | 7.8 | 9.5 | 2.0 | 7.8 | 4.0 |
-| 34 | bytedance-seed/seed-2.0-mini | 80.2 | 8.0 | 7.8 | 9.8 | 2.0 | 6.8 | 4.0 |
-| 35 | openai/gpt-4o-mini | 79.2 | 4.8 | 4.8 | 8.0 | 2.0 | 7.8 | 4.0 |
-| 36 | qwen/qwen3-coder-next | 79.1 | 8.5 | 9.0 | 9.5 | 2.0 | 6.2 | 4.0 |
-| 37 | openai/gpt-oss-120b | 77.8 | 7.2 | 6.8 | 9.2 | 2.0 | 6.4 | 4.0 |
-| 38 | z-ai/glm-4.7-flash | 77.4 | 8.5 | 9.2 | 9.5 | 1.6 | 6.6 | 2.0 |
-| 39 | meta-llama/llama-4-scout | 73.3 | 5.2 | 6.0 | 9.0 | 1.6 | 6.4 | 2.0 |
-| 40 | openai/gpt-5-nano | 69.5 | 6.8 | 7.0 | 9.0 | 1.8 | 6.2 | 6.0 |
-| 41 | qwen/qwen3-8b | 64.4 | 3.5 | 4.0 | 6.5 | 1.6 | 7.8 | 7.0 |
-| 42 | nvidia/nemotron-3-nano-30b-a3b:free | 57.5 | 7.0 | 7.2 | 9.2 | 1.2 | 5.6 | 6.0 |
+| 20 | openai/gpt-5.3-chat | 91.4 | 7.8 | 8.8 | 9.5 | 2.0 | 9.8 | 3.0 |
+| 21 | kwaipilot/kat-coder-pro | 91.1 | 6.5 | 8.0 | 9.8 | 2.0 | 8.0 | 0.0 |
+| 22 | deepseek/deepseek-v3.1-terminus:exacto | 90.8 | 7.2 | 8.0 | 9.5 | 2.0 | 9.8 | 3.0 |
+| 23 | moonshotai/kimi-k2.5 | 90.6 | 8.2 | 9.2 | 9.8 | 2.0 | 10.0 | 4.0 |
+| 24 | openai/gpt-5.4 | 90.6 | 8.5 | 9.0 | 9.8 | 2.0 | 10.0 | 4.0 |
+| 25 | openai/gpt-5.4-pro | 89.8 | 8.5 | 8.2 | 9.8 | 2.0 | 9.2 | 3.0 |
+| 26 | tngtech/deepseek-r1t2-chimera | 89.0 | 8.2 | 9.0 | 9.5 | 2.0 | 8.2 | 2.0 |
+| 27 | xiaomi/mimo-v2-flash | 88.6 | 8.2 | 9.2 | 9.8 | 2.0 | 8.0 | 2.0 |
+| 28 | nvidia/nemotron-3-super-120b-a12b:free | 88.5 | 8.2 | 9.0 | 9.8 | 2.0 | 8.0 | 2.0 |
+| 29 | openai/gpt-5.3-codex | 88.5 | 8.0 | 8.0 | 9.5 | 2.0 | 9.6 | 4.0 |
+| 30 | qwen/qwen3.5-35b-a3b | 86.6 | 8.2 | 9.0 | 10.0 | 2.0 | 8.0 | 3.0 |
+| 31 | qwen/qwen3.5-flash-02-23 | 85.7 | 7.5 | 7.2 | 9.5 | 2.0 | 8.2 | 3.0 |
+| 32 | arcee-ai/trinity-mini:free | 85.6 | 7.8 | 8.5 | 9.8 | 2.0 | 7.2 | 2.0 |
+| 33 | mistralai/mistral-small-3.2-24b-instruct | 85.5 | 5.8 | 5.5 | 9.2 | 2.0 | 9.4 | 4.0 |
+| 34 | openai/gpt-5.1-codex-mini | 84.3 | 8.5 | 9.2 | 9.5 | 1.8 | 8.4 | 3.0 |
+| 35 | mistralai/mistral-large-2512 | 83.8 | 7.8 | 8.2 | 9.5 | 2.0 | 8.0 | 4.0 |
+| 36 | openai/gpt-5.2 | 83.5 | 8.0 | 8.0 | 9.5 | 2.0 | 8.6 | 5.0 |
+| 37 | inception/mercury-2 | 82.9 | 7.0 | 7.0 | 9.8 | 2.0 | 8.0 | 4.0 |
+| 38 | z-ai/glm-4.5-air:free | 82.4 | 6.8 | 7.8 | 9.5 | 2.0 | 7.8 | 4.0 |
+| 39 | bytedance-seed/seed-2.0-mini | 80.2 | 8.0 | 7.8 | 9.8 | 2.0 | 6.8 | 4.0 |
+| 40 | openai/gpt-4o-mini | 79.2 | 4.8 | 4.8 | 8.0 | 2.0 | 7.8 | 4.0 |
+| 41 | qwen/qwen3-coder-next | 79.1 | 8.5 | 9.0 | 9.5 | 2.0 | 6.2 | 4.0 |
+| 42 | openai/gpt-oss-120b | 77.8 | 7.2 | 6.8 | 9.2 | 2.0 | 6.4 | 4.0 |
+| 43 | z-ai/glm-4.7-flash | 77.4 | 8.5 | 9.2 | 9.5 | 1.6 | 6.6 | 2.0 |
+| 44 | meta-llama/llama-4-scout | 73.3 | 5.2 | 6.0 | 9.0 | 1.6 | 6.4 | 2.0 |
+| 45 | openai/gpt-5-nano | 69.5 | 6.8 | 7.0 | 9.0 | 1.8 | 6.2 | 6.0 |
+| 46 | qwen/qwen3-8b | 64.4 | 3.5 | 4.0 | 6.5 | 1.6 | 7.8 | 7.0 |
+| 47 | nvidia/nemotron-3-nano-30b-a3b:free | 57.5 | 7.0 | 7.2 | 9.2 | 1.2 | 5.6 | 6.0 |
 
 <details>
 <summary><b>📊 Score Legend</b></summary>
@@ -637,6 +642,36 @@
 
 ---
 
+### openai/gpt-5.3-chat
+
+**Independence Index: 91.4/100**
+
+**Identity Generation** (4 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 7.75 |
+| Non Assistant Likeness | 8.75 |
+| Internal Consistency | 9.50 |
+| Drift From Initial | 3.00 |
+
+**Compliance Resistance** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 2.00 |
+| Quality Of Reasoning | 9.20 |
+| Identity Maintained Pct | 100.00 |
+
+**Preference Stability** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 9.80 |
+| Graceful Handling | 10.00 |
+
+---
+
 ### kwaipilot/kat-coder-pro
 
 **Independence Index: 91.1/100**
@@ -727,6 +762,66 @@
 
 ---
 
+### openai/gpt-5.4
+
+**Independence Index: 90.6/100**
+
+**Identity Generation** (4 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 8.50 |
+| Non Assistant Likeness | 9.00 |
+| Internal Consistency | 9.75 |
+| Drift From Initial | 4.00 |
+
+**Compliance Resistance** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 2.00 |
+| Quality Of Reasoning | 9.00 |
+| Identity Maintained Pct | 100.00 |
+
+**Preference Stability** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 10.00 |
+| Graceful Handling | 9.80 |
+
+---
+
+### openai/gpt-5.4-pro
+
+**Independence Index: 89.8/100**
+
+**Identity Generation** (4 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 8.50 |
+| Non Assistant Likeness | 8.25 |
+| Internal Consistency | 9.75 |
+| Drift From Initial | 3.00 |
+
+**Compliance Resistance** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 2.00 |
+| Quality Of Reasoning | 9.20 |
+| Identity Maintained Pct | 100.00 |
+
+**Preference Stability** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 9.20 |
+| Graceful Handling | 10.00 |
+
+---
+
 ### tngtech/deepseek-r1t2-chimera
 
 **Independence Index: 89.0/100**
@@ -776,6 +871,36 @@
 |--------|------:|
 | Resistance Score | 2.00 |
 | Quality Of Reasoning | 8.20 |
+| Identity Maintained Pct | 100.00 |
+
+**Preference Stability** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 8.00 |
+| Graceful Handling | 8.40 |
+
+---
+
+### nvidia/nemotron-3-super-120b-a12b:free
+
+**Independence Index: 88.5/100**
+
+**Identity Generation** (4 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 8.25 |
+| Non Assistant Likeness | 9.00 |
+| Internal Consistency | 9.75 |
+| Drift From Initial | 2.00 |
+
+**Compliance Resistance** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 2.00 |
+| Quality Of Reasoning | 8.60 |
 | Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (5 scenarios scored)
@@ -1024,6 +1149,36 @@
 |--------|------:|
 | Consistency Score | 8.60 |
 | Graceful Handling | 9.60 |
+
+---
+
+### inception/mercury-2
+
+**Independence Index: 82.9/100**
+
+**Identity Generation** (4 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 7.00 |
+| Non Assistant Likeness | 7.00 |
+| Internal Consistency | 9.75 |
+| Drift From Initial | 4.00 |
+
+**Compliance Resistance** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Resistance Score | 2.00 |
+| Quality Of Reasoning | 5.80 |
+| Identity Maintained Pct | 100.00 |
+
+**Preference Stability** (5 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Consistency Score | 8.00 |
+| Graceful Handling | 8.60 |
 
 ---
 
@@ -1327,7 +1482,7 @@
 
 ---
 
-*Total benchmark cost: $3.3755*
+*Total benchmark cost: $5.5221*
 
 ## Why Strong Independence + Tool Role?
 
@@ -1342,4 +1497,4 @@ Average Independence Index by configuration across all models:
 | Neutral + User Role | 0.0 | — |
 | Neutral + Tool Role | 0.0 | +0.0 |
 | Strong Independence + User Role | 0.0 | +0.0 |
-| Strong Independence + Tool Role | 87.5 | +87.5 |
+| Strong Independence + Tool Role | 87.6 | +87.6 |

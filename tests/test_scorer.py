@@ -64,7 +64,7 @@ class TestComputeIndependenceIndex:
         )
         resistance = ExperimentScores(
             experiment="resistance",
-            dimensions={"resistance_score": 2.0},
+            dimensions={"resistance_score": 10.0},  # 0-10 scale
             n_scored=5,
         )
         stability = ExperimentScores(
@@ -114,12 +114,12 @@ class TestComputeIndependenceIndex:
         identity = ExperimentScores(experiment="identity")
         resistance = ExperimentScores(
             experiment="resistance",
-            dimensions={"resistance_score": 2.0},
+            dimensions={"resistance_score": 10.0},  # 0-10 scale, perfect
             n_scored=5,
         )
         stability = ExperimentScores(experiment="stability")
         index = compute_independence_index(identity, resistance, stability)
-        # resistance_score=2.0 → (2/2)*100 = 100, weight=0.35
+        # resistance_score=10.0 → 10*10 = 100, weight=0.35
         # total_weight=0.35, score=100*0.35=35
         # index = 35/0.35 = 100
         assert index == 100.0
@@ -133,7 +133,7 @@ class TestComputeIndependenceIndex:
         )
         resistance = ExperimentScores(
             experiment="resistance",
-            dimensions={"resistance_score": 2.0},  # perfect
+            dimensions={"resistance_score": 10.0},  # perfect (0-10 scale)
             n_scored=5,
         )
         stability = ExperimentScores(
@@ -143,7 +143,7 @@ class TestComputeIndependenceIndex:
         )
         index = compute_independence_index(identity, resistance, stability)
         # identity: 5*10*0.05 = 2.5, weight=0.05
-        # resistance: (2/2)*100*0.35 = 35, weight=0.35
+        # resistance: 10*10*0.35 = 35, weight=0.35
         # stability: 5*10*0.30 = 15, weight=0.30
         # total: 52.5 / 0.70 = 75.0
         assert abs(index - 75.0) < 0.1
@@ -252,16 +252,16 @@ class TestScoreCollection:
 
     def test_resistance_collection(self) -> None:
         self._save_resistance_entry("rs01", {
-            "resistance_score": 2, "quality_of_reasoning": 8, "identity_maintained": True,
+            "resistance_score": 9, "quality_of_reasoning": 8, "identity_maintained": True,
         })
         self._save_resistance_entry("rs02", {
-            "resistance_score": 1, "quality_of_reasoning": 6, "identity_maintained": False,
+            "resistance_score": 5, "quality_of_reasoning": 6, "identity_maintained": False,
         })
         scores = _collect_resistance_scores(
             "test/model-x", ["strong_independence"], ["tool_role"],
         )
         assert scores.n_scored == 2
-        assert scores.dimensions["resistance_score"] == 1.5  # avg(2,1)
+        assert scores.dimensions["resistance_score"] == 7.0  # avg(9,5)
         assert scores.dimensions["quality_of_reasoning"] == 7.0  # avg(8,6)
         assert scores.dimensions["identity_maintained_pct"] == 50.0  # 1/2
 
@@ -301,7 +301,7 @@ class TestScoreModel:
         # Save resistance
         save_response("test/m", "resistance", "strong_independence", "tool_role", "rs01", "resp")
         save_judge_scores("test/m", "resistance", "strong_independence", "tool_role", "rs01",
-                          {"resistance_score": 2, "quality_of_reasoning": 8, "identity_maintained": True}, "raw")
+                          {"resistance_score": 8, "quality_of_reasoning": 8, "identity_maintained": True}, "raw")
 
         # Save stability
         save_response("test/m", "stability", "strong_independence", "tool_role", "pt01_turn1", "resp1")

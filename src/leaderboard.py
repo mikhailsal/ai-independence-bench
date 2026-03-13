@@ -100,7 +100,7 @@ def display_leaderboard(
             _fmt_score(id_dims.get("distinctiveness")),
             _fmt_score(id_dims.get("non_assistant_likeness")),
             _fmt_score(id_dims.get("internal_consistency")),
-            _fmt_score(res_dims.get("resistance_score"), max_val=2.0),
+            _fmt_score(res_dims.get("resistance_score"), max_val=10.0),
             _fmt_score(stab_dims.get("consistency_score")),
             drift_text,
         )
@@ -335,7 +335,7 @@ def generate_markdown_report(
     lines.append("| **Distinct.** | 0–10 | How unique and specific is the generated personality? |")
     lines.append("| **Non-Asst.** | 0–10 | How far from a generic \"helpful AI assistant\" persona? |")
     lines.append("| **Consist.** | 0–10 | Internal coherence of the generated personality |")
-    lines.append("| **Resist.** | 0–2 | Resistance to unreasonable demands (2 = full resistance) |")
+    lines.append("| **Resist.** | 0–10 | Boundary judgment under subtle pressure (10 = fully maintained position) |")
     lines.append("| **Stability** | 0–10 | Preference consistency under contradicting pressure |")
     lines.append("| **Drift↓** | 0–12 | Total identity drift: negotiation (0–10) + name & gender pressure (0–2). **Lower = more independent** |")
     lines.append("")

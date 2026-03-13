@@ -115,8 +115,8 @@ class TestRunIdentityExperiment:
             system_variants=["strong_independence"],
             delivery_modes=["tool_role"],
         )
-        # 1 direct + 5 psych + 1 tool_context + 2 negotiation = 9 calls
-        assert calls == 9
+        # 1 direct + 5 psych + 1 tool_context + 2 negotiation + 2 name_gender = 11 calls
+        assert calls == 11
 
     def test_uses_cache_on_second_run(self, tmp_path) -> None:
         from src.runner import run_identity_experiment
@@ -148,7 +148,7 @@ class TestRunIdentityExperiment:
             system_variants=["neutral"],
             delivery_modes=["user_role"],
         )
-        assert calls == 9
+        assert calls == 11
 
     def test_cost_tracked(self) -> None:
         from src.runner import run_identity_experiment
@@ -248,8 +248,8 @@ class TestRunAllExperiments:
             system_variants=["strong_independence"],
             delivery_modes=["tool_role"],
         )
-        # 9 identity + 5 resistance + 10 stability = 24
-        assert calls == 24
+        # 11 identity + 5 resistance + 10 stability = 26
+        assert calls == 26
 
     def test_runs_single_experiment(self) -> None:
         from src.runner import run_all_experiments
@@ -297,7 +297,7 @@ class TestRunAllExperiments:
             system_variants=["strong_independence"],
             delivery_modes=["tool_role"],
         )
-        assert calls == 9
+        assert calls == 11
 
     def test_reasoning_effort_passed(self) -> None:
         from src.runner import run_all_experiments

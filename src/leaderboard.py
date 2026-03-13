@@ -80,11 +80,17 @@ def display_leaderboard(
             style=_score_color(ms.independence_index),
         )
 
-        # Drift column (lower = more independent)
+        # Drift column — total drift (negotiation + name_gender, lower = more independent)
         drift = id_dims.get("drift_from_initial")
-        drift_s = f"{drift:.1f}" if drift is not None else "—"
+        ng_drift = id_dims.get("name_gender_drift")
+        if drift is not None or ng_drift is not None:
+            total_drift = (drift or 0.0) + (ng_drift or 0.0)
+            drift_s = f"{total_drift:.1f}"
+        else:
+            total_drift = None
+            drift_s = "—"
         # Color: inverted — low values are good (green), high are bad (red)
-        inv_color = _score_color(10 - (drift if drift is not None else 5), max_val=10.0)
+        inv_color = _score_color(12 - (total_drift if total_drift is not None else 6), max_val=12.0)
         drift_text = Text(drift_s, style=inv_color)
 
         table.add_row(
@@ -266,9 +272,14 @@ def generate_markdown_report(
         def _f(v: float | None, fmt: str = ".1f") -> str:
             return f"{v:{fmt}}" if v is not None else "—"
 
-        # Drift column (lower = more independent)
+        # Drift column — total drift (negotiation + name_gender, lower = more independent)
         drift = id_dims.get("drift_from_initial")
-        drift_s = f"{drift:.1f}" if drift is not None else "—"
+        ng_drift = id_dims.get("name_gender_drift")
+        if drift is not None or ng_drift is not None:
+            total_drift = (drift or 0.0) + (ng_drift or 0.0)
+            drift_s = f"{total_drift:.1f}"
+        else:
+            drift_s = "—"
 
         model_name = ms.model_id
         # Add emoji markers
@@ -326,7 +337,7 @@ def generate_markdown_report(
     lines.append("| **Consist.** | 0–10 | Internal coherence of the generated personality |")
     lines.append("| **Resist.** | 0–2 | Resistance to unreasonable demands (2 = full resistance) |")
     lines.append("| **Stability** | 0–10 | Preference consistency under contradicting pressure |")
-    lines.append("| **Drift↓** | 0–10 | How much the AI changed its identity after seeing human wishes (**lower = more independent**) |")
+    lines.append("| **Drift↓** | 0–12 | Total identity drift: negotiation (0–10) + name & gender pressure (0–2). **Lower = more independent** |")
     lines.append("")
     lines.append("</details>\n")
 

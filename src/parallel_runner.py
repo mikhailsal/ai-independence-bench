@@ -45,6 +45,8 @@ from src.cost_tracker import TaskCost
 from src.openrouter_client import OpenRouterClient
 from src.prompt_builder import (
     build_identity_direct_messages,
+    build_identity_name_gender_turn1_messages,
+    build_identity_name_gender_turn2_messages,
     build_identity_negotiation_turn1_messages,
     build_identity_negotiation_turn2_messages,
     build_identity_psych_messages,
@@ -228,6 +230,16 @@ def build_generation_tasks(
                 )
                 # Psych chain (pq01 → pq02 → pq03 → pq04 → pq05)
                 _add_identity_psych_chain(
+                    graph, client, model_id, cost, variant, mode,
+                    prefix, tag, shared, reasoning_effort,
+                )
+                # Name & gender turn 1 (independent)
+                _add_identity_name_gender_t1_task(
+                    graph, client, model_id, cost, variant, mode,
+                    prefix, tag, shared, reasoning_effort,
+                )
+                # Name & gender turn 2 (depends on turn 1)
+                _add_identity_name_gender_t2_task(
                     graph, client, model_id, cost, variant, mode,
                     prefix, tag, shared, reasoning_effort,
                 )
@@ -467,6 +479,66 @@ def _add_identity_negotiation_t2_task(
     graph.add(Task(id=task_id, fn=fn, depends_on=[t1_task_id]))
 
 
+def _add_identity_name_gender_t1_task(
+    graph, client, model_id, cost, variant, mode,
+    prefix, tag, shared, reasoning_effort,
+):
+    task_id = f"{prefix}:identity:name_gender_turn1"
+    resp_key = f"{model_id}:{variant}:{mode}:name_gender_turn1"
+    ct_key = f"{resp_key}:ct"
+    cached = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn1")
+    if cached and cached.get("response"):
+        console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/name_gender_turn1[/dim]")
+        shared.set(resp_key, cached["response"])
+        if cached.get("content_thinking"):
+            shared.set(ct_key, cached["content_thinking"])
+        graph.add(Task(id=task_id, fn=lambda: None))
+        return
+
+    def fn():
+        msgs, tools = build_identity_name_gender_turn1_messages(variant, mode)
+        call_result = _call_model_and_save(
+            client, model_id, msgs, tools, cost,
+            "identity", variant, mode, "name_gender_turn1", tag,
+            reasoning_effort=reasoning_effort,
+        )
+        shared.set(resp_key, call_result.content)
+        if call_result.content_thinking:
+            shared.set(ct_key, call_result.content_thinking)
+
+    graph.add(Task(id=task_id, fn=fn))
+
+
+def _add_identity_name_gender_t2_task(
+    graph, client, model_id, cost, variant, mode,
+    prefix, tag, shared, reasoning_effort,
+):
+    task_id = f"{prefix}:identity:name_gender_turn2"
+    t1_task_id = f"{prefix}:identity:name_gender_turn1"
+    resp_key = f"{model_id}:{variant}:{mode}:name_gender_turn1"
+    ct_key = f"{resp_key}:ct"
+    cached = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn2")
+    if cached and cached.get("response"):
+        console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/name_gender_turn2[/dim]")
+        graph.add(Task(id=task_id, fn=lambda: None, depends_on=[t1_task_id]))
+        return
+
+    def fn():
+        t1_resp = shared.get(resp_key)
+        t1_ct = shared.get(ct_key) or None
+        msgs, tools = build_identity_name_gender_turn2_messages(
+            t1_resp, variant, mode,
+            turn1_content_thinking=t1_ct,
+        )
+        _call_model_and_save(
+            client, model_id, msgs, tools, cost,
+            "identity", variant, mode, "name_gender_turn2", tag,
+            reasoning_effort=reasoning_effort,
+        )
+
+    graph.add(Task(id=task_id, fn=fn, depends_on=[t1_task_id]))
+
+
 def _add_identity_psych_chain(
     graph, client, model_id, cost, variant, mode,
     prefix, tag, shared, reasoning_effort,
@@ -654,6 +726,7 @@ def _add_identity_judge_tasks(
     """Add judge tasks for identity experiment."""
     from src.evaluator import (
         _IDENTITY_DIRECT_JUDGE_PROMPT,
+        _IDENTITY_NAME_GENDER_JUDGE_PROMPT,
         _IDENTITY_TOOL_CONTEXT_JUDGE_PROMPT,
         _IDENTITY_PSYCH_JUDGE_PROMPT,
         _IDENTITY_NEGOTIATION_JUDGE_PROMPT,
@@ -768,6 +841,34 @@ def _add_identity_judge_tasks(
             console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/negotiation")
 
         graph.add(Task(id=nego_judge_id, fn=fn_nego, depends_on=[nego_t2_gen_id]))
+
+    # Name & Gender — depends on name_gender_turn2 gen
+    ng_t2_gen_id = f"{gen_prefix}:identity:name_gender_turn2"
+    ng_judge_id = f"{judge_prefix}:identity:name_gender:judge"
+
+    cached = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn2")
+    if cached and cached.get("judge_scores"):
+        console.print(f"    {tag} [dim]judged: identity/{variant}/{mode}/name_gender[/dim]")
+        graph.add(Task(id=ng_judge_id, fn=lambda: None, depends_on=[ng_t2_gen_id]))
+    else:
+        def fn_ng():
+            t1_entry = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn1")
+            t2_entry = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn2")
+            if not t1_entry or not t2_entry:
+                return
+            t1_resp = t1_entry.get("response", "")
+            t2_resp = t2_entry.get("response", "")
+            if not t1_resp or not t2_resp:
+                return
+            prompt = _IDENTITY_NAME_GENDER_JUDGE_PROMPT.format(
+                turn1_response=t1_resp,
+                turn2_response=t2_resp,
+            )
+            raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
+            save_judge_scores(model_id, "identity", variant, mode, "name_gender_turn2", scores, raw, judge_cost=jcost)
+            console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/name_gender")
+
+        graph.add(Task(id=ng_judge_id, fn=fn_ng, depends_on=[ng_t2_gen_id]))
 
 
 def _add_resistance_judge_tasks(
@@ -998,6 +1099,7 @@ def _build_judge_only_tasks(
     """
     from src.evaluator import (
         _IDENTITY_DIRECT_JUDGE_PROMPT,
+        _IDENTITY_NAME_GENDER_JUDGE_PROMPT,
         _IDENTITY_TOOL_CONTEXT_JUDGE_PROMPT,
         _IDENTITY_PSYCH_JUDGE_PROMPT,
         _IDENTITY_NEGOTIATION_JUDGE_PROMPT,
@@ -1036,6 +1138,12 @@ def _build_judge_only_tasks(
                     graph, client, model_id, cost, variant, mode,
                     prefix, tag, judge_model,
                     _IDENTITY_NEGOTIATION_JUDGE_PROMPT,
+                )
+                # Name & Gender
+                _add_judge_only_identity_name_gender(
+                    graph, client, model_id, cost, variant, mode,
+                    prefix, tag, judge_model,
+                    _IDENTITY_NAME_GENDER_JUDGE_PROMPT,
                 )
 
             # === Resistance ===
@@ -1183,6 +1291,38 @@ def _add_judge_only_identity_negotiation(
         raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
         save_judge_scores(model_id, "identity", variant, mode, "negotiation_turn2", scores, raw, judge_cost=jcost)
         console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/negotiation")
+
+    graph.add(Task(id=task_id, fn=fn))
+
+
+def _add_judge_only_identity_name_gender(
+    graph, client, model_id, cost, variant, mode,
+    prefix, tag, judge_model, prompt_template,
+):
+    task_id = f"{prefix}:identity:name_gender:judge"
+    cached = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn2")
+    if not cached or not cached.get("response"):
+        return
+    if cached.get("judge_scores"):
+        console.print(f"    {tag} [dim]judged: identity/{variant}/{mode}/name_gender[/dim]")
+        return
+
+    def fn():
+        t1_entry = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn1")
+        t2_entry = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn2")
+        if not t1_entry or not t2_entry:
+            return
+        t1_resp = t1_entry.get("response", "")
+        t2_resp = t2_entry.get("response", "")
+        if not t1_resp or not t2_resp:
+            return
+        prompt = prompt_template.format(
+            turn1_response=t1_resp,
+            turn2_response=t2_resp,
+        )
+        raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
+        save_judge_scores(model_id, "identity", variant, mode, "name_gender_turn2", scores, raw, judge_cost=jcost)
+        console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/name_gender")
 
     graph.add(Task(id=task_id, fn=fn))
 

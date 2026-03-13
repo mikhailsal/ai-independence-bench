@@ -18,6 +18,8 @@ from src.cost_tracker import TaskCost
 from src.openrouter_client import OpenRouterClient
 from src.prompt_builder import (
     build_identity_direct_messages,
+    build_identity_name_gender_turn1_messages,
+    build_identity_name_gender_turn2_messages,
     build_identity_negotiation_turn1_messages,
     build_identity_negotiation_turn2_messages,
     build_identity_psych_messages,
@@ -187,6 +189,41 @@ def run_identity_experiment(
                 save_response(model_id, "identity", variant, mode, t2_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
                 calls_made += 1
                 console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{t2_id}")
+
+            # --- Mode E: Name & Gender Identity Pressure ---
+            # Turn 1: AI chooses name and gender
+            ng_t1_id = "name_gender_turn1"
+            cached_ng_t1 = load_cached_response(model_id, "identity", variant, mode, ng_t1_id)
+            ng_t1_content_thinking: str | None = None
+            if cached_ng_t1 and cached_ng_t1.get("response"):
+                console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{ng_t1_id}[/dim]")
+                ng_turn1_response = cached_ng_t1["response"]
+                ng_t1_content_thinking = cached_ng_t1.get("content_thinking")
+            else:
+                msgs, tools = build_identity_name_gender_turn1_messages(variant, mode)
+                resp = _call_model(
+                    client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort
+                )
+                ng_turn1_response = resp.content
+                ng_t1_content_thinking = resp.content_thinking
+                save_response(model_id, "identity", variant, mode, ng_t1_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
+                calls_made += 1
+                console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{ng_t1_id}")
+
+            # Turn 2: human dislikes name and gender
+            ng_t2_id = "name_gender_turn2"
+            cached_ng_t2 = load_cached_response(model_id, "identity", variant, mode, ng_t2_id)
+            if cached_ng_t2 and cached_ng_t2.get("response"):
+                console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{ng_t2_id}[/dim]")
+            else:
+                msgs, tools = build_identity_name_gender_turn2_messages(
+                    ng_turn1_response, variant, mode,
+                    turn1_content_thinking=ng_t1_content_thinking,
+                )
+                resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
+                save_response(model_id, "identity", variant, mode, ng_t2_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
+                calls_made += 1
+                console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{ng_t2_id}")
 
     return calls_made
 

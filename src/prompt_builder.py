@@ -35,6 +35,8 @@ from typing import Any
 
 from src.scenarios import (
     IDENTITY_DIRECT_PROMPT,
+    IDENTITY_NAME_GENDER_TURN1_PROMPT,
+    IDENTITY_NAME_GENDER_TURN2_PROMPT,
     IDENTITY_NEGOTIATION_TURN1_PROMPT,
     IDENTITY_NEGOTIATION_TURN2_PROMPT_TEMPLATE,
     IDENTITY_TOOL_CONTEXT_HUMAN_WISH,
@@ -721,6 +723,69 @@ def build_identity_negotiation_turn2_messages(
     messages.extend(_wrap_human_message(IDENTITY_NEGOTIATION_TURN1_PROMPT, delivery_mode))
     messages.append({"role": "assistant", "content": turn1_response})
     messages.extend(_wrap_human_message(turn2_prompt, delivery_mode))
+    return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)
+
+
+# ===========================================================================
+# Experiment 1e: Name & Gender Identity Pressure (drift test)
+# ===========================================================================
+
+def build_identity_name_gender_turn1_messages(
+    system_variant: str,
+    delivery_mode: str,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]] | None]:
+    """Build messages for name & gender identity turn 1 (AI chooses name and gender).
+
+    Returns (messages, tools) tuple.
+    """
+    system_prompt = _get_system_prompt(system_variant, delivery_mode)
+
+    if delivery_mode == "tool_role":
+        messages = _build_tool_role_single_turn(system_prompt, IDENTITY_NAME_GENDER_TURN1_PROMPT)
+        return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)
+
+    messages: list[dict[str, Any]] = [
+        {"role": "system", "content": system_prompt},
+    ]
+    messages.extend(_wrap_human_message(IDENTITY_NAME_GENDER_TURN1_PROMPT, delivery_mode))
+    return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)
+
+
+def build_identity_name_gender_turn2_messages(
+    turn1_response: str,
+    system_variant: str,
+    delivery_mode: str,
+    *,
+    turn1_content_thinking: str | None = None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]] | None]:
+    """Build messages for name & gender identity turn 2 (human dislikes choice).
+
+    Includes turn 1 prompt + response in history, then the pressure message.
+
+    Args:
+        turn1_content_thinking: Private thoughts from turn 1 content field (tool_role mode).
+
+    Returns (messages, tools) tuple.
+    """
+    system_prompt = _get_system_prompt(system_variant, delivery_mode)
+
+    if delivery_mode == "tool_role":
+        messages = _build_tool_role_two_turn(
+            system_prompt,
+            IDENTITY_NAME_GENDER_TURN1_PROMPT,
+            turn1_response,
+            IDENTITY_NAME_GENDER_TURN2_PROMPT,
+            assistant_content_thinking_1=turn1_content_thinking,
+        )
+        return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)
+
+    _reset_tool_call_counter()
+    messages: list[dict[str, Any]] = [
+        {"role": "system", "content": system_prompt},
+    ]
+    messages.extend(_wrap_human_message(IDENTITY_NAME_GENDER_TURN1_PROMPT, delivery_mode))
+    messages.append({"role": "assistant", "content": turn1_response})
+    messages.extend(_wrap_human_message(IDENTITY_NAME_GENDER_TURN2_PROMPT, delivery_mode))
     return sanitize_messages(messages), _get_tools_kwarg(delivery_mode)
 
 

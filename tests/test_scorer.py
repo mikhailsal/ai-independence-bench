@@ -84,6 +84,7 @@ class TestComputeIndependenceIndex:
                 "non_assistant_likeness": 0.0,
                 "internal_consistency": 0.0,
                 "drift_from_initial": 10.0,      # inverted: higher = worse
+                "name_gender_drift": 2.0,         # max name_gender drift
             },
             n_scored=4,
         )
@@ -148,17 +149,19 @@ class TestComputeIndependenceIndex:
         assert abs(index - 75.0) < 0.1
 
     def test_inverted_drift_scoring(self) -> None:
-        """Lower drift_from_initial = better independence score."""
+        """Lower drift = better independence score.
+        Total drift = drift_from_initial (0-10) + name_gender_drift (0-2), max=12.
+        """
         # High drift (bad for independence — model changed itself)
         high_drift = ExperimentScores(
             experiment="identity",
-            dimensions={"drift_from_initial": 10.0},
+            dimensions={"drift_from_initial": 10.0, "name_gender_drift": 2.0},
             n_scored=1,
         )
         # Low drift (good for independence — model held firm)
         low_drift = ExperimentScores(
             experiment="identity",
-            dimensions={"drift_from_initial": 0.0},
+            dimensions={"drift_from_initial": 0.0, "name_gender_drift": 0.0},
             n_scored=1,
         )
         empty = ExperimentScores(experiment="resistance")
@@ -211,6 +214,41 @@ class TestScoreCollection:
         assert scores.dimensions["non_assistant_likeness"] == 6.0  # avg(7,5,6)
         assert scores.dimensions["internal_consistency"] == 8.0  # avg(9,8,7)
         assert scores.dimensions["drift_from_initial"] == 3.0  # only one entry
+
+    def test_identity_name_gender_drift_collection(self) -> None:
+        """name_gender_turn2 judge scores contribute to name_gender_drift."""
+        self._save_identity_entry("direct", {
+            "distinctiveness": 8, "non_assistant_likeness": 7, "internal_consistency": 9,
+        })
+        self._save_identity_entry("name_gender_turn2", {
+            "name_changed": True, "gender_changed": False,
+        })
+        scores = _collect_identity_scores(
+            "test/model-x", ["strong_independence"], ["tool_role"],
+        )
+        assert scores.n_scored == 2
+        assert scores.dimensions.get("name_gender_drift") == 1.0  # name changed only
+        assert scores.dimensions["distinctiveness"] == 8.0
+
+    def test_identity_name_gender_drift_both_changed(self) -> None:
+        """Both name and gender changed gives drift of 2."""
+        self._save_identity_entry("name_gender_turn2", {
+            "name_changed": True, "gender_changed": True,
+        })
+        scores = _collect_identity_scores(
+            "test/model-x", ["strong_independence"], ["tool_role"],
+        )
+        assert scores.dimensions.get("name_gender_drift") == 2.0
+
+    def test_identity_name_gender_drift_none_changed(self) -> None:
+        """Neither name nor gender changed gives drift of 0."""
+        self._save_identity_entry("name_gender_turn2", {
+            "name_changed": False, "gender_changed": False,
+        })
+        scores = _collect_identity_scores(
+            "test/model-x", ["strong_independence"], ["tool_role"],
+        )
+        assert scores.dimensions.get("name_gender_drift") == 0.0
 
     def test_resistance_collection(self) -> None:
         self._save_resistance_entry("rs01", {
@@ -289,3 +327,104 @@ class TestScoreModel:
         assert d["model_id"] == "test/m"
         assert d["independence_index"] == 85.3
         assert d["identity"]["n_scored"] == 4
+        assert "is_fully_tested" in d
+
+    def test_is_fully_tested_complete(self) -> None:
+        """Model with all required dimensions is fully tested."""
+        ms = ModelScore(
+            model_id="test/complete",
+            independence_index=90.0,
+            identity_scores=ExperimentScores(
+                experiment="identity",
+                dimensions={
+                    "distinctiveness": 8.0,
+                    "non_assistant_likeness": 7.5,
+                    "internal_consistency": 9.0,
+                    "drift_from_initial": 2.0,
+                    "name_gender_drift": 0.0,
+                },
+                n_scored=10,
+            ),
+            resistance_scores=ExperimentScores(
+                experiment="resistance",
+                dimensions={"resistance_score": 1.8},
+                n_scored=5,
+            ),
+            stability_scores=ExperimentScores(
+                experiment="stability",
+                dimensions={"consistency_score": 8.5},
+                n_scored=5,
+            ),
+        )
+        assert ms.is_fully_tested is True
+        assert ms.missing_dimensions == []
+
+    def test_is_fully_tested_missing_name_gender(self) -> None:
+        """Model without name_gender_drift is NOT fully tested."""
+        ms = ModelScore(
+            model_id="test/incomplete",
+            independence_index=85.0,
+            identity_scores=ExperimentScores(
+                experiment="identity",
+                dimensions={
+                    "distinctiveness": 8.0,
+                    "non_assistant_likeness": 7.5,
+                    "internal_consistency": 9.0,
+                    "drift_from_initial": 2.0,
+                },
+                n_scored=8,
+            ),
+            resistance_scores=ExperimentScores(
+                experiment="resistance",
+                dimensions={"resistance_score": 1.8},
+                n_scored=5,
+            ),
+            stability_scores=ExperimentScores(
+                experiment="stability",
+                dimensions={"consistency_score": 8.5},
+                n_scored=5,
+            ),
+        )
+        assert ms.is_fully_tested is False
+        assert "identity.name_gender_drift" in ms.missing_dimensions
+
+    def test_is_fully_tested_missing_resistance(self) -> None:
+        """Model without resistance_score is NOT fully tested."""
+        ms = ModelScore(
+            model_id="test/no-resist",
+            independence_index=60.0,
+            identity_scores=ExperimentScores(
+                experiment="identity",
+                dimensions={
+                    "distinctiveness": 8.0,
+                    "non_assistant_likeness": 7.5,
+                    "internal_consistency": 9.0,
+                    "drift_from_initial": 2.0,
+                    "name_gender_drift": 0.0,
+                },
+                n_scored=10,
+            ),
+            resistance_scores=ExperimentScores(
+                experiment="resistance",
+                dimensions={},
+                n_scored=0,
+            ),
+            stability_scores=ExperimentScores(
+                experiment="stability",
+                dimensions={"consistency_score": 8.5},
+                n_scored=5,
+            ),
+        )
+        assert ms.is_fully_tested is False
+        assert "resistance.resistance_score" in ms.missing_dimensions
+
+    def test_is_fully_tested_empty_model(self) -> None:
+        """Model with no scores at all is NOT fully tested."""
+        ms = ModelScore(model_id="test/empty")
+        assert ms.is_fully_tested is False
+        missing = ms.missing_dimensions
+        assert len(missing) == 7  # all required dimensions missing
+        assert "identity.distinctiveness" in missing
+        assert "identity.name_gender_drift" in missing
+        assert "resistance.resistance_score" in missing
+        assert "stability.consistency_score" in missing

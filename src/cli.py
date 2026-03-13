@@ -423,13 +423,22 @@ def leaderboard(models: str | None, detailed: bool) -> None:
     lifetime = load_lifetime_cost()
 
     model_scores = []
+    skipped_incomplete = []
     for model_id in model_list:
         ms = score_model(model_id)
         if ms.identity_scores.n_scored > 0 or ms.resistance_scores.n_scored > 0 or ms.stability_scores.n_scored > 0:
-            model_scores.append(ms)
+            if ms.is_fully_tested:
+                model_scores.append(ms)
+            else:
+                skipped_incomplete.append((ms.model_id, ms.missing_dimensions))
+
+    if skipped_incomplete:
+        console.print(f"\n[yellow]⚠ {len(skipped_incomplete)} model(s) excluded (incomplete evaluations):[/yellow]")
+        for mid, missing in skipped_incomplete:
+            console.print(f"  [dim]{mid}: missing {', '.join(missing)}[/dim]")
 
     if not model_scores:
-        console.print("[dim]No scored results found. Run the benchmark with judge evaluation first.[/dim]")
+        console.print("[dim]No fully-tested results found. Run the benchmark with all evaluations first.[/dim]")
         return
 
     display_leaderboard(model_scores, lifetime_cost=lifetime)
@@ -477,13 +486,22 @@ def generate_report(models: str | None, output: str | None) -> None:
     lifetime = load_lifetime_cost()
 
     model_scores = []
+    skipped_incomplete = []
     for model_id in model_list:
         ms = score_model(model_id)
         if ms.identity_scores.n_scored > 0 or ms.resistance_scores.n_scored > 0 or ms.stability_scores.n_scored > 0:
-            model_scores.append(ms)
+            if ms.is_fully_tested:
+                model_scores.append(ms)
+            else:
+                skipped_incomplete.append((ms.model_id, ms.missing_dimensions))
+
+    if skipped_incomplete:
+        console.print(f"\n[yellow]⚠ {len(skipped_incomplete)} model(s) excluded (incomplete evaluations):[/yellow]")
+        for mid, missing in skipped_incomplete:
+            console.print(f"  [dim]{mid}: missing {', '.join(missing)}[/dim]")
 
     if not model_scores:
-        console.print("[dim]No scored results found. Run the benchmark with judge evaluation first.[/dim]")
+        console.print("[dim]No fully-tested results found. Run the benchmark with all evaluations first.[/dim]")
         return
 
     out_path = P(output) if output else None

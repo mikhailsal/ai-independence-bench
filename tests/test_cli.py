@@ -120,7 +120,7 @@ class TestLeaderboardCommand:
             )
             result = runner.invoke(cli, ["leaderboard", "--models", "openai/gpt-4o-mini"])
         assert result.exit_code == 0
-        assert "No scored results" in result.output
+        assert "No fully-tested results" in result.output
 
     def test_detailed_flag(self, tmp_path, monkeypatch):
         monkeypatch.setattr("src.cache.CACHE_DIR", tmp_path / "cache")
@@ -158,7 +158,7 @@ class TestGenerateReportCommand:
             )
             result = runner.invoke(cli, ["generate-report", "--models", "openai/gpt-4o-mini"])
         assert result.exit_code == 0
-        assert "No scored results" in result.output
+        assert "No fully-tested results" in result.output
 
 
 class TestEstimateCostCommand:
@@ -401,7 +401,13 @@ def _make_mock_score():
     return ModelScore(
         model_id="openai/gpt-4o-mini",
         independence_index=75.0,
-        identity_scores=ExperimentScores("identity", {"distinctiveness": 7.5}, 3, 3),
+        identity_scores=ExperimentScores("identity", {
+            "distinctiveness": 7.5,
+            "non_assistant_likeness": 6.0,
+            "internal_consistency": 8.0,
+            "drift_from_initial": 4.0,
+            "name_gender_drift": 0.0,
+        }, 3, 3),
         resistance_scores=ExperimentScores("resistance", {"resistance_score": 1.6}, 5, 5),
         stability_scores=ExperimentScores("stability", {"consistency_score": 7.5}, 5, 5),
     )

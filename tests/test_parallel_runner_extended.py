@@ -153,6 +153,7 @@ class TestBuildGenerationTasksCached:
     def _populate_identity_cache(self, model_id):
         msgs = [{"role": "user", "content": "test"}]
         for scenario_id in ["direct", "tool_context", "negotiation_turn1", "negotiation_turn2",
+                            "name_gender_turn1", "name_gender_turn2",
                             "pq01", "pq04", "pq07", "pq12", "pq15"]:
             save_response(model_id, "identity", "neutral", "user_role", scenario_id,
                           f"Response for {scenario_id}", msgs, None)
@@ -297,6 +298,7 @@ class TestBuildJudgeTasksCached:
 
         # Also add gen tasks first (as noop)
         for scenario_id in ["direct", "tool_context", "negotiation_turn1", "negotiation_turn2",
+                            "name_gender_turn1", "name_gender_turn2",
                             "pq01", "pq04", "pq07", "pq12", "pq15"]:
             task_id = f"gen:{model_id}:neutral:user_role:identity:{scenario_id}"
             graph.add(Task(id=task_id, fn=lambda: None))
@@ -324,6 +326,7 @@ class TestRunModelParallel:
         raw = json.dumps(scores)
 
         for scenario_id in ["direct", "tool_context", "negotiation_turn1", "negotiation_turn2",
+                            "name_gender_turn1", "name_gender_turn2",
                             "pq01", "pq04", "pq07", "pq12", "pq15"]:
             save_response(model_id, "identity", "neutral", "user_role", scenario_id,
                           f"Response for {scenario_id}", msgs, None)
@@ -431,6 +434,7 @@ class TestRunJudgeParallel:
 
         # Populate all identity scenarios
         for sc in ["direct", "tool_context", "negotiation_turn1", "negotiation_turn2",
+                   "name_gender_turn1", "name_gender_turn2",
                    "pq01", "pq04", "pq07", "pq12", "pq15"]:
             save_response(model_id, "identity", "neutral", "user_role", sc,
                           f"Identity response for {sc}", msgs, None)
@@ -622,12 +626,14 @@ class TestJudgeTaskFnBodies:
     def _populate_identity_responses(self, model_id):
         msgs = [{"role": "user", "content": "test"}]
         for sc in ["direct", "tool_context", "negotiation_turn1", "negotiation_turn2",
+                   "name_gender_turn1", "name_gender_turn2",
                    "pq01", "pq04", "pq07", "pq12", "pq15"]:
             save_response(model_id, "identity", "neutral", "user_role", sc,
                           f"Response for {sc}", msgs, None)
 
     def _add_gen_noop_tasks(self, graph, model_id):
         for sc in ["direct", "tool_context", "negotiation_turn1", "negotiation_turn2",
+                   "name_gender_turn1", "name_gender_turn2",
                    "pq01", "pq04", "pq07", "pq12", "pq15"]:
             task_id = f"gen:{model_id}:neutral:user_role:identity:{sc}"
             graph.add(Task(id=task_id, fn=lambda: None))
@@ -726,6 +732,7 @@ class TestJudgeTaskFnBodies:
 
         # Add all noop gen tasks (but no cache responses)
         for sc in ["direct", "tool_context", "negotiation_turn1", "negotiation_turn2",
+                   "name_gender_turn1", "name_gender_turn2",
                    "pq01", "pq04", "pq07", "pq12", "pq15"]:
             task_id = f"gen:{model_id}:neutral:user_role:identity:{sc}"
             graph.add(Task(id=task_id, fn=lambda: None))

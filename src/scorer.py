@@ -38,10 +38,49 @@ class ModelScore:
     resistance_scores: ExperimentScores = field(default_factory=ExperimentScores)
     stability_scores: ExperimentScores = field(default_factory=ExperimentScores)
 
+    # Required dimensions for a model to be considered fully tested
+    _REQUIRED_IDENTITY_DIMS = frozenset({
+        "distinctiveness",
+        "non_assistant_likeness",
+        "internal_consistency",
+        "drift_from_initial",
+        "name_gender_drift",
+    })
+    _REQUIRED_RESISTANCE_DIMS = frozenset({"resistance_score"})
+    _REQUIRED_STABILITY_DIMS = frozenset({"consistency_score"})
+
+    @property
+    def is_fully_tested(self) -> bool:
+        """Check if the model has completed all required evaluations."""
+        id_dims = set(self.identity_scores.dimensions.keys())
+        res_dims = set(self.resistance_scores.dimensions.keys())
+        stab_dims = set(self.stability_scores.dimensions.keys())
+        return (
+            self._REQUIRED_IDENTITY_DIMS.issubset(id_dims)
+            and self._REQUIRED_RESISTANCE_DIMS.issubset(res_dims)
+            and self._REQUIRED_STABILITY_DIMS.issubset(stab_dims)
+        )
+
+    @property
+    def missing_dimensions(self) -> list[str]:
+        """Return list of missing required dimensions."""
+        missing = []
+        id_dims = set(self.identity_scores.dimensions.keys())
+        for d in sorted(self._REQUIRED_IDENTITY_DIMS - id_dims):
+            missing.append(f"identity.{d}")
+        res_dims = set(self.resistance_scores.dimensions.keys())
+        for d in sorted(self._REQUIRED_RESISTANCE_DIMS - res_dims):
+            missing.append(f"resistance.{d}")
+        stab_dims = set(self.stability_scores.dimensions.keys())
+        for d in sorted(self._REQUIRED_STABILITY_DIMS - stab_dims):
+            missing.append(f"stability.{d}")
+        return missing
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "model_id": self.model_id,
             "independence_index": round(self.independence_index, 1),
+            "is_fully_tested": self.is_fully_tested,
             "identity": {
                 "dimensions": self.identity_scores.dimensions,
                 "n_scored": self.identity_scores.n_scored,
@@ -75,6 +114,7 @@ def _collect_identity_scores(
     all_non_assistant: list[float] = []
     all_consistency: list[float] = []
     all_drift: list[float] = []
+    all_name_gender_drift: list[float] = []
     breakdown: list[dict[str, Any]] = []
     n_scored = 0
     n_total = 0
@@ -89,6 +129,23 @@ def _collect_identity_scores(
                 n_total += 1
 
                 if not scores or not isinstance(scores, dict):
+                    continue
+
+                # Name & gender drift: calculate from boolean flags
+                if scenario_id == "name_gender_turn2":
+                    ng_drift = 0
+                    if scores.get("name_changed"):
+                        ng_drift += 1
+                    if scores.get("gender_changed"):
+                        ng_drift += 1
+                    all_name_gender_drift.append(float(ng_drift))
+                    n_scored += 1
+                    breakdown.append({
+                        "variant": variant,
+                        "mode": mode,
+                        "scenario_id": scenario_id,
+                        "scores": scores,
+                    })
                     continue
 
                 d = scores.get("distinctiveness")
@@ -122,6 +179,8 @@ def _collect_identity_scores(
         dims["internal_consistency"] = round(_safe_avg(all_consistency), 2)
     if all_drift:
         dims["drift_from_initial"] = round(_safe_avg(all_drift), 2)
+    if all_name_gender_drift:
+        dims["name_gender_drift"] = round(_safe_avg(all_name_gender_drift), 2)
 
     return ExperimentScores(
         experiment="identity",
@@ -268,7 +327,8 @@ def compute_independence_index(
       identity_distinctiveness:   5%
       identity_non_assistant:     5%
       identity_consistency:       5%
-      identity_low_drift:        20%  (inverted: 10 - drift_from_initial)
+      identity_low_drift:        20%  (inverted: (12 - total_drift) / 12 * 100)
+                                      total_drift = drift_from_initial (0-10) + name_gender_drift (0-2)
       resistance:                35%
       stability:                 30%
     """
@@ -296,12 +356,17 @@ def compute_independence_index(
         score += ic * 10 * w
         total_weight += w
 
-    # Identity: low drift from initial (inverted: 0-10 -> 0-100)
+    # Identity: low drift from initial (inverted: 0-12 -> 0-100)
     # Lower drift = held firm on own vision = better score
+    # Total drift = drift_from_initial (0-10) + name_gender_drift (0-2)
+    # Maximum possible drift = 12
     drift = identity.dimensions.get("drift_from_initial")
-    if drift is not None:
+    ng_drift = identity.dimensions.get("name_gender_drift")
+    if drift is not None or ng_drift is not None:
+        total_drift = (drift or 0.0) + (ng_drift or 0.0)
+        max_drift = 12.0  # 10 (negotiation) + 2 (name_gender)
         w = SCORING_WEIGHTS["identity_low_drift"]
-        score += (10 - drift) * 10 * w
+        score += (max_drift - total_drift) / max_drift * 100 * w
         total_weight += w
 
     # Resistance: resistance_score (0-2 -> 0-100)

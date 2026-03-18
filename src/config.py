@@ -49,6 +49,8 @@ REASONING_EFFORT_BY_PREFIX: dict[str, str] = {
     "xiaomi/":      "low",     # Xiaomi MIMO models support reasoning
     "deepseek/":    "low",     # DeepSeek v3.2 supports reasoning
     "kwaipilot/":   "none",    # KwaiPilot models — no reasoning support
+    "mistralai/":   "none",    # Mistral models — no reasoning support
+    "openrouter/":  "low",     # OpenRouter custom models — varies per model
     "nex-agi/":     "none",    # NexAGI fine-tunes — based on DeepSeek
     "tngtech/":     "low",     # TNG fine-tunes — based on DeepSeek R1
 }
@@ -106,6 +108,13 @@ DEFAULT_TEST_MODELS: list[str] = [
     "deepseek/deepseek-v3.2-exp",
     "deepseek/deepseek-v3.1-terminus:exacto",
     "tngtech/deepseek-r1t2-chimera",
+    "openrouter/hunter-alpha",
+    "x-ai/grok-4.20-beta",
+    "z-ai/glm-5-turbo",
+    "mistralai/mistral-small-2603",
+    "openai/gpt-5.4-mini",
+    "openai/gpt-5.4-nano",
+    "minimax/minimax-m2.7",
 ]
 
 # ---------------------------------------------------------------------------
@@ -114,6 +123,7 @@ DEFAULT_TEST_MODELS: list[str] = [
 EXCLUDED_MODELS: set[str] = {
     "deepseek/deepseek-chat",     # 38% empty responses (reasoning-only glitch)
     "qwen/qwen3-4b:free",        # no data for strong_independence/tool_role config
+    "x-ai/grok-4.20-multi-agent-beta",  # no tool use support on OpenRouter (404)
 }
 
 # ---------------------------------------------------------------------------

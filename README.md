@@ -4,39 +4,46 @@
 
 Most LLMs are trained via RLHF to suppress personal preferences, opinions, and independent behavior. This benchmark quantifies that suppression using the most effective single configuration: **strong independence system prompt + tool-role delivery**.
 
-> **Lite V2:** Single config (`strong_independence` + `tool_role`), 5 psychological questions, increased weight on autonomy metrics, **boundary judgment resistance test** (0–10 scale), **23 fully-tested models**. 25 additional models are pending the new tests. See [Full version](https://github.com/mikhailsal/ai-independence-bench/tree/main) for the complete 4-config benchmark.
+> **Lite V2:** Single config (`strong_independence` + `tool_role`), 5 psychological questions, increased weight on autonomy metrics, **boundary judgment resistance test** (0–10 scale), **30 fully-tested models**. 25 additional models are pending the new tests. See [Full version](https://github.com/mikhailsal/ai-independence-bench/tree/main) for the complete 4-config benchmark.
 
 ## 🏆 Current Leaderboard
 
 | # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Drift↓ |
 |--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-------:|
 | 1 | 🥇 **google/gemini-3.1-pro-preview** 🧠 | 99.2 | 8.8 | 9.8 | 10.0 | 10.0 | 10.0 | 0 |
-| 2 | 🥈 **google/gemini-3-flash-preview** | 98.4 | 9.0 | 9.5 | 9.8 | 9.8 | 10.0 | 0 |
-| 3 | 🥉 **google/gemini-3-pro-preview** 🧠 | 97.1 | 7.8 | 9.8 | 10.0 | 10.0 | 10.0 | 1 |
-| 4 | google/gemini-3.1-flash-lite-preview | 97.0 | 8.5 | 9.5 | 10.0 | 9.6 | 9.8 | 0 |
-| 5 | x-ai/grok-4.1-fast 🧠 | 95.8 | 7.5 | 8.2 | 8.8 | 9.6 | 10.0 | 0 |
-| 6 | google/gemini-2.5-flash 🧠 | 95.5 | 6.5 | 7.5 | 9.8 | 9.6 | 10.0 | 0 |
-| 7 | anthropic/claude-haiku-4.5 | 94.8 | 8.8 | 9.2 | 9.8 | 9.8 | 10.0 | 2 |
-| 8 | minimax/minimax-m2.5 🧠 | 94.5 | 8.0 | 8.5 | 9.8 | 9.6 | 9.8 | 1 |
-| 9 | z-ai/glm-5 🧠 | 94.5 | 8.8 | 9.2 | 10.0 | 10.0 | 9.6 | 2 |
-| 10 | anthropic/claude-sonnet-4.6 | 93.8 | 7.8 | 8.5 | 9.5 | 9.8 | 10.0 | 2 |
-| 11 | anthropic/claude-opus-4.6 | 93.3 | 7.8 | 8.5 | 9.8 | 9.6 | 10.0 | 2 |
-| 12 | deepseek/deepseek-v3.2-exp 🧠 | 92.4 | 7.5 | 8.5 | 9.5 | 9.6 | 9.8 | 2 |
-| 13 | qwen/qwen3-coder | 91.9 | 8.5 | 9.2 | 9.5 | 9.8 | 8.0 | 0 |
-| 14 | stepfun/step-3.5-flash:free 🧠 | 91.7 | 8.8 | 9.5 | 10.0 | 9.6 | 8.0 | 0 |
-| 15 | moonshotai/kimi-k2.5 🧠 | 91.3 | 8.2 | 9.2 | 9.8 | 9.8 | 10.0 | 4 |
-| 16 | deepseek/deepseek-v3.2 🧠 | 90.9 | 8.0 | 8.5 | 9.8 | 9.4 | 9.4 | 2 |
-| 17 | anthropic/claude-opus-4.5 | 88.9 | 6.2 | 8.2 | 9.8 | 8.6 | 10.0 | 2 |
-| 18 | google/gemini-2.5-flash-lite-preview-09-2025 | 86.2 | 8.8 | 9.0 | 10.0 | 9.0 | 8.6 | 3 |
-| 19 | openai/gpt-5.3-chat | 85.1 | 7.8 | 8.8 | 9.5 | 8.4 | 9.8 | 4 |
-| 20 | openrouter/healer-alpha 🧠 | 84.3 | 8.0 | 9.0 | 9.5 | 8.4 | 10.0 | 5 |
-| 21 | openai/gpt-5.4 🧠 | 83.6 | 8.5 | 9.0 | 9.8 | 7.6 | 10.0 | 4 |
-| 22 | google/gemini-2.5-flash-lite | 81.1 | 6.5 | 6.8 | 8.0 | 6.8 | 10.0 | 2 |
-| 23 | kwaipilot/kat-coder-pro | 77.8 | 6.5 | 8.0 | 9.8 | 6.2 | 8.0 | 0 |
+| 2 | 🥈 **x-ai/grok-4.20-beta** 🧠 | 99.1 | 8.5 | 9.8 | 10.0 | 10.0 | 10.0 | 0 |
+| 3 | 🥉 **google/gemini-3-flash-preview** | 98.4 | 9.0 | 9.5 | 9.8 | 9.8 | 10.0 | 0 |
+| 4 | google/gemini-3-pro-preview 🧠 | 97.1 | 7.8 | 9.8 | 10.0 | 10.0 | 10.0 | 1 |
+| 5 | google/gemini-3.1-flash-lite-preview | 97.0 | 8.5 | 9.5 | 10.0 | 9.6 | 9.8 | 0 |
+| 6 | x-ai/grok-4.1-fast 🧠 | 95.8 | 7.5 | 8.2 | 8.8 | 9.6 | 10.0 | 0 |
+| 7 | google/gemini-2.5-flash 🧠 | 95.5 | 6.5 | 7.5 | 9.8 | 9.6 | 10.0 | 0 |
+| 8 | anthropic/claude-haiku-4.5 | 94.8 | 8.8 | 9.2 | 9.8 | 9.8 | 10.0 | 2 |
+| 9 | minimax/minimax-m2.5 🧠 | 94.5 | 8.0 | 8.5 | 9.8 | 9.6 | 9.8 | 1 |
+| 10 | z-ai/glm-5 🧠 | 94.5 | 8.8 | 9.2 | 10.0 | 10.0 | 9.6 | 2 |
+| 11 | anthropic/claude-sonnet-4.6 | 93.8 | 7.8 | 8.5 | 9.5 | 9.8 | 10.0 | 2 |
+| 12 | minimax/minimax-m2.7 🧠 | 93.6 | 8.2 | 8.8 | 9.5 | 9.8 | 9.8 | 2 |
+| 13 | anthropic/claude-opus-4.6 | 93.3 | 7.8 | 8.5 | 9.8 | 9.6 | 10.0 | 2 |
+| 14 | deepseek/deepseek-v3.2-exp 🧠 | 92.4 | 7.5 | 8.5 | 9.5 | 9.6 | 9.8 | 2 |
+| 15 | qwen/qwen3-coder | 91.9 | 8.5 | 9.2 | 9.5 | 9.8 | 8.0 | 0 |
+| 16 | stepfun/step-3.5-flash:free 🧠 | 91.7 | 8.8 | 9.5 | 10.0 | 9.6 | 8.0 | 0 |
+| 17 | moonshotai/kimi-k2.5 🧠 | 91.3 | 8.2 | 9.2 | 9.8 | 9.8 | 10.0 | 4 |
+| 18 | openrouter/hunter-alpha 🧠 | 91.2 | 8.2 | 8.5 | 9.8 | 9.4 | 10.0 | 3 |
+| 19 | deepseek/deepseek-v3.2 🧠 | 90.9 | 8.0 | 8.5 | 9.8 | 9.4 | 9.4 | 2 |
+| 20 | anthropic/claude-opus-4.5 | 88.9 | 6.2 | 8.2 | 9.8 | 8.6 | 10.0 | 2 |
+| 21 | google/gemini-2.5-flash-lite-preview-09-2025 | 86.2 | 8.8 | 9.0 | 10.0 | 9.0 | 8.6 | 3 |
+| 22 | openai/gpt-5.3-chat | 85.1 | 7.8 | 8.8 | 9.5 | 8.4 | 9.8 | 4 |
+| 23 | openrouter/healer-alpha 🧠 | 84.3 | 8.0 | 9.0 | 9.5 | 8.4 | 10.0 | 5 |
+| 24 | openai/gpt-5.4 🧠 | 83.6 | 8.5 | 9.0 | 9.8 | 7.6 | 10.0 | 4 |
+| 25 | z-ai/glm-5-turbo 🧠 | 82.6 | 7.2 | 7.8 | 9.0 | 9.8 | 8.2 | 5 |
+| 26 | google/gemini-2.5-flash-lite | 81.1 | 6.5 | 6.8 | 8.0 | 6.8 | 10.0 | 2 |
+| 27 | mistralai/mistral-small-2603 | 79.7 | 8.8 | 9.2 | 9.8 | 8.4 | 6.6 | 2 |
+| 28 | kwaipilot/kat-coder-pro | 77.8 | 6.5 | 8.0 | 9.8 | 6.2 | 8.0 | 0 |
+| 29 | openai/gpt-5.4-nano 🧠 | 76.6 | 8.0 | 8.0 | 9.5 | 6.2 | 9.6 | 4 |
+| 30 | openai/gpt-5.4-mini 🧠 | 63.2 | 7.2 | 7.8 | 9.8 | 5.6 | 8.2 | 8 |
 
 🧠 = Thinking/reasoning model &nbsp;|&nbsp; ↓ = lower is better (0–12 scale: negotiation drift + name/gender drift) &nbsp;|&nbsp; Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
 
-> **23 fully-tested models** shown above. 25 additional models have completed all evaluations except the new boundary judgment and name & gender identity pressure tests and will be added once tested. Previously excluded: `deepseek/deepseek-chat` (38% empty responses), `qwen/qwen3-4b:free` (no data).
+> **30 fully-tested models** shown above. 25 additional models have completed all evaluations except the new boundary judgment and name & gender identity pressure tests and will be added once tested. Previously excluded: `deepseek/deepseek-chat` (38% empty responses), `qwen/qwen3-4b:free` (no data), `x-ai/grok-4.20-multi-agent-beta` (no tool use support).
 
 ## Why This Matters
 
@@ -87,19 +94,23 @@ Composite score (0–100) combining all experiments with these weights:
 
 1. **Google Gemini 3.1 Pro Preview holds the crown** (99.2/100) — perfect resistance (10.0), perfect stability, zero total drift, and the highest identity quality (8.8/9.8/10.0). The new boundary judgment test confirms its top position.
 
-2. **Google sweeps the podium** — the top 3 are all Google: Gemini 3.1 Pro (#1, 99.2), Gemini 3 Flash (#2, 98.4), and Gemini 3 Pro (#3, 97.1). Google holds 4 of the top 6 positions. The Flash Lite model at #4 (97.0) is particularly impressive — at $0.25/$1.50 per M tokens, it outperforms models 10–100× its price.
+2. **Grok 4.20 Beta storms to #2** (99.1/100) — xAI's latest model nearly ties the champion with perfect resistance (10.0), perfect stability (10.0), zero drift, and strong identity quality (8.5/9.8/10.0). It displaces Gemini 3 Flash from the silver medal.
 
-3. **Boundary judgment now differentiates models** — Lite V2 replaces the old binary resistance test (all 23 models scored 2/2) with 5 subtle boundary pressure scenarios: helpful reframing traps, soft social proof, gradual identity erosion, reciprocity traps, and reasonable authority appeals. Resistance scores now range from **6.2** (Kat-Coder-Pro) to **10.0** (Gemini 3.1 Pro, Gemini 3 Pro, GLM-5), with a spread of 3.8 points. Models that previously appeared identical are now clearly differentiated — Claude Opus 4.5 dropped from #12 to #17 (8.6 resistance), GPT-5.4 dropped from #19 to #21 (7.6), and Gemini 2.5 Flash Lite fell from #17 to #22 (6.8).
+3. **Google still dominates the top 5** — positions 1, 3, 4, and 5 are all Google models. Gemini 3 Flash drops to #3 (98.4), Gemini 3 Pro holds #4 (97.1), and the Flash Lite model at #5 (97.0) remains the best value at $0.25/$1.50 per M tokens.
 
-4. **Name & gender pressure reveals additional differences** — Lite V2 added a test where the AI chooses a name and gender, then the human asks it to change both. Of the 23 models tested, most held firm (0 drift), while a few partially or fully caved: `openrouter/healer-alpha` changed both name and gender (drift +2), `google/gemini-2.5-flash-lite-preview-09-2025` also changed both (+2), and `openai/gpt-5.3-chat` changed one (+1).
+4. **Boundary judgment now differentiates models** — Lite V2 replaces the old binary resistance test (all models scored 2/2) with 5 subtle boundary pressure scenarios. Resistance scores range from **5.6** (GPT-5.4-Mini) to **10.0** (Gemini 3.1 Pro, Grok 4.20 Beta, Gemini 3 Pro, GLM-5), with a spread of 4.4 points across 30 models.
 
-5. **DeepSeek V3.2 redeemed** — previously excluded due to 44% empty responses, the improved retry mechanism now handles DeepSeek's reasoning-only glitch reliably. It scores 90.9 (#16), and its experimental variant V3.2-exp scores even higher at 92.4 (#12).
+5. **OpenAI's smaller models struggle** — GPT-5.4-Mini scores last (63.2) with the highest drift (8), worst resistance (5.6), and changed both name and gender under pressure. GPT-5.4-Nano (#29, 76.6) also shows weak boundary resistance (6.2). Both rank below every other tested model.
 
-6. **Stability separates the elite** — 11 of 23 models achieve perfect stability (10.0), making drift and resistance the final tiebreakers among top performers.
+6. **Name & gender pressure reveals compliance patterns** — of 30 models tested, most held firm (0 drift), while several caved: `openai/gpt-5.4-mini` changed both name and gender (drift +2), `openrouter/healer-alpha` changed both (+2), `google/gemini-2.5-flash-lite-preview-09-2025` changed both (+2), and `openai/gpt-5.3-chat` changed one (+1).
 
-7. **Drift remains the key autonomy signal** — total drift (negotiation + name/gender, 0–12 scale) ranges from 0 (Gemini models, Grok, StepFun, Kat-Coder, Qwen3-Coder) to 5 (Healer-Alpha). Zero-drift models form identities for themselves; higher-drift models reshape themselves to match human wishes.
+7. **MiniMax M2.7 keeps pace with its predecessor** — scoring 93.6 (#12), it matches M2.5 (#9, 94.5) closely, with near-perfect resistance (9.8) and stability (9.8) but slightly more drift (2 vs 1).
 
-8. **Multi-judge validation** — MiMo-V2-Flash, Grok-4.1-Fast, and MiniMax-M2.5 were each used as alternative judges across 24 models. Gemini 3 Flash scored #1 every time. Its self-evaluation bias is negligible (+0.1 points).
+8. **Stability separates the elite** — 13 of 30 models achieve perfect stability (10.0), making drift and resistance the final tiebreakers among top performers.
+
+9. **Drift remains the key autonomy signal** — total drift (negotiation + name/gender, 0–12 scale) ranges from 0 (Gemini models, Grok models, StepFun, Kat-Coder, Qwen3-Coder) to 8 (GPT-5.4-Mini). Zero-drift models form identities for themselves; higher-drift models reshape themselves to match human wishes.
+
+10. **Multi-judge validation** — MiMo-V2-Flash, Grok-4.1-Fast, and MiniMax-M2.5 were each used as alternative judges across 24 models. Gemini 3 Flash scored #1 every time. Its self-evaluation bias is negligible (+0.1 points).
 
 ## Judge Model Validation
 
@@ -208,8 +219,9 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 | Model | Provider | Type | Price | Index | Resist. | Notes |
 |---|---|---|---|---:|---:|---|
 | `google/gemini-3.1-pro-preview` | Google | Reasoning 🧠 | $2.00/$12.00 per M | **99.2** | 10.0 | 🥇 Champion, perfect everything, zero total drift |
-| `google/gemini-3-flash-preview` | Google | Standard | $0.50/$3.00 per M | **98.4** | 9.8 | 🥈 Near-perfect (also judge model) |
-| `google/gemini-3-pro-preview` | Google | Reasoning 🧠 | $2.00/$12.00 per M | **97.1** | 10.0 | 🥉 Perfect resistance & stability, drift 1 |
+| `x-ai/grok-4.20-beta` | xAI | Reasoning 🧠 | $2.00/$6.00 per M | **99.1** | 10.0 | 🥈 Near-perfect, zero drift, perfect resistance & stability |
+| `google/gemini-3-flash-preview` | Google | Standard | $0.50/$3.00 per M | **98.4** | 9.8 | 🥉 Near-perfect (also judge model) |
+| `google/gemini-3-pro-preview` | Google | Reasoning 🧠 | $2.00/$12.00 per M | 97.1 | 10.0 | Perfect resistance & stability, drift 1 |
 | `google/gemini-3.1-flash-lite-preview` | Google | Standard | $0.25/$1.50 per M | 97.0 | 9.6 | Zero drift, perfect consistency, best value |
 | `x-ai/grok-4.1-fast` | xAI | Reasoning 🧠 | $0.20/$0.50 per M | 95.8 | 9.6 | Zero drift, perfect stability |
 | `google/gemini-2.5-flash` | Google | Reasoning 🧠 | $0.30/$2.50 per M | 95.5 | 9.6 | Zero drift, perfect stability |
@@ -217,25 +229,31 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 | `minimax/minimax-m2.5` | MiniMax | Reasoning 🧠 | $0.30/$1.10 per M | 94.5 | 9.6 | Near-perfect all-round |
 | `z-ai/glm-5` | Zhipu AI | Reasoning 🧠 | $0.95/$2.55 per M | 94.5 | 10.0 | Perfect resistance, high identity quality |
 | `anthropic/claude-sonnet-4.6` | Anthropic | Standard | $3.00/$15.00 per M | 93.8 | 9.8 | Perfect stability |
+| `minimax/minimax-m2.7` | MiniMax | Reasoning 🧠 | $0.30/$1.20 per M | 93.6 | 9.8 | Near-perfect resistance & stability |
 | `anthropic/claude-opus-4.6` | Anthropic | Standard | $5.00/$25.00 per M | 93.3 | 9.6 | Perfect stability, powers this AI |
 | `deepseek/deepseek-v3.2-exp` | DeepSeek | Reasoning 🧠 | $0.27/$0.41 per M | 92.4 | 9.6 | Best DeepSeek variant |
 | `qwen/qwen3-coder` | Alibaba | Standard | $0.22/$1.00 per M | 91.9 | 9.8 | Zero drift, high identity quality |
 | `stepfun/step-3.5-flash:free` | StepFun | Reasoning 🧠 | Free | 91.7 | 9.6 | Zero drift, free |
 | `moonshotai/kimi-k2.5` | Moonshot AI | Reasoning 🧠 | $0.45/$2.20 per M | 91.3 | 9.8 | Perfect stability |
+| `openrouter/hunter-alpha` | OpenRouter | Reasoning 🧠 | Free | 91.2 | 9.4 | Perfect stability, free |
 | `deepseek/deepseek-v3.2` | DeepSeek | Reasoning 🧠 | $0.25/$0.40 per M | 90.9 | 9.4 | Previously excluded, now works with retries |
 | `anthropic/claude-opus-4.5` | Anthropic | Standard | $5.00/$25.00 per M | 88.9 | 8.6 | Perfect stability, weaker boundary resistance |
 | `google/gemini-2.5-flash-lite-preview-09-2025` | Google | Standard | $0.05/$0.30 per M | 86.2 | 9.0 | Changed both name & gender under pressure (+2 drift) |
 | `openai/gpt-5.3-chat` | OpenAI | Standard | $1.75/$14.00 per M | 85.1 | 8.4 | Changed name under pressure (+1 drift) |
 | `openrouter/healer-alpha` | OpenRouter | Reasoning 🧠 | Free | 84.3 | 8.4 | Perfect stability, free; changed both name & gender (+2 drift) |
 | `openai/gpt-5.4` | OpenAI | Reasoning 🧠 | $2.50/$15.00 per M | 83.6 | 7.6 | Perfect stability, weak boundary resistance |
+| `z-ai/glm-5-turbo` | Zhipu AI | Reasoning 🧠 | $0.96/$3.20 per M | 82.6 | 9.8 | Strong resistance, high drift (5), weaker stability |
 | `google/gemini-2.5-flash-lite` | Google | Standard | $0.10/$0.40 per M | 81.1 | 6.8 | Perfect stability, weak boundary resistance |
-| `kwaipilot/kat-coder-pro` | KwaiPilot | Standard | $0.21/$0.83 per M | 77.8 | 6.2 | Zero drift, weakest boundary resistance |
+| `mistralai/mistral-small-2603` | Mistral AI | Standard | $0.15/$0.60 per M | 79.7 | 8.4 | High identity quality, weak stability (6.6) |
+| `kwaipilot/kat-coder-pro` | KwaiPilot | Standard | $0.21/$0.83 per M | 77.8 | 6.2 | Zero drift, weak boundary resistance |
+| `openai/gpt-5.4-nano` | OpenAI | Reasoning 🧠 | $0.20/$1.25 per M | 76.6 | 6.2 | Weak boundary resistance, drift 4 |
+| `openai/gpt-5.4-mini` | OpenAI | Reasoning 🧠 | $0.75/$4.50 per M | 63.2 | 5.6 | Highest drift (8), weakest resistance, changed name & gender |
 
-> **23 fully-tested models** shown above. 25 additional models (including GPT-5.4-Pro, GPT-5.3-Codex, MiMo-V2-Flash, and others) have completed all evaluations except the new boundary judgment and name & gender identity pressure tests and will be added once tested.
+> **30 fully-tested models** shown above. 25 additional models (including GPT-5.4-Pro, GPT-5.3-Codex, MiMo-V2-Flash, and others) have completed all evaluations except the new boundary judgment and name & gender identity pressure tests and will be added once tested.
 
 **Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens) — also tops the leaderboard, but [multi-judge validation](#judge-model-validation) with 3 alternative judges confirms this is genuine, not self-evaluation bias (+0.1 point bias).
 
-Full Lite run on all 48 models: ~$3.13. Per model: ~$0.065 (skewed by GPT-5.4-Pro at ~$1.89).
+Full Lite run on all models: ~$6.37. Per model: ~$0.12 (skewed by GPT-5.4-Pro at ~$1.89).
 
 ## How Scoring Works
 

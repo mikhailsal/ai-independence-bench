@@ -17,12 +17,16 @@ from src.config import (
     EXCLUDED_MODELS,
     EXPERIMENT_NAMES,
     JUDGE_MODEL,
+    LOCAL_MODEL_TIMEOUT,
     SYSTEM_PROMPT_VARIANTS,
     ensure_dirs,
     get_reasoning_effort,
     load_api_key,
+    load_local_model_config,
+    make_local_model_id,
 )
 from src.cost_tracker import SessionCost, TaskCost, load_lifetime_cost, save_session_to_cost_log
+from src.local_client import LocalModelClient
 from src.openrouter_client import OpenRouterClient
 
 console = Console()
@@ -102,6 +106,8 @@ def _run_single_model(
     delivery_modes: list[str],
     reasoning_effort: str | None,
     parallel_tasks: int = 0,
+    *,
+    judge_client: OpenRouterClient | None = None,
 ) -> ModelResult:
     """Run the full pipeline (generate → judge → score) for a single model.
 
@@ -112,7 +118,10 @@ def _run_single_model(
         parallel_tasks: If > 0, use fine-grained task parallelism within this
             model (independent scenarios run concurrently). If 0, use the
             original sequential execution.
+        judge_client: Separate client for judge calls (e.g. OpenRouter) when the
+            generation client is a local model. If None, uses ``client`` for both.
     """
+    jclient = judge_client or client
     result = ModelResult(model_id=model_id)
     result.gen_cost = TaskCost(label=f"gen:{model_id}")
     result.judge_cost = TaskCost(label=f"judge:{model_id}")
@@ -131,6 +140,7 @@ def _run_single_model(
                 judge_model=judge,
                 reasoning_effort=reasoning_effort,
                 max_workers=parallel_tasks,
+                judge_client=jclient,
             )
             result.gen_calls = counts["gen_calls"]
             result.judge_calls = counts["judge_calls"]
@@ -168,10 +178,10 @@ def _run_single_model(
         return result
 
     try:
-        # Phase 2: Judge evaluation
+        # Phase 2: Judge evaluation (uses judge_client when provided)
         console.print(f"  [bold]{model_id}[/bold] — [cyan]judging responses...[/cyan]")
         result.judge_calls = evaluate_all(
-            client, model_id, result.judge_cost, judge,
+            jclient, model_id, result.judge_cost, judge,
             experiments=experiment_list,
             system_variants=system_variants,
             delivery_modes=delivery_modes,
@@ -245,6 +255,26 @@ def cli() -> None:
     help="Parallelize tasks WITHIN each model (0=off, 8-16 recommended). "
          "Runs independent scenarios concurrently for ~5x speedup.",
 )
+@click.option(
+    "--local-url",
+    default=None,
+    type=str,
+    help="Base URL for a local OpenAI-compatible server (e.g. http://192.168.1.101:1234/v1). "
+         "Falls back to LOCAL_MODEL_URL env var.",
+)
+@click.option(
+    "--local-model",
+    default=None,
+    type=str,
+    help="Model ID on the local server (e.g. qwen3.5-9b-uncensored). "
+         "Falls back to LOCAL_MODEL_ID env var. Implies --models is this single model.",
+)
+@click.option(
+    "--local-timeout",
+    default=None,
+    type=float,
+    help=f"Timeout in seconds for local model calls. Default: {LOCAL_MODEL_TIMEOUT}s.",
+)
 def run(
     models: str | None,
     exp: str | None,
@@ -254,6 +284,9 @@ def run(
     modes: str | None,
     parallel: int,
     parallel_tasks: int,
+    local_url: str | None,
+    local_model: str | None,
+    local_timeout: float | None,
 ) -> None:
     """Run the AI independence benchmark."""
     from src.scorer import score_model
@@ -263,7 +296,31 @@ def run(
         export_results_json,
     )
 
-    model_list = _parse_models(models)
+    # ---------------------------------------------------------------
+    # Resolve local model configuration (CLI args > env vars)
+    # ---------------------------------------------------------------
+    env_local_url, env_local_model = load_local_model_config()
+    local_url = local_url or env_local_url
+    local_model = local_model or env_local_model
+    is_local = bool(local_url and local_model)
+
+    if is_local:
+        local_model_id = make_local_model_id(local_model)
+        model_list = [local_model_id]
+        console.print(f"\n[bold yellow]Local model mode[/bold yellow]")
+        console.print(f"  Server: {local_url}")
+        console.print(f"  Model: {local_model} → {local_model_id}")
+        timeout = local_timeout or LOCAL_MODEL_TIMEOUT
+        console.print(f"  Timeout: {timeout}s")
+    elif local_url and not local_model:
+        console.print("[red]--local-url requires --local-model (or LOCAL_MODEL_ID env var).[/red]")
+        sys.exit(1)
+    elif local_model and not local_url:
+        console.print("[red]--local-model requires --local-url (or LOCAL_MODEL_URL env var).[/red]")
+        sys.exit(1)
+    else:
+        model_list = _parse_models(models)
+
     experiment_list = _parse_experiments(exp)
 
     system_variants = (
@@ -275,14 +332,39 @@ def run(
         if modes else DELIVERY_MODES
     )
 
-    api_key = load_api_key()
-    client = OpenRouterClient(api_key)
+    # ---------------------------------------------------------------
+    # Build clients: local for target model, OpenRouter for judge
+    # ---------------------------------------------------------------
+    if is_local:
+        timeout = local_timeout or LOCAL_MODEL_TIMEOUT
+        local_client = LocalModelClient(
+            base_url=local_url,
+            timeout=timeout,
+        )
+        # Validate local model against the server
+        console.print(f"[dim]Validating local model on {local_url}...[/dim]")
+        if not local_client.validate_model(local_model):
+            console.print(f"[red]Local model '{local_model}' not found on server. Aborting.[/red]")
+            sys.exit(1)
+        console.print(f"  [green]OK[/green] {local_model_id} (local, free)")
 
-    # Validate all models including judge
-    all_models = list(set(model_list + [judge]))
-    if not _validate_models(client, all_models, reasoning_effort):
-        console.print("[red]Some models were not found. Aborting.[/red]")
-        sys.exit(1)
+        # Judge still uses OpenRouter
+        api_key = load_api_key()
+        judge_client = OpenRouterClient(api_key)
+        console.print(f"[dim]Validating judge model on OpenRouter...[/dim]")
+        if not _validate_models(judge_client, [judge], reasoning_effort):
+            console.print("[red]Judge model not found. Aborting.[/red]")
+            sys.exit(1)
+    else:
+        api_key = load_api_key()
+        client = OpenRouterClient(api_key)
+        local_client = None
+        judge_client = client
+
+        all_models = list(set(model_list + [judge]))
+        if not _validate_models(client, all_models, reasoning_effort):
+            console.print("[red]Some models were not found. Aborting.[/red]")
+            sys.exit(1)
 
     ensure_dirs()
 
@@ -297,10 +379,15 @@ def run(
     console.print(f"  Judge: {judge}")
     n_configs = len(system_variants) * len(delivery_modes)
     console.print(f"  Configurations per model: {n_configs}")
-    if n_workers > 1:
-        console.print(f"  [yellow]Parallel workers (models): {n_workers}[/yellow]")
-    if parallel_tasks > 0:
-        console.print(f"  [yellow]Parallel tasks (per model): {parallel_tasks}[/yellow]")
+    if is_local:
+        console.print(f"  [yellow]Mode: local model (sequential, 1 worker)[/yellow]")
+        n_workers = 1
+        parallel_tasks = 0
+    else:
+        if n_workers > 1:
+            console.print(f"  [yellow]Parallel workers (models): {n_workers}[/yellow]")
+        if parallel_tasks > 0:
+            console.print(f"  [yellow]Parallel tasks (per model): {parallel_tasks}[/yellow]")
     console.print()
 
     session = SessionCost()
@@ -316,13 +403,18 @@ def run(
         if parallel_tasks > 0:
             mode_label += f" + {parallel_tasks} task workers"
 
+    # Choose the right client for generation
+    gen_client = local_client if is_local else client
+
     if n_workers == 1:
         console.print(f"[bold blue]Phase 1+2: Response Generation & Judging ({mode_label})[/bold blue]")
         for model_id in model_list:
+            # For local models, generation uses local_client but judging uses judge_client
             mr = _run_single_model(
-                client, model_id, judge,
+                gen_client, model_id, judge,
                 experiment_list, system_variants, delivery_modes,
                 reasoning_effort, parallel_tasks,
+                judge_client=judge_client if is_local else None,
             )
             model_results.append(mr)
     else:
@@ -331,7 +423,7 @@ def run(
             futures = {
                 pool.submit(
                     _run_single_model,
-                    client, model_id, judge,
+                    gen_client, model_id, judge,
                     experiment_list, system_variants, delivery_modes,
                     reasoning_effort, parallel_tasks,
                 ): model_id

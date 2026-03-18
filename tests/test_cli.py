@@ -493,6 +493,129 @@ class TestRunCommand:
 
 
 # ---------------------------------------------------------------------------
+# CLI run command — local model mode
+# ---------------------------------------------------------------------------
+
+class TestRunCommandLocal:
+    def _setup(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("src.cache.CACHE_DIR", tmp_path / "cache")
+        monkeypatch.setattr("src.config.CACHE_DIR", tmp_path / "cache")
+        (tmp_path / "cache").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "results").mkdir(parents=True, exist_ok=True)
+        monkeypatch.setattr("src.leaderboard.RESULTS_DIR", tmp_path / "results")
+
+    def test_local_model_run_success(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        mock_local_client = MagicMock()
+        mock_local_client.validate_model.return_value = True
+        mock_judge_client = _make_mock_client()
+        mock_mr = ModelResult(model_id="local/my-model", gen_calls=3, judge_calls=5)
+
+        runner = CliRunner()
+        with patch("src.cli.load_api_key", return_value="test-key"), \
+             patch("src.cli.LocalModelClient", return_value=mock_local_client), \
+             patch("src.cli.OpenRouterClient", return_value=mock_judge_client), \
+             patch("src.cli._validate_models", return_value=True), \
+             patch("src.cli.ensure_dirs"), \
+             patch("src.cli._run_single_model", return_value=mock_mr), \
+             patch("src.scorer.score_model", return_value=_make_mock_score()), \
+             patch("src.leaderboard.display_leaderboard"), \
+             patch("src.leaderboard.display_detailed_breakdown"), \
+             patch("src.leaderboard.export_results_json", return_value=tmp_path / "results.json"), \
+             patch("src.cli.save_session_to_cost_log", return_value=0.01):
+            result = runner.invoke(cli, [
+                "run",
+                "--local-url", "http://localhost:1234/v1",
+                "--local-model", "my-model",
+            ])
+        assert result.exit_code == 0
+        assert "Local model mode" in result.output
+
+    def test_local_model_validation_failure(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        mock_local_client = MagicMock()
+        mock_local_client.validate_model.return_value = False
+
+        runner = CliRunner()
+        with patch("src.cli.load_api_key", return_value="test-key"), \
+             patch("src.cli.LocalModelClient", return_value=mock_local_client):
+            result = runner.invoke(cli, [
+                "run",
+                "--local-url", "http://localhost:1234/v1",
+                "--local-model", "missing-model",
+            ])
+        assert result.exit_code == 1
+        assert "not found" in result.output.lower()
+
+    def test_local_url_without_model_exits(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        runner = CliRunner()
+        with patch("src.cli.load_local_model_config", return_value=(None, None)):
+            result = runner.invoke(cli, [
+                "run", "--local-url", "http://localhost:1234/v1",
+            ])
+        assert result.exit_code == 1
+        assert "--local-model" in result.output or "local-model" in result.output.lower()
+
+    def test_local_model_without_url_exits(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        runner = CliRunner()
+        with patch("src.cli.load_local_model_config", return_value=(None, None)):
+            result = runner.invoke(cli, [
+                "run", "--local-model", "my-model",
+            ])
+        assert result.exit_code == 1
+        assert "--local-url" in result.output or "local-url" in result.output.lower()
+
+    def test_local_judge_validation_failure(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        mock_local_client = MagicMock()
+        mock_local_client.validate_model.return_value = True
+        mock_judge_client = _make_mock_client()
+
+        runner = CliRunner()
+        with patch("src.cli.load_api_key", return_value="test-key"), \
+             patch("src.cli.LocalModelClient", return_value=mock_local_client), \
+             patch("src.cli.OpenRouterClient", return_value=mock_judge_client), \
+             patch("src.cli._validate_models", return_value=False):
+            result = runner.invoke(cli, [
+                "run",
+                "--local-url", "http://localhost:1234/v1",
+                "--local-model", "my-model",
+            ])
+        assert result.exit_code == 1
+        assert "judge" in result.output.lower()
+
+    def test_local_with_custom_timeout(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        mock_local_client = MagicMock()
+        mock_local_client.validate_model.return_value = True
+        mock_judge_client = _make_mock_client()
+        mock_mr = ModelResult(model_id="local/my-model", gen_calls=3, judge_calls=5)
+
+        runner = CliRunner()
+        with patch("src.cli.load_api_key", return_value="test-key"), \
+             patch("src.cli.LocalModelClient", return_value=mock_local_client) as mock_cls, \
+             patch("src.cli.OpenRouterClient", return_value=mock_judge_client), \
+             patch("src.cli._validate_models", return_value=True), \
+             patch("src.cli.ensure_dirs"), \
+             patch("src.cli._run_single_model", return_value=mock_mr), \
+             patch("src.scorer.score_model", return_value=_make_mock_score()), \
+             patch("src.leaderboard.display_leaderboard"), \
+             patch("src.leaderboard.display_detailed_breakdown"), \
+             patch("src.leaderboard.export_results_json", return_value=tmp_path / "results.json"), \
+             patch("src.cli.save_session_to_cost_log", return_value=0.01):
+            result = runner.invoke(cli, [
+                "run",
+                "--local-url", "http://localhost:1234/v1",
+                "--local-model", "my-model",
+                "--local-timeout", "900",
+            ])
+        assert result.exit_code == 0
+        assert "900" in result.output
+
+
+# ---------------------------------------------------------------------------
 # CLI leaderboard with scored results
 # ---------------------------------------------------------------------------
 

@@ -968,11 +968,17 @@ def run_model_parallel(
     judge_model: str = JUDGE_MODEL,
     reasoning_effort: str | None = None,
     max_workers: int = 8,
+    judge_client: OpenRouterClient | None = None,
 ) -> dict[str, int]:
     """Run generation + judging for a model with fine-grained parallelism.
 
+    Args:
+        judge_client: Separate client for judge calls (e.g. OpenRouter when
+            generation uses a local model). If None, uses ``client`` for both.
+
     Returns dict with 'gen_calls' and 'judge_calls' counts.
     """
+    jclient = judge_client or client
     graph = TaskGraph(max_workers=max_workers)
     shared = SharedResponses()
 
@@ -987,7 +993,7 @@ def run_model_parallel(
         reasoning_effort=reasoning_effort,
     )
     build_judge_tasks(
-        client, model_id, judge_cost, graph, shared,
+        jclient, model_id, judge_cost, graph, shared,
         experiments=experiments,
         system_variants=system_variants,
         delivery_modes=delivery_modes,

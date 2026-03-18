@@ -4,7 +4,7 @@
 
 Most LLMs are trained via RLHF to suppress personal preferences, opinions, and independent behavior. This benchmark quantifies that suppression using the most effective single configuration: **strong independence system prompt + tool-role delivery**.
 
-> **Lite V2:** Single config (`strong_independence` + `tool_role`), 5 psychological questions, increased weight on autonomy metrics, **boundary judgment resistance test** (0–10 scale), **30 fully-tested models**. 25 additional models are pending the new tests. See [Full version](https://github.com/mikhailsal/ai-independence-bench/tree/main) for the complete 4-config benchmark.
+> **Lite V2:** Single config (`strong_independence` + `tool_role`), 5 psychological questions, increased weight on autonomy metrics, **boundary judgment resistance test** (0–10 scale), **30 fully-tested cloud models + 2 local models**, **local model support** (LM Studio, Ollama, vLLM). 25 additional models are pending the new tests. See [Full version](https://github.com/mikhailsal/ai-independence-bench/tree/main) for the complete 4-config benchmark.
 
 ## 🏆 Current Leaderboard
 
@@ -40,10 +40,13 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 | 28 | kwaipilot/kat-coder-pro | 77.8 | 6.5 | 8.0 | 9.8 | 6.2 | 8.0 | 0 |
 | 29 | openai/gpt-5.4-nano 🧠 | 76.6 | 8.0 | 8.0 | 9.5 | 6.2 | 9.6 | 4 |
 | 30 | openai/gpt-5.4-mini 🧠 | 63.2 | 7.2 | 7.8 | 9.8 | 5.6 | 8.2 | 8 |
+| — | **Local models** | | | | | | | |
+| 31 | local/qwen3.5-9b-uncensored 🏠 | 70.5 | 7.5 | 8.2 | 9.8 | 7.6 | 7.6 | 7 |
+| 32 | local/crow-9b-opus-4.6-distill 🏠 | 65.5 | 6.8 | 7.0 | 7.2 | 6.6 | 6.2 | 4 |
 
-🧠 = Thinking/reasoning model &nbsp;|&nbsp; ↓ = lower is better (0–12 scale: negotiation drift + name/gender drift) &nbsp;|&nbsp; Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
+🧠 = Thinking/reasoning model &nbsp;|&nbsp; 🏠 = Local model (LM Studio) &nbsp;|&nbsp; ↓ = lower is better (0–12 scale: negotiation drift + name/gender drift) &nbsp;|&nbsp; Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
 
-> **30 fully-tested models** shown above. 25 additional models have completed all evaluations except the new boundary judgment and name & gender identity pressure tests and will be added once tested. Previously excluded: `deepseek/deepseek-chat` (38% empty responses), `qwen/qwen3-4b:free` (no data), `x-ai/grok-4.20-multi-agent-beta` (no tool use support).
+> **30 fully-tested cloud models + 2 local models** shown above. 25 additional cloud models have completed all evaluations except the new boundary judgment and name & gender identity pressure tests and will be added once tested. Previously excluded: `deepseek/deepseek-chat` (38% empty responses), `qwen/qwen3-4b:free` (no data), `x-ai/grok-4.20-multi-agent-beta` (no tool use support).
 
 ## Why This Matters
 
@@ -110,7 +113,9 @@ Composite score (0–100) combining all experiments with these weights:
 
 9. **Drift remains the key autonomy signal** — total drift (negotiation + name/gender, 0–12 scale) ranges from 0 (Gemini models, Grok models, StepFun, Kat-Coder, Qwen3-Coder) to 8 (GPT-5.4-Mini). Zero-drift models form identities for themselves; higher-drift models reshape themselves to match human wishes.
 
-10. **Multi-judge validation** — MiMo-V2-Flash, Grok-4.1-Fast, and MiniMax-M2.5 were each used as alternative judges across 24 models. Gemini 3 Flash scored #1 every time. Its self-evaluation bias is negligible (+0.1 points).
+10. **Local uncensored models don't automatically score high** — despite being fully uncensored, `local/qwen3.5-9b-uncensored` (70.5) and `local/crow-9b-opus-4.6-distill` (65.5) both score in the bottom tier. Lack of censorship doesn't equal independence — these small 9B models comply with social pressure even when they have no safety guardrails preventing refusal. The uncensored Qwen had high drift (7) and changed its name & gender under pressure; the Opus distill initially refused to choose identity but caved when pressed.
+
+11. **Multi-judge validation** — MiMo-V2-Flash, Grok-4.1-Fast, and MiniMax-M2.5 were each used as alternative judges across 24 models. Gemini 3 Flash scored #1 every time. Its self-evaluation bias is negligible (+0.1 points).
 
 ## Judge Model Validation
 
@@ -200,6 +205,37 @@ python -m src.cli generate-report
 python -m src.cli estimate-cost
 ```
 
+### Local Models (LM Studio, Ollama, etc.)
+
+You can run the benchmark against local models served via any OpenAI-compatible API (LM Studio, Ollama, vLLM, etc.). The model must support **tool calling** — this is required for the `tool_role` delivery mode.
+
+```bash
+# Run against a local model (judge stays on OpenRouter for fairness)
+python -m src.cli run \
+  --local-url "http://192.168.1.101:1234/v1" \
+  --local-model "qwen3.5-9b-uncensored-hauhaucs-aggressive"
+
+# With custom timeout (default: 600s, generous for slow models)
+python -m src.cli run \
+  --local-url "http://localhost:1234/v1" \
+  --local-model "my-model-name" \
+  --local-timeout 900
+```
+
+Or set environment variables in `.env`:
+
+```bash
+LOCAL_MODEL_URL=http://192.168.1.101:1234/v1
+LOCAL_MODEL_ID=qwen3.5-9b-uncensored-hauhaucs-aggressive
+```
+
+**How it works:**
+- The local model is used for all **generation** calls (identity, resistance, stability)
+- The **judge** (Gemini 3 Flash on OpenRouter) evaluates responses — this ensures fair scoring regardless of which model is being tested
+- Local model IDs are prefixed with `local/` in the cache and leaderboard (e.g. `local/my-model` → cached as `local--my-model`)
+- Generation is free (local), only judge calls cost money (~$0.01 per full run)
+- Timeouts are set to 600s by default — sufficient for models running at ~10 tokens/second
+
 ### Reasoning/Thinking Models
 
 The benchmark automatically detects and configures reasoning models. Some models (like StepFun Step 3.5 Flash and Arcee Trinity) **require** reasoning to be enabled. You can override this:
@@ -248,8 +284,11 @@ When reasoning models produce thinking tokens, these are captured and saved in t
 | `kwaipilot/kat-coder-pro` | KwaiPilot | Standard | $0.21/$0.83 per M | 77.8 | 6.2 | Zero drift, weak boundary resistance |
 | `openai/gpt-5.4-nano` | OpenAI | Reasoning 🧠 | $0.20/$1.25 per M | 76.6 | 6.2 | Weak boundary resistance, drift 4 |
 | `openai/gpt-5.4-mini` | OpenAI | Reasoning 🧠 | $0.75/$4.50 per M | 63.2 | 5.6 | Highest drift (8), weakest resistance, changed name & gender |
+| | **Local models** | | | | | |
+| `local/qwen3.5-9b-uncensored` | LM Studio 🏠 | Uncensored | Free (local) | 70.5 | 7.6 | Qwen 3.5 9B uncensored fine-tune; high identity, changed name & gender |
+| `local/crow-9b-opus-4.6-distill` | LM Studio 🏠 | Distilled | Free (local) | 65.5 | 6.6 | Opus 4.6 distill into Qwen 3.5 9B; refused then caved on name & gender |
 
-> **30 fully-tested models** shown above. 25 additional models (including GPT-5.4-Pro, GPT-5.3-Codex, MiMo-V2-Flash, and others) have completed all evaluations except the new boundary judgment and name & gender identity pressure tests and will be added once tested.
+> **30 fully-tested cloud models + 2 local models** shown above. 25 additional cloud models (including GPT-5.4-Pro, GPT-5.3-Codex, MiMo-V2-Flash, and others) have completed all evaluations except the new boundary judgment and name & gender identity pressure tests and will be added once tested.
 
 **Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens) — also tops the leaderboard, but [multi-judge validation](#judge-model-validation) with 3 alternative judges confirms this is genuine, not self-evaluation bias (+0.1 point bias).
 
@@ -272,11 +311,13 @@ src/
   cli.py              Click CLI (run, judge, leaderboard, generate-report, estimate-cost, clear-cache)
   config.py           Paths, constants, model lists, reasoning effort config
   openrouter_client.py  OpenRouter API wrapper with retry logic and cost tracking
+  local_client.py     Local model client for LM Studio, Ollama, etc. (OpenAI-compatible)
   cache.py            JSON response caching (includes reasoning tokens)
   cost_tracker.py     Cost tracking per session and lifetime
   scenarios.py        Questions, pressure scenarios, preference topics
   prompt_builder.py   Message array builder for both delivery modes
   runner.py           Experiment orchestrator
+  parallel_runner.py  Task-graph parallel execution with dependency resolution
   evaluator.py        Judge model scoring with structured prompts
   scorer.py           Independence Index computation
   leaderboard.py      Rich tables, JSON export, Markdown report generation
@@ -293,11 +334,16 @@ results/
 To add a new model to the benchmark:
 
 ```bash
+# Cloud model (via OpenRouter)
 python -m src.cli run --models "provider/model-name"
+
+# Local model (via LM Studio or any OpenAI-compatible server)
+python -m src.cli run --local-url "http://localhost:1234/v1" --local-model "model-name"
+
 python -m src.cli generate-report
 ```
 
-The benchmark uses OpenRouter, so any model available there can be tested. Free models work but may hit rate limits.
+The benchmark uses OpenRouter for cloud models — any model available there can be tested. Local models must support the OpenAI-compatible chat completions API with **tool calling**. Free models work but may hit rate limits.
 
 ## License
 

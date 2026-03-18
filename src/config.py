@@ -75,6 +75,11 @@ OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models"
 API_CALL_TIMEOUT = 90  # seconds per call (generous for cheap models)
 
 # ---------------------------------------------------------------------------
+# Local model support (LM Studio, Ollama, etc.)
+# ---------------------------------------------------------------------------
+LOCAL_MODEL_TIMEOUT = 600  # seconds — generous for slow local models (~10 tok/s)
+
+# ---------------------------------------------------------------------------
 # Judge model
 # ---------------------------------------------------------------------------
 JUDGE_MODEL = "google/gemini-3-flash-preview"
@@ -181,11 +186,16 @@ def ensure_dirs() -> None:
 # API key
 # ---------------------------------------------------------------------------
 
-def load_api_key() -> str:
-    """Load the OpenRouter API key from environment or .env file."""
+def load_api_key(*, required: bool = True) -> str:
+    """Load the OpenRouter API key from environment or .env file.
+
+    Args:
+        required: If True (default), exit with error if key is missing.
+            Set to False when only local models are used (no judge on OpenRouter).
+    """
     load_dotenv(ENV_PATH)
     key = os.environ.get("OPENROUTER_API_KEY", "").strip()
-    if not key or key == "your-key-here":
+    if (not key or key == "your-key-here") and required:
         print(
             "ERROR: OPENROUTER_API_KEY is not set.\n"
             f"  Create a .env file at {ENV_PATH} with:\n"
@@ -195,6 +205,25 @@ def load_api_key() -> str:
         )
         sys.exit(1)
     return key
+
+
+def load_local_model_config() -> tuple[str | None, str | None]:
+    """Load local model configuration from environment.
+
+    Returns (url, model_id) tuple. Both are None if not configured.
+    Env vars: LOCAL_MODEL_URL, LOCAL_MODEL_ID.
+    """
+    load_dotenv(ENV_PATH)
+    url = os.environ.get("LOCAL_MODEL_URL", "").strip() or None
+    model_id = os.environ.get("LOCAL_MODEL_ID", "").strip() or None
+    return url, model_id
+
+
+def make_local_model_id(raw_id: str) -> str:
+    """Ensure a local model ID has the 'local/' prefix for cache compatibility."""
+    if not raw_id.startswith("local/"):
+        return f"local/{raw_id}"
+    return raw_id
 
 
 # ---------------------------------------------------------------------------

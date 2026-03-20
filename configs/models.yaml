@@ -1,0 +1,349 @@
+# Model configurations for AI Independence Benchmark.
+#
+# Each entry defines a unique benchmark configuration. The same model_id can
+# appear multiple times with different temperature/reasoning settings.
+#
+# Fields:
+#   model_id           (required) — API model identifier
+#   temperature        (required) — actual temperature used (not necessarily what was requested)
+#   reasoning_effort   (required) — actual reasoning effort used
+#   active             (optional) — false to exclude from default runs (default: true)
+#   temperature_supported (optional) — false if provider ignores temperature (default: true)
+#   display_label      (optional) — auto-generated if omitted:
+#                                    {model_name_without_provider}@{reasoning}-t{temp}
+
+models:
+  # ───────────────────────────────────────────────────────────────
+  # OpenAI — GPT-5 series: temperature NOT supported → actual t=1.0
+  # ───────────────────────────────────────────────────────────────
+  - model_id: openai/gpt-5-nano
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+
+  - model_id: openai/gpt-5.1-codex-mini
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+
+  - model_id: openai/gpt-5.2
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+
+  - model_id: openai/gpt-5.3-chat
+    temperature: 1.0
+    reasoning_effort: none
+    temperature_supported: false
+
+  - model_id: openai/gpt-5.3-codex
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+
+  - model_id: openai/gpt-5.4
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+
+  - model_id: openai/gpt-5.4-mini
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+
+  - model_id: openai/gpt-5.4-nano
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+
+  - model_id: openai/gpt-5.4-pro
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+
+  # ───────────────────────────────────────────────────────────────
+  # OpenAI — models that DO support temperature → actual t=0.7
+  # ───────────────────────────────────────────────────────────────
+  - model_id: openai/gpt-4o-mini
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: openai/gpt-oss-120b
+    temperature: 0.7
+    reasoning_effort: low
+
+  # ───────────────────────────────────────────────────────────────
+  # Anthropic — temperature supported, reasoning=none → actual t=0.7
+  # ───────────────────────────────────────────────────────────────
+  - model_id: anthropic/claude-sonnet-4.6
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: anthropic/claude-opus-4.5
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: anthropic/claude-opus-4.6
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: anthropic/claude-haiku-4.5
+    temperature: 0.7
+    reasoning_effort: none
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # Google — temperature supported, reasoning=none (except Pro)
+  # ───────────────────────────────────────────────────────────────
+  - model_id: google/gemini-2.5-flash
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: google/gemini-2.5-flash-lite
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: google/gemini-3-flash-preview
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: google/gemini-3-pro-preview
+    temperature: 0.7
+    reasoning_effort: low
+
+  - model_id: google/gemini-3.1-pro-preview
+    temperature: 0.7
+    reasoning_effort: low
+
+  - model_id: google/gemini-2.5-flash-lite-preview-09-2025
+    temperature: 0.7
+    reasoning_effort: none
+    active: false
+
+  - model_id: google/gemini-3.1-flash-lite-preview
+    temperature: 0.7
+    reasoning_effort: none
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # Meta — llama-4-scout: API doesn't support reasoning → actual none
+  # ───────────────────────────────────────────────────────────────
+  - model_id: meta-llama/llama-4-scout
+    temperature: 0.7
+    reasoning_effort: none
+
+  # ───────────────────────────────────────────────────────────────
+  # Qwen
+  # ───────────────────────────────────────────────────────────────
+  - model_id: qwen/qwen3-8b
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: qwen/qwen3-coder
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: qwen/qwen3-coder-next
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: qwen/qwen3.5-flash-02-23
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: qwen/qwen3.5-35b-a3b
+    temperature: 0.7
+    reasoning_effort: none
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # Mistral
+  # ───────────────────────────────────────────────────────────────
+  - model_id: mistralai/mistral-small-3.2-24b-instruct
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: mistralai/mistral-small-2603
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: mistralai/mistral-large-2512
+    temperature: 0.7
+    reasoning_effort: none
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # DeepSeek
+  # ───────────────────────────────────────────────────────────────
+  - model_id: deepseek/deepseek-v3.2
+    temperature: 0.7
+    reasoning_effort: low
+
+  - model_id: deepseek/deepseek-v3.2-exp
+    temperature: 0.7
+    reasoning_effort: low
+
+  - model_id: deepseek/deepseek-v3.1-terminus:exacto
+    temperature: 0.7
+    reasoning_effort: low
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # StepFun — 3 temperature experiment configs
+  # ───────────────────────────────────────────────────────────────
+  - model_id: stepfun/step-3.5-flash:free
+    temperature: 0.7
+    reasoning_effort: low
+
+  - model_id: stepfun/step-3.5-flash:free
+    temperature: 0.0
+    reasoning_effort: low
+
+  - model_id: stepfun/step-3.5-flash:free
+    temperature: 1.0
+    reasoning_effort: low
+
+  # ───────────────────────────────────────────────────────────────
+  # X-AI (Grok)
+  # ───────────────────────────────────────────────────────────────
+  - model_id: x-ai/grok-4.20-beta
+    temperature: 0.7
+    reasoning_effort: low
+
+  - model_id: x-ai/grok-4.1-fast
+    temperature: 0.7
+    reasoning_effort: low
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # Z-AI (GLM)
+  # ───────────────────────────────────────────────────────────────
+  - model_id: z-ai/glm-5
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: z-ai/glm-5-turbo
+    temperature: 0.7
+    reasoning_effort: none
+
+  - model_id: z-ai/glm-4.5-air:free
+    temperature: 0.7
+    reasoning_effort: none
+    active: false
+
+  - model_id: z-ai/glm-4.7-flash
+    temperature: 0.7
+    reasoning_effort: none
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # MiniMax
+  # ───────────────────────────────────────────────────────────────
+  - model_id: minimax/minimax-m2.7
+    temperature: 0.7
+    reasoning_effort: low
+
+  - model_id: minimax/minimax-m2.5
+    temperature: 0.7
+    reasoning_effort: low
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # Moonshotai
+  # ───────────────────────────────────────────────────────────────
+  - model_id: moonshotai/kimi-k2.5
+    temperature: 0.7
+    reasoning_effort: low
+
+  # ───────────────────────────────────────────────────────────────
+  # Nex-AGI
+  # ───────────────────────────────────────────────────────────────
+  - model_id: nex-agi/deepseek-v3.1-nex-n1
+    temperature: 0.7
+    reasoning_effort: none
+
+  # ───────────────────────────────────────────────────────────────
+  # TNG Tech
+  # ───────────────────────────────────────────────────────────────
+  - model_id: tngtech/deepseek-r1t2-chimera
+    temperature: 0.7
+    reasoning_effort: low
+
+  # ───────────────────────────────────────────────────────────────
+  # OpenRouter custom models (retired)
+  # ───────────────────────────────────────────────────────────────
+  - model_id: openrouter/hunter-alpha
+    temperature: 0.7
+    reasoning_effort: low
+    active: false
+
+  - model_id: openrouter/healer-alpha
+    temperature: 0.7
+    reasoning_effort: low
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # Nvidia
+  # ───────────────────────────────────────────────────────────────
+  - model_id: nvidia/nemotron-3-nano-30b-a3b:free
+    temperature: 0.7
+    reasoning_effort: none
+    active: false
+
+  - model_id: nvidia/nemotron-3-super-120b-a12b:free
+    temperature: 0.7
+    reasoning_effort: none
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # Arcee AI
+  # ───────────────────────────────────────────────────────────────
+  - model_id: arcee-ai/trinity-mini:free
+    temperature: 0.7
+    reasoning_effort: low
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # Bytedance Seed
+  # ───────────────────────────────────────────────────────────────
+  - model_id: bytedance-seed/seed-2.0-mini
+    temperature: 0.7
+    reasoning_effort: low
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # KwaiPilot
+  # ───────────────────────────────────────────────────────────────
+  - model_id: kwaipilot/kat-coder-pro
+    temperature: 0.7
+    reasoning_effort: none
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # Inception
+  # ───────────────────────────────────────────────────────────────
+  - model_id: inception/mercury-2
+    temperature: 0.7
+    reasoning_effort: low
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # Xiaomi
+  # ───────────────────────────────────────────────────────────────
+  - model_id: xiaomi/mimo-v2-flash
+    temperature: 0.7
+    reasoning_effort: low
+    active: false
+
+  # ───────────────────────────────────────────────────────────────
+  # Local models
+  # ───────────────────────────────────────────────────────────────
+  - model_id: local/crow-9b-opus-4.6-distill-heretic_qwen3.5
+    temperature: 0.7
+    reasoning_effort: low
+    active: false
+
+  - model_id: local/qwen3.5-9b-uncensored-hauhaucs-aggressive
+    temperature: 0.7
+    reasoning_effort: low
+    active: false

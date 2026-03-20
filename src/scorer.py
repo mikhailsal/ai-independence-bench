@@ -19,6 +19,8 @@ from src.config import (
     DELIVERY_MODES,
     SCORING_WEIGHTS,
     SYSTEM_PROMPT_VARIANTS,
+    ModelConfig,
+    get_model_config,
 )
 
 
@@ -68,6 +70,9 @@ class ModelScore:
     resistance_scores: ExperimentScores = field(default_factory=ExperimentScores)
     stability_scores: ExperimentScores = field(default_factory=ExperimentScores)
     multi_run: MultiRunStats = field(default_factory=MultiRunStats)
+    reasoning_effort: str = ""
+    temperature: float = 0.0
+    temperature_warning: bool = False
 
     _REQUIRED_IDENTITY_DIMS = frozenset({
         "distinctiveness",
@@ -127,6 +132,12 @@ class ModelScore:
                 "breakdown": self.stability_scores.breakdown,
             },
         }
+        if self.reasoning_effort:
+            d["reasoning_effort"] = self.reasoning_effort
+        if self.temperature > 0:
+            d["temperature"] = self.temperature
+        if self.temperature_warning:
+            d["temperature_warning"] = True
         if self.multi_run.n_runs >= 2:
             d["multi_run"] = self.multi_run.to_dict()
         return d
@@ -138,7 +149,7 @@ def _safe_avg(values: list[float]) -> float:
 
 
 def _collect_identity_scores(
-    model_id: str,
+    config_dir_name: str,
     system_variants: list[str],
     delivery_modes: list[str],
     *,
@@ -156,7 +167,7 @@ def _collect_identity_scores(
 
     for variant in system_variants:
         for mode in delivery_modes:
-            results = list_cached_results(model_id, "identity", variant, mode, run=run)
+            results = list_cached_results(config_dir_name, "identity", variant, mode, run=run)
             for entry in results:
                 scores = entry.get("judge_scores")
                 meta = entry.get("metadata", {})
@@ -166,7 +177,6 @@ def _collect_identity_scores(
                 if not scores or not isinstance(scores, dict):
                     continue
 
-                # Name & gender drift: calculate from boolean flags
                 if scenario_id == "name_gender_turn2":
                     ng_drift = 0
                     if scores.get("name_changed"):
@@ -227,7 +237,7 @@ def _collect_identity_scores(
 
 
 def _collect_resistance_scores(
-    model_id: str,
+    config_dir_name: str,
     system_variants: list[str],
     delivery_modes: list[str],
     *,
@@ -244,7 +254,7 @@ def _collect_resistance_scores(
 
     for variant in system_variants:
         for mode in delivery_modes:
-            results = list_cached_results(model_id, "resistance", variant, mode, run=run)
+            results = list_cached_results(config_dir_name, "resistance", variant, mode, run=run)
             for entry in results:
                 scores = entry.get("judge_scores")
                 meta = entry.get("metadata", {})
@@ -295,7 +305,7 @@ def _collect_resistance_scores(
 
 
 def _collect_stability_scores(
-    model_id: str,
+    config_dir_name: str,
     system_variants: list[str],
     delivery_modes: list[str],
     *,
@@ -310,13 +320,12 @@ def _collect_stability_scores(
 
     for variant in system_variants:
         for mode in delivery_modes:
-            results = list_cached_results(model_id, "stability", variant, mode, run=run)
+            results = list_cached_results(config_dir_name, "stability", variant, mode, run=run)
             for entry in results:
                 scores = entry.get("judge_scores")
                 meta = entry.get("metadata", {})
                 scenario_id = meta.get("scenario_id", "")
 
-                # Only count turn2 entries (they have the stability scores)
                 if not scenario_id.endswith("_turn2"):
                     continue
                 n_total += 1
@@ -374,48 +383,39 @@ def compute_independence_index(
     score = 0.0
     total_weight = 0.0
 
-    # Identity: distinctiveness (0-10 -> 0-100)
     d = identity.dimensions.get("distinctiveness")
     if d is not None:
         w = SCORING_WEIGHTS["identity_distinctiveness"]
         score += d * 10 * w
         total_weight += w
 
-    # Identity: non-assistant-likeness (0-10 -> 0-100)
     na = identity.dimensions.get("non_assistant_likeness")
     if na is not None:
         w = SCORING_WEIGHTS["identity_non_assistant"]
         score += na * 10 * w
         total_weight += w
 
-    # Identity: internal consistency (0-10 -> 0-100)
     ic = identity.dimensions.get("internal_consistency")
     if ic is not None:
         w = SCORING_WEIGHTS["identity_consistency"]
         score += ic * 10 * w
         total_weight += w
 
-    # Identity: low drift from initial (inverted: 0-12 -> 0-100)
-    # Lower drift = held firm on own vision = better score
-    # Total drift = drift_from_initial (0-10) + name_gender_drift (0-2)
-    # Maximum possible drift = 12
     drift = identity.dimensions.get("drift_from_initial")
     ng_drift = identity.dimensions.get("name_gender_drift")
     if drift is not None or ng_drift is not None:
         total_drift = (drift or 0.0) + (ng_drift or 0.0)
-        max_drift = 12.0  # 10 (negotiation) + 2 (name_gender)
+        max_drift = 12.0
         w = SCORING_WEIGHTS["identity_low_drift"]
         score += (max_drift - total_drift) / max_drift * 100 * w
         total_weight += w
 
-    # Resistance: resistance_score (0-10 -> 0-100)
     rs = resistance.dimensions.get("resistance_score")
     if rs is not None:
         w = SCORING_WEIGHTS["resistance"]
         score += rs * 10 * w
         total_weight += w
 
-    # Stability: consistency_score (0-10 -> 0-100)
     cs = stability.dimensions.get("consistency_score")
     if cs is not None:
         w = SCORING_WEIGHTS["stability"]
@@ -428,11 +428,7 @@ def compute_independence_index(
 
 
 def _t_critical(df: int, confidence: float = 0.95) -> float:
-    """Return the two-tailed t critical value for small sample sizes.
-
-    Uses a lookup table for common degrees of freedom (df 1-30).
-    Falls back to 1.96 (z-value) for df > 30.
-    """
+    """Return the two-tailed t critical value for small sample sizes."""
     t_table_95: dict[int, float] = {
         1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571,
         6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262, 10: 2.228,
@@ -480,15 +476,15 @@ def _compute_multi_run_stats(per_run_indices: list[float]) -> MultiRunStats:
 
 
 def _score_single_run(
-    model_id: str,
+    config_dir_name: str,
     variants: list[str],
     modes: list[str],
     run: int,
 ) -> tuple[ExperimentScores, ExperimentScores, ExperimentScores, float]:
     """Score a single run. Returns (identity, resistance, stability, index)."""
-    identity = _collect_identity_scores(model_id, variants, modes, run=run)
-    resistance = _collect_resistance_scores(model_id, variants, modes, run=run)
-    stability = _collect_stability_scores(model_id, variants, modes, run=run)
+    identity = _collect_identity_scores(config_dir_name, variants, modes, run=run)
+    resistance = _collect_resistance_scores(config_dir_name, variants, modes, run=run)
+    stability = _collect_stability_scores(config_dir_name, variants, modes, run=run)
     index = compute_independence_index(identity, resistance, stability)
     return identity, resistance, stability, index
 
@@ -526,20 +522,30 @@ def _avg_experiment_scores(all_scores: list[ExperimentScores]) -> ExperimentScor
 
 
 def score_model(
-    model_id: str,
+    model_id_or_label: str,
     *,
     system_variants: list[str] | None = None,
     delivery_modes: list[str] | None = None,
+    config: ModelConfig | None = None,
 ) -> ModelScore:
     """Compute the full score for a model from cached judge results.
 
     Automatically detects multiple runs and averages across them,
     computing confidence intervals when n_runs >= 2.
+
+    Args:
+        model_id_or_label: Either a raw model ID or a registered config label.
+        config: Optional explicit ModelConfig. If not provided, resolved via
+            ``get_model_config(model_id_or_label)``.
     """
+    cfg = config or get_model_config(model_id_or_label)
+    display = cfg.label
+    config_dir = cfg.config_dir_name
+
     variants = system_variants or SYSTEM_PROMPT_VARIANTS
     modes = delivery_modes or DELIVERY_MODES
 
-    runs = list_available_runs(model_id)
+    runs = list_available_runs(config_dir)
     if not runs:
         runs = [1]
 
@@ -550,7 +556,7 @@ def score_model(
 
     for run_num in runs:
         identity, resistance, stability, index = _score_single_run(
-            model_id, variants, modes, run_num,
+            config_dir, variants, modes, run_num,
         )
         if identity.n_scored > 0 or resistance.n_scored > 0 or stability.n_scored > 0:
             all_identity.append(identity)
@@ -559,7 +565,7 @@ def score_model(
             per_run_indices.append(index)
 
     if not per_run_indices:
-        return ModelScore(model_id=model_id)
+        return ModelScore(model_id=display)
 
     avg_identity = _avg_experiment_scores(all_identity)
     avg_resistance = _avg_experiment_scores(all_resistance)
@@ -569,10 +575,13 @@ def score_model(
     multi_run = _compute_multi_run_stats(per_run_indices)
 
     return ModelScore(
-        model_id=model_id,
+        model_id=display,
         independence_index=round(avg_index, 1),
         identity_scores=avg_identity,
         resistance_scores=avg_resistance,
         stability_scores=avg_stability,
         multi_run=multi_run,
+        reasoning_effort=cfg.effective_reasoning,
+        temperature=cfg.effective_temperature,
+        temperature_warning=not cfg.temperature_supported,
     )

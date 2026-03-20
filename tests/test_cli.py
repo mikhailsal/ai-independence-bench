@@ -10,8 +10,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
-from src.cli import _parse_experiments, _parse_models, cli, ModelResult
-from src.config import EXPERIMENT_NAMES, DEFAULT_TEST_MODELS
+from src.cli import _expand_model_configs, _parse_experiments, _parse_models, cli, ModelResult
+from src.config import EXPERIMENT_NAMES, DEFAULT_TEST_MODELS, MODEL_CONFIGS, ModelConfig, register_config
 from src.cost_tracker import TaskCost
 
 
@@ -953,4 +953,64 @@ class TestJudgeCommandParallel:
              patch("src.leaderboard.display_leaderboard"):
             result = runner.invoke(cli, ["judge"])
         assert result.exit_code == 0
+
+
+# ---------------------------------------------------------------------------
+# _expand_model_configs
+# ---------------------------------------------------------------------------
+
+class TestExpandModelConfigs:
+    """Test _expand_model_configs expands registered configs correctly."""
+
+    @pytest.fixture(autouse=True)
+    def _clean_registry(self):
+        saved = dict(MODEL_CONFIGS)
+        yield
+        MODEL_CONFIGS.clear()
+        MODEL_CONFIGS.update(saved)
+
+    def test_unregistered_model_passes_through(self) -> None:
+        entries = _expand_model_configs(["test/unregistered-model-xyz"])
+        assert len(entries) == 1
+        label, cfg = entries[0]
+        assert label == "test/unregistered-model-xyz"
+        assert cfg.model_id == "test/unregistered-model-xyz"
+
+    def test_registered_label_passes_through(self) -> None:
+        cfg = ModelConfig(model_id="test/expand-a", display_label="test/expand-a@custom")
+        register_config(cfg)
+        entries = _expand_model_configs(["test/expand-a@custom"])
+        assert len(entries) == 1
+        assert entries[0][0] == "test/expand-a@custom"
+        assert entries[0][1] is cfg
+
+    def test_model_id_expands_to_all_registered(self) -> None:
+        cfg1 = ModelConfig(model_id="test/expand-b", display_label="test/expand-b@x")
+        cfg2 = ModelConfig(model_id="test/expand-b", display_label="test/expand-b@y")
+        register_config(cfg1)
+        register_config(cfg2)
+        entries = _expand_model_configs(["test/expand-b"])
+        labels = {e[0] for e in entries}
+        assert labels == {"test/expand-b@x", "test/expand-b@y"}
+
+    def test_no_duplicates(self) -> None:
+        entries = _expand_model_configs(["openai/gpt-5-nano", "openai/gpt-5-nano"])
+        assert len(entries) == 1
+
+    def test_mixed_registered_and_unregistered(self) -> None:
+        cfg = ModelConfig(model_id="test/expand-c", display_label="test/expand-c@z")
+        register_config(cfg)
+        entries = _expand_model_configs(["test/expand-c", "test/unregistered-model-xyz"])
+        labels = [e[0] for e in entries]
+        assert "test/expand-c@z" in labels
+        assert "test/unregistered-model-xyz" in labels
+
+    def test_step_flash_expansion(self) -> None:
+        """stepfun/step-3.5-flash:free should expand into 3 registered configs."""
+        entries = _expand_model_configs(["stepfun/step-3.5-flash:free"])
+        labels = {e[0] for e in entries}
+        assert "step-3.5-flash:free@low-t0.7" in labels
+        assert "step-3.5-flash:free@low-t0.0" in labels
+        assert "step-3.5-flash:free@low-t1.0" in labels
+        assert len(entries) == 3
 

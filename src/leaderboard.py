@@ -63,7 +63,7 @@ def display_leaderboard(
         expand=False,
     )
     table.add_column("#", justify="right", style="dim", width=3)
-    table.add_column("Model", style="bold", max_width=32, no_wrap=True, overflow="ellipsis")
+    table.add_column("Model", style="bold", max_width=45, no_wrap=True, overflow="ellipsis")
     table.add_column("Index", justify="center", width=7)
     if has_multi_run:
         table.add_column("95% CI", justify="center", width=13)

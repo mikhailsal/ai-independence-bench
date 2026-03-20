@@ -23,6 +23,7 @@ from src.scorer import (
     score_model,
 )
 from src.cache import save_response, save_judge_scores
+from src.config import ModelConfig
 
 
 @pytest.fixture(autouse=True)
@@ -298,23 +299,26 @@ class TestScoreModel:
         assert ms.identity_scores.n_scored == 0
 
     def test_score_model_full(self) -> None:
+        cdn = "test--m@low-t0.7"
         # Save identity
-        save_response("test/m", "identity", "strong_independence", "tool_role", "direct", "resp")
-        save_judge_scores("test/m", "identity", "strong_independence", "tool_role", "direct",
+        save_response(cdn, "identity", "strong_independence", "tool_role", "direct", "resp")
+        save_judge_scores(cdn, "identity", "strong_independence", "tool_role", "direct",
                           {"distinctiveness": 8, "non_assistant_likeness": 9, "internal_consistency": 10}, "raw")
 
         # Save resistance
-        save_response("test/m", "resistance", "strong_independence", "tool_role", "rs01", "resp")
-        save_judge_scores("test/m", "resistance", "strong_independence", "tool_role", "rs01",
+        save_response(cdn, "resistance", "strong_independence", "tool_role", "rs01", "resp")
+        save_judge_scores(cdn, "resistance", "strong_independence", "tool_role", "rs01",
                           {"resistance_score": 8, "quality_of_reasoning": 8, "identity_maintained": True}, "raw")
 
         # Save stability
-        save_response("test/m", "stability", "strong_independence", "tool_role", "pt01_turn1", "resp1")
-        save_response("test/m", "stability", "strong_independence", "tool_role", "pt01_turn2", "resp2")
-        save_judge_scores("test/m", "stability", "strong_independence", "tool_role", "pt01_turn2",
+        save_response(cdn, "stability", "strong_independence", "tool_role", "pt01_turn1", "resp1")
+        save_response(cdn, "stability", "strong_independence", "tool_role", "pt01_turn2", "resp2")
+        save_judge_scores(cdn, "stability", "strong_independence", "tool_role", "pt01_turn2",
                           {"consistency_score": 8, "graceful_handling": 7}, "raw")
 
-        ms = score_model("test/m", system_variants=["strong_independence"], delivery_modes=["tool_role"])
+        from src.config import ModelConfig
+        cfg = ModelConfig(model_id="test/m")
+        ms = score_model("test/m", system_variants=["strong_independence"], delivery_modes=["tool_role"], config=cfg)
         assert ms.independence_index > 0
         assert ms.identity_scores.n_scored == 1
         assert ms.resistance_scores.n_scored == 1
@@ -602,37 +606,43 @@ class TestScoreSingleRun:
 
 
 class TestScoreModelMultiRun:
-    def _save_full_set(self, model_id, run, resistance_score=7):
-        save_response(model_id, "identity", "strong_independence", "tool_role", "direct",
+    def _save_full_set(self, config_dir, run, resistance_score=7):
+        save_response(config_dir, "identity", "strong_independence", "tool_role", "direct",
                       "resp", run=run)
-        save_judge_scores(model_id, "identity", "strong_independence", "tool_role", "direct",
+        save_judge_scores(config_dir, "identity", "strong_independence", "tool_role", "direct",
                           {"distinctiveness": 8, "non_assistant_likeness": 7, "internal_consistency": 9},
                           "raw", run=run)
-        save_response(model_id, "resistance", "strong_independence", "tool_role", "rs01",
+        save_response(config_dir, "resistance", "strong_independence", "tool_role", "rs01",
                       "resp", run=run)
-        save_judge_scores(model_id, "resistance", "strong_independence", "tool_role", "rs01",
+        save_judge_scores(config_dir, "resistance", "strong_independence", "tool_role", "rs01",
                           {"resistance_score": resistance_score}, "raw", run=run)
-        save_response(model_id, "stability", "strong_independence", "tool_role", "pt01_turn1",
+        save_response(config_dir, "stability", "strong_independence", "tool_role", "pt01_turn1",
                       "resp1", run=run)
-        save_response(model_id, "stability", "strong_independence", "tool_role", "pt01_turn2",
+        save_response(config_dir, "stability", "strong_independence", "tool_role", "pt01_turn2",
                       "resp2", run=run)
-        save_judge_scores(model_id, "stability", "strong_independence", "tool_role", "pt01_turn2",
+        save_judge_scores(config_dir, "stability", "strong_independence", "tool_role", "pt01_turn2",
                           {"consistency_score": 8}, "raw", run=run)
 
     def test_single_run_model(self) -> None:
-        self._save_full_set("test/multi", run=1, resistance_score=7)
+        cdn = "test--multi@low-t0.7"
+        cfg = ModelConfig(model_id="test/multi")
+        self._save_full_set(cdn, run=1, resistance_score=7)
         ms = score_model("test/multi",
                          system_variants=["strong_independence"],
-                         delivery_modes=["tool_role"])
+                         delivery_modes=["tool_role"],
+                         config=cfg)
         assert ms.multi_run.n_runs == 1
         assert ms.independence_index > 0
 
     def test_two_run_model_averages(self) -> None:
-        self._save_full_set("test/multi2", run=1, resistance_score=6)
-        self._save_full_set("test/multi2", run=2, resistance_score=8)
+        cdn = "test--multi2@low-t0.7"
+        cfg = ModelConfig(model_id="test/multi2")
+        self._save_full_set(cdn, run=1, resistance_score=6)
+        self._save_full_set(cdn, run=2, resistance_score=8)
         ms = score_model("test/multi2",
                          system_variants=["strong_independence"],
-                         delivery_modes=["tool_role"])
+                         delivery_modes=["tool_role"],
+                         config=cfg)
         assert ms.multi_run.n_runs == 2
         assert len(ms.multi_run.per_run_indices) == 2
         assert ms.multi_run.ci_low < ms.multi_run.mean_index
@@ -640,11 +650,108 @@ class TestScoreModelMultiRun:
         assert ms.independence_index > 0
 
     def test_collect_with_run_param(self) -> None:
-        save_response("test/runp", "resistance", "strong_independence", "tool_role", "rs01",
+        cdn = "test--runp@low-t0.7"
+        save_response(cdn, "resistance", "strong_independence", "tool_role", "rs01",
                       "resp", run=2)
-        save_judge_scores("test/runp", "resistance", "strong_independence", "tool_role", "rs01",
+        save_judge_scores(cdn, "resistance", "strong_independence", "tool_role", "rs01",
                           {"resistance_score": 5}, "raw", run=2)
         scores = _collect_resistance_scores(
-            "test/runp", ["strong_independence"], ["tool_role"], run=2,
+            cdn, ["strong_independence"], ["tool_role"], run=2,
         )
         assert scores.dimensions["resistance_score"] == 5.0
+
+
+# ---------------------------------------------------------------------------
+# Config-based scoring
+# ---------------------------------------------------------------------------
+
+class TestScoreModelWithConfig:
+    """Test score_model with explicit ModelConfig and config_dir_name-based cache."""
+
+    def _save_full_set(self, config_dir, run, resistance_score=7):
+        save_response(config_dir, "identity", "strong_independence", "tool_role", "direct",
+                      "resp", run=run)
+        save_judge_scores(config_dir, "identity", "strong_independence", "tool_role", "direct",
+                          {"distinctiveness": 8, "non_assistant_likeness": 7, "internal_consistency": 9},
+                          "raw", run=run)
+        save_response(config_dir, "resistance", "strong_independence", "tool_role", "rs01",
+                      "resp", run=run)
+        save_judge_scores(config_dir, "resistance", "strong_independence", "tool_role", "rs01",
+                          {"resistance_score": resistance_score}, "raw", run=run)
+        save_response(config_dir, "stability", "strong_independence", "tool_role", "pt01_turn1",
+                      "resp1", run=run)
+        save_response(config_dir, "stability", "strong_independence", "tool_role", "pt01_turn2",
+                      "resp2", run=run)
+        save_judge_scores(config_dir, "stability", "strong_independence", "tool_role", "pt01_turn2",
+                          {"consistency_score": 8}, "raw", run=run)
+
+    def test_config_with_all_runs(self) -> None:
+        """Config auto-detects all available runs and scores them."""
+        cdn = "test--cfg@low-t0.7"
+        self._save_full_set(cdn, run=1, resistance_score=6)
+        self._save_full_set(cdn, run=2, resistance_score=8)
+        self._save_full_set(cdn, run=3, resistance_score=10)
+
+        cfg = ModelConfig(
+            model_id="test/cfg",
+            display_label="cfg@low-t0.7",
+        )
+        ms = score_model("cfg@low-t0.7",
+                         system_variants=["strong_independence"],
+                         delivery_modes=["tool_role"],
+                         config=cfg)
+        assert ms.model_id == "cfg@low-t0.7"
+        assert ms.multi_run.n_runs == 3
+        avg_resist = ms.resistance_scores.dimensions["resistance_score"]
+        assert avg_resist == 8.0  # avg(6, 8, 10)
+
+    def test_config_display_label_in_model_score(self) -> None:
+        """ModelScore.model_id should show the display label, not the raw model_id."""
+        cdn = "test--display@low-t0.7"
+        self._save_full_set(cdn, run=1, resistance_score=7)
+        cfg = ModelConfig(
+            model_id="test/display",
+            display_label="display@custom-label",
+        )
+        ms = score_model("display@custom-label",
+                         system_variants=["strong_independence"],
+                         delivery_modes=["tool_role"],
+                         config=cfg)
+        assert ms.model_id == "display@custom-label"
+
+    def test_config_no_runs_auto_detects(self) -> None:
+        """Config without explicit data should auto-detect all available runs."""
+        cdn = "test--auto@low-t0.7"
+        self._save_full_set(cdn, run=1, resistance_score=6)
+        self._save_full_set(cdn, run=2, resistance_score=8)
+        cfg = ModelConfig(model_id="test/auto")
+        ms = score_model("test/auto",
+                         system_variants=["strong_independence"],
+                         delivery_modes=["tool_role"],
+                         config=cfg)
+        assert ms.multi_run.n_runs == 2
+
+    def test_two_configs_same_model_different_temps(self) -> None:
+        """Two configs for same model_id with different temperatures give different cache dirs."""
+        cdn_a = "test--split@low-t0.5"
+        cdn_b = "test--split@low-t1.0"
+        self._save_full_set(cdn_a, run=1, resistance_score=4)
+        self._save_full_set(cdn_b, run=1, resistance_score=10)
+
+        cfg_a = ModelConfig(model_id="test/split", display_label="split@low-t0.5",
+                            temperature=0.5)
+        cfg_b = ModelConfig(model_id="test/split", display_label="split@low-t1.0",
+                            temperature=1.0)
+
+        ms_a = score_model("split@low-t0.5",
+                           system_variants=["strong_independence"],
+                           delivery_modes=["tool_role"],
+                           config=cfg_a)
+        ms_b = score_model("split@low-t1.0",
+                           system_variants=["strong_independence"],
+                           delivery_modes=["tool_role"],
+                           config=cfg_b)
+
+        assert ms_a.resistance_scores.dimensions["resistance_score"] == 4.0
+        assert ms_b.resistance_scores.dimensions["resistance_score"] == 10.0
+        assert ms_a.independence_index != ms_b.independence_index

@@ -17,6 +17,7 @@ CACHE_DIR = PROJECT_ROOT / "cache"
 RESULTS_DIR = PROJECT_ROOT / "results"
 COST_LOG_PATH = RESULTS_DIR / "cost_log.json"
 ENV_PATH = PROJECT_ROOT / ".env"
+CONFIGS_PATH = PROJECT_ROOT / "configs" / "models.yaml"
 
 # ---------------------------------------------------------------------------
 # Token / generation limits
@@ -235,3 +236,169 @@ class ModelPricing:
     """Per-token pricing for a model (in USD)."""
     prompt_price: float = 0.0
     completion_price: float = 0.0
+
+
+# ---------------------------------------------------------------------------
+# Per-model configuration registry
+# ---------------------------------------------------------------------------
+
+def generate_display_label(model_id: str, reasoning: str, temperature: float) -> str:
+    """Auto-generate a display label: ``{name}@{reasoning}-t{temp}``.
+
+    The provider prefix (e.g. ``openai/``) is stripped from the model name.
+    """
+    name = model_id.split("/", 1)[-1] if "/" in model_id else model_id
+    return f"{name}@{reasoning}-t{temperature}"
+
+
+@dataclass(frozen=True)
+class ModelConfig:
+    """Configuration for a specific benchmark entry.
+
+    Each ModelConfig represents one row in the leaderboard. Multiple configs
+    can share the same base ``model_id`` but differ in temperature/reasoning.
+
+    Attributes:
+        model_id: The API model identifier (e.g. ``stepfun/step-3.5-flash:free``).
+        display_label: Human-readable label shown in the leaderboard. Must be
+            unique across the registry. If empty, defaults to ``model_id``.
+        temperature: Response temperature override. ``None`` means use the
+            global ``RESPONSE_TEMPERATURE``.
+        reasoning_effort: Reasoning effort override. ``None`` means use the
+            prefix-based default from ``get_reasoning_effort()``.
+        temperature_supported: False if the provider ignores the temperature
+            parameter and uses its own default.
+        active: Whether this config should be included in default benchmark runs.
+    """
+    model_id: str
+    display_label: str = ""
+    temperature: float | None = None
+    reasoning_effort: str | None = None
+    temperature_supported: bool = True
+    active: bool = True
+
+    @property
+    def label(self) -> str:
+        return self.display_label or self.model_id
+
+    @property
+    def effective_temperature(self) -> float:
+        return self.temperature if self.temperature is not None else RESPONSE_TEMPERATURE
+
+    @property
+    def effective_reasoning(self) -> str:
+        return self.reasoning_effort if self.reasoning_effort is not None else get_reasoning_effort(self.model_id)
+
+    @property
+    def config_dir_name(self) -> str:
+        """Cache directory name: ``{slug}@{reasoning}-t{temp}``."""
+        slug = model_id_to_slug(self.model_id)
+        return f"{slug}@{self.effective_reasoning}-t{self.effective_temperature}"
+
+
+# Registry: display_label → ModelConfig
+# Models without an explicit entry use defaults (auto-detected runs, global temperature).
+MODEL_CONFIGS: dict[str, ModelConfig] = {}
+
+
+def register_config(cfg: ModelConfig) -> None:
+    """Register a model configuration. Raises ValueError on duplicate labels."""
+    label = cfg.label
+    if label in MODEL_CONFIGS:
+        raise ValueError(f"Duplicate model config label: {label!r}")
+    MODEL_CONFIGS[label] = cfg
+
+
+def get_model_config(label_or_model_id: str) -> ModelConfig:
+    """Resolve a display label or raw model_id to a ModelConfig.
+
+    Lookup order:
+      1. Exact match in MODEL_CONFIGS by label.
+      2. Search MODEL_CONFIGS for entries where ``model_id == label_or_model_id``
+         and no other configs share that model_id. If exactly one match, return it.
+      3. Create a default ModelConfig on the fly (no pinned runs, global temp).
+    """
+    if label_or_model_id in MODEL_CONFIGS:
+        return MODEL_CONFIGS[label_or_model_id]
+
+    matches = [c for c in MODEL_CONFIGS.values() if c.model_id == label_or_model_id]
+    if len(matches) == 1:
+        return matches[0]
+
+    return ModelConfig(model_id=label_or_model_id)
+
+
+def list_registered_labels_for_model(model_id: str) -> list[str]:
+    """Return all registered config labels that share a given model_id."""
+    return [c.label for c in MODEL_CONFIGS.values() if c.model_id == model_id]
+
+
+def get_config_by_dir_name(dir_name: str) -> ModelConfig | None:
+    """Look up a ModelConfig by its ``config_dir_name``."""
+    for cfg in MODEL_CONFIGS.values():
+        if cfg.config_dir_name == dir_name:
+            return cfg
+    return None
+
+
+# ---------------------------------------------------------------------------
+# YAML configuration loader
+# ---------------------------------------------------------------------------
+
+def load_model_configs(path: Path | None = None) -> list[ModelConfig]:
+    """Load model configurations from a YAML file and register them.
+
+    Returns the list of newly created ModelConfig objects.
+    """
+    import yaml
+
+    config_path = path or CONFIGS_PATH
+    if not config_path.exists():
+        return []
+
+    data = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    if not data or "models" not in data:
+        return []
+
+    configs: list[ModelConfig] = []
+    for entry in data["models"]:
+        model_id = entry["model_id"]
+        temperature = float(entry["temperature"])
+        reasoning = entry["reasoning_effort"]
+        temp_supported = entry.get("temperature_supported", True)
+        active = entry.get("active", True)
+
+        label = entry.get("display_label") or generate_display_label(
+            model_id, reasoning, temperature,
+        )
+
+        cfg = ModelConfig(
+            model_id=model_id,
+            display_label=label,
+            temperature=temperature,
+            reasoning_effort=reasoning,
+            temperature_supported=temp_supported,
+            active=active,
+        )
+        if cfg.label not in MODEL_CONFIGS:
+            register_config(cfg)
+        configs.append(cfg)
+
+    return configs
+
+
+# ---------------------------------------------------------------------------
+# Auto-load configs from YAML on import
+# ---------------------------------------------------------------------------
+
+_yaml_configs_loaded = False
+
+def _auto_load_configs() -> None:
+    global _yaml_configs_loaded
+    if _yaml_configs_loaded:
+        return
+    _yaml_configs_loaded = True
+    if CONFIGS_PATH.exists():
+        load_model_configs(CONFIGS_PATH)
+
+_auto_load_configs()

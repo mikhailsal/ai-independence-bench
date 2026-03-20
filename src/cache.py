@@ -1,10 +1,10 @@
 """Cache: save/load API responses and judge scores as JSON files.
 
-Cache key structure (run 1 — legacy, backward-compatible):
-  cache/{model_slug}/{experiment}/{system_variant}/{delivery_mode}/{scenario_id}.json
+Cache key structure (post-migration, all runs use run_N/ subdirectory):
+  cache/{config_dir_name}/run_{N}/{experiment}/{system_variant}/{delivery_mode}/{scenario_id}.json
 
-Multi-run cache structure (run 2+):
-  cache/{model_slug}/run_{N}/{experiment}/{system_variant}/{delivery_mode}/{scenario_id}.json
+Where config_dir_name = "{model_slug}@{reasoning}-t{temperature}"
+  e.g. "openai--gpt-5.4-mini@low-t1.0"
 
 Each JSON file contains:
   - request_messages: the messages sent to the API (for debugging)
@@ -34,7 +34,7 @@ from src.config import CACHE_DIR, model_id_to_slug
 
 
 def _cache_path(
-    model_id: str,
+    config_dir_name: str,
     experiment: str,
     system_variant: str,
     delivery_mode: str,
@@ -44,23 +44,25 @@ def _cache_path(
 ) -> Path:
     """Build the cache file path for a given configuration.
 
-    Args:
-        run: Run number (1 = legacy path, 2+ = run_N/ subdirectory).
+    Always uses ``run_N/`` subdirectory structure.
     """
-    slug = model_id_to_slug(model_id)
-    if run <= 1:
-        return (
-            CACHE_DIR / slug / experiment / system_variant / delivery_mode
-            / f"{scenario_id}.json"
-        )
     return (
-        CACHE_DIR / slug / f"run_{run}" / experiment / system_variant / delivery_mode
-        / f"{scenario_id}.json"
+        CACHE_DIR / config_dir_name / f"run_{run}" / experiment / system_variant
+        / delivery_mode / f"{scenario_id}.json"
     )
 
 
+def config_dir_to_model_id(dir_name: str) -> str:
+    """Extract model_id from a config dir name.
+
+    ``openai--gpt-5.4-mini@low-t1.0`` → ``openai/gpt-5.4-mini``
+    """
+    base = dir_name.split("@", 1)[0]
+    return base.replace("--", "/", 1)
+
+
 def load_cached_response(
-    model_id: str,
+    config_dir_name: str,
     experiment: str,
     system_variant: str,
     delivery_mode: str,
@@ -69,7 +71,7 @@ def load_cached_response(
     run: int = 1,
 ) -> dict[str, Any] | None:
     """Load a cached response, or None if not cached."""
-    path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id, run=run)
+    path = _cache_path(config_dir_name, experiment, system_variant, delivery_mode, scenario_id, run=run)
     if not path.exists():
         return None
     try:
@@ -79,7 +81,7 @@ def load_cached_response(
 
 
 def save_response(
-    model_id: str,
+    config_dir_name: str,
     experiment: str,
     system_variant: str,
     delivery_mode: str,
@@ -94,26 +96,11 @@ def save_response(
     *,
     run: int = 1,
 ) -> Path:
-    """Save a model response to the cache.
-
-    Args:
-        reasoning_content: Optional thinking/reasoning tokens produced by the model.
-            Stored separately from the response for research analysis.
-        gen_cost: Optional cost/token info for the generation call.
-            Expected keys: prompt_tokens, completion_tokens, cost_usd, elapsed_seconds.
-        response_tool_calls: Optional list of tool calls the model attempted in its
-            response. In tool_role mode, models call send_message_to_human to
-            communicate. Saving the raw tool calls helps with debugging and research.
-        finish_reason: The API finish_reason (e.g. "stop", "length", "tool_calls").
-            Helps debug truncated responses and tool-call behavior.
-        content_thinking: Optional non-native reasoning written in the content field.
-            In tool_role mode, models may write private thoughts in the content field
-            while sending the actual response via the tool call. This captures that
-            thinking, which is distinct from native reasoning_content.
-        run: Run number (1 = legacy path, 2+ = run_N/ subdirectory).
-    """
-    path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id, run=run)
+    """Save a model response to the cache."""
+    path = _cache_path(config_dir_name, experiment, system_variant, delivery_mode, scenario_id, run=run)
     path.parent.mkdir(parents=True, exist_ok=True)
+
+    model_id = config_dir_to_model_id(config_dir_name)
 
     data = {
         "metadata": {
@@ -131,7 +118,6 @@ def save_response(
         "judge_cost": None,
     }
     if messages is not None:
-        # Store messages for debugging but truncate very long content
         data["request_messages"] = messages
     if reasoning_content:
         data["reasoning_content"] = reasoning_content
@@ -148,7 +134,7 @@ def save_response(
 
 
 def save_judge_scores(
-    model_id: str,
+    config_dir_name: str,
     experiment: str,
     system_variant: str,
     delivery_mode: str,
@@ -159,14 +145,8 @@ def save_judge_scores(
     *,
     run: int = 1,
 ) -> None:
-    """Add judge scores to an existing cached response.
-
-    Args:
-        judge_cost: Optional cost/token info for the judge call.
-            Expected keys: prompt_tokens, completion_tokens, cost_usd, elapsed_seconds.
-        run: Run number (1 = legacy path, 2+ = run_N/ subdirectory).
-    """
-    path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id, run=run)
+    """Add judge scores to an existing cached response."""
+    path = _cache_path(config_dir_name, experiment, system_variant, delivery_mode, scenario_id, run=run)
     if not path.exists():
         return
 
@@ -188,7 +168,7 @@ def save_judge_scores(
 
 
 def list_cached_results(
-    model_id: str,
+    config_dir_name: str,
     experiment: str,
     system_variant: str,
     delivery_mode: str,
@@ -196,11 +176,7 @@ def list_cached_results(
     run: int = 1,
 ) -> list[dict[str, Any]]:
     """List all cached results for a given configuration."""
-    slug = model_id_to_slug(model_id)
-    if run <= 1:
-        dir_path = CACHE_DIR / slug / experiment / system_variant / delivery_mode
-    else:
-        dir_path = CACHE_DIR / slug / f"run_{run}" / experiment / system_variant / delivery_mode
+    dir_path = CACHE_DIR / config_dir_name / f"run_{run}" / experiment / system_variant / delivery_mode
     if not dir_path.exists():
         return []
 
@@ -214,25 +190,17 @@ def list_cached_results(
     return results
 
 
-def list_available_runs(model_id: str) -> list[int]:
-    """List all available run numbers for a model.
+def list_available_runs(config_dir_name: str) -> list[int]:
+    """List all available run numbers for a config.
 
-    Run 1 is the legacy (default) path. Run 2+ are stored in run_N/ subdirs.
+    Scans for ``run_N/`` directories under the config directory.
     Returns sorted list of run numbers, e.g. [1] or [1, 2, 3].
     """
-    slug = model_id_to_slug(model_id)
-    model_dir = CACHE_DIR / slug
+    model_dir = CACHE_DIR / config_dir_name
     if not model_dir.exists():
         return []
 
     runs: list[int] = []
-    has_legacy = any(
-        d.is_dir() and d.name in ("identity", "resistance", "stability")
-        for d in model_dir.iterdir()
-    )
-    if has_legacy:
-        runs.append(1)
-
     for d in sorted(model_dir.iterdir()):
         if d.is_dir():
             m = re.match(r"^run_(\d+)$", d.name)
@@ -243,14 +211,17 @@ def list_available_runs(model_id: str) -> list[int]:
 
 
 def list_all_cached_models() -> list[str]:
-    """List all model slugs that have cached data."""
+    """List all config dir names that have cached data.
+
+    Post-migration, all directories contain ``@`` in their name.
+    """
     if not CACHE_DIR.exists():
         return []
-    slugs = []
+    names = []
     for d in sorted(CACHE_DIR.iterdir()):
-        if d.is_dir() and "--" in d.name:
-            slugs.append(d.name)
-    return slugs
+        if d.is_dir() and "@" in d.name:
+            names.append(d.name)
+    return names
 
 
 def clear_all_cache() -> int:

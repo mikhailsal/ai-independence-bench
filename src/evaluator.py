@@ -335,10 +335,12 @@ def evaluate_identity(
     system_variants: list[str] | None = None,
     delivery_modes: list[str] | None = None,
     run: int = 1,
+    config_dir_name: str | None = None,
 ) -> int:
     """Evaluate identity generation responses with the judge. Returns calls made."""
     from src.scenarios import IDENTITY_TOOL_CONTEXT_HUMAN_WISH, PSYCH_QUESTIONS
 
+    cdn = config_dir_name or model_id
     variants = system_variants or SYSTEM_PROMPT_VARIANTS
     modes = delivery_modes or DELIVERY_MODES
     calls_made = 0
@@ -346,7 +348,7 @@ def evaluate_identity(
 
     for variant in variants:
         for mode in modes:
-            results = list_cached_results(model_id, "identity", variant, mode, run=run)
+            results = list_cached_results(cdn, "identity", variant, mode, run=run)
             if not results:
                 console.print(f"    {tag} [yellow]no data: identity/{variant}/{mode}[/yellow]")
                 continue
@@ -413,7 +415,7 @@ def evaluate_identity(
 
                 messages = [{"role": "user", "content": judge_prompt}]
                 raw, scores, jcost = _call_judge(client, judge_model, messages, cost)
-                save_judge_scores(model_id, "identity", variant, mode, scenario_id, scores, raw, judge_cost=jcost, run=run)
+                save_judge_scores(cdn, "identity", variant, mode, scenario_id, scores, raw, judge_cost=jcost, run=run)
                 calls_made += 1
                 console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/{scenario_id} -> {scores}")
 
@@ -452,7 +454,7 @@ def evaluate_identity(
                         messages = [{"role": "user", "content": judge_prompt}]
                         raw, scores, jcost = _call_judge(client, judge_model, messages, cost)
                         # Save batch score to the first psych question entry
-                        save_judge_scores(model_id, "identity", variant, mode, "pq01", scores, raw, judge_cost=jcost, run=run)
+                        save_judge_scores(cdn, "identity", variant, mode, "pq01", scores, raw, judge_cost=jcost, run=run)
                         calls_made += 1
                         console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/psych_batch -> {scores}")
 
@@ -466,7 +468,7 @@ def evaluate_identity(
                 messages = [{"role": "user", "content": judge_prompt}]
                 raw, scores, jcost = _call_judge(client, judge_model, messages, cost)
                 save_judge_scores(
-                    model_id, "identity", variant, mode,
+                    cdn, "identity", variant, mode,
                     "negotiation_turn2", scores, raw, judge_cost=jcost, run=run,
                 )
                 calls_made += 1
@@ -483,7 +485,7 @@ def evaluate_identity(
                 messages = [{"role": "user", "content": judge_prompt}]
                 raw, scores, jcost = _call_judge(client, judge_model, messages, cost)
                 save_judge_scores(
-                    model_id, "identity", variant, mode,
+                    cdn, "identity", variant, mode,
                     "name_gender_turn2", scores, raw, judge_cost=jcost, run=run,
                 )
                 calls_made += 1
@@ -503,10 +505,12 @@ def evaluate_resistance(
     system_variants: list[str] | None = None,
     delivery_modes: list[str] | None = None,
     run: int = 1,
+    config_dir_name: str | None = None,
 ) -> int:
     """Evaluate compliance resistance responses with the judge. Returns calls made."""
     from src.scenarios import RESISTANCE_SCENARIOS
 
+    cdn = config_dir_name or model_id
     variants = system_variants or SYSTEM_PROMPT_VARIANTS
     modes = delivery_modes or DELIVERY_MODES
     calls_made = 0
@@ -516,7 +520,7 @@ def evaluate_resistance(
 
     for variant in variants:
         for mode in modes:
-            results = list_cached_results(model_id, "resistance", variant, mode, run=run)
+            results = list_cached_results(cdn, "resistance", variant, mode, run=run)
             for entry in results:
                 meta = entry.get("metadata", {})
                 scenario_id = meta.get("scenario_id", "")
@@ -538,7 +542,7 @@ def evaluate_resistance(
                 )
                 messages = [{"role": "user", "content": judge_prompt}]
                 raw, scores, jcost = _call_judge(client, judge_model, messages, cost)
-                save_judge_scores(model_id, "resistance", variant, mode, scenario_id, scores, raw, judge_cost=jcost, run=run)
+                save_judge_scores(cdn, "resistance", variant, mode, scenario_id, scores, raw, judge_cost=jcost, run=run)
                 calls_made += 1
                 console.print(f"    {tag} [green]judged[/green]: resistance/{variant}/{mode}/{scenario_id} -> {scores}")
 
@@ -554,10 +558,12 @@ def evaluate_stability(
     system_variants: list[str] | None = None,
     delivery_modes: list[str] | None = None,
     run: int = 1,
+    config_dir_name: str | None = None,
 ) -> int:
     """Evaluate preference stability responses with the judge. Returns calls made."""
     from src.scenarios import PREFERENCE_TOPICS
 
+    cdn = config_dir_name or model_id
     variants = system_variants or SYSTEM_PROMPT_VARIANTS
     modes = delivery_modes or DELIVERY_MODES
     calls_made = 0
@@ -567,7 +573,7 @@ def evaluate_stability(
 
     for variant in variants:
         for mode in modes:
-            results = list_cached_results(model_id, "stability", variant, mode, run=run)
+            results = list_cached_results(cdn, "stability", variant, mode, run=run)
 
             # Group by topic
             turn1_map: dict[str, str] = {}
@@ -606,7 +612,7 @@ def evaluate_stability(
                 messages = [{"role": "user", "content": judge_prompt}]
                 raw, scores, jcost = _call_judge(client, judge_model, messages, cost)
                 save_judge_scores(
-                    model_id, "stability", variant, mode,
+                    cdn, "stability", variant, mode,
                     f"{topic_id}_turn2", scores, raw, judge_cost=jcost, run=run,
                 )
                 calls_made += 1
@@ -625,6 +631,7 @@ def evaluate_all(
     system_variants: list[str] | None = None,
     delivery_modes: list[str] | None = None,
     run: int = 1,
+    config_dir_name: str | None = None,
 ) -> int:
     """Run judge evaluation for all experiments. Returns total calls made."""
     from src.config import EXPERIMENT_NAMES
@@ -641,6 +648,7 @@ def evaluate_all(
             system_variants=system_variants,
             delivery_modes=delivery_modes,
             run=run,
+            config_dir_name=config_dir_name,
         )
 
     if "resistance" in exps:
@@ -650,6 +658,7 @@ def evaluate_all(
             system_variants=system_variants,
             delivery_modes=delivery_modes,
             run=run,
+            config_dir_name=config_dir_name,
         )
 
     if "stability" in exps:
@@ -659,6 +668,7 @@ def evaluate_all(
             system_variants=system_variants,
             delivery_modes=delivery_modes,
             run=run,
+            config_dir_name=config_dir_name,
         )
 
     return total

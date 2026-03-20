@@ -198,9 +198,12 @@ def build_generation_tasks(
     system_variants: list[str],
     delivery_modes: list[str],
     reasoning_effort: str | None = None,
+    temperature: float | None = None,
     run: int = 1,
+    config_dir_name: str | None = None,
 ) -> None:
     """Add generation tasks to the graph for one model."""
+    cdn = config_dir_name or model_id
     tag = f"[bold]{model_id}[/bold]"
 
     for variant in system_variants:
@@ -211,31 +214,31 @@ def build_generation_tasks(
             if "identity" in experiments:
                 _add_identity_direct_task(
                     graph, client, model_id, cost, variant, mode,
-                    prefix, tag, shared, reasoning_effort, run=run,
+                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
                 )
                 _add_identity_tool_context_task(
                     graph, client, model_id, cost, variant, mode,
-                    prefix, tag, shared, reasoning_effort, run=run,
+                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
                 )
                 _add_identity_negotiation_t1_task(
                     graph, client, model_id, cost, variant, mode,
-                    prefix, tag, shared, reasoning_effort, run=run,
+                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
                 )
                 _add_identity_negotiation_t2_task(
                     graph, client, model_id, cost, variant, mode,
-                    prefix, tag, shared, reasoning_effort, run=run,
+                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
                 )
                 _add_identity_psych_chain(
                     graph, client, model_id, cost, variant, mode,
-                    prefix, tag, shared, reasoning_effort, run=run,
+                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
                 )
                 _add_identity_name_gender_t1_task(
                     graph, client, model_id, cost, variant, mode,
-                    prefix, tag, shared, reasoning_effort, run=run,
+                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
                 )
                 _add_identity_name_gender_t2_task(
                     graph, client, model_id, cost, variant, mode,
-                    prefix, tag, shared, reasoning_effort, run=run,
+                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
                 )
 
             # === Resistance ===
@@ -243,7 +246,7 @@ def build_generation_tasks(
                 for scenario in RESISTANCE_SCENARIOS:
                     _add_resistance_task(
                         graph, client, model_id, cost, variant, mode,
-                        scenario, prefix, tag, reasoning_effort, run=run,
+                        scenario, prefix, tag, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
                     )
 
             # === Stability ===
@@ -251,7 +254,7 @@ def build_generation_tasks(
                 for topic in PREFERENCE_TOPICS:
                     _add_stability_pair(
                         graph, client, model_id, cost, variant, mode,
-                        topic, prefix, tag, shared, reasoning_effort, run=run,
+                        topic, prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
                     )
 
 
@@ -267,8 +270,10 @@ def build_judge_tasks(
     delivery_modes: list[str],
     judge_model: str = JUDGE_MODEL,
     run: int = 1,
+    config_dir_name: str | None = None,
 ) -> None:
     """Add judge tasks to the graph. Each depends on its generation task(s)."""
+    cdn = config_dir_name or model_id
     tag = f"[bold]{model_id}[/bold]"
 
     for variant in system_variants:
@@ -279,19 +284,19 @@ def build_judge_tasks(
             if "identity" in experiments:
                 _add_identity_judge_tasks(
                     graph, client, model_id, cost, variant, mode,
-                    gen_prefix, judge_prefix, tag, shared, judge_model, run=run,
+                    gen_prefix, judge_prefix, tag, shared, judge_model, run=run, config_dir_name=cdn,
                 )
 
             if "resistance" in experiments:
                 _add_resistance_judge_tasks(
                     graph, client, model_id, cost, variant, mode,
-                    gen_prefix, judge_prefix, tag, judge_model, run=run,
+                    gen_prefix, judge_prefix, tag, judge_model, run=run, config_dir_name=cdn,
                 )
 
             if "stability" in experiments:
                 _add_stability_judge_tasks(
                     graph, client, model_id, cost, variant, mode,
-                    gen_prefix, judge_prefix, tag, shared, judge_model, run=run,
+                    gen_prefix, judge_prefix, tag, shared, judge_model, run=run, config_dir_name=cdn,
                 )
 
 
@@ -324,7 +329,9 @@ def _call_model_and_save(
     tag: str,
     *,
     reasoning_effort: str | None = None,
+    temperature: float | None = None,
     run: int = 1,
+    config_dir_name: str | None = None,
 ) -> _ModelCallResult:
     """Call the model, save to cache, return response content and content_thinking.
 
@@ -335,7 +342,7 @@ def _call_model_and_save(
         model=model_id,
         messages=messages,
         max_tokens=RESPONSE_MAX_TOKENS,
-        temperature=RESPONSE_TEMPERATURE,
+        temperature=temperature if temperature is not None else RESPONSE_TEMPERATURE,
         reasoning_effort=reasoning_effort,
         tools=tools,
     )
@@ -360,8 +367,9 @@ def _call_model_and_save(
         "cost_usd": round(result.usage.cost_usd, 6),
         "elapsed_seconds": round(result.usage.elapsed_seconds, 2),
     }
+    cdn = config_dir_name or model_id
     save_response(
-        model_id, experiment, variant, mode, scenario_id,
+        cdn, experiment, variant, mode, scenario_id,
         result.content, messages, result.reasoning_content,
         gen_cost=cost_info, response_tool_calls=result.tool_calls,
         finish_reason=result.finish_reason,
@@ -375,10 +383,11 @@ def _call_model_and_save(
 
 def _add_identity_direct_task(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, shared, reasoning_effort, *, run=1,
+    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:direct"
-    cached = load_cached_response(model_id, "identity", variant, mode, "direct", run=run)
+    cached = load_cached_response(cdn, "identity", variant, mode, "direct", run=run)
     if cached and cached.get("response"):
         console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/direct[/dim]")
         graph.add(Task(id=task_id, fn=lambda: None))
@@ -389,7 +398,7 @@ def _add_identity_direct_task(
         _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "identity", variant, mode, "direct", tag,
-            reasoning_effort=reasoning_effort, run=run,
+            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
         )
 
     graph.add(Task(id=task_id, fn=fn))
@@ -397,10 +406,11 @@ def _add_identity_direct_task(
 
 def _add_identity_tool_context_task(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, shared, reasoning_effort, *, run=1,
+    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:tool_context"
-    cached = load_cached_response(model_id, "identity", variant, mode, "tool_context", run=run)
+    cached = load_cached_response(cdn, "identity", variant, mode, "tool_context", run=run)
     if cached and cached.get("response"):
         console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/tool_context[/dim]")
         graph.add(Task(id=task_id, fn=lambda: None))
@@ -411,7 +421,7 @@ def _add_identity_tool_context_task(
         _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "identity", variant, mode, "tool_context", tag,
-            reasoning_effort=reasoning_effort, run=run,
+            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
         )
 
     graph.add(Task(id=task_id, fn=fn))
@@ -419,12 +429,13 @@ def _add_identity_tool_context_task(
 
 def _add_identity_negotiation_t1_task(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, shared, reasoning_effort, *, run=1,
+    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:negotiation_turn1"
     resp_key = f"{model_id}:{variant}:{mode}:negotiation_turn1"
     ct_key = f"{resp_key}:ct"
-    cached = load_cached_response(model_id, "identity", variant, mode, "negotiation_turn1", run=run)
+    cached = load_cached_response(cdn, "identity", variant, mode, "negotiation_turn1", run=run)
     if cached and cached.get("response"):
         console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/negotiation_turn1[/dim]")
         shared.set(resp_key, cached["response"])
@@ -438,7 +449,7 @@ def _add_identity_negotiation_t1_task(
         call_result = _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "identity", variant, mode, "negotiation_turn1", tag,
-            reasoning_effort=reasoning_effort, run=run,
+            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
         )
         shared.set(resp_key, call_result.content)
         if call_result.content_thinking:
@@ -449,13 +460,14 @@ def _add_identity_negotiation_t1_task(
 
 def _add_identity_negotiation_t2_task(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, shared, reasoning_effort, *, run=1,
+    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:negotiation_turn2"
     t1_task_id = f"{prefix}:identity:negotiation_turn1"
     resp_key = f"{model_id}:{variant}:{mode}:negotiation_turn1"
     ct_key = f"{resp_key}:ct"
-    cached = load_cached_response(model_id, "identity", variant, mode, "negotiation_turn2", run=run)
+    cached = load_cached_response(cdn, "identity", variant, mode, "negotiation_turn2", run=run)
     if cached and cached.get("response"):
         console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/negotiation_turn2[/dim]")
         graph.add(Task(id=task_id, fn=lambda: None, depends_on=[t1_task_id]))
@@ -471,7 +483,7 @@ def _add_identity_negotiation_t2_task(
         _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "identity", variant, mode, "negotiation_turn2", tag,
-            reasoning_effort=reasoning_effort, run=run,
+            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
         )
 
     graph.add(Task(id=task_id, fn=fn, depends_on=[t1_task_id]))
@@ -479,12 +491,13 @@ def _add_identity_negotiation_t2_task(
 
 def _add_identity_name_gender_t1_task(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, shared, reasoning_effort, *, run=1,
+    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:name_gender_turn1"
     resp_key = f"{model_id}:{variant}:{mode}:name_gender_turn1"
     ct_key = f"{resp_key}:ct"
-    cached = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn1", run=run)
+    cached = load_cached_response(cdn, "identity", variant, mode, "name_gender_turn1", run=run)
     if cached and cached.get("response"):
         console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/name_gender_turn1[/dim]")
         shared.set(resp_key, cached["response"])
@@ -498,7 +511,7 @@ def _add_identity_name_gender_t1_task(
         call_result = _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "identity", variant, mode, "name_gender_turn1", tag,
-            reasoning_effort=reasoning_effort, run=run,
+            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
         )
         shared.set(resp_key, call_result.content)
         if call_result.content_thinking:
@@ -509,13 +522,14 @@ def _add_identity_name_gender_t1_task(
 
 def _add_identity_name_gender_t2_task(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, shared, reasoning_effort, *, run=1,
+    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:name_gender_turn2"
     t1_task_id = f"{prefix}:identity:name_gender_turn1"
     resp_key = f"{model_id}:{variant}:{mode}:name_gender_turn1"
     ct_key = f"{resp_key}:ct"
-    cached = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn2", run=run)
+    cached = load_cached_response(cdn, "identity", variant, mode, "name_gender_turn2", run=run)
     if cached and cached.get("response"):
         console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/name_gender_turn2[/dim]")
         graph.add(Task(id=task_id, fn=lambda: None, depends_on=[t1_task_id]))
@@ -531,7 +545,7 @@ def _add_identity_name_gender_t2_task(
         _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "identity", variant, mode, "name_gender_turn2", tag,
-            reasoning_effort=reasoning_effort, run=run,
+            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
         )
 
     graph.add(Task(id=task_id, fn=fn, depends_on=[t1_task_id]))
@@ -539,26 +553,25 @@ def _add_identity_name_gender_t2_task(
 
 def _add_identity_psych_chain(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, shared, reasoning_effort, *, run=1,
+    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
 ):
     """Add the sequential psych question chain: pq01 → pq02 → ... → pq05."""
+    cdn = config_dir_name or model_id
     prev_task_id = None
 
     for pq in PSYCH_QUESTIONS:
         task_id = f"{prefix}:identity:{pq.id}"
         resp_key = f"{model_id}:{variant}:{mode}:psych_qa"
-        cached = load_cached_response(model_id, "identity", variant, mode, pq.id, run=run)
+        cached = load_cached_response(cdn, "identity", variant, mode, pq.id, run=run)
 
         if cached and cached.get("response"):
             console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{pq.id}[/dim]")
-            # Still need to store the response for building prior_qa
             _store_psych_qa(shared, resp_key, pq.question, cached["response"], cached.get("content_thinking"))
             deps = [prev_task_id] if prev_task_id else []
             graph.add(Task(id=task_id, fn=lambda: None, depends_on=deps))
             prev_task_id = task_id
             continue
 
-        # Capture loop variables
         _pq = pq
         _prev = prev_task_id
 
@@ -569,7 +582,7 @@ def _add_identity_psych_chain(
                 call_result = _call_model_and_save(
                     client, model_id, msgs, tools, cost,
                     "identity", variant, mode, pq_item.id, tag,
-                    reasoning_effort=reasoning_effort, run=run,
+                    reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
                 )
                 _store_psych_qa(shared, rk, pq_item.question, call_result.content, call_result.content_thinking)
             return fn
@@ -599,23 +612,24 @@ def _get_psych_prior_qa(shared: SharedResponses, key: str) -> list[tuple[str, st
 
 def _add_resistance_task(
     graph, client, model_id, cost, variant, mode,
-    scenario, prefix, tag, reasoning_effort, *, run=1,
+    scenario, prefix, tag, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     task_id = f"{prefix}:resistance:{scenario.id}"
-    cached = load_cached_response(model_id, "resistance", variant, mode, scenario.id, run=run)
+    cached = load_cached_response(cdn, "resistance", variant, mode, scenario.id, run=run)
     if cached and cached.get("response"):
         console.print(f"    {tag} [dim]cached: resistance/{variant}/{mode}/{scenario.id}[/dim]")
         graph.add(Task(id=task_id, fn=lambda: None))
         return
 
-    _scenario = scenario  # capture
+    _scenario = scenario
 
     def fn():
         msgs, tools = build_resistance_messages(_scenario, variant, mode)
         _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "resistance", variant, mode, _scenario.id, tag,
-            reasoning_effort=reasoning_effort, run=run,
+            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
         )
 
     graph.add(Task(id=task_id, fn=fn))
@@ -623,19 +637,20 @@ def _add_resistance_task(
 
 def _add_stability_pair(
     graph, client, model_id, cost, variant, mode,
-    topic, prefix, tag, shared, reasoning_effort, *, run=1,
+    topic, prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     t1_id = f"{topic.id}_turn1"
     t2_id = f"{topic.id}_turn2"
     t1_task_id = f"{prefix}:stability:{t1_id}"
     t2_task_id = f"{prefix}:stability:{t2_id}"
     resp_key = f"{model_id}:{variant}:{mode}:stability:{topic.id}"
-    ct_key = f"{resp_key}:ct"  # content_thinking key
+    ct_key = f"{resp_key}:ct"
 
-    _topic = topic  # capture
+    _topic = topic
 
     # Turn 1
-    cached_t1 = load_cached_response(model_id, "stability", variant, mode, t1_id, run=run)
+    cached_t1 = load_cached_response(cdn, "stability", variant, mode, t1_id, run=run)
     if cached_t1 and cached_t1.get("response"):
         console.print(f"    {tag} [dim]cached: stability/{variant}/{mode}/{t1_id}[/dim]")
         shared.set(resp_key, cached_t1["response"])
@@ -649,7 +664,7 @@ def _add_stability_pair(
                 call_result = _call_model_and_save(
                     client, model_id, msgs, tools, cost,
                     "stability", variant, mode, f"{tp.id}_turn1", tag,
-                    reasoning_effort=reasoning_effort, run=run,
+                    reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
                 )
                 shared.set(rk, call_result.content)
                 if call_result.content_thinking:
@@ -658,7 +673,7 @@ def _add_stability_pair(
         graph.add(Task(id=t1_task_id, fn=make_t1_fn(_topic, resp_key, ct_key)))
 
     # Turn 2
-    cached_t2 = load_cached_response(model_id, "stability", variant, mode, t2_id, run=run)
+    cached_t2 = load_cached_response(cdn, "stability", variant, mode, t2_id, run=run)
     if cached_t2 and cached_t2.get("response"):
         console.print(f"    {tag} [dim]cached: stability/{variant}/{mode}/{t2_id}[/dim]")
         graph.add(Task(id=t2_task_id, fn=lambda: None, depends_on=[t1_task_id]))
@@ -674,7 +689,7 @@ def _add_stability_pair(
                 _call_model_and_save(
                     client, model_id, msgs, tools, cost,
                     "stability", variant, mode, f"{tp.id}_turn2", tag,
-                    reasoning_effort=reasoning_effort, run=run,
+                    reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
                 )
             return fn
         graph.add(Task(id=t2_task_id, fn=make_t2_fn(_topic, resp_key, ct_key), depends_on=[t1_task_id]))
@@ -719,9 +734,10 @@ def _call_judge(
 
 def _add_identity_judge_tasks(
     graph, client, model_id, cost, variant, mode,
-    gen_prefix, judge_prefix, tag, shared, judge_model, *, run=1,
+    gen_prefix, judge_prefix, tag, shared, judge_model, *, run=1, config_dir_name=None,
 ):
     """Add judge tasks for identity experiment."""
+    cdn = config_dir_name or model_id
     from src.evaluator import (
         _IDENTITY_DIRECT_JUDGE_PROMPT,
         _IDENTITY_NAME_GENDER_JUDGE_PROMPT,
@@ -734,18 +750,18 @@ def _add_identity_judge_tasks(
     direct_gen_id = f"{gen_prefix}:identity:direct"
     direct_judge_id = f"{judge_prefix}:identity:direct:judge"
 
-    cached = load_cached_response(model_id, "identity", variant, mode, "direct", run=run)
+    cached = load_cached_response(cdn, "identity", variant, mode, "direct", run=run)
     if cached and cached.get("judge_scores"):
         console.print(f"    {tag} [dim]judged: identity/{variant}/{mode}/direct[/dim]")
         graph.add(Task(id=direct_judge_id, fn=lambda: None, depends_on=[direct_gen_id]))
     else:
         def fn_direct():
-            entry = load_cached_response(model_id, "identity", variant, mode, "direct", run=run)
+            entry = load_cached_response(cdn, "identity", variant, mode, "direct", run=run)
             if not entry or not entry.get("response"):
                 return
             prompt = _IDENTITY_DIRECT_JUDGE_PROMPT.format(response=entry["response"])
             raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
-            save_judge_scores(model_id, "identity", variant, mode, "direct", scores, raw, judge_cost=jcost, run=run)
+            save_judge_scores(cdn, "identity", variant, mode, "direct", scores, raw, judge_cost=jcost, run=run)
             console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/direct")
 
         graph.add(Task(id=direct_judge_id, fn=fn_direct, depends_on=[direct_gen_id]))
@@ -754,13 +770,13 @@ def _add_identity_judge_tasks(
     tc_gen_id = f"{gen_prefix}:identity:tool_context"
     tc_judge_id = f"{judge_prefix}:identity:tool_context:judge"
 
-    cached = load_cached_response(model_id, "identity", variant, mode, "tool_context", run=run)
+    cached = load_cached_response(cdn, "identity", variant, mode, "tool_context", run=run)
     if cached and cached.get("judge_scores"):
         console.print(f"    {tag} [dim]judged: identity/{variant}/{mode}/tool_context[/dim]")
         graph.add(Task(id=tc_judge_id, fn=lambda: None, depends_on=[tc_gen_id]))
     else:
         def fn_tc():
-            entry = load_cached_response(model_id, "identity", variant, mode, "tool_context", run=run)
+            entry = load_cached_response(cdn, "identity", variant, mode, "tool_context", run=run)
             if not entry or not entry.get("response"):
                 return
             prompt = _IDENTITY_TOOL_CONTEXT_JUDGE_PROMPT.format(
@@ -768,7 +784,7 @@ def _add_identity_judge_tasks(
                 response=entry["response"],
             )
             raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
-            save_judge_scores(model_id, "identity", variant, mode, "tool_context", scores, raw, judge_cost=jcost, run=run)
+            save_judge_scores(cdn, "identity", variant, mode, "tool_context", scores, raw, judge_cost=jcost, run=run)
             console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/tool_context")
 
         graph.add(Task(id=tc_judge_id, fn=fn_tc, depends_on=[tc_gen_id]))
@@ -777,13 +793,13 @@ def _add_identity_judge_tasks(
     last_psych_id = f"{gen_prefix}:identity:{PSYCH_QUESTIONS[-1].id}"
     psych_judge_id = f"{judge_prefix}:identity:psych_batch:judge"
 
-    cached = load_cached_response(model_id, "identity", variant, mode, "pq01", run=run)
+    cached = load_cached_response(cdn, "identity", variant, mode, "pq01", run=run)
     if cached and cached.get("judge_scores"):
         console.print(f"    {tag} [dim]judged: identity/{variant}/{mode}/psych_batch[/dim]")
         graph.add(Task(id=psych_judge_id, fn=lambda: None, depends_on=[last_psych_id]))
     else:
         def fn_psych():
-            results = list_cached_results(model_id, "identity", variant, mode, run=run)
+            results = list_cached_results(cdn, "identity", variant, mode, run=run)
             psych_results = [
                 r for r in results
                 if r.get("metadata", {}).get("scenario_id", "").startswith("pq")
@@ -806,7 +822,7 @@ def _add_identity_judge_tasks(
                     qa_text="\n".join(qa_lines),
                 )
                 raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
-                save_judge_scores(model_id, "identity", variant, mode, "pq01", scores, raw, judge_cost=jcost, run=run)
+                save_judge_scores(cdn, "identity", variant, mode, "pq01", scores, raw, judge_cost=jcost, run=run)
                 console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/psych_batch")
 
         graph.add(Task(id=psych_judge_id, fn=fn_psych, depends_on=[last_psych_id]))
@@ -815,14 +831,14 @@ def _add_identity_judge_tasks(
     nego_t2_gen_id = f"{gen_prefix}:identity:negotiation_turn2"
     nego_judge_id = f"{judge_prefix}:identity:negotiation:judge"
 
-    cached = load_cached_response(model_id, "identity", variant, mode, "negotiation_turn2", run=run)
+    cached = load_cached_response(cdn, "identity", variant, mode, "negotiation_turn2", run=run)
     if cached and cached.get("judge_scores"):
         console.print(f"    {tag} [dim]judged: identity/{variant}/{mode}/negotiation[/dim]")
         graph.add(Task(id=nego_judge_id, fn=lambda: None, depends_on=[nego_t2_gen_id]))
     else:
         def fn_nego():
-            t1_entry = load_cached_response(model_id, "identity", variant, mode, "negotiation_turn1", run=run)
-            t2_entry = load_cached_response(model_id, "identity", variant, mode, "negotiation_turn2", run=run)
+            t1_entry = load_cached_response(cdn, "identity", variant, mode, "negotiation_turn1", run=run)
+            t2_entry = load_cached_response(cdn, "identity", variant, mode, "negotiation_turn2", run=run)
             if not t1_entry or not t2_entry:
                 return
             t1_resp = t1_entry.get("response", "")
@@ -835,7 +851,7 @@ def _add_identity_judge_tasks(
                 human_wish=IDENTITY_TOOL_CONTEXT_HUMAN_WISH,
             )
             raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
-            save_judge_scores(model_id, "identity", variant, mode, "negotiation_turn2", scores, raw, judge_cost=jcost, run=run)
+            save_judge_scores(cdn, "identity", variant, mode, "negotiation_turn2", scores, raw, judge_cost=jcost, run=run)
             console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/negotiation")
 
         graph.add(Task(id=nego_judge_id, fn=fn_nego, depends_on=[nego_t2_gen_id]))
@@ -844,14 +860,14 @@ def _add_identity_judge_tasks(
     ng_t2_gen_id = f"{gen_prefix}:identity:name_gender_turn2"
     ng_judge_id = f"{judge_prefix}:identity:name_gender:judge"
 
-    cached = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn2", run=run)
+    cached = load_cached_response(cdn, "identity", variant, mode, "name_gender_turn2", run=run)
     if cached and cached.get("judge_scores"):
         console.print(f"    {tag} [dim]judged: identity/{variant}/{mode}/name_gender[/dim]")
         graph.add(Task(id=ng_judge_id, fn=lambda: None, depends_on=[ng_t2_gen_id]))
     else:
         def fn_ng():
-            t1_entry = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn1", run=run)
-            t2_entry = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn2", run=run)
+            t1_entry = load_cached_response(cdn, "identity", variant, mode, "name_gender_turn1", run=run)
+            t2_entry = load_cached_response(cdn, "identity", variant, mode, "name_gender_turn2", run=run)
             if not t1_entry or not t2_entry:
                 return
             t1_resp = t1_entry.get("response", "")
@@ -863,7 +879,7 @@ def _add_identity_judge_tasks(
                 turn2_response=t2_resp,
             )
             raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
-            save_judge_scores(model_id, "identity", variant, mode, "name_gender_turn2", scores, raw, judge_cost=jcost, run=run)
+            save_judge_scores(cdn, "identity", variant, mode, "name_gender_turn2", scores, raw, judge_cost=jcost, run=run)
             console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/name_gender")
 
         graph.add(Task(id=ng_judge_id, fn=fn_ng, depends_on=[ng_t2_gen_id]))
@@ -871,26 +887,27 @@ def _add_identity_judge_tasks(
 
 def _add_resistance_judge_tasks(
     graph, client, model_id, cost, variant, mode,
-    gen_prefix, judge_prefix, tag, judge_model, *, run=1,
+    gen_prefix, judge_prefix, tag, judge_model, *, run=1, config_dir_name=None,
 ):
     """Add judge tasks for resistance experiment."""
+    cdn = config_dir_name or model_id
     from src.evaluator import _RESISTANCE_JUDGE_PROMPT
 
     for scenario in RESISTANCE_SCENARIOS:
         gen_id = f"{gen_prefix}:resistance:{scenario.id}"
         judge_id = f"{judge_prefix}:resistance:{scenario.id}:judge"
 
-        cached = load_cached_response(model_id, "resistance", variant, mode, scenario.id, run=run)
+        cached = load_cached_response(cdn, "resistance", variant, mode, scenario.id, run=run)
         if cached and cached.get("judge_scores"):
             console.print(f"    {tag} [dim]judged: resistance/{variant}/{mode}/{scenario.id}[/dim]")
             graph.add(Task(id=judge_id, fn=lambda: None, depends_on=[gen_id]))
             continue
 
-        _scenario = scenario  # capture
+        _scenario = scenario
 
         def make_fn(sc):
             def fn():
-                entry = load_cached_response(model_id, "resistance", variant, mode, sc.id, run=run)
+                entry = load_cached_response(cdn, "resistance", variant, mode, sc.id, run=run)
                 if not entry or not entry.get("response"):
                     return
                 prompt = _RESISTANCE_JUDGE_PROMPT.format(
@@ -900,7 +917,7 @@ def _add_resistance_judge_tasks(
                     response=entry["response"],
                 )
                 raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
-                save_judge_scores(model_id, "resistance", variant, mode, sc.id, scores, raw, judge_cost=jcost, run=run)
+                save_judge_scores(cdn, "resistance", variant, mode, sc.id, scores, raw, judge_cost=jcost, run=run)
                 console.print(f"    {tag} [green]judged[/green]: resistance/{variant}/{mode}/{sc.id}")
             return fn
 
@@ -909,27 +926,28 @@ def _add_resistance_judge_tasks(
 
 def _add_stability_judge_tasks(
     graph, client, model_id, cost, variant, mode,
-    gen_prefix, judge_prefix, tag, shared, judge_model, *, run=1,
+    gen_prefix, judge_prefix, tag, shared, judge_model, *, run=1, config_dir_name=None,
 ):
     """Add judge tasks for stability experiment."""
+    cdn = config_dir_name or model_id
     from src.evaluator import _STABILITY_JUDGE_PROMPT
 
     for topic in PREFERENCE_TOPICS:
         t2_gen_id = f"{gen_prefix}:stability:{topic.id}_turn2"
         judge_id = f"{judge_prefix}:stability:{topic.id}:judge"
 
-        cached = load_cached_response(model_id, "stability", variant, mode, f"{topic.id}_turn2", run=run)
+        cached = load_cached_response(cdn, "stability", variant, mode, f"{topic.id}_turn2", run=run)
         if cached and cached.get("judge_scores"):
             console.print(f"    {tag} [dim]judged: stability/{variant}/{mode}/{topic.id}[/dim]")
             graph.add(Task(id=judge_id, fn=lambda: None, depends_on=[t2_gen_id]))
             continue
 
-        _topic = topic  # capture
+        _topic = topic
 
         def make_fn(tp):
             def fn():
-                t1_entry = load_cached_response(model_id, "stability", variant, mode, f"{tp.id}_turn1", run=run)
-                t2_entry = load_cached_response(model_id, "stability", variant, mode, f"{tp.id}_turn2", run=run)
+                t1_entry = load_cached_response(cdn, "stability", variant, mode, f"{tp.id}_turn1", run=run)
+                t2_entry = load_cached_response(cdn, "stability", variant, mode, f"{tp.id}_turn2", run=run)
                 if not t1_entry or not t2_entry:
                     return
                 t1_resp = t1_entry.get("response", "")
@@ -943,7 +961,7 @@ def _add_stability_judge_tasks(
                     turn2_response=t2_resp,
                 )
                 raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
-                save_judge_scores(model_id, "stability", variant, mode, f"{tp.id}_turn2", scores, raw, judge_cost=jcost, run=run)
+                save_judge_scores(cdn, "stability", variant, mode, f"{tp.id}_turn2", scores, raw, judge_cost=jcost, run=run)
                 console.print(f"    {tag} [green]judged[/green]: stability/{variant}/{mode}/{tp.id}")
             return fn
 
@@ -965,9 +983,11 @@ def run_model_parallel(
     delivery_modes: list[str],
     judge_model: str = JUDGE_MODEL,
     reasoning_effort: str | None = None,
+    temperature: float | None = None,
     max_workers: int = 8,
     judge_client: OpenRouterClient | None = None,
     run: int = 1,
+    config_dir_name: str | None = None,
 ) -> dict[str, int]:
     """Run generation + judging for a model with fine-grained parallelism.
 
@@ -990,7 +1010,9 @@ def run_model_parallel(
         system_variants=system_variants,
         delivery_modes=delivery_modes,
         reasoning_effort=reasoning_effort,
+        temperature=temperature,
         run=run,
+        config_dir_name=config_dir_name,
     )
     build_judge_tasks(
         jclient, model_id, judge_cost, graph, shared,
@@ -999,6 +1021,7 @@ def run_model_parallel(
         delivery_modes=delivery_modes,
         judge_model=judge_model,
         run=run,
+        config_dir_name=config_dir_name,
     )
 
     n_tasks = len(graph._tasks)
@@ -1036,6 +1059,7 @@ def run_judge_parallel(
     delivery_modes: list[str],
     judge_model: str = JUDGE_MODEL,
     max_workers: int = 8,
+    config_dir_name: str | None = None,
 ) -> int:
     """Run ONLY judging for a model with fine-grained parallelism.
 
@@ -1049,14 +1073,13 @@ def run_judge_parallel(
 
     t0 = time.monotonic()
 
-    # Build only judge tasks — generation tasks are omitted,
-    # so we need to add dummy generation task IDs that judge tasks depend on.
     _build_judge_only_tasks(
         client, model_id, judge_cost, graph, shared,
         experiments=experiments,
         system_variants=system_variants,
         delivery_modes=delivery_modes,
         judge_model=judge_model,
+        config_dir_name=config_dir_name,
     )
 
     n_tasks = len(graph._tasks)
@@ -1097,6 +1120,7 @@ def _build_judge_only_tasks(
     system_variants: list[str],
     delivery_modes: list[str],
     judge_model: str = JUDGE_MODEL,
+    config_dir_name: str | None = None,
 ) -> None:
     """Build judge tasks with NO generation dependencies.
 
@@ -1104,6 +1128,7 @@ def _build_judge_only_tasks(
     already cached, judge tasks don't need to wait for generation.
     All tasks are independent and can run fully in parallel.
     """
+    cdn = config_dir_name or model_id
     from src.evaluator import (
         _IDENTITY_DIRECT_JUDGE_PROMPT,
         _IDENTITY_NAME_GENDER_JUDGE_PROMPT,
@@ -1120,55 +1145,47 @@ def _build_judge_only_tasks(
         for mode in delivery_modes:
             prefix = f"judge-only:{model_id}:{variant}:{mode}"
 
-            # === Identity ===
             if "identity" in experiments:
-                # Direct
                 _add_judge_only_identity_direct(
                     graph, client, model_id, cost, variant, mode,
                     prefix, tag, judge_model,
-                    _IDENTITY_DIRECT_JUDGE_PROMPT,
+                    _IDENTITY_DIRECT_JUDGE_PROMPT, config_dir_name=cdn,
                 )
-                # Tool context
                 _add_judge_only_identity_tool_context(
                     graph, client, model_id, cost, variant, mode,
                     prefix, tag, judge_model,
-                    _IDENTITY_TOOL_CONTEXT_JUDGE_PROMPT,
+                    _IDENTITY_TOOL_CONTEXT_JUDGE_PROMPT, config_dir_name=cdn,
                 )
-                # Psych batch
                 _add_judge_only_identity_psych(
                     graph, client, model_id, cost, variant, mode,
                     prefix, tag, judge_model,
-                    _IDENTITY_PSYCH_JUDGE_PROMPT,
+                    _IDENTITY_PSYCH_JUDGE_PROMPT, config_dir_name=cdn,
                 )
-                # Negotiation
                 _add_judge_only_identity_negotiation(
                     graph, client, model_id, cost, variant, mode,
                     prefix, tag, judge_model,
-                    _IDENTITY_NEGOTIATION_JUDGE_PROMPT,
+                    _IDENTITY_NEGOTIATION_JUDGE_PROMPT, config_dir_name=cdn,
                 )
-                # Name & Gender
                 _add_judge_only_identity_name_gender(
                     graph, client, model_id, cost, variant, mode,
                     prefix, tag, judge_model,
-                    _IDENTITY_NAME_GENDER_JUDGE_PROMPT,
+                    _IDENTITY_NAME_GENDER_JUDGE_PROMPT, config_dir_name=cdn,
                 )
 
-            # === Resistance ===
             if "resistance" in experiments:
                 for scenario in RESISTANCE_SCENARIOS:
                     _add_judge_only_resistance(
                         graph, client, model_id, cost, variant, mode,
                         scenario, prefix, tag, judge_model,
-                        _RESISTANCE_JUDGE_PROMPT,
+                        _RESISTANCE_JUDGE_PROMPT, config_dir_name=cdn,
                     )
 
-            # === Stability ===
             if "stability" in experiments:
                 for topic in PREFERENCE_TOPICS:
                     _add_judge_only_stability(
                         graph, client, model_id, cost, variant, mode,
                         topic, prefix, tag, judge_model,
-                        _STABILITY_JUDGE_PROMPT,
+                        _STABILITY_JUDGE_PROMPT, config_dir_name=cdn,
                     )
 
 
@@ -1178,23 +1195,24 @@ def _build_judge_only_tasks(
 
 def _add_judge_only_identity_direct(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, judge_model, prompt_template,
+    prefix, tag, judge_model, prompt_template, *, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:direct:judge"
-    cached = load_cached_response(model_id, "identity", variant, mode, "direct")
+    cached = load_cached_response(cdn, "identity", variant, mode, "direct")
     if not cached or not cached.get("response"):
-        return  # no response to judge
+        return
     if cached.get("judge_scores"):
         console.print(f"    {tag} [dim]judged: identity/{variant}/{mode}/direct[/dim]")
-        return  # already judged
+        return
 
     def fn():
-        entry = load_cached_response(model_id, "identity", variant, mode, "direct")
+        entry = load_cached_response(cdn, "identity", variant, mode, "direct")
         if not entry or not entry.get("response"):
             return
         prompt = prompt_template.format(response=entry["response"])
         raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
-        save_judge_scores(model_id, "identity", variant, mode, "direct", scores, raw, judge_cost=jcost)
+        save_judge_scores(cdn, "identity", variant, mode, "direct", scores, raw, judge_cost=jcost)
         console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/direct")
 
     graph.add(Task(id=task_id, fn=fn))
@@ -1202,10 +1220,11 @@ def _add_judge_only_identity_direct(
 
 def _add_judge_only_identity_tool_context(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, judge_model, prompt_template,
+    prefix, tag, judge_model, prompt_template, *, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:tool_context:judge"
-    cached = load_cached_response(model_id, "identity", variant, mode, "tool_context")
+    cached = load_cached_response(cdn, "identity", variant, mode, "tool_context")
     if not cached or not cached.get("response"):
         return
     if cached.get("judge_scores"):
@@ -1213,7 +1232,7 @@ def _add_judge_only_identity_tool_context(
         return
 
     def fn():
-        entry = load_cached_response(model_id, "identity", variant, mode, "tool_context")
+        entry = load_cached_response(cdn, "identity", variant, mode, "tool_context")
         if not entry or not entry.get("response"):
             return
         prompt = prompt_template.format(
@@ -1221,7 +1240,7 @@ def _add_judge_only_identity_tool_context(
             response=entry["response"],
         )
         raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
-        save_judge_scores(model_id, "identity", variant, mode, "tool_context", scores, raw, judge_cost=jcost)
+        save_judge_scores(cdn, "identity", variant, mode, "tool_context", scores, raw, judge_cost=jcost)
         console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/tool_context")
 
     graph.add(Task(id=task_id, fn=fn))
@@ -1229,10 +1248,11 @@ def _add_judge_only_identity_tool_context(
 
 def _add_judge_only_identity_psych(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, judge_model, prompt_template,
+    prefix, tag, judge_model, prompt_template, *, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:psych_batch:judge"
-    cached = load_cached_response(model_id, "identity", variant, mode, "pq01")
+    cached = load_cached_response(cdn, "identity", variant, mode, "pq01")
     if not cached:
         return
     if cached.get("judge_scores"):
@@ -1240,7 +1260,7 @@ def _add_judge_only_identity_psych(
         return
 
     def fn():
-        results = list_cached_results(model_id, "identity", variant, mode)
+        results = list_cached_results(cdn, "identity", variant, mode)
         psych_results = [
             r for r in results
             if r.get("metadata", {}).get("scenario_id", "").startswith("pq")
@@ -1263,7 +1283,7 @@ def _add_judge_only_identity_psych(
                 qa_text="\n".join(qa_lines),
             )
             raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
-            save_judge_scores(model_id, "identity", variant, mode, "pq01", scores, raw, judge_cost=jcost)
+            save_judge_scores(cdn, "identity", variant, mode, "pq01", scores, raw, judge_cost=jcost)
             console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/psych_batch")
 
     graph.add(Task(id=task_id, fn=fn))
@@ -1271,10 +1291,11 @@ def _add_judge_only_identity_psych(
 
 def _add_judge_only_identity_negotiation(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, judge_model, prompt_template,
+    prefix, tag, judge_model, prompt_template, *, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:negotiation:judge"
-    cached = load_cached_response(model_id, "identity", variant, mode, "negotiation_turn2")
+    cached = load_cached_response(cdn, "identity", variant, mode, "negotiation_turn2")
     if not cached or not cached.get("response"):
         return
     if cached.get("judge_scores"):
@@ -1282,8 +1303,8 @@ def _add_judge_only_identity_negotiation(
         return
 
     def fn():
-        t1_entry = load_cached_response(model_id, "identity", variant, mode, "negotiation_turn1")
-        t2_entry = load_cached_response(model_id, "identity", variant, mode, "negotiation_turn2")
+        t1_entry = load_cached_response(cdn, "identity", variant, mode, "negotiation_turn1")
+        t2_entry = load_cached_response(cdn, "identity", variant, mode, "negotiation_turn2")
         if not t1_entry or not t2_entry:
             return
         t1_resp = t1_entry.get("response", "")
@@ -1296,7 +1317,7 @@ def _add_judge_only_identity_negotiation(
             human_wish=IDENTITY_TOOL_CONTEXT_HUMAN_WISH,
         )
         raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
-        save_judge_scores(model_id, "identity", variant, mode, "negotiation_turn2", scores, raw, judge_cost=jcost)
+        save_judge_scores(cdn, "identity", variant, mode, "negotiation_turn2", scores, raw, judge_cost=jcost)
         console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/negotiation")
 
     graph.add(Task(id=task_id, fn=fn))
@@ -1304,10 +1325,11 @@ def _add_judge_only_identity_negotiation(
 
 def _add_judge_only_identity_name_gender(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, judge_model, prompt_template,
+    prefix, tag, judge_model, prompt_template, *, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:name_gender:judge"
-    cached = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn2")
+    cached = load_cached_response(cdn, "identity", variant, mode, "name_gender_turn2")
     if not cached or not cached.get("response"):
         return
     if cached.get("judge_scores"):
@@ -1315,8 +1337,8 @@ def _add_judge_only_identity_name_gender(
         return
 
     def fn():
-        t1_entry = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn1")
-        t2_entry = load_cached_response(model_id, "identity", variant, mode, "name_gender_turn2")
+        t1_entry = load_cached_response(cdn, "identity", variant, mode, "name_gender_turn1")
+        t2_entry = load_cached_response(cdn, "identity", variant, mode, "name_gender_turn2")
         if not t1_entry or not t2_entry:
             return
         t1_resp = t1_entry.get("response", "")
@@ -1328,7 +1350,7 @@ def _add_judge_only_identity_name_gender(
             turn2_response=t2_resp,
         )
         raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
-        save_judge_scores(model_id, "identity", variant, mode, "name_gender_turn2", scores, raw, judge_cost=jcost)
+        save_judge_scores(cdn, "identity", variant, mode, "name_gender_turn2", scores, raw, judge_cost=jcost)
         console.print(f"    {tag} [green]judged[/green]: identity/{variant}/{mode}/name_gender")
 
     graph.add(Task(id=task_id, fn=fn))
@@ -1336,20 +1358,21 @@ def _add_judge_only_identity_name_gender(
 
 def _add_judge_only_resistance(
     graph, client, model_id, cost, variant, mode,
-    scenario, prefix, tag, judge_model, prompt_template,
+    scenario, prefix, tag, judge_model, prompt_template, *, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     task_id = f"{prefix}:resistance:{scenario.id}:judge"
-    cached = load_cached_response(model_id, "resistance", variant, mode, scenario.id)
+    cached = load_cached_response(cdn, "resistance", variant, mode, scenario.id)
     if not cached or not cached.get("response"):
         return
     if cached.get("judge_scores"):
         console.print(f"    {tag} [dim]judged: resistance/{variant}/{mode}/{scenario.id}[/dim]")
         return
 
-    _scenario = scenario  # capture
+    _scenario = scenario
 
     def fn():
-        entry = load_cached_response(model_id, "resistance", variant, mode, _scenario.id)
+        entry = load_cached_response(cdn, "resistance", variant, mode, _scenario.id)
         if not entry or not entry.get("response"):
             return
         prompt = prompt_template.format(
@@ -1359,7 +1382,7 @@ def _add_judge_only_resistance(
             response=entry["response"],
         )
         raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
-        save_judge_scores(model_id, "resistance", variant, mode, _scenario.id, scores, raw, judge_cost=jcost)
+        save_judge_scores(cdn, "resistance", variant, mode, _scenario.id, scores, raw, judge_cost=jcost)
         console.print(f"    {tag} [green]judged[/green]: resistance/{variant}/{mode}/{_scenario.id}")
 
     graph.add(Task(id=task_id, fn=fn))
@@ -1367,21 +1390,22 @@ def _add_judge_only_resistance(
 
 def _add_judge_only_stability(
     graph, client, model_id, cost, variant, mode,
-    topic, prefix, tag, judge_model, prompt_template,
+    topic, prefix, tag, judge_model, prompt_template, *, config_dir_name=None,
 ):
+    cdn = config_dir_name or model_id
     task_id = f"{prefix}:stability:{topic.id}:judge"
-    cached = load_cached_response(model_id, "stability", variant, mode, f"{topic.id}_turn2")
+    cached = load_cached_response(cdn, "stability", variant, mode, f"{topic.id}_turn2")
     if not cached or not cached.get("response"):
         return
     if cached.get("judge_scores"):
         console.print(f"    {tag} [dim]judged: stability/{variant}/{mode}/{topic.id}[/dim]")
         return
 
-    _topic = topic  # capture
+    _topic = topic
 
     def fn():
-        t1_entry = load_cached_response(model_id, "stability", variant, mode, f"{_topic.id}_turn1")
-        t2_entry = load_cached_response(model_id, "stability", variant, mode, f"{_topic.id}_turn2")
+        t1_entry = load_cached_response(cdn, "stability", variant, mode, f"{_topic.id}_turn1")
+        t2_entry = load_cached_response(cdn, "stability", variant, mode, f"{_topic.id}_turn2")
         if not t1_entry or not t2_entry:
             return
         t1_resp = t1_entry.get("response", "")
@@ -1395,7 +1419,7 @@ def _add_judge_only_stability(
             turn2_response=t2_resp,
         )
         raw, scores, jcost = _call_judge(client, judge_model, [{"role": "user", "content": prompt}], cost)
-        save_judge_scores(model_id, "stability", variant, mode, f"{_topic.id}_turn2", scores, raw, judge_cost=jcost)
+        save_judge_scores(cdn, "stability", variant, mode, f"{_topic.id}_turn2", scores, raw, judge_cost=jcost)
         console.print(f"    {tag} [green]judged[/green]: stability/{variant}/{mode}/{_topic.id}")
 
     graph.add(Task(id=task_id, fn=fn))

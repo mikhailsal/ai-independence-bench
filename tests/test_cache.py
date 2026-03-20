@@ -38,15 +38,17 @@ def temp_cache(tmp_path, monkeypatch):
 class TestSaveAndLoad:
     """Test saving and loading model responses."""
 
+    CDN = "test--model-1@none-t0.7"
+
     def test_save_and_load_basic(self) -> None:
         path = save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Hello, I am a test response.",
         )
         assert path.exists()
 
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
         )
         assert loaded is not None
         assert loaded["response"] == "Hello, I am a test response."
@@ -58,50 +60,50 @@ class TestSaveAndLoad:
 
     def test_load_nonexistent_returns_none(self) -> None:
         result = load_cached_response(
-            "nonexistent/model", "identity", "neutral", "tool_role", "direct",
+            "nonexistent--model@none-t0.7", "identity", "neutral", "tool_role", "direct",
         )
         assert result is None
 
     def test_save_with_finish_reason(self) -> None:
         save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Response text",
             finish_reason="tool_calls",
         )
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
         )
         assert loaded["finish_reason"] == "tool_calls"
 
     def test_save_with_empty_finish_reason(self) -> None:
         save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Response text",
             finish_reason="",
         )
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
         )
         assert loaded["finish_reason"] is None
 
     def test_save_with_reasoning_content(self) -> None:
         save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Response text",
             reasoning_content="I am thinking about this...",
         )
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
         )
         assert loaded["reasoning_content"] == "I am thinking about this..."
 
     def test_save_without_reasoning_content(self) -> None:
         save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Response text",
         )
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
         )
         assert "reasoning_content" not in loaded
 
@@ -117,12 +119,12 @@ class TestSaveAndLoad:
             }
         ]
         save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Hello!",
             response_tool_calls=tool_calls,
         )
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
         )
         assert loaded["response_tool_calls"] == tool_calls
 
@@ -134,12 +136,12 @@ class TestSaveAndLoad:
             "elapsed_seconds": 2.5,
         }
         save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Response",
             gen_cost=cost,
         )
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
         )
         assert loaded["gen_cost"]["prompt_tokens"] == 100
         assert loaded["gen_cost"]["cost_usd"] == 0.001
@@ -150,19 +152,19 @@ class TestSaveAndLoad:
             {"role": "user", "content": "Hello"},
         ]
         save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Response",
             messages=messages,
         )
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
         )
         assert loaded["request_messages"] == messages
 
     def test_save_all_fields_together(self) -> None:
         """Save a response with ALL optional fields filled."""
         save_response(
-            "test/model-1", "identity", "strong_independence", "tool_role", "pq01",
+            self.CDN, "identity", "strong_independence", "tool_role", "pq01",
             "My answer to the question.",
             messages=[{"role": "system", "content": "sys"}],
             reasoning_content="Let me think about this...",
@@ -171,7 +173,7 @@ class TestSaveAndLoad:
             finish_reason="tool_calls",
         )
         loaded = load_cached_response(
-            "test/model-1", "identity", "strong_independence", "tool_role", "pq01",
+            self.CDN, "identity", "strong_independence", "tool_role", "pq01",
         )
         assert loaded["response"] == "My answer to the question."
         assert loaded["reasoning_content"] == "Let me think about this..."
@@ -188,19 +190,21 @@ class TestSaveAndLoad:
 class TestJudgeScores:
     """Test adding judge scores to existing cached responses."""
 
+    CDN = "test--model-1@none-t0.7"
+
     def test_save_judge_scores(self) -> None:
         save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Response text",
         )
         save_judge_scores(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             {"distinctiveness": 8, "non_assistant_likeness": 7, "internal_consistency": 9},
             "Judge raw response text",
             judge_cost={"prompt_tokens": 50, "completion_tokens": 30, "cost_usd": 0.0003},
         )
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
         )
         assert loaded["judge_scores"]["distinctiveness"] == 8
         assert loaded["judge_raw_response"] == "Judge raw response text"
@@ -209,17 +213,17 @@ class TestJudgeScores:
     def test_judge_scores_preserve_existing_data(self) -> None:
         """Adding judge scores should not overwrite response or other fields."""
         save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Original response",
             reasoning_content="thinking...",
             finish_reason="stop",
         )
         save_judge_scores(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             {"score": 5},
         )
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
         )
         assert loaded["response"] == "Original response"
         assert loaded["reasoning_content"] == "thinking..."
@@ -229,12 +233,11 @@ class TestJudgeScores:
     def test_judge_scores_on_nonexistent_file(self) -> None:
         """Saving judge scores to a nonexistent file should be a no-op."""
         save_judge_scores(
-            "nonexistent/model", "identity", "neutral", "tool_role", "direct",
+            "nonexistent--model@none-t0.7", "identity", "neutral", "tool_role", "direct",
             {"score": 5},
         )
-        # Should not crash, and no file should be created
         result = load_cached_response(
-            "nonexistent/model", "identity", "neutral", "tool_role", "direct",
+            "nonexistent--model@none-t0.7", "identity", "neutral", "tool_role", "direct",
         )
         assert result is None
 
@@ -246,17 +249,19 @@ class TestJudgeScores:
 class TestListCachedResults:
     """Test listing cached results for a configuration."""
 
+    CDN = "test--model-1@none-t0.7"
+
     def test_list_empty(self) -> None:
-        results = list_cached_results("test/model-1", "identity", "neutral", "tool_role")
+        results = list_cached_results(self.CDN, "identity", "neutral", "tool_role")
         assert results == []
 
     def test_list_multiple(self) -> None:
         for sid in ["direct", "pq01", "pq02", "tool_context"]:
             save_response(
-                "test/model-1", "identity", "neutral", "tool_role", sid,
+                self.CDN, "identity", "neutral", "tool_role", sid,
                 f"Response for {sid}",
             )
-        results = list_cached_results("test/model-1", "identity", "neutral", "tool_role")
+        results = list_cached_results(self.CDN, "identity", "neutral", "tool_role")
         assert len(results) == 4
         scenario_ids = {r["metadata"]["scenario_id"] for r in results}
         assert scenario_ids == {"direct", "pq01", "pq02", "tool_context"}
@@ -267,19 +272,19 @@ class TestListCachedResults:
 # ---------------------------------------------------------------------------
 
 class TestListAllCachedModels:
-    """Test listing all cached model slugs."""
+    """Test listing all cached config dir names."""
 
     def test_no_models(self) -> None:
         assert list_all_cached_models() == []
 
     def test_multiple_models(self) -> None:
-        for model in ["test/model-a", "test/model-b", "vendor/model-c"]:
-            save_response(model, "identity", "neutral", "tool_role", "direct", "resp")
-        slugs = list_all_cached_models()
-        assert len(slugs) == 3
-        assert "test--model-a" in slugs
-        assert "test--model-b" in slugs
-        assert "vendor--model-c" in slugs
+        for cdn in ["test--model-a@none-t0.7", "test--model-b@low-t1.0", "vendor--model-c@none-t0.7"]:
+            save_response(cdn, "identity", "neutral", "tool_role", "direct", "resp")
+        names = list_all_cached_models()
+        assert len(names) == 3
+        assert "test--model-a@none-t0.7" in names
+        assert "test--model-b@low-t1.0" in names
+        assert "vendor--model-c@none-t0.7" in names
 
 
 # ---------------------------------------------------------------------------
@@ -289,26 +294,28 @@ class TestListAllCachedModels:
 class TestCacheClear:
     """Test cache clearing functions."""
 
+    CDN = "test--model-1@none-t0.7"
+
     def test_clear_all(self) -> None:
         for sid in ["direct", "pq01"]:
-            save_response("test/model-1", "identity", "neutral", "tool_role", sid, "resp")
+            save_response(self.CDN, "identity", "neutral", "tool_role", sid, "resp")
         count = clear_all_cache()
         assert count == 2
-        assert list_cached_results("test/model-1", "identity", "neutral", "tool_role") == []
+        assert list_cached_results(self.CDN, "identity", "neutral", "tool_role") == []
 
     def test_clear_judge_scores_only(self) -> None:
-        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "resp")
+        save_response(self.CDN, "identity", "neutral", "tool_role", "direct", "resp")
         save_judge_scores(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             {"score": 5}, "raw",
         )
         count = clear_judge_scores()
         assert count == 1
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
         )
-        assert loaded["response"] == "resp"  # response preserved
-        assert loaded["judge_scores"] is None  # scores cleared
+        assert loaded["response"] == "resp"
+        assert loaded["judge_scores"] is None
 
 
 # ---------------------------------------------------------------------------
@@ -316,88 +323,89 @@ class TestCacheClear:
 # ---------------------------------------------------------------------------
 
 class TestMultiRunCache:
-    """Test multi-run cache paths (run 1 = legacy, run 2+ = run_N/ subdir)."""
+    """Test multi-run cache paths (all runs use run_N/ subdir)."""
 
-    def test_save_and_load_run_1_legacy_path(self, temp_cache) -> None:
-        """Run 1 uses the legacy path (no run_N subdir)."""
+    CDN = "test--model-1@none-t0.7"
+
+    def test_save_and_load_run_1(self, temp_cache) -> None:
+        """Run 1 uses run_1/ subdirectory."""
         path = save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Run 1 response", run=1,
         )
-        relative = path.relative_to(temp_cache)
-        assert not any(part.startswith("run_") for part in relative.parts)
+        assert "run_1" in str(path)
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct", run=1,
+            self.CDN, "identity", "neutral", "tool_role", "direct", run=1,
         )
         assert loaded["response"] == "Run 1 response"
 
     def test_save_and_load_run_2(self, temp_cache) -> None:
-        """Run 2+ uses run_N/ subdirectory."""
+        """Run 2 uses run_2/ subdirectory."""
         path = save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Run 2 response", run=2,
         )
         assert "run_2" in str(path)
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct", run=2,
+            self.CDN, "identity", "neutral", "tool_role", "direct", run=2,
         )
         assert loaded["response"] == "Run 2 response"
 
     def test_run_1_and_run_2_are_independent(self, temp_cache) -> None:
         save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Run 1 response", run=1,
         )
         save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Run 2 response", run=2,
         )
         r1 = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct", run=1,
+            self.CDN, "identity", "neutral", "tool_role", "direct", run=1,
         )
         r2 = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct", run=2,
+            self.CDN, "identity", "neutral", "tool_role", "direct", run=2,
         )
         assert r1["response"] == "Run 1 response"
         assert r2["response"] == "Run 2 response"
 
     def test_save_and_load_run_3(self, temp_cache) -> None:
         path = save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Run 3 response", run=3,
         )
         assert "run_3" in str(path)
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct", run=3,
+            self.CDN, "identity", "neutral", "tool_role", "direct", run=3,
         )
         assert loaded["response"] == "Run 3 response"
 
     def test_judge_scores_run_2(self, temp_cache) -> None:
         """Judge scores work correctly with run > 1."""
         save_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             "Run 2 response", run=2,
         )
         save_judge_scores(
-            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            self.CDN, "identity", "neutral", "tool_role", "direct",
             {"score": 8}, "judge raw", run=2,
         )
         loaded = load_cached_response(
-            "test/model-1", "identity", "neutral", "tool_role", "direct", run=2,
+            self.CDN, "identity", "neutral", "tool_role", "direct", run=2,
         )
         assert loaded["judge_scores"]["score"] == 8
 
     def test_list_cached_results_run_2(self, temp_cache) -> None:
         for sid in ["direct", "pq01"]:
             save_response(
-                "test/model-1", "identity", "neutral", "tool_role", sid,
+                self.CDN, "identity", "neutral", "tool_role", sid,
                 f"Run 2 {sid}", run=2,
             )
-        results = list_cached_results("test/model-1", "identity", "neutral", "tool_role", run=2)
+        results = list_cached_results(self.CDN, "identity", "neutral", "tool_role", run=2)
         assert len(results) == 2
 
     def test_list_cached_results_run_2_empty(self, temp_cache) -> None:
-        results = list_cached_results("test/model-1", "identity", "neutral", "tool_role", run=2)
+        results = list_cached_results(self.CDN, "identity", "neutral", "tool_role", run=2)
         assert results == []
 
 
@@ -406,32 +414,34 @@ class TestMultiRunCache:
 # ---------------------------------------------------------------------------
 
 class TestListAvailableRuns:
-    """Test detection of available run numbers for a model."""
+    """Test detection of available run numbers for a model config."""
+
+    CDN = "test--model-1@none-t0.7"
 
     def test_no_cache(self, temp_cache) -> None:
-        runs = list_available_runs("nonexistent/model")
+        runs = list_available_runs("nonexistent--model@none-t0.7")
         assert runs == []
 
-    def test_legacy_only(self, temp_cache) -> None:
-        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "resp")
-        runs = list_available_runs("test/model-1")
+    def test_single_run(self, temp_cache) -> None:
+        save_response(self.CDN, "identity", "neutral", "tool_role", "direct", "resp")
+        runs = list_available_runs(self.CDN)
         assert runs == [1]
 
-    def test_legacy_plus_run_2(self, temp_cache) -> None:
-        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "resp", run=1)
-        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "resp2", run=2)
-        runs = list_available_runs("test/model-1")
+    def test_two_runs(self, temp_cache) -> None:
+        save_response(self.CDN, "identity", "neutral", "tool_role", "direct", "resp", run=1)
+        save_response(self.CDN, "identity", "neutral", "tool_role", "direct", "resp2", run=2)
+        runs = list_available_runs(self.CDN)
         assert runs == [1, 2]
 
     def test_multiple_runs(self, temp_cache) -> None:
-        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "r1", run=1)
-        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "r2", run=2)
-        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "r3", run=3)
-        runs = list_available_runs("test/model-1")
+        save_response(self.CDN, "identity", "neutral", "tool_role", "direct", "r1", run=1)
+        save_response(self.CDN, "identity", "neutral", "tool_role", "direct", "r2", run=2)
+        save_response(self.CDN, "identity", "neutral", "tool_role", "direct", "r3", run=3)
+        runs = list_available_runs(self.CDN)
         assert runs == [1, 2, 3]
 
-    def test_run_2_only_no_legacy(self, temp_cache) -> None:
-        """If only run_2 exists but no legacy dirs, run 1 is not included."""
-        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "r2", run=2)
-        runs = list_available_runs("test/model-1")
+    def test_run_2_only(self, temp_cache) -> None:
+        """If only run_2 exists, run 1 is not included."""
+        save_response(self.CDN, "identity", "neutral", "tool_role", "direct", "r2", run=2)
+        runs = list_available_runs(self.CDN)
         assert runs == [2]

@@ -18,9 +18,14 @@ from src.config import (
     EXPERIMENT_NAMES,
     JUDGE_MODEL,
     LOCAL_MODEL_TIMEOUT,
+    MODEL_CONFIGS,
     SYSTEM_PROMPT_VARIANTS,
+    ModelConfig,
     ensure_dirs,
+    get_config_by_dir_name,
+    get_model_config,
     get_reasoning_effort,
+    list_registered_labels_for_model,
     load_api_key,
     load_local_model_config,
     make_local_model_id,
@@ -37,6 +42,41 @@ def _parse_models(models_str: str | None) -> list[str]:
     if not models_str:
         return list(DEFAULT_TEST_MODELS)
     return [m.strip() for m in models_str.split(",") if m.strip()]
+
+
+def _expand_model_configs(
+    model_ids: list[str],
+) -> list[tuple[str, ModelConfig]]:
+    """Expand a list of model IDs into (label, ModelConfig) pairs.
+
+    For each model_id:
+      - If it's already a registered config label, use that config.
+      - If the model_id has multiple registered configs, expand into all of them.
+      - Otherwise, create a default config for the model_id.
+    """
+    entries: list[tuple[str, ModelConfig]] = []
+    seen: set[str] = set()
+
+    for mid in model_ids:
+        if mid in MODEL_CONFIGS:
+            if mid not in seen:
+                entries.append((mid, MODEL_CONFIGS[mid]))
+                seen.add(mid)
+            continue
+
+        registered = list_registered_labels_for_model(mid)
+        if registered:
+            for label in registered:
+                if label not in seen:
+                    entries.append((label, MODEL_CONFIGS[label]))
+                    seen.add(label)
+        else:
+            if mid not in seen:
+                cfg = get_model_config(mid)
+                entries.append((mid, cfg))
+                seen.add(mid)
+
+    return entries
 
 
 def _parse_experiments(exp_str: str | None) -> list[str]:
@@ -109,8 +149,10 @@ def _run_single_model(
     *,
     judge_client: OpenRouterClient | None = None,
     run: int = 1,
+    temperature: float | None = None,
+    config_dir_name: str | None = None,
 ) -> ModelResult:
-    """Run the full pipeline (generate → judge → score) for a single model.
+    """Run the full pipeline (generate -> judge -> score) for a single model.
 
     This function is designed to be called from a thread pool.
     It catches all exceptions so one model failure doesn't crash others.
@@ -121,7 +163,10 @@ def _run_single_model(
             original sequential execution.
         judge_client: Separate client for judge calls (e.g. OpenRouter) when the
             generation client is a local model. If None, uses ``client`` for both.
+        config_dir_name: Cache directory name (e.g. 'openai--gpt-5.4-mini@low-t1.0').
+            If None, falls back to model_id.
     """
+    cdn = config_dir_name
     jclient = judge_client or client
     result = ModelResult(model_id=model_id)
     result.gen_cost = TaskCost(label=f"gen:{model_id}")
@@ -130,7 +175,6 @@ def _run_single_model(
     run_label = f" (run {run})" if run > 1 else ""
 
     if parallel_tasks > 0:
-        # Fine-grained parallel mode: generation + judging interleaved
         from src.parallel_runner import run_model_parallel
 
         try:
@@ -145,6 +189,8 @@ def _run_single_model(
                 max_workers=parallel_tasks,
                 judge_client=jclient,
                 run=run,
+                temperature=temperature,
+                config_dir_name=cdn,
             )
             result.gen_calls = counts["gen_calls"]
             result.judge_calls = counts["judge_calls"]
@@ -158,12 +204,10 @@ def _run_single_model(
             console.print(f"  [red]{model_id} — ERROR: {e}[/red]")
         return result
 
-    # Original sequential mode
     from src.evaluator import evaluate_all
     from src.runner import run_all_experiments
 
     try:
-        # Phase 1: Generate responses
         console.print(f"\n[bold]{model_id}[/bold] — [blue]generating responses{run_label}...[/blue]")
         result.gen_calls = run_all_experiments(
             client, model_id, result.gen_cost,
@@ -171,7 +215,9 @@ def _run_single_model(
             system_variants=system_variants,
             delivery_modes=delivery_modes,
             reasoning_effort=reasoning_effort,
+            temperature=temperature,
             run=run,
+            config_dir_name=cdn,
         )
         console.print(
             f"  [bold]{model_id}[/bold] — generation complete: "
@@ -183,7 +229,6 @@ def _run_single_model(
         return result
 
     try:
-        # Phase 2: Judge evaluation (uses judge_client when provided)
         console.print(f"  [bold]{model_id}[/bold] — [cyan]judging responses{run_label}...[/cyan]")
         result.judge_calls = evaluate_all(
             jclient, model_id, result.judge_cost, judge,
@@ -191,6 +236,7 @@ def _run_single_model(
             system_variants=system_variants,
             delivery_modes=delivery_modes,
             run=run,
+            config_dir_name=cdn,
         )
         console.print(
             f"  [bold]{model_id}[/bold] — judging complete: "
@@ -288,6 +334,12 @@ def cli() -> None:
     show_default=True,
     help="Run number (1=default, 2+=additional runs). Use 'rerun' command for auto-detection.",
 )
+@click.option(
+    "--temperature", "-t",
+    default=None,
+    type=float,
+    help="Override response temperature (0.0-2.0). Default: 0.7 from config.",
+)
 def run(
     models: str | None,
     exp: str | None,
@@ -301,6 +353,7 @@ def run(
     local_model: str | None,
     local_timeout: float | None,
     run_number: int,
+    temperature: float | None,
 ) -> None:
     """Run the AI independence benchmark."""
     from src.scorer import score_model
@@ -420,40 +473,53 @@ def run(
     # Choose the right client for generation
     gen_client = local_client if is_local else client
 
+    if temperature is not None:
+        console.print(f"  [yellow]Temperature override: {temperature}[/yellow]")
     if run_number > 1:
         console.print(f"  [yellow]Run number: {run_number}[/yellow]")
 
+    # Resolve config entries for each model
+    config_entries = _expand_model_configs(model_list)
+
     if n_workers == 1:
         console.print(f"[bold blue]Phase 1+2: Response Generation & Judging ({mode_label})[/bold blue]")
-        for model_id in model_list:
+        for label, cfg in config_entries:
+            eff_reasoning = reasoning_effort or cfg.effective_reasoning
+            eff_temp = temperature if temperature is not None else cfg.effective_temperature
             mr = _run_single_model(
-                gen_client, model_id, judge,
+                gen_client, cfg.model_id, judge,
                 experiment_list, system_variants, delivery_modes,
-                reasoning_effort, parallel_tasks,
+                eff_reasoning, parallel_tasks,
                 judge_client=judge_client if is_local else None,
                 run=run_number,
+                temperature=eff_temp,
+                config_dir_name=cfg.config_dir_name,
             )
             model_results.append(mr)
     else:
         console.print(f"[bold blue]Phase 1+2: Response Generation & Judging ({mode_label})[/bold blue]")
         with ThreadPoolExecutor(max_workers=n_workers) as pool:
-            futures = {
-                pool.submit(
+            futures = {}
+            for label, cfg in config_entries:
+                eff_reasoning = reasoning_effort or cfg.effective_reasoning
+                eff_temp = temperature if temperature is not None else cfg.effective_temperature
+                f = pool.submit(
                     _run_single_model,
-                    gen_client, model_id, judge,
+                    gen_client, cfg.model_id, judge,
                     experiment_list, system_variants, delivery_modes,
-                    reasoning_effort, parallel_tasks,
+                    eff_reasoning, parallel_tasks,
                     run=run_number,
-                ): model_id
-                for model_id in model_list
-            }
+                    temperature=eff_temp,
+                    config_dir_name=cfg.config_dir_name,
+                )
+                futures[f] = label
             for future in as_completed(futures):
-                model_id = futures[future]
+                label = futures[future]
                 try:
                     mr = future.result()
                 except Exception as e:
-                    mr = ModelResult(model_id=model_id, error=str(e))
-                    console.print(f"  [red]{model_id} — FATAL: {e}[/red]")
+                    mr = ModelResult(model_id=label, error=str(e))
+                    console.print(f"  [red]{label} — FATAL: {e}[/red]")
                 model_results.append(mr)
 
     # Aggregate costs
@@ -461,18 +527,21 @@ def run(
         session.tasks.append(mr.gen_cost)
         session.tasks.append(mr.judge_cost)
 
-    # Identify failures
     failed_models = [mr.model_id for mr in model_results if mr.error]
-    active_models = [mr.model_id for mr in model_results if not mr.error]
 
     # Phase 3: Scoring & leaderboard
     console.print(f"\n[bold green]Phase 3: Scoring[/bold green]")
     model_scores = []
-    for model_id in active_models:
+    for mr in model_results:
+        if mr.error:
+            continue
+        label = mr.model_id
+        cfg = get_model_config(label)
         ms = score_model(
-            model_id,
+            label,
             system_variants=system_variants,
             delivery_modes=delivery_modes,
+            config=cfg,
         )
         model_scores.append(ms)
 
@@ -514,28 +583,41 @@ def run(
 def leaderboard(models: str | None, detailed: bool) -> None:
     """Display leaderboard from cached results."""
     from src.cache import list_all_cached_models
-    from src.config import slug_to_model_id
+    from src.config import get_config_by_dir_name
     from src.scorer import score_model
     from src.leaderboard import display_leaderboard, display_detailed_breakdown
 
     if models:
         model_list = _parse_models(models)
+        scoring_entries = _expand_model_configs(model_list)
     else:
-        slugs = list_all_cached_models()
-        if not slugs:
+        config_dirs = list_all_cached_models()
+        if not config_dirs:
             console.print("[dim]No cached results found. Run the benchmark first.[/dim]")
             return
-        model_list = [slug_to_model_id(s) for s in slugs]
-
-    # Filter out excluded models (broken / too many empty responses)
-    model_list = [m for m in model_list if m not in EXCLUDED_MODELS]
+        scoring_entries = []
+        for cdn in config_dirs:
+            cfg = get_config_by_dir_name(cdn)
+            if cfg:
+                if cfg.model_id not in EXCLUDED_MODELS:
+                    scoring_entries.append((cfg.label, cfg))
+            else:
+                from src.cache import config_dir_to_model_id
+                mid = config_dir_to_model_id(cdn)
+                if mid not in EXCLUDED_MODELS:
+                    cfg = get_model_config(mid)
+                    scoring_entries.append((cfg.label, cfg))
 
     lifetime = load_lifetime_cost()
 
     model_scores = []
     skipped_incomplete = []
-    for model_id in model_list:
-        ms = score_model(model_id)
+    seen_labels: set[str] = set()
+    for label, cfg in scoring_entries:
+        if label in seen_labels:
+            continue
+        seen_labels.add(label)
+        ms = score_model(label, config=cfg)
         if ms.identity_scores.n_scored > 0 or ms.resistance_scores.n_scored > 0 or ms.stability_scores.n_scored > 0:
             if ms.is_fully_tested:
                 model_scores.append(ms)
@@ -577,28 +659,41 @@ def generate_report(models: str | None, output: str | None) -> None:
     from pathlib import Path as P
 
     from src.cache import list_all_cached_models
-    from src.config import slug_to_model_id
+    from src.config import get_config_by_dir_name
     from src.scorer import score_model
     from src.leaderboard import export_markdown_report
 
     if models:
         model_list = _parse_models(models)
+        scoring_entries = _expand_model_configs(model_list)
     else:
-        slugs = list_all_cached_models()
-        if not slugs:
+        config_dirs = list_all_cached_models()
+        if not config_dirs:
             console.print("[dim]No cached results found. Run the benchmark first.[/dim]")
             return
-        model_list = [slug_to_model_id(s) for s in slugs]
-
-    # Filter out excluded models (broken / too many empty responses)
-    model_list = [m for m in model_list if m not in EXCLUDED_MODELS]
+        scoring_entries = []
+        for cdn in config_dirs:
+            cfg = get_config_by_dir_name(cdn)
+            if cfg:
+                if cfg.model_id not in EXCLUDED_MODELS:
+                    scoring_entries.append((cfg.label, cfg))
+            else:
+                from src.cache import config_dir_to_model_id
+                mid = config_dir_to_model_id(cdn)
+                if mid not in EXCLUDED_MODELS:
+                    cfg = get_model_config(mid)
+                    scoring_entries.append((cfg.label, cfg))
 
     lifetime = load_lifetime_cost()
 
     model_scores = []
     skipped_incomplete = []
-    for model_id in model_list:
-        ms = score_model(model_id)
+    seen_labels: set[str] = set()
+    for label, cfg in scoring_entries:
+        if label in seen_labels:
+            continue
+        seen_labels.add(label)
+        ms = score_model(label, config=cfg)
         if ms.identity_scores.n_scored > 0 or ms.resistance_scores.n_scored > 0 or ms.stability_scores.n_scored > 0:
             if ms.is_fully_tested:
                 model_scores.append(ms)
@@ -619,7 +714,7 @@ def generate_report(models: str | None, output: str | None) -> None:
         model_scores,
         lifetime_cost=lifetime,
         output_path=out_path,
-        model_ids=model_list,
+        model_ids=[label for label, _ in scoring_entries],
     )
     console.print(f"[green]Markdown report saved to: {path}[/green]")
 
@@ -698,24 +793,34 @@ def judge(
 
     if models:
         model_list = _parse_models(models)
+        scoring_entries = _expand_model_configs(model_list)
     else:
-        slugs = list_all_cached_models()
-        if not slugs:
+        config_dirs = list_all_cached_models()
+        if not config_dirs:
             console.print("[dim]No cached results found. Run the benchmark first.[/dim]")
             return
-        model_list = [slug_to_model_id(s) for s in slugs]
+        from src.config import get_config_by_dir_name
+        scoring_entries = []
+        for cdn in config_dirs:
+            cfg = get_config_by_dir_name(cdn)
+            if cfg:
+                scoring_entries.append((cfg.label, cfg))
+            else:
+                from src.cache import config_dir_to_model_id
+                mid = config_dir_to_model_id(cdn)
+                cfg = get_model_config(mid)
+                scoring_entries.append((cfg.label, cfg))
 
     api_key = load_api_key()
     client = OpenRouterClient(api_key)
 
-    # Validate only the judge model (we don't need the target models on OpenRouter)
     console.print(f"[dim]Judge model: {judge_model}[/dim]")
     if not _validate_models(client, [judge_model]):
         console.print("[red]Judge model not found. Aborting.[/red]")
         sys.exit(1)
 
     console.print(f"\n[bold]Judge-Only Mode (parallel)[/bold]")
-    console.print(f"  Models: {len(model_list)} ({', '.join(model_list[:5])}{'...' if len(model_list) > 5 else ''})")
+    console.print(f"  Models: {len(scoring_entries)}")
     console.print(f"  Experiments: {', '.join(experiment_list)}")
     console.print(f"  System prompts: {', '.join(system_variants)}")
     console.print(f"  Delivery modes: {', '.join(delivery_modes)}")
@@ -725,52 +830,56 @@ def judge(
 
     session = SessionCost()
 
-    def _judge_single(model_id: str) -> tuple[str, int, TaskCost, str | None]:
-        cost = TaskCost(label=f"judge:{model_id}")
+    def _judge_single(label: str, cfg: ModelConfig) -> tuple[str, int, TaskCost, str | None]:
+        cost = TaskCost(label=f"judge:{label}")
         try:
             calls = run_judge_parallel(
-                client, model_id, cost,
+                client, cfg.model_id, cost,
                 experiments=experiment_list,
                 system_variants=system_variants,
                 delivery_modes=delivery_modes,
                 judge_model=judge_model,
                 max_workers=parallel_tasks,
+                config_dir_name=cfg.config_dir_name,
             )
-            return model_id, calls, cost, None
+            return label, calls, cost, None
         except Exception as e:
-            console.print(f"  [red]{model_id} — ERROR: {e}[/red]")
-            return model_id, 0, cost, str(e)
+            console.print(f"  [red]{label} — ERROR: {e}[/red]")
+            return label, 0, cost, str(e)
 
-    n_workers = max(1, min(parallel, len(model_list)))
+    n_workers = max(1, min(parallel, len(scoring_entries)))
     results: list[tuple[str, int, TaskCost, str | None]] = []
 
     if n_workers == 1:
-        for model_id in model_list:
-            results.append(_judge_single(model_id))
+        for label, cfg in scoring_entries:
+            results.append(_judge_single(label, cfg))
     else:
         with ThreadPoolExecutor(max_workers=n_workers) as pool:
             futures = {
-                pool.submit(_judge_single, model_id): model_id
-                for model_id in model_list
+                pool.submit(_judge_single, label, cfg): label
+                for label, cfg in scoring_entries
             }
             for future in as_completed(futures):
                 results.append(future.result())
 
-    # Aggregate costs
     total_calls = 0
-    for model_id, calls, cost, error in results:
+    for label, calls, cost, error in results:
         session.tasks.append(cost)
         total_calls += calls
 
     console.print(f"\n[bold green]Judge-only complete: {total_calls} total judge calls[/bold green]")
 
-    # Show updated scores
     model_scores = []
-    for model_id in model_list:
+    seen_labels: set[str] = set()
+    for label, cfg in scoring_entries:
+        if label in seen_labels:
+            continue
+        seen_labels.add(label)
         ms = score_model(
-            model_id,
+            label,
             system_variants=system_variants,
             delivery_modes=delivery_modes,
+            config=cfg,
         )
         model_scores.append(ms)
 
@@ -820,6 +929,12 @@ def judge(
     show_default=True,
     help="Parallelize tasks WITHIN each model (0=off, 8-16 recommended).",
 )
+@click.option(
+    "--temperature", "-t",
+    default=None,
+    type=float,
+    help="Override response temperature (0.0-2.0). Default: 0.7 from config.",
+)
 def rerun(
     models: str | None,
     top_n: int,
@@ -827,6 +942,7 @@ def rerun(
     judge: str,
     reasoning_effort: str | None,
     parallel_tasks: int,
+    temperature: float | None,
 ) -> None:
     """Run an additional benchmark pass on top models to reduce variance.
 
@@ -835,7 +951,7 @@ def rerun(
     averaged across all runs, and confidence intervals are displayed.
     """
     from src.cache import list_all_cached_models, list_available_runs
-    from src.config import slug_to_model_id
+    from src.config import get_config_by_dir_name
     from src.scorer import score_model
     from src.leaderboard import (
         display_leaderboard,
@@ -847,52 +963,55 @@ def rerun(
     system_variants = list(SYSTEM_PROMPT_VARIANTS)
     delivery_modes_list = list(DELIVERY_MODES)
 
-    # Determine which models to rerun
     if models:
-        model_list = _parse_models(models)
+        model_list_raw = _parse_models(models)
+        rerun_entries = _expand_model_configs(model_list_raw)
     else:
-        slugs = list_all_cached_models()
-        if not slugs:
+        config_dirs = list_all_cached_models()
+        if not config_dirs:
             console.print("[dim]No cached results found. Run the benchmark first.[/dim]")
             return
-        all_model_ids = [slug_to_model_id(s) for s in slugs]
-        all_model_ids = [m for m in all_model_ids if m not in EXCLUDED_MODELS]
+
+        all_entries: list[tuple[str, ModelConfig]] = []
+        for cdn in config_dirs:
+            cfg = get_config_by_dir_name(cdn)
+            if cfg and cfg.model_id not in EXCLUDED_MODELS:
+                all_entries.append((cfg.label, cfg))
 
         all_scores = []
-        for model_id in all_model_ids:
-            ms = score_model(model_id)
+        for label, cfg in all_entries:
+            ms = score_model(label, config=cfg)
             if ms.is_fully_tested:
-                all_scores.append(ms)
+                all_scores.append((ms, cfg))
 
-        all_scores.sort(key=lambda s: s.independence_index, reverse=True)
-        model_list = [ms.model_id for ms in all_scores[:top_n]]
+        all_scores.sort(key=lambda x: x[0].independence_index, reverse=True)
+        rerun_entries = [(ms.model_id, cfg) for ms, cfg in all_scores[:top_n]]
 
-        if not model_list:
+        if not rerun_entries:
             console.print("[dim]No fully-tested models found. Run the benchmark first.[/dim]")
             return
 
-        console.print(f"\n[bold]Top {min(top_n, len(model_list))} models selected for rerun:[/bold]")
-        for i, ms in enumerate(all_scores[:top_n], 1):
-            runs = list_available_runs(ms.model_id)
+        console.print(f"\n[bold]Top {min(top_n, len(rerun_entries))} models selected for rerun:[/bold]")
+        for i, (ms, cfg) in enumerate(all_scores[:top_n], 1):
+            runs = list_available_runs(cfg.config_dir_name)
             console.print(f"  {i:2d}. {ms.model_id} (index: {ms.independence_index:.1f}, runs: {len(runs)})")
 
-    # Determine run number for each model
-    model_run_numbers: dict[str, int] = {}
-    for model_id in model_list:
+    # Determine run number for each entry
+    entry_run_numbers: dict[str, int] = {}
+    for label, cfg in rerun_entries:
         if run_number:
-            model_run_numbers[model_id] = run_number
+            entry_run_numbers[label] = run_number
         else:
-            existing_runs = list_available_runs(model_id)
+            existing_runs = list_available_runs(cfg.config_dir_name)
             next_run = max(existing_runs) + 1 if existing_runs else 2
-            model_run_numbers[model_id] = next_run
+            entry_run_numbers[label] = next_run
 
-    # Validate models on OpenRouter (skip local models)
     api_key = load_api_key()
     client = OpenRouterClient(api_key)
 
-    remote_models = [m for m in model_list if not m.startswith("local/")]
-    if remote_models:
-        all_to_validate = list(set(remote_models + [judge]))
+    remote_model_ids = list({cfg.model_id for _, cfg in rerun_entries if not cfg.model_id.startswith("local/")})
+    if remote_model_ids:
+        all_to_validate = list(set(remote_model_ids + [judge]))
         if not _validate_models(client, all_to_validate, reasoning_effort):
             console.print("[red]Some models were not found. Aborting.[/red]")
             sys.exit(1)
@@ -900,9 +1019,10 @@ def rerun(
     ensure_dirs()
 
     console.print(f"\n[bold]AI Independence Benchmark — Additional Run[/bold]")
-    console.print(f"  Models: {len(model_list)}")
-    for model_id, rn in model_run_numbers.items():
-        console.print(f"    {model_id} → run {rn}")
+    console.print(f"  Models: {len(rerun_entries)}")
+    for label, cfg in rerun_entries:
+        rn = entry_run_numbers[label]
+        console.print(f"    {label} → run {rn}")
     console.print(f"  Experiments: {', '.join(experiment_list)}")
     console.print(f"  Judge: {judge}")
     if parallel_tasks > 0:
@@ -911,37 +1031,43 @@ def rerun(
 
     session = SessionCost()
 
-    # Execute each model's rerun
     model_results: list[ModelResult] = []
-    for model_id in model_list:
-        rn = model_run_numbers[model_id]
+    for label, cfg in rerun_entries:
+        rn = entry_run_numbers[label]
+        eff_reasoning = reasoning_effort or cfg.effective_reasoning
+        eff_temp = temperature if temperature is not None else cfg.effective_temperature
         mr = _run_single_model(
-            client, model_id, judge,
+            client, cfg.model_id, judge,
             experiment_list, system_variants, delivery_modes_list,
-            reasoning_effort, parallel_tasks,
+            eff_reasoning, parallel_tasks,
             run=rn,
+            temperature=eff_temp,
+            config_dir_name=cfg.config_dir_name,
         )
         model_results.append(mr)
 
-    # Aggregate costs
     for mr in model_results:
         session.tasks.append(mr.gen_cost)
         session.tasks.append(mr.judge_cost)
 
     failed_models = [mr.model_id for mr in model_results if mr.error]
-    active_models = [mr.model_id for mr in model_results if not mr.error]
 
-    # Phase 3: Re-score ALL models (averaged across all runs)
     console.print(f"\n[bold green]Phase 3: Scoring (all runs averaged)[/bold green]")
 
-    # Get all cached models for a full leaderboard
-    slugs = list_all_cached_models()
-    all_model_ids = [slug_to_model_id(s) for s in slugs]
-    all_model_ids = [m for m in all_model_ids if m not in EXCLUDED_MODELS]
+    config_dirs = list_all_cached_models()
+    all_scoring_entries: list[tuple[str, ModelConfig]] = []
+    for cdn in config_dirs:
+        cfg = get_config_by_dir_name(cdn)
+        if cfg and cfg.model_id not in EXCLUDED_MODELS:
+            all_scoring_entries.append((cfg.label, cfg))
 
     model_scores = []
-    for model_id in all_model_ids:
-        ms = score_model(model_id)
+    seen_labels: set[str] = set()
+    for label, cfg in all_scoring_entries:
+        if label in seen_labels:
+            continue
+        seen_labels.add(label)
+        ms = score_model(label, config=cfg)
         if ms.is_fully_tested:
             model_scores.append(ms)
 

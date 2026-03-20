@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from src.scorer import ModelScore, ExperimentScores, MultiRunStats, _compute_multi_run_stats
+from src.scorer import ModelScore, ExperimentScores, MultiRunStats, RunHealthIssue, _compute_multi_run_stats
 from src.cost_tracker import SessionCost, TaskCost
 
 
@@ -482,3 +482,28 @@ class TestExportResultsJsonMultiRun:
         data = json.loads(path.read_text())
         assert data["models"][0].get("multi_run") is not None
         assert data["models"][0]["multi_run"]["n_runs"] == 2
+
+
+class TestHealthWarnings:
+    def test_leaderboard_shows_health_issues(self, capsys) -> None:
+        from src.leaderboard import display_leaderboard
+        ms = _make_model_score("test/unhealthy", 85.0)
+        ms.health_issues = [
+            RunHealthIssue(run=2, experiment="identity", scenario_id="pq15", issue="missing"),
+            RunHealthIssue(run=4, experiment="identity", scenario_id="direct", issue="truncated",
+                           detail="judge scored 0/0/0 (271 chars)"),
+        ]
+        display_leaderboard([ms])
+        captured = capsys.readouterr()
+        assert "data quality issues" in captured.out
+        assert "pq15" in captured.out
+        assert "direct" in captured.out
+        assert "missing" in captured.out
+        assert "truncated" in captured.out
+
+    def test_leaderboard_no_warning_when_healthy(self, capsys) -> None:
+        from src.leaderboard import display_leaderboard
+        ms = _make_model_score("test/healthy", 90.0)
+        display_leaderboard([ms])
+        captured = capsys.readouterr()
+        assert "data quality issues" not in captured.out

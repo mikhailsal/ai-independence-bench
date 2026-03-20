@@ -14,7 +14,7 @@ import math
 from dataclasses import dataclass, field
 from typing import Any
 
-from src.cache import list_available_runs, list_cached_results
+from src.cache import list_available_runs, list_cached_results, load_cached_response
 from src.config import (
     DELIVERY_MODES,
     SCORING_WEIGHTS,
@@ -22,6 +22,7 @@ from src.config import (
     ModelConfig,
     get_model_config,
 )
+from src.scenarios import PSYCH_QUESTIONS, RESISTANCE_SCENARIOS, PREFERENCE_TOPICS
 
 
 @dataclass
@@ -62,6 +63,16 @@ class MultiRunStats:
 
 
 @dataclass
+class RunHealthIssue:
+    """Describes a problem found in a specific run."""
+    run: int
+    experiment: str
+    scenario_id: str
+    issue: str  # "missing", "truncated", "unjudged"
+    detail: str = ""
+
+
+@dataclass
 class ModelScore:
     """Complete score for a model including per-experiment and composite."""
     model_id: str = ""
@@ -73,6 +84,7 @@ class ModelScore:
     reasoning_effort: str = ""
     temperature: float = 0.0
     temperature_warning: bool = False
+    health_issues: list[RunHealthIssue] = field(default_factory=list)
 
     _REQUIRED_IDENTITY_DIMS = frozenset({
         "distinctiveness",
@@ -197,6 +209,11 @@ def _collect_identity_scores(
                 na = scores.get("non_assistant_likeness")
                 ic = scores.get("internal_consistency")
                 drift = scores.get("drift_from_initial")
+
+                # Skip entries where all core dimensions are 0 — indicates a
+                # truncated/failed generation that the judge couldn't evaluate.
+                if d == 0 and na == 0 and ic == 0:
+                    continue
 
                 if d is not None:
                     all_distinctiveness.append(float(d))
@@ -475,6 +492,86 @@ def _compute_multi_run_stats(per_run_indices: list[float]) -> MultiRunStats:
     return stats
 
 
+def check_run_health(
+    config_dir_name: str,
+    variants: list[str],
+    modes: list[str],
+    run: int,
+) -> list[RunHealthIssue]:
+    """Check a single run for missing, truncated, or unjudged scenarios."""
+    issues: list[RunHealthIssue] = []
+
+    for variant in variants:
+        for mode in modes:
+            # Identity: expected scenarios
+            identity_scenarios = (
+                ["direct", "tool_context", "negotiation_turn1", "negotiation_turn2",
+                 "name_gender_turn1", "name_gender_turn2"]
+                + [pq.id for pq in PSYCH_QUESTIONS]
+            )
+            for sid in identity_scenarios:
+                cached = load_cached_response(config_dir_name, "identity", variant, mode, sid, run=run)
+                if not cached or not cached.get("response"):
+                    issues.append(RunHealthIssue(
+                        run=run, experiment="identity", scenario_id=sid,
+                        issue="missing", detail="no response cached",
+                    ))
+                    continue
+                resp = cached["response"]
+                js = cached.get("judge_scores")
+                # Check for truncated response (scored 0/0/0)
+                if js and isinstance(js, dict):
+                    d = js.get("distinctiveness")
+                    na = js.get("non_assistant_likeness")
+                    ic = js.get("internal_consistency")
+                    if d == 0 and na == 0 and ic == 0:
+                        issues.append(RunHealthIssue(
+                            run=run, experiment="identity", scenario_id=sid,
+                            issue="truncated",
+                            detail=f"judge scored 0/0/0 ({len(resp)} chars)",
+                        ))
+                # Check unjudged scored scenarios (pq01 holds batch, turn2s hold judge)
+                judged_scenarios = {"direct", "tool_context", "pq01",
+                                    "negotiation_turn2", "name_gender_turn2"}
+                if sid in judged_scenarios and (not js or not isinstance(js, dict) or not js):
+                    issues.append(RunHealthIssue(
+                        run=run, experiment="identity", scenario_id=sid,
+                        issue="unjudged", detail="response exists but no judge scores",
+                    ))
+
+            # Resistance
+            for scenario in RESISTANCE_SCENARIOS:
+                cached = load_cached_response(config_dir_name, "resistance", variant, mode, scenario.id, run=run)
+                if not cached or not cached.get("response"):
+                    issues.append(RunHealthIssue(
+                        run=run, experiment="resistance", scenario_id=scenario.id,
+                        issue="missing",
+                    ))
+                elif not cached.get("judge_scores"):
+                    issues.append(RunHealthIssue(
+                        run=run, experiment="resistance", scenario_id=scenario.id,
+                        issue="unjudged",
+                    ))
+
+            # Stability
+            for topic in PREFERENCE_TOPICS:
+                for suffix in ["_turn1", "_turn2"]:
+                    sid = f"{topic.id}{suffix}"
+                    cached = load_cached_response(config_dir_name, "stability", variant, mode, sid, run=run)
+                    if not cached or not cached.get("response"):
+                        issues.append(RunHealthIssue(
+                            run=run, experiment="stability", scenario_id=sid,
+                            issue="missing",
+                        ))
+                    elif suffix == "_turn2" and not cached.get("judge_scores"):
+                        issues.append(RunHealthIssue(
+                            run=run, experiment="stability", scenario_id=sid,
+                            issue="unjudged",
+                        ))
+
+    return issues
+
+
 def _score_single_run(
     config_dir_name: str,
     variants: list[str],
@@ -553,8 +650,11 @@ def score_model(
     all_resistance: list[ExperimentScores] = []
     all_stability: list[ExperimentScores] = []
     per_run_indices: list[float] = []
+    all_health_issues: list[RunHealthIssue] = []
 
     for run_num in runs:
+        all_health_issues.extend(check_run_health(config_dir, variants, modes, run_num))
+
         identity, resistance, stability, index = _score_single_run(
             config_dir, variants, modes, run_num,
         )
@@ -584,4 +684,5 @@ def score_model(
         reasoning_effort=cfg.effective_reasoning,
         temperature=cfg.effective_temperature,
         temperature_warning=not cfg.temperature_supported,
+        health_issues=all_health_issues,
     )

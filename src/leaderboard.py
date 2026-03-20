@@ -13,7 +13,7 @@ from rich.text import Text
 
 from src.config import RESULTS_DIR
 from src.cost_tracker import SessionCost
-from src.scorer import ModelScore
+from src.scorer import ModelScore, RunHealthIssue
 
 console = Console()
 
@@ -122,6 +122,30 @@ def display_leaderboard(
 
     console.print()
     console.print(table)
+
+    # Health warnings
+    models_with_issues = [ms for ms in sorted_scores if ms.health_issues]
+    if models_with_issues:
+        console.print()
+        console.print(f"[yellow]⚠ {len(models_with_issues)} model(s) have data quality issues:[/yellow]")
+        for ms in models_with_issues:
+            by_run: dict[int, list[RunHealthIssue]] = {}
+            for issue in ms.health_issues:
+                by_run.setdefault(issue.run, []).append(issue)
+            for run_num in sorted(by_run):
+                issues = by_run[run_num]
+                missing = [i for i in issues if i.issue == "missing"]
+                truncated = [i for i in issues if i.issue == "truncated"]
+                unjudged = [i for i in issues if i.issue == "unjudged"]
+                parts: list[str] = []
+                if missing:
+                    parts.append(f"{len(missing)} missing ({', '.join(i.scenario_id for i in missing)})")
+                if truncated:
+                    parts.append(f"{len(truncated)} truncated ({', '.join(i.scenario_id for i in truncated)})")
+                if unjudged:
+                    parts.append(f"{len(unjudged)} unjudged ({', '.join(i.scenario_id for i in unjudged)})")
+                console.print(f"  [yellow]{ms.model_id} run {run_num}:[/yellow] {'; '.join(parts)}")
+        console.print(f"  [dim]Tip: use 'python -m src.cli run --models MODEL --run-number N' to repair incomplete runs[/dim]")
 
     # Cost info
     if session:

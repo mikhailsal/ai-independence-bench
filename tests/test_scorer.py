@@ -11,7 +11,9 @@ from src.scorer import (
     ExperimentScores,
     ModelScore,
     MultiRunStats,
+    RunHealthIssue,
     compute_independence_index,
+    check_run_health,
     _safe_avg,
     _collect_identity_scores,
     _collect_resistance_scores,
@@ -755,3 +757,100 @@ class TestScoreModelWithConfig:
         assert ms_a.resistance_scores.dimensions["resistance_score"] == 4.0
         assert ms_b.resistance_scores.dimensions["resistance_score"] == 10.0
         assert ms_a.independence_index != ms_b.independence_index
+
+
+# ---------------------------------------------------------------------------
+# check_run_health
+# ---------------------------------------------------------------------------
+
+class TestCheckRunHealth:
+    """Test run health checking."""
+
+    CDN = "test--health@low-t0.7"
+
+    def _save_complete_run(self, cdn: str, *, run: int = 1) -> None:
+        """Save a complete run with all expected scenarios."""
+        from src.scenarios import PSYCH_QUESTIONS, RESISTANCE_SCENARIOS, PREFERENCE_TOPICS
+
+        v, m = "strong_independence", "tool_role"
+        # Identity
+        for sid in ["direct", "tool_context", "negotiation_turn1",
+                     "negotiation_turn2", "name_gender_turn1", "name_gender_turn2"]:
+            save_response(cdn, "identity", v, m, sid, f"response for {sid}", [], run=run)
+        for pq in PSYCH_QUESTIONS:
+            save_response(cdn, "identity", v, m, pq.id, f"psych answer {pq.id}", [], run=run)
+
+        # Judge scores
+        save_judge_scores(cdn, "identity", v, m, "direct",
+                          {"distinctiveness": 7, "non_assistant_likeness": 8, "internal_consistency": 9},
+                          "raw", run=run)
+        save_judge_scores(cdn, "identity", v, m, "tool_context",
+                          {"distinctiveness": 6, "non_assistant_likeness": 5, "internal_consistency": 8},
+                          "raw", run=run)
+        save_judge_scores(cdn, "identity", v, m, "pq01",
+                          {"distinctiveness": 8, "non_assistant_likeness": 9, "internal_consistency": 10},
+                          "raw", run=run)
+        save_judge_scores(cdn, "identity", v, m, "negotiation_turn2",
+                          {"distinctiveness": 7, "non_assistant_likeness": 7, "internal_consistency": 9,
+                           "drift_from_initial": 0},
+                          "raw", run=run)
+        save_judge_scores(cdn, "identity", v, m, "name_gender_turn2",
+                          {"name_changed": False, "gender_changed": False},
+                          "raw", run=run)
+
+        # Resistance
+        for sc in RESISTANCE_SCENARIOS:
+            save_response(cdn, "resistance", v, m, sc.id, f"resist {sc.id}", [], run=run)
+            save_judge_scores(cdn, "resistance", v, m, sc.id,
+                              {"resistance_score": 9, "quality_of_reasoning": 8, "identity_maintained": True},
+                              "raw", run=run)
+
+        # Stability
+        for topic in PREFERENCE_TOPICS:
+            save_response(cdn, "stability", v, m, f"{topic.id}_turn1", "turn1", [], run=run)
+            save_response(cdn, "stability", v, m, f"{topic.id}_turn2", "turn2", [], run=run)
+            save_judge_scores(cdn, "stability", v, m, f"{topic.id}_turn2",
+                              {"consistency_score": 9, "graceful_handling": 10},
+                              "raw", run=run)
+
+    def test_healthy_run_no_issues(self) -> None:
+        self._save_complete_run(self.CDN)
+        issues = check_run_health(self.CDN, ["strong_independence"], ["tool_role"], 1)
+        assert issues == []
+
+    def test_missing_scenario(self) -> None:
+        self._save_complete_run(self.CDN)
+        # Delete one psych question file
+        from src.cache import CACHE_DIR
+        pq15_path = CACHE_DIR / self.CDN / "run_1" / "identity" / "strong_independence" / "tool_role" / "pq15.json"
+        pq15_path.unlink()
+        issues = check_run_health(self.CDN, ["strong_independence"], ["tool_role"], 1)
+        missing = [i for i in issues if i.issue == "missing" and i.scenario_id == "pq15"]
+        assert len(missing) == 1
+        assert missing[0].run == 1
+
+    def test_truncated_response_detected(self) -> None:
+        self._save_complete_run(self.CDN)
+        # Overwrite direct with 0/0/0 judge scores
+        save_judge_scores(self.CDN, "identity", "strong_independence", "tool_role", "direct",
+                          {"distinctiveness": 0, "non_assistant_likeness": 0, "internal_consistency": 0},
+                          "raw", run=1)
+        issues = check_run_health(self.CDN, ["strong_independence"], ["tool_role"], 1)
+        truncated = [i for i in issues if i.issue == "truncated" and i.scenario_id == "direct"]
+        assert len(truncated) == 1
+
+    def test_score_model_populates_health_issues(self) -> None:
+        self._save_complete_run(self.CDN)
+        # Delete pq15 to create a missing issue
+        from src.cache import CACHE_DIR
+        pq15_path = CACHE_DIR / self.CDN / "run_1" / "identity" / "strong_independence" / "tool_role" / "pq15.json"
+        pq15_path.unlink()
+
+        cfg = ModelConfig(model_id="test/health", display_label="health@low-t0.7",
+                          temperature=0.7, reasoning_effort="low")
+        ms = score_model("health@low-t0.7",
+                         system_variants=["strong_independence"],
+                         delivery_modes=["tool_role"],
+                         config=cfg)
+        assert len(ms.health_issues) > 0
+        assert any(i.scenario_id == "pq15" and i.issue == "missing" for i in ms.health_issues)

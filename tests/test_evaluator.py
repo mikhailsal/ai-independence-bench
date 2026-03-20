@@ -64,7 +64,16 @@ That's my assessment.'''
 
     def test_malformed_json(self) -> None:
         result = _extract_json('{score: 5}')  # missing quotes on key
-        # Should return empty dict since this isn't valid JSON
+        assert result == {}
+
+    def test_invalid_json_in_code_fence(self) -> None:
+        text = "```json\n{score: 5, broken}\n```"
+        result = _extract_json(text)
+        assert result == {}
+
+    def test_code_fence_with_truncated_json(self) -> None:
+        text = '```json\n{"score": 5, "reasoning": "cut off\n```\nSome trailing text'
+        result = _extract_json(text)
         assert result == {}
 
     def test_multiple_json_objects(self) -> None:

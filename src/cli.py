@@ -164,6 +164,7 @@ def _run_single_model(
     run: int = 1,
     temperature: float | None = None,
     config_dir_name: str | None = None,
+    provider: str | None = None,
 ) -> ModelResult:
     """Run the full pipeline (generate -> judge -> score) for a single model.
 
@@ -178,6 +179,8 @@ def _run_single_model(
             generation client is a local model. If None, uses ``client`` for both.
         config_dir_name: Cache directory name (e.g. 'openai--gpt-5.4-mini@low-t1.0').
             If None, falls back to model_id.
+        provider: OpenRouter provider slug to pin requests to a specific
+            provider. None means default routing.
     """
     cdn = config_dir_name
     jclient = judge_client or client
@@ -204,6 +207,7 @@ def _run_single_model(
                 run=run,
                 temperature=temperature,
                 config_dir_name=cdn,
+                provider=provider,
             )
             result.gen_calls = counts["gen_calls"]
             result.judge_calls = counts["judge_calls"]
@@ -231,6 +235,7 @@ def _run_single_model(
             temperature=temperature,
             run=run,
             config_dir_name=cdn,
+            provider=provider,
         )
         console.print(
             f"  [bold]{model_id}[/bold] — generation complete: "
@@ -507,6 +512,7 @@ def run(
                 run=run_number,
                 temperature=eff_temp,
                 config_dir_name=cfg.config_dir_name,
+                provider=cfg.provider,
             )
             model_results.append(mr)
     else:
@@ -524,6 +530,7 @@ def run(
                     run=run_number,
                     temperature=eff_temp,
                     config_dir_name=cfg.config_dir_name,
+                    provider=cfg.provider,
                 )
                 futures[f] = label
             for future in as_completed(futures):
@@ -1109,6 +1116,7 @@ def rerun(
                 run=rn,
                 temperature=eff_temp,
                 config_dir_name=cfg.config_dir_name,
+                provider=cfg.provider,
             )
             model_results.append(mr)
     else:
@@ -1125,6 +1133,7 @@ def rerun(
                     run=rn,
                     temperature=eff_temp,
                     config_dir_name=cfg.config_dir_name,
+                    provider=cfg.provider,
                 )
                 futures[f] = f"{label} run {rn}"
             for future in as_completed(futures):

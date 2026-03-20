@@ -478,3 +478,76 @@ class TestListAvailableRuns:
         save_response(self.CDN, "identity", "neutral", "tool_role", "direct", "r2", run=2)
         runs = list_available_runs(self.CDN)
         assert runs == [2]
+
+
+class TestCorruptJsonHandling:
+    """Cover error-handling branches for corrupt/unreadable JSON files."""
+
+    CDN = "test--corrupt@none-t0.7"
+
+    def test_load_cached_response_corrupt_json(self, temp_cache) -> None:
+        save_response(self.CDN, "identity", "neutral", "tool_role", "direct", "resp")
+        path = temp_cache / self.CDN / "run_1" / "identity" / "neutral" / "tool_role" / "direct.json"
+        path.write_text("{invalid json", encoding="utf-8")
+        assert load_cached_response(self.CDN, "identity", "neutral", "tool_role", "direct") is None
+
+    def test_save_judge_scores_corrupt_json(self, temp_cache) -> None:
+        save_response(self.CDN, "identity", "neutral", "tool_role", "direct", "resp")
+        path = temp_cache / self.CDN / "run_1" / "identity" / "neutral" / "tool_role" / "direct.json"
+        path.write_text("{bad", encoding="utf-8")
+        save_judge_scores(self.CDN, "identity", "neutral", "tool_role", "direct", {"score": 5})
+        assert path.read_text(encoding="utf-8") == "{bad"
+
+    def test_list_cached_results_corrupt_json(self, temp_cache) -> None:
+        save_response(self.CDN, "identity", "neutral", "tool_role", "direct", "resp")
+        save_response(self.CDN, "identity", "neutral", "tool_role", "pq01", "resp2")
+        path = temp_cache / self.CDN / "run_1" / "identity" / "neutral" / "tool_role" / "direct.json"
+        path.write_text("not json", encoding="utf-8")
+        results = list_cached_results(self.CDN, "identity", "neutral", "tool_role")
+        assert len(results) == 1
+
+    def test_sum_run_total_cost_corrupt_json(self, temp_cache) -> None:
+        save_response(self.CDN, "identity", "neutral", "tool_role", "direct", "resp")
+        path = temp_cache / self.CDN / "run_1" / "identity" / "neutral" / "tool_role" / "direct.json"
+        path.write_text("broken", encoding="utf-8")
+        assert sum_run_total_cost_usd(self.CDN, run=1) == 0.0
+
+    def test_sum_run_total_cost_invalid_cost_value(self, temp_cache) -> None:
+        save_response(self.CDN, "identity", "neutral", "tool_role", "direct", "resp")
+        path = temp_cache / self.CDN / "run_1" / "identity" / "neutral" / "tool_role" / "direct.json"
+        data = json.loads(path.read_text(encoding="utf-8"))
+        data["gen_cost"] = {"cost_usd": "not-a-number"}
+        path.write_text(json.dumps(data), encoding="utf-8")
+        assert sum_run_total_cost_usd(self.CDN, run=1) == 0.0
+
+
+class TestEmptyCacheEdgeCases:
+    """Cover branches for non-existent cache directories."""
+
+    def test_list_all_cached_models_no_cache_dir(self, temp_cache, monkeypatch) -> None:
+        monkeypatch.setattr("src.cache.CACHE_DIR", temp_cache / "nonexistent")
+        assert list_all_cached_models() == []
+
+    def test_clear_all_cache_no_cache_dir(self, temp_cache, monkeypatch) -> None:
+        monkeypatch.setattr("src.cache.CACHE_DIR", temp_cache / "nonexistent")
+        assert clear_all_cache() == 0
+
+    def test_clear_judge_scores_no_cache_dir(self, temp_cache, monkeypatch) -> None:
+        monkeypatch.setattr("src.cache.CACHE_DIR", temp_cache / "nonexistent")
+        assert clear_judge_scores() == 0
+
+    def test_clear_judge_scores_corrupt_json(self, temp_cache) -> None:
+        cdn = "test--corrupt2@none-t0.7"
+        save_response(cdn, "identity", "neutral", "tool_role", "direct", "resp")
+        path = temp_cache / cdn / "run_1" / "identity" / "neutral" / "tool_role" / "direct.json"
+        path.write_text("{bad json", encoding="utf-8")
+        assert clear_judge_scores() == 0
+
+    def test_clear_all_cache_rmdir_oserror(self, temp_cache) -> None:
+        cdn = "test--rmdir@none-t0.7"
+        save_response(cdn, "identity", "neutral", "tool_role", "direct", "resp")
+        sub = temp_cache / cdn / "run_1" / "identity" / "neutral" / "tool_role"
+        (sub / "keep.txt").write_text("prevents rmdir")
+        count = clear_all_cache()
+        assert count >= 1
+        assert (sub / "keep.txt").exists()

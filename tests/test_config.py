@@ -213,6 +213,27 @@ class TestModelConfig:
         with pytest.raises(AttributeError):
             cfg.model_id = "other"  # type: ignore[misc]
 
+    def test_provider_default_none(self) -> None:
+        cfg = ModelConfig(model_id="openai/gpt-5-nano")
+        assert cfg.provider is None
+
+    def test_provider_set(self) -> None:
+        cfg = ModelConfig(model_id="moonshotai/kimi-k2.5", provider="moonshotai/int4")
+        assert cfg.provider == "moonshotai/int4"
+
+    def test_config_dir_name_without_provider(self) -> None:
+        cfg = ModelConfig(model_id="openai/gpt-5-nano", temperature=0.7, reasoning_effort="low")
+        assert cfg.config_dir_name == "openai--gpt-5-nano@low-t0.7"
+
+    def test_config_dir_name_with_provider(self) -> None:
+        cfg = ModelConfig(
+            model_id="moonshotai/kimi-k2.5",
+            temperature=0.7,
+            reasoning_effort="low",
+            provider="moonshotai/int4",
+        )
+        assert cfg.config_dir_name == "moonshotai--kimi-k2.5+moonshotai-int4@low-t0.7"
+
 
 class TestModelConfigRegistry:
     """Test register_config, get_model_config, list_registered_labels_for_model."""

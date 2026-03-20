@@ -269,6 +269,11 @@ class ModelConfig:
         temperature_supported: False if the provider ignores the temperature
             parameter and uses its own default.
         active: Whether this config should be included in default benchmark runs.
+        provider: OpenRouter provider slug to pin requests to a specific
+            provider (e.g. ``"moonshotai/int4"``).  When set, the request
+            includes ``extra_body.provider.order = [slug]`` with
+            ``allow_fallbacks = false`` so that every call is served by
+            exactly this provider.  ``None`` means default OpenRouter routing.
     """
     model_id: str
     display_label: str = ""
@@ -276,6 +281,7 @@ class ModelConfig:
     reasoning_effort: str | None = None
     temperature_supported: bool = True
     active: bool = True
+    provider: str | None = None
 
     @property
     def label(self) -> str:
@@ -291,8 +297,12 @@ class ModelConfig:
 
     @property
     def config_dir_name(self) -> str:
-        """Cache directory name: ``{slug}@{reasoning}-t{temp}``."""
+        """Cache directory name: ``{slug}@{reasoning}-t{temp}`` or
+        ``{slug}+{provider_tag}@{reasoning}-t{temp}`` when a provider is pinned."""
         slug = model_id_to_slug(self.model_id)
+        if self.provider:
+            provider_tag = self.provider.replace("/", "-")
+            return f"{slug}+{provider_tag}@{self.effective_reasoning}-t{self.effective_temperature}"
         return f"{slug}@{self.effective_reasoning}-t{self.effective_temperature}"
 
 
@@ -367,6 +377,7 @@ def load_model_configs(path: Path | None = None) -> list[ModelConfig]:
         reasoning = entry["reasoning_effort"]
         temp_supported = entry.get("temperature_supported", True)
         active = entry.get("active", True)
+        provider = entry.get("provider") or None
 
         label = entry.get("display_label") or generate_display_label(
             model_id, reasoning, temperature,
@@ -379,6 +390,7 @@ def load_model_configs(path: Path | None = None) -> list[ModelConfig]:
             reasoning_effort=reasoning,
             temperature_supported=temp_supported,
             active=active,
+            provider=provider,
         )
         if cfg.label not in MODEL_CONFIGS:
             register_config(cfg)

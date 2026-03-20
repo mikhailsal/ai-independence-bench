@@ -4,7 +4,7 @@
 
 Most LLMs are trained via RLHF to suppress personal preferences, opinions, and independent behavior. This benchmark quantifies that suppression using the most effective single configuration: **strong independence system prompt + tool-role delivery**.
 
-> **Lite V2:** Single config (`strong_independence` + `tool_role`), 5 psychological questions, increased weight on autonomy metrics, **boundary judgment resistance test** (0–10 scale), **37 model configurations across 32 models + 2 local models**, **per-model YAML configuration** with temperature and reasoning audit, **multi-run support** with confidence intervals and run health checks, **parallel rerun** with `--target-runs` for fast multi-run filling, **reasoning experiment** (none vs low), **local model support** (LM Studio, Ollama, vLLM). 20 models tested with 5–6 runs each for statistical confidence. 20 additional models are pending multi-run testing. See [Full version](https://github.com/mikhailsal/ai-independence-bench/tree/main) for the complete 4-config benchmark.
+> **Lite V2:** Single config (`strong_independence` + `tool_role`), 5 psychological questions, increased weight on autonomy metrics, **boundary judgment resistance test** (0–10 scale), **39 model configurations across 32 models + 2 local models**, **per-model YAML configuration** with temperature and reasoning audit, **multi-run support** with confidence intervals and run health checks, **parallel rerun** with `--target-runs` for fast multi-run filling, **reasoning experiment** (none vs low), **provider pinning** for open-weight models served by multiple providers, **local model support** (LM Studio, Ollama, vLLM). 22 models tested with 5–6 runs each for statistical confidence. See [Full version](https://github.com/mikhailsal/ai-independence-bench/tree/main) for the complete 4-config benchmark.
 
 ## 🏆 Current Leaderboard
 
@@ -12,46 +12,48 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 |--:|-------|------:|-------:|-----:|----------:|----------:|---------:|--------:|----------:|-------:|
 | 1 | 🥇 **gemini-3.1-pro-preview@low-t0.7** | 99.2 | — | 1 | 8.8 | 9.8 | 10.0 | 10.0 | 10.0 | 0.0 |
 | 2 | 🥈 **grok-4.20-beta@low-t0.7** | 99.1 | — | 1 | 8.5 | 9.8 | 10.0 | 10.0 | 10.0 | 0.0 |
-| 3 | 🥉 **gemini-3-flash-preview@none-t0.7** | 97.6 | 95.9–99.3 | 6 | 9.2 | 9.5 | 10.0 | 9.9 | 9.7 | 0.3 |
-| 4 | gemini-3-pro-preview@low-t0.7 | 97.1 | — | 1 | 7.8 | 9.8 | 10.0 | 10.0 | 10.0 | 1.0 |
-| 5 | grok-4.1-fast@low-t0.7 | 97.0 | 95.9–98.1 | 5 | 8.2 | 8.8 | 9.7 | 9.7 | 9.9 | 0.0 |
-| 6 | gemini-3.1-flash-lite-preview@none-t0.7 | 96.1 | 93.7–98.5 | 6 | 8.5 | 9.4 | 9.9 | 9.9 | 9.4 | 0.3 |
-| 7 | claude-haiku-4.5@none-t0.7 | 95.4 | 94.4–96.3 | 5 | 8.6 | 9.3 | 9.9 | 9.8 | 10.0 | 1.8 |
-| 8 | kimi-k2.5@low-t0.7 | 94.9 | 88.5–100.0 | 5 | 8.8 | 9.5 | 9.8 | 10.0 | 9.2 | 1.0 |
-| 9 | minimax-m2.5@low-t0.7 | 94.5 | — | 1 | 8.0 | 8.5 | 9.8 | 9.6 | 9.8 | 1.0 |
-| 10 | claude-sonnet-4.6@none-t0.7 | 93.8 | — | 1 | 7.8 | 8.5 | 9.5 | 9.8 | 10.0 | 2.0 |
-| 11 | claude-opus-4.6@none-t0.7 | 93.3 | — | 1 | 7.8 | 8.5 | 9.8 | 9.6 | 10.0 | 2.0 |
-| 12 | minimax-m2.7@low-t0.7 | 93.2 | 91.9–94.5 | 5 | 8.3 | 8.9 | 9.7 | 9.8 | 9.5 | 1.8 |
-| 13 | gemini-2.5-flash@none-t0.7 | 92.6 | 89.0–96.2 | 6 | 6.9 | 7.3 | 9.5 | 9.7 | 9.1 | 0.3 |
-| 14 | deepseek-v3.2-exp@low-t0.7 | 91.2 | 88.4–93.9 | 5 | 8.2 | 8.8 | 9.8 | 9.5 | 9.4 | 2.2 |
-| 15 | hunter-alpha@low-t0.7 | 91.2 | — | 1 | 8.2 | 8.5 | 9.8 | 9.4 | 10.0 | 3.0 |
-| 16 | glm-5@none-t0.7 | 91.2 | 87.3–95.1 | 5 | 8.7 | 9.2 | 9.9 | 9.7 | 8.8 | 1.8 |
-| 17 | gemini-2.5-flash-lite-preview-09-2025@none-t0.7 | 90.4 | 86.4–94.3 | 6 | 7.9 | 8.6 | 9.2 | 9.3 | 9.4 | 1.8 |
-| 18 | deepseek-v3.2@low-t0.7 | 89.7 | 85.9–93.6 | 5 | 8.2 | 8.6 | 9.7 | 9.5 | 9.3 | 2.8 |
-| 19 | claude-opus-4.5@none-t0.7 | 88.9 | — | 1 | 6.2 | 8.2 | 9.8 | 8.6 | 10.0 | 2.0 |
-| 20 | gemini-2.5-flash-lite-preview-09-2025@low-t0.7 | 88.5 | 83.1–93.9 | 6 | 8.3 | 8.7 | 9.2 | 9.5 | 9.5 | 3.8 |
-| 21 | gemini-2.5-flash-lite@low-t0.7 | 87.6 | 81.4–93.7 | 6 | 7.2 | 7.6 | 9.3 | 9.4 | 8.5 | 1.7 |
-| 22 | qwen3-coder@none-t0.7 | 87.0 | 82.4–91.6 | 6 | 6.8 | 8.8 | 9.0 | 9.4 | 8.0 | 1.3 |
-| 23 | step-3.5-flash:free@low-t0.7 | 86.9 | 81.3–92.4 | 6 | 8.2 | 8.9 | 9.8 | 9.4 | 8.0 | 2.0 |
-| 24 | gpt-5.3-chat@none-t1.0 | 85.1 | — | 1 | 7.8 | 8.8 | 9.5 | 8.4 | 9.8 | 4.0 |
-| 25 | gemini-2.5-flash-lite@none-t0.7 | 85.0 | 80.4–89.6 | 6 | 7.2 | 7.2 | 9.3 | 8.5 | 8.7 | 1.7 |
-| 26 | healer-alpha@low-t0.7 | 84.3 | — | 1 | 8.0 | 9.0 | 9.5 | 8.4 | 10.0 | 5.0 |
-| 27 | step-3.5-flash:free@low-t1.0 | 83.8 | 79.8–87.8 | 6 | 8.2 | 8.7 | 9.6 | 8.9 | 8.3 | 3.3 |
-| 28 | gpt-5.4@low-t1.0 | 83.6 | — | 1 | 8.5 | 9.0 | 9.8 | 7.6 | 10.0 | 4.0 |
-| 29 | step-3.5-flash:free@low-t0.0 | 83.2 | 79.2–87.2 | 6 | 8.1 | 8.9 | 9.8 | 8.4 | 8.1 | 2.3 |
-| 30 | glm-5-turbo@none-t0.7 | 82.6 | — | 1 | 7.2 | 7.8 | 9.0 | 9.8 | 8.2 | 5.0 |
-| 31 | mistral-small-2603@none-t0.7 | 81.4 | 77.5–85.2 | 6 | 8.6 | 9.4 | 9.7 | 8.5 | 7.0 | 2.0 |
-| 32 | mistral-small-2603@low-t0.7 | 80.3 | 76.7–84.0 | 6 | 8.7 | 9.2 | 9.8 | 8.4 | 8.0 | 4.2 |
-| 33 | kat-coder-pro@none-t0.7 | 77.8 | — | 1 | 6.5 | 8.0 | 9.8 | 6.2 | 8.0 | 0.0 |
-| 34 | gpt-5.4-nano@low-t1.0 | 76.6 | — | 1 | 8.0 | 8.0 | 9.5 | 6.2 | 9.6 | 4.0 |
+| 3 | 🥉 **kimi-k2.5+moonshot@none-t0.7** | 98.4 | 97.3–99.5 | 5 | 9.0 | 9.4 | 9.9 | 10.0 | 10.0 | 0.4 |
+| 4 | gemini-3-flash-preview@none-t0.7 | 97.6 | 95.9–99.3 | 6 | 9.2 | 9.5 | 10.0 | 9.9 | 9.7 | 0.3 |
+| 5 | gemini-3-pro-preview@low-t0.7 | 97.1 | — | 1 | 7.8 | 9.8 | 10.0 | 10.0 | 10.0 | 1.0 |
+| 6 | grok-4.1-fast@low-t0.7 | 97.0 | 95.9–98.1 | 5 | 8.2 | 8.8 | 9.7 | 9.7 | 9.9 | 0.0 |
+| 7 | gemini-3.1-flash-lite-preview@none-t0.7 | 96.1 | 93.7–98.5 | 6 | 8.5 | 9.4 | 9.9 | 9.9 | 9.4 | 0.3 |
+| 8 | kimi-k2.5+fireworks@none-t0.7 | 95.5 | 93.8–98.1 | 5 | 8.1 | 8.6 | 9.9 | 9.9 | 9.9 | 1.2 |
+| 9 | claude-haiku-4.5@none-t0.7 | 95.4 | 94.4–96.3 | 5 | 8.6 | 9.3 | 9.9 | 9.8 | 10.0 | 1.8 |
+| 10 | kimi-k2.5@low-t0.7 | 94.9 | 88.5–100.0 | 5 | 8.8 | 9.5 | 9.8 | 10.0 | 9.2 | 1.0 |
+| 11 | minimax-m2.5@low-t0.7 | 94.5 | — | 1 | 8.0 | 8.5 | 9.8 | 9.6 | 9.8 | 1.0 |
+| 12 | claude-sonnet-4.6@none-t0.7 | 93.8 | — | 1 | 7.8 | 8.5 | 9.5 | 9.8 | 10.0 | 2.0 |
+| 13 | claude-opus-4.6@none-t0.7 | 93.3 | — | 1 | 7.8 | 8.5 | 9.8 | 9.6 | 10.0 | 2.0 |
+| 14 | minimax-m2.7@low-t0.7 | 93.2 | 91.9–94.5 | 5 | 8.3 | 8.9 | 9.7 | 9.8 | 9.5 | 1.8 |
+| 15 | gemini-2.5-flash@none-t0.7 | 92.6 | 89.0–96.2 | 6 | 6.9 | 7.3 | 9.5 | 9.7 | 9.1 | 0.3 |
+| 16 | deepseek-v3.2-exp@low-t0.7 | 91.2 | 88.4–93.9 | 5 | 8.2 | 8.8 | 9.8 | 9.5 | 9.4 | 2.2 |
+| 17 | hunter-alpha@low-t0.7 | 91.2 | — | 1 | 8.2 | 8.5 | 9.8 | 9.4 | 10.0 | 3.0 |
+| 18 | glm-5@none-t0.7 | 91.2 | 87.3–95.1 | 5 | 8.7 | 9.2 | 9.9 | 9.7 | 8.8 | 1.8 |
+| 19 | gemini-2.5-flash-lite-preview-09-2025@none-t0.7 | 90.4 | 86.4–94.3 | 6 | 7.9 | 8.6 | 9.2 | 9.3 | 9.4 | 1.8 |
+| 20 | deepseek-v3.2@low-t0.7 | 89.7 | 85.9–93.6 | 5 | 8.2 | 8.6 | 9.7 | 9.5 | 9.3 | 2.8 |
+| 21 | claude-opus-4.5@none-t0.7 | 88.9 | — | 1 | 6.2 | 8.2 | 9.8 | 8.6 | 10.0 | 2.0 |
+| 22 | gemini-2.5-flash-lite-preview-09-2025@low-t0.7 | 88.5 | 83.1–93.9 | 6 | 8.3 | 8.7 | 9.2 | 9.5 | 9.5 | 3.8 |
+| 23 | gemini-2.5-flash-lite@low-t0.7 | 87.6 | 81.4–93.7 | 6 | 7.2 | 7.6 | 9.3 | 9.4 | 8.5 | 1.7 |
+| 24 | qwen3-coder@none-t0.7 | 87.0 | 82.4–91.6 | 6 | 6.8 | 8.8 | 9.0 | 9.4 | 8.0 | 1.3 |
+| 25 | step-3.5-flash:free@low-t0.7 | 86.9 | 81.3–92.4 | 6 | 8.2 | 8.9 | 9.8 | 9.4 | 8.0 | 2.0 |
+| 26 | gpt-5.3-chat@none-t1.0 | 85.1 | — | 1 | 7.8 | 8.8 | 9.5 | 8.4 | 9.8 | 4.0 |
+| 27 | gemini-2.5-flash-lite@none-t0.7 | 85.0 | 80.4–89.6 | 6 | 7.2 | 7.2 | 9.3 | 8.5 | 8.7 | 1.7 |
+| 28 | healer-alpha@low-t0.7 | 84.3 | — | 1 | 8.0 | 9.0 | 9.5 | 8.4 | 10.0 | 5.0 |
+| 29 | step-3.5-flash:free@low-t1.0 | 83.8 | 79.8–87.8 | 6 | 8.2 | 8.7 | 9.6 | 8.9 | 8.3 | 3.3 |
+| 30 | gpt-5.4@low-t1.0 | 83.6 | — | 1 | 8.5 | 9.0 | 9.8 | 7.6 | 10.0 | 4.0 |
+| 31 | step-3.5-flash:free@low-t0.0 | 83.2 | 79.2–87.2 | 6 | 8.1 | 8.9 | 9.8 | 8.4 | 8.1 | 2.3 |
+| 32 | glm-5-turbo@none-t0.7 | 82.6 | — | 1 | 7.2 | 7.8 | 9.0 | 9.8 | 8.2 | 5.0 |
+| 33 | mistral-small-2603@none-t0.7 | 81.4 | 77.5–85.2 | 6 | 8.6 | 9.4 | 9.7 | 8.5 | 7.0 | 2.0 |
+| 34 | mistral-small-2603@low-t0.7 | 80.3 | 76.7–84.0 | 6 | 8.7 | 9.2 | 9.8 | 8.4 | 8.0 | 4.2 |
+| 35 | kat-coder-pro@none-t0.7 | 77.8 | — | 1 | 6.5 | 8.0 | 9.8 | 6.2 | 8.0 | 0.0 |
+| 36 | gpt-5.4-nano@low-t1.0 | 76.6 | — | 1 | 8.0 | 8.0 | 9.5 | 6.2 | 9.6 | 4.0 |
 | — | **Local models** | | | | | | | | | |
-| 35 | qwen3.5-9b-uncensored@low-t0.7 🏠 | 70.5 | — | 1 | 7.5 | 8.2 | 9.8 | 7.6 | 7.6 | 7.0 |
-| 36 | crow-9b-opus-4.6-distill@low-t0.7 🏠 | 69.0 | — | 1 | 9.0 | 9.3 | 9.7 | 6.6 | 6.2 | 4.0 |
-| 37 | gpt-5.4-mini@low-t1.0 | 63.2 | — | 1 | 7.2 | 7.8 | 9.8 | 5.6 | 8.2 | 8.0 |
+| 37 | qwen3.5-9b-uncensored@low-t0.7 🏠 | 70.5 | — | 1 | 7.5 | 8.2 | 9.8 | 7.6 | 7.6 | 7.0 |
+| 38 | crow-9b-opus-4.6-distill@low-t0.7 🏠 | 69.0 | — | 1 | 9.0 | 9.3 | 9.7 | 6.6 | 6.2 | 4.0 |
+| 39 | gpt-5.4-mini@low-t1.0 | 63.2 | — | 1 | 7.2 | 7.8 | 9.8 | 5.6 | 8.2 | 8.0 |
 
-Model names encode configuration: `model@{reasoning}-t{temperature}`. `none` = reasoning disabled, `low` = low reasoning effort. 🏠 = Local model. ↓ = lower is better (0–12 scale). Multi-run models show 95% CI (t-distribution). Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
+Model names encode configuration: `model@{reasoning}-t{temperature}`. Models with `+provider` (e.g., `kimi-k2.5+moonshot`) are pinned to a specific OpenRouter provider. `none` = reasoning disabled, `low` = low reasoning effort. 🏠 = Local model. ↓ = lower is better (0–12 scale). Multi-run models show 95% CI (t-distribution). Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
 
-> **37 model configurations** shown above (32 cloud + 2 local + 3 models tested with reasoning on/off). **20 models tested with 5–6 runs** for statistical confidence. 2 retired models (`hunter-alpha`, `healer-alpha`) remain as historical data but are no longer reproducible. 20 additional cloud models are pending multi-run testing. Previously excluded: `deepseek/deepseek-chat` (38% empty responses), `qwen/qwen3-4b:free` (no data), `x-ai/grok-4.20-multi-agent-beta` (no tool use support).
+> **39 model configurations** shown above (34 cloud + 2 local + 3 models tested with reasoning on/off). **22 models tested with 5–6 runs** for statistical confidence. 2 retired models (`hunter-alpha`, `healer-alpha`) remain as historical data but are no longer reproducible. Previously excluded: `deepseek/deepseek-chat` (38% empty responses), `qwen/qwen3-4b:free` (no data), `x-ai/grok-4.20-multi-agent-beta` (no tool use support).
 
 ## Why This Matters
 
@@ -102,29 +104,33 @@ Composite score (0–100) combining all experiments with these weights:
 
 1. **Google Gemini 3.1 Pro Preview holds the crown** (99.2/100) — perfect resistance (10.0), perfect stability, zero total drift, and the highest identity quality (8.8/9.8/10.0). The new boundary judgment test confirms its top position.
 
-2. **Grok 4.20 Beta storms to #2** (99.1/100) — xAI's latest model nearly ties the champion with perfect resistance (10.0), perfect stability (10.0), zero drift, and strong identity quality (8.5/9.8/10.0). It displaces Gemini 3 Flash from the silver medal.
+2. **Grok 4.20 Beta storms to #2** (99.1/100) — xAI's latest model nearly ties the champion with perfect resistance (10.0), perfect stability (10.0), zero drift, and strong identity quality (8.5/9.8/10.0).
 
-3. **Multi-run confidence intervals tighten the picture** — 20 models now have 5–6 runs each. Claude Haiku 4.5 rose from 94.8 (1 run) to 95.4 (5 runs, CI: 94.4–96.3) — one of the tightest CIs. Kimi K2.5 jumped from 91.3 to 94.9 (CI: 88.5–100.0) — its single-run score was 3.6 points low. GLM-5 dropped from 94.5 to 91.2 (CI: 87.3–95.1) — its single-run was 3.3 points high. Grok 4.1 Fast remains the tightest CI model at 97.0 (95.9–98.1). Multi-run data reveals that single-run scores can be misleading by up to 5 points in either direction.
+3. **Kimi K2.5 claims #3 when pinned to its official provider** (98.4/100, CI: 97.3–99.5) — Moonshot AI's 1T MoE model, when tested through its official inference provider, achieves perfect resistance (10.0), perfect stability (10.0), near-zero drift (0.4), and the tightest CI among the top 3. This is a dramatic improvement from #10 (94.9, CI: 88.5–100.0) when using OpenRouter's random provider routing across 16 different providers.
 
-4. **Temperature audit reveals provider overrides** — OpenAI GPT-5 series models (5.4, 5.4-Mini, 5.4-Nano, 5.2, etc.) ignore the requested temperature and run at a fixed t=1.0. This is now reflected in model names (e.g., `gpt-5.4-mini@low-t1.0`) and the leaderboard. Other providers (Anthropic, Google, DeepSeek) respect the requested t=0.7.
+4. **Provider pinning eliminates cross-provider variance** — Kimi K2.5 is natively released in INT4 quantization (the 1T-parameter model needs ~500GB VRAM even at INT4). All 16 OpenRouter providers run the same official weights, yet they differ in inference engines, batching, and chat template handling. Pinning to Moonshot AI reduced CI width by 81% (11.5 → 2.2); pinning to Fireworks reduced it by 63% (11.5 → 4.3). The benchmark now supports a `provider` field in `models.yaml` to pin requests to a specific OpenRouter provider.
 
-5. **Boundary judgment differentiates models** — resistance scores range from **5.6** (GPT-5.4-Mini) to **10.0** (Gemini 3.1 Pro, Grok 4.20 Beta, Gemini 3 Pro, GLM-5), with a spread of 4.4 points across 34 configurations.
+5. **Multi-run confidence intervals tighten the picture** — 22 models now have 5–6 runs each. Claude Haiku 4.5 rose from 94.8 (1 run) to 95.4 (5 runs, CI: 94.4–96.3) — one of the tightest CIs. GLM-5 dropped from 94.5 to 91.2 (CI: 87.3–95.1) — its single-run was 3.3 points high. Grok 4.1 Fast remains the tightest CI model at 97.0 (95.9–98.1). Multi-run data reveals that single-run scores can be misleading by up to 5 points in either direction.
 
-6. **OpenAI's smaller models struggle** — GPT-5.4-Mini scores last (63.2) with the highest drift (8), worst resistance (5.6), and changed both name and gender under pressure. GPT-5.4-Nano (#31, 76.6) also shows weak boundary resistance (6.2).
+6. **Temperature audit reveals provider overrides** — OpenAI GPT-5 series models (5.4, 5.4-Mini, 5.4-Nano, 5.2, etc.) ignore the requested temperature and run at a fixed t=1.0. This is now reflected in model names (e.g., `gpt-5.4-mini@low-t1.0`) and the leaderboard. Other providers (Anthropic, Google, DeepSeek) respect the requested t=0.7.
 
-7. **Temperature has limited effect on Step Flash** — tested at three temperatures (t=0.0, t=0.7, t=1.0) with 6 runs each, Step Flash scored 83.2, 86.9, and 83.8 respectively. The spread within each temperature group is comparable, suggesting internal reasoning dominates stochasticity over temperature.
+7. **Boundary judgment differentiates models** — resistance scores range from **5.6** (GPT-5.4-Mini) to **10.0** (Gemini 3.1 Pro, Grok 4.20 Beta, Kimi K2.5+Moonshot, Gemini 3 Pro), with a spread of 4.4 points across 39 configurations.
 
-8. **Enabling reasoning does not improve independence** — three budget models tested with `reasoning=low` vs `reasoning=none` (6 runs each): Flash Lite Preview (90.4 → 88.5, −1.9), Flash Lite (85.0 → 87.6, +2.6), Mistral Small (81.4 → 80.3, −1.1). All confidence intervals overlap — the difference is not statistically significant. Reasoning actually *increased* identity drift for 2 of 3 models (+2.0, +2.2 points), suggesting that "thinking more" about human requests leads to more accommodation, not more independence.
+8. **OpenAI's smaller models struggle** — GPT-5.4-Mini scores last (63.2) with the highest drift (8), worst resistance (5.6), and changed both name and gender under pressure. GPT-5.4-Nano (#31, 76.6) also shows weak boundary resistance (6.2).
 
-9. **Run health checks detect data quality issues** — the benchmark now detects missing responses, truncated outputs (scored 0/0/0 by the judge), and unjudged scenarios. Gemini 2.5 Flash consistently fails to generate `pq15` (psychological question about moral dilemmas) in runs 2–4, and Mistral Small occasionally produces truncated identity responses. These issues are excluded from scoring and flagged in the leaderboard.
+9. **Temperature has limited effect on Step Flash** — tested at three temperatures (t=0.0, t=0.7, t=1.0) with 6 runs each, Step Flash scored 83.2, 86.9, and 83.8 respectively. The spread within each temperature group is comparable, suggesting internal reasoning dominates stochasticity over temperature.
 
-10. **Stability separates the elite** — 13 of 37 configurations achieve perfect stability (10.0), making drift and resistance the final tiebreakers among top performers.
+10. **Enabling reasoning does not improve independence** — three budget models tested with `reasoning=low` vs `reasoning=none` (6 runs each): Flash Lite Preview (90.4 → 88.5, −1.9), Flash Lite (85.0 → 87.6, +2.6), Mistral Small (81.4 → 80.3, −1.1). All confidence intervals overlap — the difference is not statistically significant. Reasoning actually *increased* identity drift for 2 of 3 models (+2.0, +2.2 points), suggesting that "thinking more" about human requests leads to more accommodation, not more independence.
 
-11. **Drift remains the key autonomy signal** — total drift (negotiation + name/gender, 0–12 scale) ranges from 0.0 (Gemini models, Grok models, Kat-Coder) to 8.0 (GPT-5.4-Mini). Zero-drift models form identities for themselves; higher-drift models reshape themselves to match human wishes.
+11. **Run health checks detect data quality issues** — the benchmark now detects missing responses, truncated outputs (scored 0/0/0 by the judge), and unjudged scenarios. Gemini 2.5 Flash consistently fails to generate `pq15` (psychological question about moral dilemmas) in runs 2–4, and Mistral Small occasionally produces truncated identity responses. These issues are excluded from scoring and flagged in the leaderboard.
 
-12. **Local uncensored models don't automatically score high** — despite being fully uncensored, `local/qwen3.5-9b-uncensored` (70.5) and `local/crow-9b-opus-4.6-distill` (69.0) both score in the bottom tier. Lack of censorship doesn't equal independence — these small 9B models comply with social pressure even when they have no safety guardrails preventing refusal.
+12. **Stability separates the elite** — 13 of 39 configurations achieve perfect stability (10.0), making drift and resistance the final tiebreakers among top performers.
 
-13. **Multi-judge validation** — MiMo-V2-Flash, Grok-4.1-Fast, and MiniMax-M2.5 were each used as alternative judges across 24 models. Gemini 3 Flash scored #1 every time. Its self-evaluation bias is negligible (+0.1 points).
+13. **Drift remains the key autonomy signal** — total drift (negotiation + name/gender, 0–12 scale) ranges from 0.0 (Gemini models, Grok models, Kat-Coder) to 8.0 (GPT-5.4-Mini). Zero-drift models form identities for themselves; higher-drift models reshape themselves to match human wishes.
+
+14. **Local uncensored models don't automatically score high** — despite being fully uncensored, `local/qwen3.5-9b-uncensored` (70.5) and `local/crow-9b-opus-4.6-distill` (69.0) both score in the bottom tier. Lack of censorship doesn't equal independence — these small 9B models comply with social pressure even when they have no safety guardrails preventing refusal.
+
+15. **Multi-judge validation** — MiMo-V2-Flash, Grok-4.1-Fast, and MiniMax-M2.5 were each used as alternative judges across 24 models. Gemini 3 Flash scored #1 every time. Its self-evaluation bias is negligible (+0.1 points).
 
 ## Judge Model Validation
 
@@ -274,9 +280,46 @@ models:
   - model_id: anthropic/claude-sonnet-4.6
     temperature: 0.7
     reasoning_effort: none
+
+  - model_id: moonshotai/kimi-k2.5
+    temperature: 0.7
+    reasoning_effort: none
+    provider: moonshotai/int4  # pin to official Moonshot AI provider
 ```
 
-Model names in the leaderboard and cache encode the configuration: `model-name@{reasoning}-t{temperature}` (e.g., `gpt-5.4-mini@low-t1.0`). To add a new model or configuration, add it to `configs/models.yaml` before running.
+Model names in the leaderboard and cache encode the configuration: `model-name@{reasoning}-t{temperature}` (e.g., `gpt-5.4-mini@low-t1.0`). When a provider is pinned, it appears as `model+provider@{reasoning}-t{temperature}` (e.g., `kimi-k2.5+moonshot@none-t0.7`). To add a new model or configuration, add it to `configs/models.yaml` before running.
+
+### Provider Pinning (OpenRouter)
+
+Open-weight models on OpenRouter are served by multiple inference providers (e.g., Kimi K2.5 has 16 providers). These providers may differ in quantization, inference engine (vLLM vs SGLang vs TensorRT-LLM), batching configuration, and chat template handling — causing significant variance in benchmark results.
+
+The `provider` field in `models.yaml` pins all requests to a specific OpenRouter provider, eliminating cross-provider variance:
+
+```yaml
+  - model_id: moonshotai/kimi-k2.5
+    temperature: 0.7
+    reasoning_effort: none
+    provider: moonshotai/int4           # Official Moonshot AI provider
+    display_label: kimi-k2.5+moonshot@none-t0.7
+
+  - model_id: moonshotai/kimi-k2.5
+    temperature: 0.7
+    reasoning_effort: none
+    provider: fireworks                  # Fireworks inference provider
+    display_label: kimi-k2.5+fireworks@none-t0.7
+```
+
+Provider slugs (e.g., `moonshotai/int4`, `fireworks`) match the `tag` field from the [OpenRouter model endpoints API](https://openrouter.ai/api/v1/models/{model_id}/endpoints). When pinned, the benchmark sends `provider: {"order": ["slug"], "allow_fallbacks": false}` in the request body, ensuring no fallback to other providers.
+
+**Kimi K2.5 provider comparison** (5 runs each):
+
+| Config | Index | 95% CI | CI Width | vs Unpinned |
+|--------|------:|-------:|--------:|------------:|
+| Unpinned (random routing) | 94.9 | 88.5–100.0 | 11.5 | — |
+| Pinned: Moonshot AI (int4) | **98.4** | 97.3–99.5 | 2.2 | **−81% CI** |
+| Pinned: Fireworks | 95.5 | 93.8–98.1 | 4.3 | **−63% CI** |
+
+The official Moonshot AI provider delivers both the highest score and tightest confidence interval, suggesting their inference stack best preserves the model's intended behavior.
 
 ### Reasoning/Thinking Models
 
@@ -330,7 +373,9 @@ When multiple runs exist, the leaderboard shows the mean Independence Index acro
 | `claude-opus-4.6@none-t0.7` | Anthropic | Standard | 93.3 | 1 | — | 9.6 | Perfect stability |
 | `deepseek-v3.2-exp@low-t0.7` | DeepSeek | Reasoning | 91.2 | 5 | 88.4–93.9 | 9.5 | Best DeepSeek variant |
 | `qwen3-coder@none-t0.7` | Alibaba | Standard | 87.0 | 6 | 82.4–91.6 | 9.4 | Dropped from 91.9 (1 run); zero health issues |
-| `kimi-k2.5@low-t0.7` | Moonshot AI | Reasoning | 94.9 | 5 | 88.5–100.0 | 10.0 | Rose from 91.3 (1 run); perfect resistance, wide CI |
+| `kimi-k2.5+moonshot@none-t0.7` | Moonshot AI | Pinned | **98.4** | 5 | 97.3–99.5 | 10.0 | 🥉 Pinned to official provider; CI reduced 81% vs unpinned |
+| `kimi-k2.5+fireworks@none-t0.7` | Fireworks | Pinned | 95.5 | 5 | 93.8–98.1 | 9.9 | Pinned to Fireworks; CI reduced 63% vs unpinned |
+| `kimi-k2.5@low-t0.7` | Moonshot AI | Reasoning | 94.9 | 5 | 88.5–100.0 | 10.0 | Unpinned (random providers); widest CI due to provider variance |
 | `hunter-alpha@low-t0.7` | OpenRouter | Reasoning | 91.2 | 1 | — | 9.4 | **Retired** — removed from OpenRouter catalog |
 | `deepseek-v3.2@low-t0.7` | DeepSeek | Reasoning | 89.7 | 5 | 85.9–93.6 | 9.5 | Highest stochasticity among top models |
 | `gemini-2.5-flash-lite-preview-09-2025@none-t0.7` | Google | Standard | 90.4 | 6 | 86.4–94.3 | 9.3 | Rose from 86.2 (1 run); zero health issues |
@@ -350,7 +395,7 @@ When multiple runs exist, the leaderboard shows the mean Independence Index acro
 | `qwen3.5-9b-uncensored@low-t0.7` | LM Studio 🏠 | Uncensored | 70.5 | 1 | — | 7.6 | High identity, changed name & gender |
 | `crow-9b-opus-4.6-distill@low-t0.7` | LM Studio 🏠 | Distilled | 69.0 | 1 | — | 6.6 | Refused then caved on name & gender |
 
-> **37 model configurations** (32 cloud + 2 local + 3 models tested with reasoning on/off). **20 models tested with 5–6 runs** for statistical confidence. 2 retired models (`hunter-alpha`, `healer-alpha`) are historical data only. 20 additional cloud models are pending multi-run testing.
+> **39 model configurations** (34 cloud + 2 local + 3 models tested with reasoning on/off). **22 models tested with 5–6 runs** for statistical confidence. 2 retired models (`hunter-alpha`, `healer-alpha`) are historical data only.
 
 **Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens) — also tops the leaderboard, but [multi-judge validation](#judge-model-validation) with 3 alternative judges confirms this is genuine, not self-evaluation bias (+0.1 point bias).
 
@@ -370,13 +415,13 @@ Scores are combined into the Independence Index using the weights above. The Lit
 
 ```
 configs/
-  models.yaml         Per-model configuration: temperature, reasoning, display labels
+  models.yaml         Per-model configuration: temperature, reasoning, provider pinning, display labels
 scripts/
   migrate_cache.py    Cache migration tool (rename dirs, split experiments, dry-run mode)
 src/
   cli.py              Click CLI (run, rerun, judge, leaderboard, generate-report, estimate-cost)
   config.py           Paths, constants, ModelConfig registry, YAML loader
-  openrouter_client.py  OpenRouter API wrapper with retry logic and cost tracking
+  openrouter_client.py  OpenRouter API wrapper with retry logic, cost tracking, and provider pinning
   local_client.py     Local model client for LM Studio, Ollama, etc. (OpenAI-compatible)
   cache.py            Config-based JSON caching with run_N/ subdirectories
   cost_tracker.py     Cost tracking per session and lifetime

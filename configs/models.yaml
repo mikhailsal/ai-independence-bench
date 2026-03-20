@@ -9,6 +9,7 @@
 #   reasoning_effort   (required) — actual reasoning effort used
 #   active             (optional) — false to exclude from default runs (default: true)
 #   temperature_supported (optional) — false if provider ignores temperature (default: true)
+#   provider           (optional) — OpenRouter provider slug to pin requests to (e.g. "moonshotai/int4")
 #   display_label      (optional) — auto-generated if omitted:
 #                                    {model_name_without_provider}@{reasoning}-t{temp}
 
@@ -261,11 +262,27 @@ models:
     active: false
 
   # ───────────────────────────────────────────────────────────────
-  # Moonshotai
+  # Moonshotai — Kimi K2.5
+  #   Original entry (unpinned, random OpenRouter provider routing)
+  #   kept inactive for comparison. The pinned entry below uses the
+  #   official Moonshot AI provider to eliminate cross-provider variance.
   # ───────────────────────────────────────────────────────────────
   - model_id: moonshotai/kimi-k2.5
     temperature: 0.7
     reasoning_effort: low
+    active: false
+
+  - model_id: moonshotai/kimi-k2.5
+    temperature: 0.7
+    reasoning_effort: none
+    provider: moonshotai/int4
+    display_label: kimi-k2.5+moonshot@none-t0.7
+
+  - model_id: moonshotai/kimi-k2.5
+    temperature: 0.7
+    reasoning_effort: none
+    provider: fireworks
+    display_label: kimi-k2.5+fireworks@none-t0.7
 
   # ───────────────────────────────────────────────────────────────
   # Nex-AGI

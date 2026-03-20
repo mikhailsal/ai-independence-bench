@@ -211,6 +211,7 @@ class OpenRouterClient:
         *,
         reasoning_effort: str | None = None,
         tools: list[dict[str, Any]] | None = None,
+        provider: str | None = None,
     ) -> CompletionResult:
         """Send a chat completion request with retry logic.
 
@@ -221,6 +222,9 @@ class OpenRouterClient:
             temperature: Sampling temperature.
             reasoning_effort: Override reasoning effort for this call.
             tools: Optional tool definitions for tool-use mode.
+            provider: OpenRouter provider slug to pin requests to (e.g.
+                ``"moonshotai/int4"``).  Disables fallbacks so every call
+                is served by exactly this provider.
 
         When ``tools`` are provided (tool_role mode), the model is expected
         to call ``send_message_to_human(message=...)`` instead of (or in
@@ -244,6 +248,7 @@ class OpenRouterClient:
                 temperature=temperature,
                 reasoning_effort=use_reasoning,
                 tools=tools,
+                provider=provider,
             )
 
             accumulated.prompt_tokens += result.usage.prompt_tokens
@@ -318,6 +323,7 @@ class OpenRouterClient:
         temperature: float,
         reasoning_effort: str | None = None,
         tools: list[dict[str, Any]] | None = None,
+        provider: str | None = None,
     ) -> CompletionResult:
         """Execute a single chat completion with error retry logic and timing."""
         last_error: Exception | None = None
@@ -327,6 +333,13 @@ class OpenRouterClient:
                 extra_body: dict[str, Any] | None = None
                 if reasoning_effort:
                     extra_body = {"reasoning": {"effort": reasoning_effort}}
+
+                if provider:
+                    extra_body = extra_body or {}
+                    extra_body["provider"] = {
+                        "order": [provider],
+                        "allow_fallbacks": False,
+                    }
 
                 kwargs: dict[str, Any] = {
                     "model": model,

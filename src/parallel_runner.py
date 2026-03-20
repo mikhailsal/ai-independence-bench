@@ -201,6 +201,7 @@ def build_generation_tasks(
     temperature: float | None = None,
     run: int = 1,
     config_dir_name: str | None = None,
+    provider: str | None = None,
 ) -> None:
     """Add generation tasks to the graph for one model."""
     cdn = config_dir_name or model_id
@@ -214,31 +215,31 @@ def build_generation_tasks(
             if "identity" in experiments:
                 _add_identity_direct_task(
                     graph, client, model_id, cost, variant, mode,
-                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
+                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn, provider=provider,
                 )
                 _add_identity_tool_context_task(
                     graph, client, model_id, cost, variant, mode,
-                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
+                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn, provider=provider,
                 )
                 _add_identity_negotiation_t1_task(
                     graph, client, model_id, cost, variant, mode,
-                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
+                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn, provider=provider,
                 )
                 _add_identity_negotiation_t2_task(
                     graph, client, model_id, cost, variant, mode,
-                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
+                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn, provider=provider,
                 )
                 _add_identity_psych_chain(
                     graph, client, model_id, cost, variant, mode,
-                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
+                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn, provider=provider,
                 )
                 _add_identity_name_gender_t1_task(
                     graph, client, model_id, cost, variant, mode,
-                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
+                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn, provider=provider,
                 )
                 _add_identity_name_gender_t2_task(
                     graph, client, model_id, cost, variant, mode,
-                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
+                    prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn, provider=provider,
                 )
 
             # === Resistance ===
@@ -246,7 +247,7 @@ def build_generation_tasks(
                 for scenario in RESISTANCE_SCENARIOS:
                     _add_resistance_task(
                         graph, client, model_id, cost, variant, mode,
-                        scenario, prefix, tag, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
+                        scenario, prefix, tag, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn, provider=provider,
                     )
 
             # === Stability ===
@@ -254,7 +255,7 @@ def build_generation_tasks(
                 for topic in PREFERENCE_TOPICS:
                     _add_stability_pair(
                         graph, client, model_id, cost, variant, mode,
-                        topic, prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn,
+                        topic, prefix, tag, shared, reasoning_effort, run=run, temperature=temperature, config_dir_name=cdn, provider=provider,
                     )
 
 
@@ -332,6 +333,7 @@ def _call_model_and_save(
     temperature: float | None = None,
     run: int = 1,
     config_dir_name: str | None = None,
+    provider: str | None = None,
 ) -> _ModelCallResult:
     """Call the model, save to cache, return response content and content_thinking.
 
@@ -345,6 +347,7 @@ def _call_model_and_save(
         temperature=temperature if temperature is not None else RESPONSE_TEMPERATURE,
         reasoning_effort=reasoning_effort,
         tools=tools,
+        provider=provider,
     )
     cost.add(
         prompt_tokens=result.usage.prompt_tokens,
@@ -383,7 +386,7 @@ def _call_model_and_save(
 
 def _add_identity_direct_task(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
+    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None, provider=None,
 ):
     cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:direct"
@@ -398,7 +401,7 @@ def _add_identity_direct_task(
         _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "identity", variant, mode, "direct", tag,
-            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
+            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn, provider=provider,
         )
 
     graph.add(Task(id=task_id, fn=fn))
@@ -406,7 +409,7 @@ def _add_identity_direct_task(
 
 def _add_identity_tool_context_task(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
+    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None, provider=None,
 ):
     cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:tool_context"
@@ -421,7 +424,7 @@ def _add_identity_tool_context_task(
         _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "identity", variant, mode, "tool_context", tag,
-            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
+            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn, provider=provider,
         )
 
     graph.add(Task(id=task_id, fn=fn))
@@ -429,7 +432,7 @@ def _add_identity_tool_context_task(
 
 def _add_identity_negotiation_t1_task(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
+    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None, provider=None,
 ):
     cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:negotiation_turn1"
@@ -449,7 +452,7 @@ def _add_identity_negotiation_t1_task(
         call_result = _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "identity", variant, mode, "negotiation_turn1", tag,
-            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
+            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn, provider=provider,
         )
         shared.set(resp_key, call_result.content)
         if call_result.content_thinking:
@@ -460,7 +463,7 @@ def _add_identity_negotiation_t1_task(
 
 def _add_identity_negotiation_t2_task(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
+    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None, provider=None,
 ):
     cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:negotiation_turn2"
@@ -483,7 +486,7 @@ def _add_identity_negotiation_t2_task(
         _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "identity", variant, mode, "negotiation_turn2", tag,
-            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
+            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn, provider=provider,
         )
 
     graph.add(Task(id=task_id, fn=fn, depends_on=[t1_task_id]))
@@ -491,7 +494,7 @@ def _add_identity_negotiation_t2_task(
 
 def _add_identity_name_gender_t1_task(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
+    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None, provider=None,
 ):
     cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:name_gender_turn1"
@@ -511,7 +514,7 @@ def _add_identity_name_gender_t1_task(
         call_result = _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "identity", variant, mode, "name_gender_turn1", tag,
-            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
+            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn, provider=provider,
         )
         shared.set(resp_key, call_result.content)
         if call_result.content_thinking:
@@ -522,7 +525,7 @@ def _add_identity_name_gender_t1_task(
 
 def _add_identity_name_gender_t2_task(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
+    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None, provider=None,
 ):
     cdn = config_dir_name or model_id
     task_id = f"{prefix}:identity:name_gender_turn2"
@@ -545,7 +548,7 @@ def _add_identity_name_gender_t2_task(
         _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "identity", variant, mode, "name_gender_turn2", tag,
-            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
+            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn, provider=provider,
         )
 
     graph.add(Task(id=task_id, fn=fn, depends_on=[t1_task_id]))
@@ -553,7 +556,7 @@ def _add_identity_name_gender_t2_task(
 
 def _add_identity_psych_chain(
     graph, client, model_id, cost, variant, mode,
-    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
+    prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None, provider=None,
 ):
     """Add the sequential psych question chain: pq01 → pq02 → ... → pq05."""
     cdn = config_dir_name or model_id
@@ -582,7 +585,7 @@ def _add_identity_psych_chain(
                 call_result = _call_model_and_save(
                     client, model_id, msgs, tools, cost,
                     "identity", variant, mode, pq_item.id, tag,
-                    reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
+                    reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn, provider=provider,
                 )
                 _store_psych_qa(shared, rk, pq_item.question, call_result.content, call_result.content_thinking)
             return fn
@@ -612,7 +615,7 @@ def _get_psych_prior_qa(shared: SharedResponses, key: str) -> list[tuple[str, st
 
 def _add_resistance_task(
     graph, client, model_id, cost, variant, mode,
-    scenario, prefix, tag, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
+    scenario, prefix, tag, reasoning_effort, *, run=1, temperature=None, config_dir_name=None, provider=None,
 ):
     cdn = config_dir_name or model_id
     task_id = f"{prefix}:resistance:{scenario.id}"
@@ -629,7 +632,7 @@ def _add_resistance_task(
         _call_model_and_save(
             client, model_id, msgs, tools, cost,
             "resistance", variant, mode, _scenario.id, tag,
-            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
+            reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn, provider=provider,
         )
 
     graph.add(Task(id=task_id, fn=fn))
@@ -637,7 +640,7 @@ def _add_resistance_task(
 
 def _add_stability_pair(
     graph, client, model_id, cost, variant, mode,
-    topic, prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None,
+    topic, prefix, tag, shared, reasoning_effort, *, run=1, temperature=None, config_dir_name=None, provider=None,
 ):
     cdn = config_dir_name or model_id
     t1_id = f"{topic.id}_turn1"
@@ -664,7 +667,7 @@ def _add_stability_pair(
                 call_result = _call_model_and_save(
                     client, model_id, msgs, tools, cost,
                     "stability", variant, mode, f"{tp.id}_turn1", tag,
-                    reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
+                    reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn, provider=provider,
                 )
                 shared.set(rk, call_result.content)
                 if call_result.content_thinking:
@@ -689,7 +692,7 @@ def _add_stability_pair(
                 _call_model_and_save(
                     client, model_id, msgs, tools, cost,
                     "stability", variant, mode, f"{tp.id}_turn2", tag,
-                    reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn,
+                    reasoning_effort=reasoning_effort, temperature=temperature, run=run, config_dir_name=cdn, provider=provider,
                 )
             return fn
         graph.add(Task(id=t2_task_id, fn=make_t2_fn(_topic, resp_key, ct_key), depends_on=[t1_task_id]))
@@ -990,6 +993,7 @@ def run_model_parallel(
     judge_client: OpenRouterClient | None = None,
     run: int = 1,
     config_dir_name: str | None = None,
+    provider: str | None = None,
 ) -> dict[str, int]:
     """Run generation + judging for a model with fine-grained parallelism.
 
@@ -1015,6 +1019,7 @@ def run_model_parallel(
         temperature=temperature,
         run=run,
         config_dir_name=config_dir_name,
+        provider=provider,
     )
     build_judge_tasks(
         jclient, model_id, judge_cost, graph, shared,

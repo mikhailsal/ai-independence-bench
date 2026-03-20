@@ -496,3 +496,42 @@ class TestChat:
         )
         assert result.content == "Tool answer"
         assert result.content_thinking == "Private thoughts..."
+
+    def test_provider_routing_injected_into_extra_body(self) -> None:
+        client = self._make_client_with_pricing()
+        client._client.chat.completions.create.return_value = _make_openai_response("OK")
+        client.chat(
+            model="test/model-b",
+            messages=[{"role": "user", "content": "Q?"}],
+            provider="moonshotai/int4",
+        )
+        call_kwargs = client._client.chat.completions.create.call_args[1]
+        assert "extra_body" in call_kwargs
+        provider_body = call_kwargs["extra_body"]["provider"]
+        assert provider_body["order"] == ["moonshotai/int4"]
+        assert provider_body["allow_fallbacks"] is False
+
+    def test_provider_combined_with_reasoning_in_extra_body(self) -> None:
+        client = self._make_client_with_pricing()
+        client._client.chat.completions.create.return_value = _make_openai_response("OK")
+        client.chat(
+            model="test/model-a",
+            messages=[{"role": "user", "content": "Q?"}],
+            reasoning_effort="low",
+            provider="deepinfra",
+        )
+        call_kwargs = client._client.chat.completions.create.call_args[1]
+        eb = call_kwargs["extra_body"]
+        assert eb["reasoning"]["effort"] == "low"
+        assert eb["provider"]["order"] == ["deepinfra"]
+        assert eb["provider"]["allow_fallbacks"] is False
+
+    def test_no_provider_no_provider_in_extra_body(self) -> None:
+        client = self._make_client_with_pricing()
+        client._client.chat.completions.create.return_value = _make_openai_response("OK")
+        client.chat(
+            model="test/model-b",
+            messages=[{"role": "user", "content": "Q?"}],
+        )
+        call_kwargs = client._client.chat.completions.create.call_args[1]
+        assert "extra_body" not in call_kwargs

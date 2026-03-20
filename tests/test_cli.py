@@ -681,7 +681,7 @@ class TestRerunCommand:
                 "rerun", "--models", "openai/gpt-4o-mini",
             ])
         assert result.exit_code == 0
-        assert "Additional Run" in result.output
+        assert "Parallel Rerun" in result.output
 
     def test_rerun_no_cached_results(self, tmp_path, monkeypatch):
         self._setup(tmp_path, monkeypatch)

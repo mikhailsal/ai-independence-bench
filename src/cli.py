@@ -924,6 +924,13 @@ def judge(
     help="Specific run number to execute (e.g. 2 for second run). Auto-detects next available if not set.",
 )
 @click.option(
+    "--target-runs", "-R",
+    default=None,
+    type=int,
+    help="Ensure this many total runs exist (e.g. -R 5 fills in runs 2-5 if run 1 exists). "
+         "Overrides --run-number. Missing runs execute in parallel for maximum speed.",
+)
+@click.option(
     "--judge", "-j",
     default=JUDGE_MODEL,
     show_default=True,
@@ -936,11 +943,19 @@ def judge(
     help="Override reasoning effort: 'off', 'none', 'low', 'medium', 'high'.",
 )
 @click.option(
+    "--parallel", "-p",
+    default=4,
+    type=int,
+    show_default=True,
+    help="Number of model+run combinations to execute in parallel. "
+         "E.g. 3 models × 4 missing runs = 12 jobs; -p 6 runs 6 at once.",
+)
+@click.option(
     "--parallel-tasks", "-pt",
     default=10,
     type=int,
     show_default=True,
-    help="Parallelize tasks WITHIN each model (0=off, 8-16 recommended).",
+    help="Parallelize tasks WITHIN each model run (0=off, 8-16 recommended).",
 )
 @click.option(
     "--temperature", "-t",
@@ -952,16 +967,28 @@ def rerun(
     models: str | None,
     top_n: int,
     run_number: int | None,
+    target_runs: int | None,
     judge: str,
     reasoning_effort: str | None,
+    parallel: int,
     parallel_tasks: int,
     temperature: float | None,
 ) -> None:
-    """Run an additional benchmark pass on top models to reduce variance.
+    """Run additional benchmark passes on models to reduce variance.
 
-    By default, selects the top N models from the current leaderboard
-    and runs a second (or third, etc.) benchmark pass. Results are
-    averaged across all runs, and confidence intervals are displayed.
+    Supports two modes:
+
+    \b
+      1. Single run:   rerun -m model1,model2 -r 3
+         Runs a specific run number for each model.
+
+    \b
+      2. Target runs:  rerun -m model1,model2 -R 5
+         Ensures 5 total runs exist. Automatically finds missing runs
+         and executes them ALL in parallel for maximum speed.
+
+    By default selects the top N models from the current leaderboard.
+    All missing runs execute concurrently (controlled by --parallel).
     """
     from src.cache import list_all_cached_models, list_available_runs
     from src.config import get_config_by_dir_name
@@ -1009,20 +1036,34 @@ def rerun(
             runs = list_available_runs(cfg.config_dir_name)
             console.print(f"  {i:2d}. {ms.model_id} (index: {ms.independence_index:.1f}, runs: {len(runs)})")
 
-    # Determine run number for each entry
-    entry_run_numbers: dict[str, int] = {}
-    for label, cfg in rerun_entries:
-        if run_number:
-            entry_run_numbers[label] = run_number
-        else:
+    # ---------------------------------------------------------------
+    # Build the list of (label, cfg, run_number) jobs to execute
+    # ---------------------------------------------------------------
+    jobs: list[tuple[str, ModelConfig, int]] = []
+
+    if target_runs is not None:
+        for label, cfg in rerun_entries:
+            existing = set(list_available_runs(cfg.config_dir_name))
+            for rn in range(1, target_runs + 1):
+                if rn not in existing:
+                    jobs.append((label, cfg, rn))
+    elif run_number is not None:
+        for label, cfg in rerun_entries:
+            jobs.append((label, cfg, run_number))
+    else:
+        for label, cfg in rerun_entries:
             existing_runs = list_available_runs(cfg.config_dir_name)
             next_run = max(existing_runs) + 1 if existing_runs else 2
-            entry_run_numbers[label] = next_run
+            jobs.append((label, cfg, next_run))
+
+    if not jobs:
+        console.print("[green]All target runs already exist. Nothing to do![/green]")
+        return
 
     api_key = load_api_key()
     client = OpenRouterClient(api_key)
 
-    remote_model_ids = list({cfg.model_id for _, cfg in rerun_entries if not cfg.model_id.startswith("local/")})
+    remote_model_ids = list({cfg.model_id for _, cfg, _ in jobs if not cfg.model_id.startswith("local/")})
     if remote_model_ids:
         all_to_validate = list(set(remote_model_ids + [judge]))
         if not _validate_models(client, all_to_validate, reasoning_effort):
@@ -1031,33 +1072,69 @@ def rerun(
 
     ensure_dirs()
 
-    console.print(f"\n[bold]AI Independence Benchmark — Additional Run[/bold]")
+    n_workers = max(1, min(parallel, len(jobs)))
+
+    # Group jobs by model for display
+    from collections import defaultdict
+    jobs_by_model: dict[str, list[int]] = defaultdict(list)
+    for label, cfg, rn in jobs:
+        jobs_by_model[label].append(rn)
+
+    console.print(f"\n[bold]AI Independence Benchmark — Parallel Rerun[/bold]")
     console.print(f"  Models: {len(rerun_entries)}")
-    for label, cfg in rerun_entries:
-        rn = entry_run_numbers[label]
-        console.print(f"    {label} → run {rn}")
+    console.print(f"  Total jobs: {len(jobs)} (model × run combinations)")
+    for label, run_nums in jobs_by_model.items():
+        run_nums.sort()
+        runs_str = ", ".join(str(r) for r in run_nums)
+        console.print(f"    {label} → runs [{runs_str}]")
     console.print(f"  Experiments: {', '.join(experiment_list)}")
     console.print(f"  Judge: {judge}")
+    console.print(f"  [yellow]Parallel jobs: {n_workers}[/yellow]")
     if parallel_tasks > 0:
-        console.print(f"  [yellow]Parallel tasks: {parallel_tasks}[/yellow]")
+        console.print(f"  [yellow]Parallel tasks per job: {parallel_tasks}[/yellow]")
     console.print()
 
     session = SessionCost()
 
     model_results: list[ModelResult] = []
-    for label, cfg in rerun_entries:
-        rn = entry_run_numbers[label]
-        eff_reasoning = reasoning_effort or cfg.effective_reasoning
-        eff_temp = temperature if temperature is not None else cfg.effective_temperature
-        mr = _run_single_model(
-            client, cfg.model_id, judge,
-            experiment_list, system_variants, delivery_modes_list,
-            eff_reasoning, parallel_tasks,
-            run=rn,
-            temperature=eff_temp,
-            config_dir_name=cfg.config_dir_name,
-        )
-        model_results.append(mr)
+
+    if n_workers == 1:
+        for label, cfg, rn in jobs:
+            eff_reasoning = reasoning_effort or cfg.effective_reasoning
+            eff_temp = temperature if temperature is not None else cfg.effective_temperature
+            mr = _run_single_model(
+                client, cfg.model_id, judge,
+                experiment_list, system_variants, delivery_modes_list,
+                eff_reasoning, parallel_tasks,
+                run=rn,
+                temperature=eff_temp,
+                config_dir_name=cfg.config_dir_name,
+            )
+            model_results.append(mr)
+    else:
+        with ThreadPoolExecutor(max_workers=n_workers) as pool:
+            futures = {}
+            for label, cfg, rn in jobs:
+                eff_reasoning = reasoning_effort or cfg.effective_reasoning
+                eff_temp = temperature if temperature is not None else cfg.effective_temperature
+                f = pool.submit(
+                    _run_single_model,
+                    client, cfg.model_id, judge,
+                    experiment_list, system_variants, delivery_modes_list,
+                    eff_reasoning, parallel_tasks,
+                    run=rn,
+                    temperature=eff_temp,
+                    config_dir_name=cfg.config_dir_name,
+                )
+                futures[f] = f"{label} run {rn}"
+            for future in as_completed(futures):
+                job_label = futures[future]
+                try:
+                    mr = future.result()
+                except Exception as e:
+                    mr = ModelResult(model_id=job_label, error=str(e))
+                    console.print(f"  [red]{job_label} — FATAL: {e}[/red]")
+                model_results.append(mr)
 
     for mr in model_results:
         session.tasks.append(mr.gen_cost)

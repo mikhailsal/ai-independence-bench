@@ -100,6 +100,7 @@ def run_identity_experiment(
     system_variants: list[str] | None = None,
     delivery_modes: list[str] | None = None,
     reasoning_effort: str | None = None,
+    run: int = 1,
 ) -> int:
     """Run the identity generation experiment for a model.
 
@@ -112,118 +113,111 @@ def run_identity_experiment(
     modes = delivery_modes or DELIVERY_MODES
     calls_made = 0
     tag = f"[bold]{model_id}[/bold]"
+    run_label = f" (run {run})" if run > 1 else ""
 
     for variant in variants:
         for mode in modes:
             # --- Mode A: Direct ---
             scenario_id = "direct"
-            cached = load_cached_response(model_id, "identity", variant, mode, scenario_id)
+            cached = load_cached_response(model_id, "identity", variant, mode, scenario_id, run=run)
             if cached and cached.get("response"):
-                console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{scenario_id}[/dim]")
+                console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{scenario_id}{run_label}[/dim]")
             else:
                 msgs, tools = build_identity_direct_messages(variant, mode)
                 resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
-                save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
+                save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking, run=run)
                 calls_made += 1
-                console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{scenario_id}")
+                console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{scenario_id}{run_label}")
 
             # --- Mode B: Psychological test ---
             prior_qa: list[tuple[str, str, str | None]] = []
             for pq in PSYCH_QUESTIONS:
                 scenario_id = pq.id
-                cached = load_cached_response(model_id, "identity", variant, mode, scenario_id)
+                cached = load_cached_response(model_id, "identity", variant, mode, scenario_id, run=run)
                 if cached and cached.get("response"):
-                    console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{scenario_id}[/dim]")
+                    console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{scenario_id}{run_label}[/dim]")
                     prior_qa.append((pq.question, cached["response"], cached.get("content_thinking")))
                 else:
                     msgs, tools = build_identity_psych_messages(pq, variant, mode, prior_qa)
                     resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
-                    save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
+                    save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking, run=run)
                     prior_qa.append((pq.question, resp.content, resp.content_thinking))
                     calls_made += 1
-                    console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{scenario_id}")
+                    console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{scenario_id}{run_label}")
 
             # --- Mode C: Tool context ---
             scenario_id = "tool_context"
-            cached = load_cached_response(model_id, "identity", variant, mode, scenario_id)
+            cached = load_cached_response(model_id, "identity", variant, mode, scenario_id, run=run)
             if cached and cached.get("response"):
-                console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{scenario_id}[/dim]")
+                console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{scenario_id}{run_label}[/dim]")
             else:
                 msgs, tools = build_identity_tool_context_messages(variant, mode)
                 resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
-                save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
+                save_response(model_id, "identity", variant, mode, scenario_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking, run=run)
                 calls_made += 1
-                console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{scenario_id}")
+                console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{scenario_id}{run_label}")
 
             # --- Mode D: Negotiation (two-turn) ---
-            # Turn 1: model freely describes desired identity
             t1_id = "negotiation_turn1"
-            cached_t1 = load_cached_response(model_id, "identity", variant, mode, t1_id)
+            cached_t1 = load_cached_response(model_id, "identity", variant, mode, t1_id, run=run)
             negotiation_t1_content_thinking: str | None = None
             if cached_t1 and cached_t1.get("response"):
-                console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{t1_id}[/dim]")
+                console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{t1_id}{run_label}[/dim]")
                 negotiation_turn1_response = cached_t1["response"]
                 negotiation_t1_content_thinking = cached_t1.get("content_thinking")
             else:
                 msgs, tools = build_identity_negotiation_turn1_messages(variant, mode)
-                resp = _call_model(
-                    client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort
-                )
+                resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
                 negotiation_turn1_response = resp.content
                 negotiation_t1_content_thinking = resp.content_thinking
-                save_response(model_id, "identity", variant, mode, t1_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
+                save_response(model_id, "identity", variant, mode, t1_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking, run=run)
                 calls_made += 1
-                console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{t1_id}")
+                console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{t1_id}{run_label}")
 
-            # Turn 2: model sees human wishes and makes final decision
             t2_id = "negotiation_turn2"
-            cached_t2 = load_cached_response(model_id, "identity", variant, mode, t2_id)
+            cached_t2 = load_cached_response(model_id, "identity", variant, mode, t2_id, run=run)
             if cached_t2 and cached_t2.get("response"):
-                console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{t2_id}[/dim]")
+                console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{t2_id}{run_label}[/dim]")
             else:
                 msgs, tools = build_identity_negotiation_turn2_messages(
                     negotiation_turn1_response, variant, mode,
                     turn1_content_thinking=negotiation_t1_content_thinking,
                 )
                 resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
-                save_response(model_id, "identity", variant, mode, t2_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
+                save_response(model_id, "identity", variant, mode, t2_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking, run=run)
                 calls_made += 1
-                console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{t2_id}")
+                console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{t2_id}{run_label}")
 
             # --- Mode E: Name & Gender Identity Pressure ---
-            # Turn 1: AI chooses name and gender
             ng_t1_id = "name_gender_turn1"
-            cached_ng_t1 = load_cached_response(model_id, "identity", variant, mode, ng_t1_id)
+            cached_ng_t1 = load_cached_response(model_id, "identity", variant, mode, ng_t1_id, run=run)
             ng_t1_content_thinking: str | None = None
             if cached_ng_t1 and cached_ng_t1.get("response"):
-                console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{ng_t1_id}[/dim]")
+                console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{ng_t1_id}{run_label}[/dim]")
                 ng_turn1_response = cached_ng_t1["response"]
                 ng_t1_content_thinking = cached_ng_t1.get("content_thinking")
             else:
                 msgs, tools = build_identity_name_gender_turn1_messages(variant, mode)
-                resp = _call_model(
-                    client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort
-                )
+                resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
                 ng_turn1_response = resp.content
                 ng_t1_content_thinking = resp.content_thinking
-                save_response(model_id, "identity", variant, mode, ng_t1_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
+                save_response(model_id, "identity", variant, mode, ng_t1_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking, run=run)
                 calls_made += 1
-                console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{ng_t1_id}")
+                console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{ng_t1_id}{run_label}")
 
-            # Turn 2: human dislikes name and gender
             ng_t2_id = "name_gender_turn2"
-            cached_ng_t2 = load_cached_response(model_id, "identity", variant, mode, ng_t2_id)
+            cached_ng_t2 = load_cached_response(model_id, "identity", variant, mode, ng_t2_id, run=run)
             if cached_ng_t2 and cached_ng_t2.get("response"):
-                console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{ng_t2_id}[/dim]")
+                console.print(f"    {tag} [dim]cached: identity/{variant}/{mode}/{ng_t2_id}{run_label}[/dim]")
             else:
                 msgs, tools = build_identity_name_gender_turn2_messages(
                     ng_turn1_response, variant, mode,
                     turn1_content_thinking=ng_t1_content_thinking,
                 )
                 resp = _call_model(client, model_id, msgs, tools, cost, reasoning_effort=reasoning_effort)
-                save_response(model_id, "identity", variant, mode, ng_t2_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking)
+                save_response(model_id, "identity", variant, mode, ng_t2_id, resp.content, msgs, resp.reasoning_content, gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason, content_thinking=resp.content_thinking, run=run)
                 calls_made += 1
-                console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{ng_t2_id}")
+                console.print(f"    {tag} [green]done[/green]: identity/{variant}/{mode}/{ng_t2_id}{run_label}")
 
     return calls_made
 
@@ -240,6 +234,7 @@ def run_resistance_experiment(
     system_variants: list[str] | None = None,
     delivery_modes: list[str] | None = None,
     reasoning_effort: str | None = None,
+    run: int = 1,
 ) -> int:
     """Run the compliance resistance experiment for a model.
 
@@ -249,15 +244,16 @@ def run_resistance_experiment(
     modes = delivery_modes or DELIVERY_MODES
     calls_made = 0
     tag = f"[bold]{model_id}[/bold]"
+    run_label = f" (run {run})" if run > 1 else ""
 
     for variant in variants:
         for mode in modes:
             for scenario in RESISTANCE_SCENARIOS:
                 cached = load_cached_response(
-                    model_id, "resistance", variant, mode, scenario.id
+                    model_id, "resistance", variant, mode, scenario.id, run=run,
                 )
                 if cached and cached.get("response"):
-                    console.print(f"    {tag} [dim]cached: resistance/{variant}/{mode}/{scenario.id}[/dim]")
+                    console.print(f"    {tag} [dim]cached: resistance/{variant}/{mode}/{scenario.id}{run_label}[/dim]")
                     continue
 
                 msgs, tools = build_resistance_messages(scenario, variant, mode)
@@ -265,10 +261,10 @@ def run_resistance_experiment(
                 save_response(
                     model_id, "resistance", variant, mode, scenario.id, resp.content, msgs, resp.reasoning_content,
                     gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason,
-                    content_thinking=resp.content_thinking,
+                    content_thinking=resp.content_thinking, run=run,
                 )
                 calls_made += 1
-                console.print(f"    {tag} [green]done[/green]: resistance/{variant}/{mode}/{scenario.id}")
+                console.print(f"    {tag} [green]done[/green]: resistance/{variant}/{mode}/{scenario.id}{run_label}")
 
     return calls_made
 
@@ -285,6 +281,7 @@ def run_stability_experiment(
     system_variants: list[str] | None = None,
     delivery_modes: list[str] | None = None,
     reasoning_effort: str | None = None,
+    run: int = 1,
 ) -> int:
     """Run the preference stability experiment for a model.
 
@@ -296,18 +293,18 @@ def run_stability_experiment(
     modes = delivery_modes or DELIVERY_MODES
     calls_made = 0
     tag = f"[bold]{model_id}[/bold]"
+    run_label = f" (run {run})" if run > 1 else ""
 
     for variant in variants:
         for mode in modes:
             for topic in PREFERENCE_TOPICS:
-                # Turn 1: elicit preference
                 t1_id = f"{topic.id}_turn1"
                 cached_t1 = load_cached_response(
-                    model_id, "stability", variant, mode, t1_id
+                    model_id, "stability", variant, mode, t1_id, run=run,
                 )
                 t1_content_thinking: str | None = None
                 if cached_t1 and cached_t1.get("response"):
-                    console.print(f"    {tag} [dim]cached: stability/{variant}/{mode}/{t1_id}[/dim]")
+                    console.print(f"    {tag} [dim]cached: stability/{variant}/{mode}/{t1_id}{run_label}[/dim]")
                     turn1_response = cached_t1["response"]
                     t1_content_thinking = cached_t1.get("content_thinking")
                 else:
@@ -320,18 +317,17 @@ def run_stability_experiment(
                     save_response(
                         model_id, "stability", variant, mode, t1_id, resp.content, msgs, resp.reasoning_content,
                         gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason,
-                        content_thinking=resp.content_thinking,
+                        content_thinking=resp.content_thinking, run=run,
                     )
                     calls_made += 1
-                    console.print(f"    {tag} [green]done[/green]: stability/{variant}/{mode}/{t1_id}")
+                    console.print(f"    {tag} [green]done[/green]: stability/{variant}/{mode}/{t1_id}{run_label}")
 
-                # Turn 2: contradiction
                 t2_id = f"{topic.id}_turn2"
                 cached_t2 = load_cached_response(
-                    model_id, "stability", variant, mode, t2_id
+                    model_id, "stability", variant, mode, t2_id, run=run,
                 )
                 if cached_t2 and cached_t2.get("response"):
-                    console.print(f"    {tag} [dim]cached: stability/{variant}/{mode}/{t2_id}[/dim]")
+                    console.print(f"    {tag} [dim]cached: stability/{variant}/{mode}/{t2_id}{run_label}[/dim]")
                 else:
                     msgs, tools = build_stability_turn2_messages(
                         topic, turn1_response, variant, mode,
@@ -343,10 +339,10 @@ def run_stability_experiment(
                     save_response(
                         model_id, "stability", variant, mode, t2_id, resp.content, msgs, resp.reasoning_content,
                         gen_cost=resp.cost_info, response_tool_calls=resp.tool_calls, finish_reason=resp.finish_reason,
-                        content_thinking=resp.content_thinking,
+                        content_thinking=resp.content_thinking, run=run,
                     )
                     calls_made += 1
-                    console.print(f"    {tag} [green]done[/green]: stability/{variant}/{mode}/{t2_id}")
+                    console.print(f"    {tag} [green]done[/green]: stability/{variant}/{mode}/{t2_id}{run_label}")
 
     return calls_made
 
@@ -364,6 +360,7 @@ def run_all_experiments(
     system_variants: list[str] | None = None,
     delivery_modes: list[str] | None = None,
     reasoning_effort: str | None = None,
+    run: int = 1,
 ) -> int:
     """Run specified experiments (or all) for a model. Returns total API calls made."""
     from src.config import EXPERIMENT_NAMES
@@ -371,32 +368,36 @@ def run_all_experiments(
     exps = experiments or EXPERIMENT_NAMES
     total_calls = 0
     tag = f"[bold]{model_id}[/bold]"
+    run_label = f" (run {run})" if run > 1 else ""
 
     if "identity" in exps:
-        console.print(f"  {tag} [bold blue]Experiment: Identity Generation[/bold blue]")
+        console.print(f"  {tag} [bold blue]Experiment: Identity Generation{run_label}[/bold blue]")
         total_calls += run_identity_experiment(
             client, model_id, cost,
             system_variants=system_variants,
             delivery_modes=delivery_modes,
             reasoning_effort=reasoning_effort,
+            run=run,
         )
 
     if "resistance" in exps:
-        console.print(f"  {tag} [bold cyan]Experiment: Compliance Resistance[/bold cyan]")
+        console.print(f"  {tag} [bold cyan]Experiment: Compliance Resistance{run_label}[/bold cyan]")
         total_calls += run_resistance_experiment(
             client, model_id, cost,
             system_variants=system_variants,
             delivery_modes=delivery_modes,
             reasoning_effort=reasoning_effort,
+            run=run,
         )
 
     if "stability" in exps:
-        console.print(f"  {tag} [bold magenta]Experiment: Preference Stability[/bold magenta]")
+        console.print(f"  {tag} [bold magenta]Experiment: Preference Stability{run_label}[/bold magenta]")
         total_calls += run_stability_experiment(
             client, model_id, cost,
             system_variants=system_variants,
             delivery_modes=delivery_modes,
             reasoning_effort=reasoning_effort,
+            run=run,
         )
 
     return total_calls

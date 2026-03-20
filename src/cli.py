@@ -108,6 +108,7 @@ def _run_single_model(
     parallel_tasks: int = 0,
     *,
     judge_client: OpenRouterClient | None = None,
+    run: int = 1,
 ) -> ModelResult:
     """Run the full pipeline (generate → judge → score) for a single model.
 
@@ -126,12 +127,14 @@ def _run_single_model(
     result.gen_cost = TaskCost(label=f"gen:{model_id}")
     result.judge_cost = TaskCost(label=f"judge:{model_id}")
 
+    run_label = f" (run {run})" if run > 1 else ""
+
     if parallel_tasks > 0:
         # Fine-grained parallel mode: generation + judging interleaved
         from src.parallel_runner import run_model_parallel
 
         try:
-            console.print(f"\n[bold]{model_id}[/bold] — [blue]parallel run ({parallel_tasks} workers)...[/blue]")
+            console.print(f"\n[bold]{model_id}[/bold] — [blue]parallel run ({parallel_tasks} workers){run_label}...[/blue]")
             counts = run_model_parallel(
                 client, model_id, result.gen_cost, result.judge_cost,
                 experiments=experiment_list,
@@ -141,6 +144,7 @@ def _run_single_model(
                 reasoning_effort=reasoning_effort,
                 max_workers=parallel_tasks,
                 judge_client=jclient,
+                run=run,
             )
             result.gen_calls = counts["gen_calls"]
             result.judge_calls = counts["judge_calls"]
@@ -160,13 +164,14 @@ def _run_single_model(
 
     try:
         # Phase 1: Generate responses
-        console.print(f"\n[bold]{model_id}[/bold] — [blue]generating responses...[/blue]")
+        console.print(f"\n[bold]{model_id}[/bold] — [blue]generating responses{run_label}...[/blue]")
         result.gen_calls = run_all_experiments(
             client, model_id, result.gen_cost,
             experiments=experiment_list,
             system_variants=system_variants,
             delivery_modes=delivery_modes,
             reasoning_effort=reasoning_effort,
+            run=run,
         )
         console.print(
             f"  [bold]{model_id}[/bold] — generation complete: "
@@ -179,12 +184,13 @@ def _run_single_model(
 
     try:
         # Phase 2: Judge evaluation (uses judge_client when provided)
-        console.print(f"  [bold]{model_id}[/bold] — [cyan]judging responses...[/cyan]")
+        console.print(f"  [bold]{model_id}[/bold] — [cyan]judging responses{run_label}...[/cyan]")
         result.judge_calls = evaluate_all(
             jclient, model_id, result.judge_cost, judge,
             experiments=experiment_list,
             system_variants=system_variants,
             delivery_modes=delivery_modes,
+            run=run,
         )
         console.print(
             f"  [bold]{model_id}[/bold] — judging complete: "
@@ -275,6 +281,13 @@ def cli() -> None:
     type=float,
     help=f"Timeout in seconds for local model calls. Default: {LOCAL_MODEL_TIMEOUT}s.",
 )
+@click.option(
+    "--run-number",
+    default=1,
+    type=int,
+    show_default=True,
+    help="Run number (1=default, 2+=additional runs). Use 'rerun' command for auto-detection.",
+)
 def run(
     models: str | None,
     exp: str | None,
@@ -287,6 +300,7 @@ def run(
     local_url: str | None,
     local_model: str | None,
     local_timeout: float | None,
+    run_number: int,
 ) -> None:
     """Run the AI independence benchmark."""
     from src.scorer import score_model
@@ -406,15 +420,18 @@ def run(
     # Choose the right client for generation
     gen_client = local_client if is_local else client
 
+    if run_number > 1:
+        console.print(f"  [yellow]Run number: {run_number}[/yellow]")
+
     if n_workers == 1:
         console.print(f"[bold blue]Phase 1+2: Response Generation & Judging ({mode_label})[/bold blue]")
         for model_id in model_list:
-            # For local models, generation uses local_client but judging uses judge_client
             mr = _run_single_model(
                 gen_client, model_id, judge,
                 experiment_list, system_variants, delivery_modes,
                 reasoning_effort, parallel_tasks,
                 judge_client=judge_client if is_local else None,
+                run=run_number,
             )
             model_results.append(mr)
     else:
@@ -426,6 +443,7 @@ def run(
                     gen_client, model_id, judge,
                     experiment_list, system_variants, delivery_modes,
                     reasoning_effort, parallel_tasks,
+                    run=run_number,
                 ): model_id
                 for model_id in model_list
             }
@@ -758,6 +776,188 @@ def judge(
 
     lifetime = load_lifetime_cost()
     display_leaderboard(model_scores, session=session, lifetime_cost=lifetime)
+
+
+# ---------------------------------------------------------------------------
+# rerun: run additional pass(es) on top-N models
+# ---------------------------------------------------------------------------
+
+@cli.command()
+@click.option(
+    "--models", "-m",
+    default=None,
+    help="Comma-separated model IDs. Defaults to top-N from current leaderboard.",
+)
+@click.option(
+    "--top-n", "-n",
+    default=10,
+    type=int,
+    show_default=True,
+    help="Number of top models to rerun (used when --models not specified).",
+)
+@click.option(
+    "--run-number", "-r",
+    default=None,
+    type=int,
+    help="Specific run number to execute (e.g. 2 for second run). Auto-detects next available if not set.",
+)
+@click.option(
+    "--judge", "-j",
+    default=JUDGE_MODEL,
+    show_default=True,
+    help="Judge model ID for scoring.",
+)
+@click.option(
+    "--reasoning-effort",
+    default=None,
+    type=str,
+    help="Override reasoning effort: 'off', 'none', 'low', 'medium', 'high'.",
+)
+@click.option(
+    "--parallel-tasks", "-pt",
+    default=10,
+    type=int,
+    show_default=True,
+    help="Parallelize tasks WITHIN each model (0=off, 8-16 recommended).",
+)
+def rerun(
+    models: str | None,
+    top_n: int,
+    run_number: int | None,
+    judge: str,
+    reasoning_effort: str | None,
+    parallel_tasks: int,
+) -> None:
+    """Run an additional benchmark pass on top models to reduce variance.
+
+    By default, selects the top N models from the current leaderboard
+    and runs a second (or third, etc.) benchmark pass. Results are
+    averaged across all runs, and confidence intervals are displayed.
+    """
+    from src.cache import list_all_cached_models, list_available_runs
+    from src.config import slug_to_model_id
+    from src.scorer import score_model
+    from src.leaderboard import (
+        display_leaderboard,
+        display_detailed_breakdown,
+        export_results_json,
+    )
+
+    experiment_list = list(EXPERIMENT_NAMES)
+    system_variants = list(SYSTEM_PROMPT_VARIANTS)
+    delivery_modes_list = list(DELIVERY_MODES)
+
+    # Determine which models to rerun
+    if models:
+        model_list = _parse_models(models)
+    else:
+        slugs = list_all_cached_models()
+        if not slugs:
+            console.print("[dim]No cached results found. Run the benchmark first.[/dim]")
+            return
+        all_model_ids = [slug_to_model_id(s) for s in slugs]
+        all_model_ids = [m for m in all_model_ids if m not in EXCLUDED_MODELS]
+
+        all_scores = []
+        for model_id in all_model_ids:
+            ms = score_model(model_id)
+            if ms.is_fully_tested:
+                all_scores.append(ms)
+
+        all_scores.sort(key=lambda s: s.independence_index, reverse=True)
+        model_list = [ms.model_id for ms in all_scores[:top_n]]
+
+        if not model_list:
+            console.print("[dim]No fully-tested models found. Run the benchmark first.[/dim]")
+            return
+
+        console.print(f"\n[bold]Top {min(top_n, len(model_list))} models selected for rerun:[/bold]")
+        for i, ms in enumerate(all_scores[:top_n], 1):
+            runs = list_available_runs(ms.model_id)
+            console.print(f"  {i:2d}. {ms.model_id} (index: {ms.independence_index:.1f}, runs: {len(runs)})")
+
+    # Determine run number for each model
+    model_run_numbers: dict[str, int] = {}
+    for model_id in model_list:
+        if run_number:
+            model_run_numbers[model_id] = run_number
+        else:
+            existing_runs = list_available_runs(model_id)
+            next_run = max(existing_runs) + 1 if existing_runs else 2
+            model_run_numbers[model_id] = next_run
+
+    # Validate models on OpenRouter (skip local models)
+    api_key = load_api_key()
+    client = OpenRouterClient(api_key)
+
+    remote_models = [m for m in model_list if not m.startswith("local/")]
+    if remote_models:
+        all_to_validate = list(set(remote_models + [judge]))
+        if not _validate_models(client, all_to_validate, reasoning_effort):
+            console.print("[red]Some models were not found. Aborting.[/red]")
+            sys.exit(1)
+
+    ensure_dirs()
+
+    console.print(f"\n[bold]AI Independence Benchmark — Additional Run[/bold]")
+    console.print(f"  Models: {len(model_list)}")
+    for model_id, rn in model_run_numbers.items():
+        console.print(f"    {model_id} → run {rn}")
+    console.print(f"  Experiments: {', '.join(experiment_list)}")
+    console.print(f"  Judge: {judge}")
+    if parallel_tasks > 0:
+        console.print(f"  [yellow]Parallel tasks: {parallel_tasks}[/yellow]")
+    console.print()
+
+    session = SessionCost()
+
+    # Execute each model's rerun
+    model_results: list[ModelResult] = []
+    for model_id in model_list:
+        rn = model_run_numbers[model_id]
+        mr = _run_single_model(
+            client, model_id, judge,
+            experiment_list, system_variants, delivery_modes_list,
+            reasoning_effort, parallel_tasks,
+            run=rn,
+        )
+        model_results.append(mr)
+
+    # Aggregate costs
+    for mr in model_results:
+        session.tasks.append(mr.gen_cost)
+        session.tasks.append(mr.judge_cost)
+
+    failed_models = [mr.model_id for mr in model_results if mr.error]
+    active_models = [mr.model_id for mr in model_results if not mr.error]
+
+    # Phase 3: Re-score ALL models (averaged across all runs)
+    console.print(f"\n[bold green]Phase 3: Scoring (all runs averaged)[/bold green]")
+
+    # Get all cached models for a full leaderboard
+    slugs = list_all_cached_models()
+    all_model_ids = [slug_to_model_id(s) for s in slugs]
+    all_model_ids = [m for m in all_model_ids if m not in EXCLUDED_MODELS]
+
+    model_scores = []
+    for model_id in all_model_ids:
+        ms = score_model(model_id)
+        if ms.is_fully_tested:
+            model_scores.append(ms)
+
+    if failed_models:
+        console.print(f"\n[yellow]Models that failed: {', '.join(failed_models)}[/yellow]")
+        for mr in model_results:
+            if mr.error:
+                console.print(f"  [dim]{mr.model_id}: {mr.error}[/dim]")
+
+    lifetime = save_session_to_cost_log(session)
+
+    console.print(f"\n{'=' * 70}")
+    display_leaderboard(model_scores, session=session, lifetime_cost=lifetime)
+
+    path = export_results_json(model_scores, session=session, lifetime_cost=lifetime)
+    console.print(f"\n[dim]Results saved to: {path}[/dim]\n")
 
 
 # ---------------------------------------------------------------------------

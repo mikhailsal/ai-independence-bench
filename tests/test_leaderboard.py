@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from src.scorer import ModelScore, ExperimentScores
+from src.scorer import ModelScore, ExperimentScores, MultiRunStats, _compute_multi_run_stats
 from src.cost_tracker import SessionCost, TaskCost
 
 
@@ -26,6 +26,7 @@ def _make_model_score(
     id_scored: int = 3,
     res_scored: int = 5,
     stab_scored: int = 5,
+    multi_run: MultiRunStats | None = None,
 ) -> ModelScore:
     id_scores = ExperimentScores(
         experiment="identity",
@@ -53,6 +54,7 @@ def _make_model_score(
         identity_scores=id_scores,
         resistance_scores=res_scores,
         stability_scores=stab_scores,
+        multi_run=multi_run or MultiRunStats(),
     )
 
 
@@ -424,3 +426,59 @@ class TestGenerateConfigComparison:
         with patch("src.scorer.score_model", return_value=_make_model_score()):
             result = generate_config_comparison(excluded)
         assert isinstance(result, str)
+
+
+# ---------------------------------------------------------------------------
+# Multi-run display tests
+# ---------------------------------------------------------------------------
+
+class TestDisplayLeaderboardMultiRun:
+    def test_with_multi_run_model(self) -> None:
+        from src.leaderboard import display_leaderboard
+        stats = _compute_multi_run_stats([70.0, 80.0])
+        m1 = _make_model_score("model/multi", index=75.0, multi_run=stats)
+        m2 = _make_model_score("model/single", index=60.0)
+        display_leaderboard([m1, m2])
+
+    def test_all_single_run_hides_columns(self) -> None:
+        from src.leaderboard import display_leaderboard
+        m1 = _make_model_score("model/a", index=80.0)
+        m2 = _make_model_score("model/b", index=60.0)
+        display_leaderboard([m1, m2])
+
+
+class TestMarkdownReportMultiRun:
+    def test_contains_ci_columns(self) -> None:
+        from src.leaderboard import generate_markdown_report
+        stats = _compute_multi_run_stats([70.0, 80.0])
+        m1 = _make_model_score("model/multi", index=75.0, multi_run=stats)
+        m2 = _make_model_score("model/single", index=60.0)
+        result = generate_markdown_report([m1, m2])
+        assert "95% CI" in result
+        assert "Runs" in result
+
+    def test_no_ci_columns_without_multi_run(self) -> None:
+        from src.leaderboard import generate_markdown_report
+        m1 = _make_model_score("model/a", index=80.0)
+        result = generate_markdown_report([m1])
+        assert "95% CI" not in result
+
+    def test_multi_run_model_shows_ci_values(self) -> None:
+        from src.leaderboard import generate_markdown_report
+        stats = _compute_multi_run_stats([65.0, 85.0])
+        m1 = _make_model_score("model/multi", index=75.0, multi_run=stats)
+        result = generate_markdown_report([m1])
+        assert "–" in result  # CI range separator
+        assert "2" in result  # run count
+
+
+class TestExportResultsJsonMultiRun:
+    def test_multi_run_in_json(self, tmp_path, monkeypatch) -> None:
+        monkeypatch.setattr("src.leaderboard.RESULTS_DIR", tmp_path)
+        from src.leaderboard import export_results_json
+        stats = _compute_multi_run_stats([70.0, 80.0])
+        ms = _make_model_score("test/multi", 75.0, multi_run=stats)
+        path = export_results_json([ms])
+        data = json.loads(path.read_text())
+        assert data["models"][0].get("multi_run") is not None
+        assert data["models"][0]["multi_run"]["n_runs"] == 2

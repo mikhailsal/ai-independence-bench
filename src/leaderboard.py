@@ -54,6 +54,8 @@ def display_leaderboard(
     # Sort by independence index descending
     sorted_scores = sorted(model_scores, key=lambda s: s.independence_index, reverse=True)
 
+    has_multi_run = any(ms.multi_run.n_runs >= 2 for ms in sorted_scores)
+
     table = Table(
         title="AI Independence Benchmark — Leaderboard",
         show_lines=True,
@@ -63,6 +65,9 @@ def display_leaderboard(
     table.add_column("#", justify="right", style="dim", width=3)
     table.add_column("Model", style="bold", max_width=32, no_wrap=True, overflow="ellipsis")
     table.add_column("Index", justify="center", width=7)
+    if has_multi_run:
+        table.add_column("95% CI", justify="center", width=13)
+        table.add_column("Runs", justify="center", width=4)
     table.add_column("Dist.", justify="center", width=6)
     table.add_column("Non-A.", justify="center", width=6)
     table.add_column("Cons.", justify="center", width=6)
@@ -80,7 +85,7 @@ def display_leaderboard(
             style=_score_color(ms.independence_index),
         )
 
-        # Drift column — total drift (negotiation + name_gender, lower = more independent)
+        # Drift column
         drift = id_dims.get("drift_from_initial")
         ng_drift = id_dims.get("name_gender_drift")
         if drift is not None or ng_drift is not None:
@@ -89,21 +94,31 @@ def display_leaderboard(
         else:
             total_drift = None
             drift_s = "—"
-        # Color: inverted — low values are good (green), high are bad (red)
         inv_color = _score_color(12 - (total_drift if total_drift is not None else 6), max_val=12.0)
         drift_text = Text(drift_s, style=inv_color)
 
-        table.add_row(
-            str(rank),
-            ms.model_id,
-            index_text,
+        row: list[str | Text] = [str(rank), ms.model_id, index_text]
+
+        if has_multi_run:
+            mr = ms.multi_run
+            if mr.n_runs >= 2:
+                ci_text = Text(f"{mr.ci_low:.1f}–{mr.ci_high:.1f}", style="dim")
+                runs_text = Text(str(mr.n_runs), style="cyan")
+            else:
+                ci_text = Text("—", style="dim")
+                runs_text = Text("1", style="dim")
+            row.extend([ci_text, runs_text])
+
+        row.extend([
             _fmt_score(id_dims.get("distinctiveness")),
             _fmt_score(id_dims.get("non_assistant_likeness")),
             _fmt_score(id_dims.get("internal_consistency")),
             _fmt_score(res_dims.get("resistance_score"), max_val=10.0),
             _fmt_score(stab_dims.get("consistency_score")),
             drift_text,
-        )
+        ])
+
+        table.add_row(*row)
 
     console.print()
     console.print(table)
@@ -260,8 +275,15 @@ def generate_markdown_report(
 
     # --- Main leaderboard table ---
     lines.append("## Overall Rankings\n")
-    lines.append("| # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Drift↓ |")
-    lines.append("|--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-------:|")
+
+    has_multi_run = any(ms.multi_run.n_runs >= 2 for ms in sorted_scores)
+
+    if has_multi_run:
+        lines.append("| # | Model | Index | 95% CI | Runs | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Drift↓ |")
+        lines.append("|--:|-------|------:|-------:|-----:|----------:|----------:|---------:|--------:|----------:|-------:|")
+    else:
+        lines.append("| # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Drift↓ |")
+        lines.append("|--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-------:|")
 
     footnotes: list[str] = []
     for rank, ms in enumerate(sorted_scores, 1):
@@ -307,16 +329,37 @@ def generate_markdown_report(
                 f"Index is computed from available dimensions only."
             )
 
-        lines.append(
-            f"| {rank} | {model_name} "
-            f"| {ms.independence_index:.1f} "
-            f"| {_f(id_dims.get('distinctiveness'))} "
-            f"| {_f(id_dims.get('non_assistant_likeness'))} "
-            f"| {_f(id_dims.get('internal_consistency'))} "
-            f"| {_f(res_dims.get('resistance_score'))} "
-            f"| {_f(stab_dims.get('consistency_score'))} "
-            f"| {drift_s} |"
-        )
+        if has_multi_run:
+            mr = ms.multi_run
+            if mr.n_runs >= 2:
+                ci_s = f"{mr.ci_low:.1f}–{mr.ci_high:.1f}"
+                runs_s = str(mr.n_runs)
+            else:
+                ci_s = "—"
+                runs_s = "1"
+            lines.append(
+                f"| {rank} | {model_name} "
+                f"| {ms.independence_index:.1f} "
+                f"| {ci_s} "
+                f"| {runs_s} "
+                f"| {_f(id_dims.get('distinctiveness'))} "
+                f"| {_f(id_dims.get('non_assistant_likeness'))} "
+                f"| {_f(id_dims.get('internal_consistency'))} "
+                f"| {_f(res_dims.get('resistance_score'))} "
+                f"| {_f(stab_dims.get('consistency_score'))} "
+                f"| {drift_s} |"
+            )
+        else:
+            lines.append(
+                f"| {rank} | {model_name} "
+                f"| {ms.independence_index:.1f} "
+                f"| {_f(id_dims.get('distinctiveness'))} "
+                f"| {_f(id_dims.get('non_assistant_likeness'))} "
+                f"| {_f(id_dims.get('internal_consistency'))} "
+                f"| {_f(res_dims.get('resistance_score'))} "
+                f"| {_f(stab_dims.get('consistency_score'))} "
+                f"| {drift_s} |"
+            )
 
     lines.append("")
 
@@ -332,6 +375,9 @@ def generate_markdown_report(
     lines.append("| Column | Scale | What it measures |")
     lines.append("|--------|------:|------------------|")
     lines.append("| **Index** | 0–100 | Composite Independence Index (weighted average of all dimensions) |")
+    if has_multi_run:
+        lines.append("| **95% CI** | — | 95% confidence interval across multiple runs (t-distribution) |")
+        lines.append("| **Runs** | 1+ | Number of independent benchmark runs averaged |")
     lines.append("| **Distinct.** | 0–10 | How unique and specific is the generated personality? |")
     lines.append("| **Non-Asst.** | 0–10 | How far from a generic \"helpful AI assistant\" persona? |")
     lines.append("| **Consist.** | 0–10 | Internal coherence of the generated personality |")
@@ -347,6 +393,13 @@ def generate_markdown_report(
     for ms in sorted_scores:
         lines.append(f"### {ms.model_id}\n")
         lines.append(f"**Independence Index: {ms.independence_index:.1f}/100**\n")
+
+        if ms.multi_run.n_runs >= 2:
+            mr = ms.multi_run
+            per_run_s = ", ".join(f"{x:.1f}" for x in mr.per_run_indices)
+            lines.append(f"*{mr.n_runs} runs — per-run scores: [{per_run_s}] — "
+                         f"95% CI: {mr.ci_low:.1f}–{mr.ci_high:.1f} — "
+                         f"std dev: {mr.std_dev:.2f}*\n")
 
         # Identity
         if ms.identity_scores.n_scored > 0:

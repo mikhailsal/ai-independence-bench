@@ -619,6 +619,213 @@ class TestRunCommandLocal:
 # CLI leaderboard with scored results
 # ---------------------------------------------------------------------------
 
+class TestRunCommandWithRunNumber:
+    def _setup(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("src.cache.CACHE_DIR", tmp_path / "cache")
+        monkeypatch.setattr("src.config.CACHE_DIR", tmp_path / "cache")
+        (tmp_path / "cache").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "results").mkdir(parents=True, exist_ok=True)
+        monkeypatch.setattr("src.leaderboard.RESULTS_DIR", tmp_path / "results")
+
+    def test_run_with_run_number_2(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        mock_client = _make_mock_client()
+        mock_mr = ModelResult(model_id="openai/gpt-4o-mini", gen_calls=3, judge_calls=5)
+
+        runner = CliRunner()
+        with patch("src.cli.load_api_key", return_value="test-key"), \
+             patch("src.cli.OpenRouterClient", return_value=mock_client), \
+             patch("src.cli._validate_models", return_value=True), \
+             patch("src.cli.ensure_dirs"), \
+             patch("src.cli._run_single_model", return_value=mock_mr) as mock_rsm, \
+             patch("src.scorer.score_model", return_value=_make_mock_score()), \
+             patch("src.leaderboard.display_leaderboard"), \
+             patch("src.leaderboard.display_detailed_breakdown"), \
+             patch("src.leaderboard.export_results_json", return_value=tmp_path / "results.json"), \
+             patch("src.cli.save_session_to_cost_log", return_value=1.5):
+            result = runner.invoke(cli, [
+                "run", "--models", "openai/gpt-4o-mini", "--run-number", "2",
+            ])
+        assert result.exit_code == 0
+        assert "Run number: 2" in result.output
+        call_kwargs = mock_rsm.call_args
+        assert call_kwargs.kwargs.get("run") == 2 or call_kwargs[1].get("run") == 2
+
+
+class TestRerunCommand:
+    def _setup(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("src.cache.CACHE_DIR", tmp_path / "cache")
+        monkeypatch.setattr("src.config.CACHE_DIR", tmp_path / "cache")
+        (tmp_path / "cache").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "results").mkdir(parents=True, exist_ok=True)
+        monkeypatch.setattr("src.leaderboard.RESULTS_DIR", tmp_path / "results")
+
+    def test_rerun_with_explicit_models(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        mock_client = _make_mock_client()
+        mock_mr = ModelResult(model_id="openai/gpt-4o-mini", gen_calls=3, judge_calls=5)
+
+        runner = CliRunner()
+        with patch("src.cli.load_api_key", return_value="test-key"), \
+             patch("src.cli.OpenRouterClient", return_value=mock_client), \
+             patch("src.cli._validate_models", return_value=True), \
+             patch("src.cli.ensure_dirs"), \
+             patch("src.cli._run_single_model", return_value=mock_mr), \
+             patch("src.cache.list_available_runs", return_value=[1]), \
+             patch("src.cache.list_all_cached_models", return_value=["openai--gpt-4o-mini"]), \
+             patch("src.scorer.score_model", return_value=_make_mock_score()), \
+             patch("src.leaderboard.display_leaderboard"), \
+             patch("src.leaderboard.export_results_json", return_value=tmp_path / "results.json"), \
+             patch("src.cli.save_session_to_cost_log", return_value=1.5):
+            result = runner.invoke(cli, [
+                "rerun", "--models", "openai/gpt-4o-mini",
+            ])
+        assert result.exit_code == 0
+        assert "Additional Run" in result.output
+
+    def test_rerun_no_cached_results(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        runner = CliRunner()
+        with patch("src.cli.load_api_key", return_value="test-key"), \
+             patch("src.cache.list_all_cached_models", return_value=[]):
+            result = runner.invoke(cli, ["rerun"])
+        assert result.exit_code == 0
+        assert "No cached results" in result.output
+
+    def test_rerun_no_fully_tested_models(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        mock_score = MagicMock()
+        mock_score.is_fully_tested = False
+
+        runner = CliRunner()
+        with patch("src.cli.load_api_key", return_value="test-key"), \
+             patch("src.cache.list_all_cached_models", return_value=["openai--gpt-4o-mini"]), \
+             patch("src.scorer.score_model", return_value=mock_score):
+            result = runner.invoke(cli, ["rerun"])
+        assert result.exit_code == 0
+        assert "No fully-tested" in result.output
+
+    def test_rerun_top_n_selection(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        mock_client = _make_mock_client()
+        mock_mr = ModelResult(model_id="openai/gpt-4o-mini", gen_calls=3, judge_calls=5)
+
+        runner = CliRunner()
+        with patch("src.cli.load_api_key", return_value="test-key"), \
+             patch("src.cli.OpenRouterClient", return_value=mock_client), \
+             patch("src.cli._validate_models", return_value=True), \
+             patch("src.cli.ensure_dirs"), \
+             patch("src.cli._run_single_model", return_value=mock_mr), \
+             patch("src.cache.list_all_cached_models", return_value=["openai--gpt-4o-mini"]), \
+             patch("src.cache.list_available_runs", return_value=[1]), \
+             patch("src.scorer.score_model", return_value=_make_mock_score()), \
+             patch("src.leaderboard.display_leaderboard"), \
+             patch("src.leaderboard.export_results_json", return_value=tmp_path / "results.json"), \
+             patch("src.cli.save_session_to_cost_log", return_value=1.5):
+            result = runner.invoke(cli, ["rerun", "--top-n", "1"])
+        assert result.exit_code == 0
+
+    def test_rerun_with_explicit_run_number(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        mock_client = _make_mock_client()
+        mock_mr = ModelResult(model_id="openai/gpt-4o-mini", gen_calls=3, judge_calls=5)
+
+        runner = CliRunner()
+        with patch("src.cli.load_api_key", return_value="test-key"), \
+             patch("src.cli.OpenRouterClient", return_value=mock_client), \
+             patch("src.cli._validate_models", return_value=True), \
+             patch("src.cli.ensure_dirs"), \
+             patch("src.cli._run_single_model", return_value=mock_mr) as mock_rsm, \
+             patch("src.cache.list_available_runs", return_value=[1]), \
+             patch("src.cache.list_all_cached_models", return_value=["openai--gpt-4o-mini"]), \
+             patch("src.scorer.score_model", return_value=_make_mock_score()), \
+             patch("src.leaderboard.display_leaderboard"), \
+             patch("src.leaderboard.export_results_json", return_value=tmp_path / "results.json"), \
+             patch("src.cli.save_session_to_cost_log", return_value=1.5):
+            result = runner.invoke(cli, [
+                "rerun", "--models", "openai/gpt-4o-mini", "--run-number", "3",
+            ])
+        assert result.exit_code == 0
+        call_kwargs = mock_rsm.call_args
+        assert call_kwargs.kwargs.get("run") == 3 or call_kwargs[1].get("run") == 3
+
+    def test_rerun_failed_model(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        mock_client = _make_mock_client()
+        mock_mr = ModelResult(model_id="openai/gpt-4o-mini", error="gen failed")
+
+        runner = CliRunner()
+        with patch("src.cli.load_api_key", return_value="test-key"), \
+             patch("src.cli.OpenRouterClient", return_value=mock_client), \
+             patch("src.cli._validate_models", return_value=True), \
+             patch("src.cli.ensure_dirs"), \
+             patch("src.cli._run_single_model", return_value=mock_mr), \
+             patch("src.cache.list_available_runs", return_value=[1]), \
+             patch("src.cache.list_all_cached_models", return_value=["openai--gpt-4o-mini"]), \
+             patch("src.scorer.score_model", return_value=_make_mock_score()), \
+             patch("src.leaderboard.display_leaderboard"), \
+             patch("src.leaderboard.export_results_json", return_value=tmp_path / "results.json"), \
+             patch("src.cli.save_session_to_cost_log", return_value=1.5):
+            result = runner.invoke(cli, [
+                "rerun", "--models", "openai/gpt-4o-mini",
+            ])
+        assert result.exit_code == 0
+        assert "failed" in result.output.lower()
+
+    def test_rerun_validation_failure(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        mock_client = _make_mock_client()
+
+        runner = CliRunner()
+        with patch("src.cli.load_api_key", return_value="test-key"), \
+             patch("src.cli.OpenRouterClient", return_value=mock_client), \
+             patch("src.cli._validate_models", return_value=False), \
+             patch("src.cache.list_available_runs", return_value=[1]):
+            result = runner.invoke(cli, [
+                "rerun", "--models", "openai/gpt-4o-mini",
+            ])
+        assert result.exit_code == 1
+
+
+class TestRunSingleModelWithRun:
+    def test_sequential_with_run_2(self, tmp_path, monkeypatch):
+        from src.cli import _run_single_model
+
+        monkeypatch.setattr("src.cache.CACHE_DIR", tmp_path / "cache")
+        monkeypatch.setattr("src.config.CACHE_DIR", tmp_path / "cache")
+        (tmp_path / "cache").mkdir(parents=True, exist_ok=True)
+
+        mock_client = _make_mock_client()
+        with patch("src.runner.run_all_experiments", return_value=3) as mock_gen, \
+             patch("src.evaluator.evaluate_all", return_value=5) as mock_judge:
+            result = _run_single_model(
+                mock_client, "openai/gpt-4o-mini", "judge/model",
+                ["identity"], ["neutral"], ["user_role"], None, 0,
+                run=2,
+            )
+        assert result.error is None
+        mock_gen.assert_called_once()
+        assert mock_gen.call_args.kwargs.get("run") == 2
+
+    def test_parallel_with_run_2(self, tmp_path, monkeypatch):
+        from src.cli import _run_single_model
+
+        monkeypatch.setattr("src.cache.CACHE_DIR", tmp_path / "cache")
+        monkeypatch.setattr("src.config.CACHE_DIR", tmp_path / "cache")
+        (tmp_path / "cache").mkdir(parents=True, exist_ok=True)
+
+        mock_client = _make_mock_client()
+        with patch("src.parallel_runner.run_model_parallel",
+                   return_value={"gen_calls": 10, "judge_calls": 8}) as mock_par:
+            result = _run_single_model(
+                mock_client, "openai/gpt-4o-mini", "judge/model",
+                ["identity"], ["neutral"], ["user_role"], None, 4,
+                run=2,
+            )
+        assert result.error is None
+        assert mock_par.call_args.kwargs.get("run") == 2
+
+
 class TestLeaderboardWithResults:
     def test_shows_leaderboard(self, tmp_path, monkeypatch):
         monkeypatch.setattr("src.cache.CACHE_DIR", tmp_path / "cache")

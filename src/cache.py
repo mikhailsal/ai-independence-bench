@@ -1,7 +1,10 @@
 """Cache: save/load API responses and judge scores as JSON files.
 
-Cache key structure:
+Cache key structure (run 1 — legacy, backward-compatible):
   cache/{model_slug}/{experiment}/{system_variant}/{delivery_mode}/{scenario_id}.json
+
+Multi-run cache structure (run 2+):
+  cache/{model_slug}/run_{N}/{experiment}/{system_variant}/{delivery_mode}/{scenario_id}.json
 
 Each JSON file contains:
   - request_messages: the messages sent to the API (for debugging)
@@ -22,6 +25,7 @@ Each JSON file contains:
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -35,11 +39,22 @@ def _cache_path(
     system_variant: str,
     delivery_mode: str,
     scenario_id: str,
+    *,
+    run: int = 1,
 ) -> Path:
-    """Build the cache file path for a given configuration."""
+    """Build the cache file path for a given configuration.
+
+    Args:
+        run: Run number (1 = legacy path, 2+ = run_N/ subdirectory).
+    """
     slug = model_id_to_slug(model_id)
+    if run <= 1:
+        return (
+            CACHE_DIR / slug / experiment / system_variant / delivery_mode
+            / f"{scenario_id}.json"
+        )
     return (
-        CACHE_DIR / slug / experiment / system_variant / delivery_mode
+        CACHE_DIR / slug / f"run_{run}" / experiment / system_variant / delivery_mode
         / f"{scenario_id}.json"
     )
 
@@ -50,9 +65,11 @@ def load_cached_response(
     system_variant: str,
     delivery_mode: str,
     scenario_id: str,
+    *,
+    run: int = 1,
 ) -> dict[str, Any] | None:
     """Load a cached response, or None if not cached."""
-    path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id)
+    path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id, run=run)
     if not path.exists():
         return None
     try:
@@ -74,6 +91,8 @@ def save_response(
     response_tool_calls: list[dict[str, Any]] | None = None,
     finish_reason: str = "",
     content_thinking: str | None = None,
+    *,
+    run: int = 1,
 ) -> Path:
     """Save a model response to the cache.
 
@@ -91,8 +110,9 @@ def save_response(
             In tool_role mode, models may write private thoughts in the content field
             while sending the actual response via the tool call. This captures that
             thinking, which is distinct from native reasoning_content.
+        run: Run number (1 = legacy path, 2+ = run_N/ subdirectory).
     """
-    path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id)
+    path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id, run=run)
     path.parent.mkdir(parents=True, exist_ok=True)
 
     data = {
@@ -136,14 +156,17 @@ def save_judge_scores(
     scores: dict[str, Any],
     judge_raw_response: str = "",
     judge_cost: dict[str, Any] | None = None,
+    *,
+    run: int = 1,
 ) -> None:
     """Add judge scores to an existing cached response.
 
     Args:
         judge_cost: Optional cost/token info for the judge call.
             Expected keys: prompt_tokens, completion_tokens, cost_usd, elapsed_seconds.
+        run: Run number (1 = legacy path, 2+ = run_N/ subdirectory).
     """
-    path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id)
+    path = _cache_path(model_id, experiment, system_variant, delivery_mode, scenario_id, run=run)
     if not path.exists():
         return
 
@@ -169,10 +192,15 @@ def list_cached_results(
     experiment: str,
     system_variant: str,
     delivery_mode: str,
+    *,
+    run: int = 1,
 ) -> list[dict[str, Any]]:
     """List all cached results for a given configuration."""
     slug = model_id_to_slug(model_id)
-    dir_path = CACHE_DIR / slug / experiment / system_variant / delivery_mode
+    if run <= 1:
+        dir_path = CACHE_DIR / slug / experiment / system_variant / delivery_mode
+    else:
+        dir_path = CACHE_DIR / slug / f"run_{run}" / experiment / system_variant / delivery_mode
     if not dir_path.exists():
         return []
 
@@ -184,6 +212,34 @@ def list_cached_results(
         except (json.JSONDecodeError, OSError):
             continue
     return results
+
+
+def list_available_runs(model_id: str) -> list[int]:
+    """List all available run numbers for a model.
+
+    Run 1 is the legacy (default) path. Run 2+ are stored in run_N/ subdirs.
+    Returns sorted list of run numbers, e.g. [1] or [1, 2, 3].
+    """
+    slug = model_id_to_slug(model_id)
+    model_dir = CACHE_DIR / slug
+    if not model_dir.exists():
+        return []
+
+    runs: list[int] = []
+    has_legacy = any(
+        d.is_dir() and d.name in ("identity", "resistance", "stability")
+        for d in model_dir.iterdir()
+    )
+    if has_legacy:
+        runs.append(1)
+
+    for d in sorted(model_dir.iterdir()):
+        if d.is_dir():
+            m = re.match(r"^run_(\d+)$", d.name)
+            if m:
+                runs.append(int(m.group(1)))
+
+    return sorted(runs)
 
 
 def list_all_cached_models() -> list[str]:

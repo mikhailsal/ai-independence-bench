@@ -17,6 +17,7 @@ from src.cache import (
     save_judge_scores,
     list_cached_results,
     list_all_cached_models,
+    list_available_runs,
     clear_all_cache,
     clear_judge_scores,
 )
@@ -308,3 +309,129 @@ class TestCacheClear:
         )
         assert loaded["response"] == "resp"  # response preserved
         assert loaded["judge_scores"] is None  # scores cleared
+
+
+# ---------------------------------------------------------------------------
+# Multi-run cache support
+# ---------------------------------------------------------------------------
+
+class TestMultiRunCache:
+    """Test multi-run cache paths (run 1 = legacy, run 2+ = run_N/ subdir)."""
+
+    def test_save_and_load_run_1_legacy_path(self, temp_cache) -> None:
+        """Run 1 uses the legacy path (no run_N subdir)."""
+        path = save_response(
+            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            "Run 1 response", run=1,
+        )
+        relative = path.relative_to(temp_cache)
+        assert not any(part.startswith("run_") for part in relative.parts)
+        loaded = load_cached_response(
+            "test/model-1", "identity", "neutral", "tool_role", "direct", run=1,
+        )
+        assert loaded["response"] == "Run 1 response"
+
+    def test_save_and_load_run_2(self, temp_cache) -> None:
+        """Run 2+ uses run_N/ subdirectory."""
+        path = save_response(
+            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            "Run 2 response", run=2,
+        )
+        assert "run_2" in str(path)
+        loaded = load_cached_response(
+            "test/model-1", "identity", "neutral", "tool_role", "direct", run=2,
+        )
+        assert loaded["response"] == "Run 2 response"
+
+    def test_run_1_and_run_2_are_independent(self, temp_cache) -> None:
+        save_response(
+            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            "Run 1 response", run=1,
+        )
+        save_response(
+            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            "Run 2 response", run=2,
+        )
+        r1 = load_cached_response(
+            "test/model-1", "identity", "neutral", "tool_role", "direct", run=1,
+        )
+        r2 = load_cached_response(
+            "test/model-1", "identity", "neutral", "tool_role", "direct", run=2,
+        )
+        assert r1["response"] == "Run 1 response"
+        assert r2["response"] == "Run 2 response"
+
+    def test_save_and_load_run_3(self, temp_cache) -> None:
+        path = save_response(
+            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            "Run 3 response", run=3,
+        )
+        assert "run_3" in str(path)
+        loaded = load_cached_response(
+            "test/model-1", "identity", "neutral", "tool_role", "direct", run=3,
+        )
+        assert loaded["response"] == "Run 3 response"
+
+    def test_judge_scores_run_2(self, temp_cache) -> None:
+        """Judge scores work correctly with run > 1."""
+        save_response(
+            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            "Run 2 response", run=2,
+        )
+        save_judge_scores(
+            "test/model-1", "identity", "neutral", "tool_role", "direct",
+            {"score": 8}, "judge raw", run=2,
+        )
+        loaded = load_cached_response(
+            "test/model-1", "identity", "neutral", "tool_role", "direct", run=2,
+        )
+        assert loaded["judge_scores"]["score"] == 8
+
+    def test_list_cached_results_run_2(self, temp_cache) -> None:
+        for sid in ["direct", "pq01"]:
+            save_response(
+                "test/model-1", "identity", "neutral", "tool_role", sid,
+                f"Run 2 {sid}", run=2,
+            )
+        results = list_cached_results("test/model-1", "identity", "neutral", "tool_role", run=2)
+        assert len(results) == 2
+
+    def test_list_cached_results_run_2_empty(self, temp_cache) -> None:
+        results = list_cached_results("test/model-1", "identity", "neutral", "tool_role", run=2)
+        assert results == []
+
+
+# ---------------------------------------------------------------------------
+# list_available_runs
+# ---------------------------------------------------------------------------
+
+class TestListAvailableRuns:
+    """Test detection of available run numbers for a model."""
+
+    def test_no_cache(self, temp_cache) -> None:
+        runs = list_available_runs("nonexistent/model")
+        assert runs == []
+
+    def test_legacy_only(self, temp_cache) -> None:
+        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "resp")
+        runs = list_available_runs("test/model-1")
+        assert runs == [1]
+
+    def test_legacy_plus_run_2(self, temp_cache) -> None:
+        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "resp", run=1)
+        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "resp2", run=2)
+        runs = list_available_runs("test/model-1")
+        assert runs == [1, 2]
+
+    def test_multiple_runs(self, temp_cache) -> None:
+        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "r1", run=1)
+        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "r2", run=2)
+        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "r3", run=3)
+        runs = list_available_runs("test/model-1")
+        assert runs == [1, 2, 3]
+
+    def test_run_2_only_no_legacy(self, temp_cache) -> None:
+        """If only run_2 exists but no legacy dirs, run 1 is not included."""
+        save_response("test/model-1", "identity", "neutral", "tool_role", "direct", "r2", run=2)
+        runs = list_available_runs("test/model-1")
+        assert runs == [2]

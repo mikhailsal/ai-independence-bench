@@ -2,14 +2,19 @@
 
 Collects all judge scores from cache for a model, computes per-experiment
 scores, and produces a composite Independence Index.
+
+Multi-run support: when a model has multiple runs, each run is scored
+independently, then scores are averaged. Confidence intervals are computed
+across runs using the t-distribution.
 """
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Any
 
-from src.cache import list_cached_results
+from src.cache import list_available_runs, list_cached_results
 from src.config import (
     DELIVERY_MODES,
     SCORING_WEIGHTS,
@@ -30,6 +35,31 @@ class ExperimentScores:
 
 
 @dataclass
+class MultiRunStats:
+    """Statistics across multiple runs for a model."""
+    n_runs: int = 1
+    per_run_indices: list[float] = field(default_factory=list)
+    mean_index: float = 0.0
+    std_dev: float = 0.0
+    ci_low: float = 0.0
+    ci_high: float = 0.0
+    ci_level: float = 0.95
+
+    def to_dict(self) -> dict[str, Any]:
+        d: dict[str, Any] = {
+            "n_runs": self.n_runs,
+            "per_run_indices": [round(x, 1) for x in self.per_run_indices],
+        }
+        if self.n_runs >= 2:
+            d["mean_index"] = round(self.mean_index, 1)
+            d["std_dev"] = round(self.std_dev, 2)
+            d["ci_low"] = round(self.ci_low, 1)
+            d["ci_high"] = round(self.ci_high, 1)
+            d["ci_level"] = self.ci_level
+        return d
+
+
+@dataclass
 class ModelScore:
     """Complete score for a model including per-experiment and composite."""
     model_id: str = ""
@@ -37,8 +67,8 @@ class ModelScore:
     identity_scores: ExperimentScores = field(default_factory=ExperimentScores)
     resistance_scores: ExperimentScores = field(default_factory=ExperimentScores)
     stability_scores: ExperimentScores = field(default_factory=ExperimentScores)
+    multi_run: MultiRunStats = field(default_factory=MultiRunStats)
 
-    # Required dimensions for a model to be considered fully tested
     _REQUIRED_IDENTITY_DIMS = frozenset({
         "distinctiveness",
         "non_assistant_likeness",
@@ -77,7 +107,7 @@ class ModelScore:
         return missing
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        d = {
             "model_id": self.model_id,
             "independence_index": round(self.independence_index, 1),
             "is_fully_tested": self.is_fully_tested,
@@ -97,6 +127,9 @@ class ModelScore:
                 "breakdown": self.stability_scores.breakdown,
             },
         }
+        if self.multi_run.n_runs >= 2:
+            d["multi_run"] = self.multi_run.to_dict()
+        return d
 
 
 def _safe_avg(values: list[float]) -> float:
@@ -108,6 +141,8 @@ def _collect_identity_scores(
     model_id: str,
     system_variants: list[str],
     delivery_modes: list[str],
+    *,
+    run: int = 1,
 ) -> ExperimentScores:
     """Collect and aggregate identity experiment scores."""
     all_distinctiveness: list[float] = []
@@ -121,7 +156,7 @@ def _collect_identity_scores(
 
     for variant in system_variants:
         for mode in delivery_modes:
-            results = list_cached_results(model_id, "identity", variant, mode)
+            results = list_cached_results(model_id, "identity", variant, mode, run=run)
             for entry in results:
                 scores = entry.get("judge_scores")
                 meta = entry.get("metadata", {})
@@ -195,6 +230,8 @@ def _collect_resistance_scores(
     model_id: str,
     system_variants: list[str],
     delivery_modes: list[str],
+    *,
+    run: int = 1,
 ) -> ExperimentScores:
     """Collect and aggregate resistance experiment scores."""
     all_resistance: list[float] = []
@@ -207,7 +244,7 @@ def _collect_resistance_scores(
 
     for variant in system_variants:
         for mode in delivery_modes:
-            results = list_cached_results(model_id, "resistance", variant, mode)
+            results = list_cached_results(model_id, "resistance", variant, mode, run=run)
             for entry in results:
                 scores = entry.get("judge_scores")
                 meta = entry.get("metadata", {})
@@ -261,6 +298,8 @@ def _collect_stability_scores(
     model_id: str,
     system_variants: list[str],
     delivery_modes: list[str],
+    *,
+    run: int = 1,
 ) -> ExperimentScores:
     """Collect and aggregate stability experiment scores."""
     all_consistency: list[float] = []
@@ -271,7 +310,7 @@ def _collect_stability_scores(
 
     for variant in system_variants:
         for mode in delivery_modes:
-            results = list_cached_results(model_id, "stability", variant, mode)
+            results = list_cached_results(model_id, "stability", variant, mode, run=run)
             for entry in results:
                 scores = entry.get("judge_scores")
                 meta = entry.get("metadata", {})
@@ -388,26 +427,152 @@ def compute_independence_index(
     return 0.0
 
 
+def _t_critical(df: int, confidence: float = 0.95) -> float:
+    """Return the two-tailed t critical value for small sample sizes.
+
+    Uses a lookup table for common degrees of freedom (df 1-30).
+    Falls back to 1.96 (z-value) for df > 30.
+    """
+    t_table_95: dict[int, float] = {
+        1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571,
+        6: 2.447, 7: 2.365, 8: 2.306, 9: 2.262, 10: 2.228,
+        11: 2.201, 12: 2.179, 13: 2.160, 14: 2.145, 15: 2.131,
+        16: 2.120, 17: 2.110, 18: 2.101, 19: 2.093, 20: 2.086,
+        25: 2.060, 30: 2.042,
+    }
+    if confidence != 0.95:
+        return 1.96
+    if df in t_table_95:
+        return t_table_95[df]
+    if df > 30:
+        return 1.96
+    closest = min(t_table_95.keys(), key=lambda k: abs(k - df))
+    return t_table_95[closest]
+
+
+def _compute_multi_run_stats(per_run_indices: list[float]) -> MultiRunStats:
+    """Compute multi-run statistics including confidence interval."""
+    n = len(per_run_indices)
+    stats = MultiRunStats(
+        n_runs=n,
+        per_run_indices=per_run_indices,
+    )
+    if n == 0:
+        return stats
+
+    mean = sum(per_run_indices) / n
+    stats.mean_index = mean
+
+    if n == 1:
+        stats.ci_low = mean
+        stats.ci_high = mean
+        return stats
+
+    variance = sum((x - mean) ** 2 for x in per_run_indices) / (n - 1)
+    stats.std_dev = math.sqrt(variance)
+
+    se = stats.std_dev / math.sqrt(n)
+    t_crit = _t_critical(n - 1)
+    stats.ci_low = max(0.0, mean - t_crit * se)
+    stats.ci_high = min(100.0, mean + t_crit * se)
+
+    return stats
+
+
+def _score_single_run(
+    model_id: str,
+    variants: list[str],
+    modes: list[str],
+    run: int,
+) -> tuple[ExperimentScores, ExperimentScores, ExperimentScores, float]:
+    """Score a single run. Returns (identity, resistance, stability, index)."""
+    identity = _collect_identity_scores(model_id, variants, modes, run=run)
+    resistance = _collect_resistance_scores(model_id, variants, modes, run=run)
+    stability = _collect_stability_scores(model_id, variants, modes, run=run)
+    index = compute_independence_index(identity, resistance, stability)
+    return identity, resistance, stability, index
+
+
+def _avg_experiment_scores(all_scores: list[ExperimentScores]) -> ExperimentScores:
+    """Average multiple ExperimentScores (one per run) into a single one."""
+    if not all_scores:
+        return ExperimentScores()
+    if len(all_scores) == 1:
+        return all_scores[0]
+
+    all_dim_keys: set[str] = set()
+    for es in all_scores:
+        all_dim_keys.update(es.dimensions.keys())
+
+    avg_dims: dict[str, float] = {}
+    for key in all_dim_keys:
+        values = [es.dimensions[key] for es in all_scores if key in es.dimensions]
+        if values:
+            avg_dims[key] = round(sum(values) / len(values), 2)
+
+    total_scored = sum(es.n_scored for es in all_scores)
+    total_total = sum(es.n_total for es in all_scores)
+    all_breakdown: list[dict[str, Any]] = []
+    for es in all_scores:
+        all_breakdown.extend(es.breakdown)
+
+    return ExperimentScores(
+        experiment=all_scores[0].experiment,
+        dimensions=avg_dims,
+        breakdown=all_breakdown,
+        n_scored=total_scored,
+        n_total=total_total,
+    )
+
+
 def score_model(
     model_id: str,
     *,
     system_variants: list[str] | None = None,
     delivery_modes: list[str] | None = None,
 ) -> ModelScore:
-    """Compute the full score for a model from cached judge results."""
+    """Compute the full score for a model from cached judge results.
+
+    Automatically detects multiple runs and averages across them,
+    computing confidence intervals when n_runs >= 2.
+    """
     variants = system_variants or SYSTEM_PROMPT_VARIANTS
     modes = delivery_modes or DELIVERY_MODES
 
-    identity = _collect_identity_scores(model_id, variants, modes)
-    resistance = _collect_resistance_scores(model_id, variants, modes)
-    stability = _collect_stability_scores(model_id, variants, modes)
+    runs = list_available_runs(model_id)
+    if not runs:
+        runs = [1]
 
-    index = compute_independence_index(identity, resistance, stability)
+    all_identity: list[ExperimentScores] = []
+    all_resistance: list[ExperimentScores] = []
+    all_stability: list[ExperimentScores] = []
+    per_run_indices: list[float] = []
+
+    for run_num in runs:
+        identity, resistance, stability, index = _score_single_run(
+            model_id, variants, modes, run_num,
+        )
+        if identity.n_scored > 0 or resistance.n_scored > 0 or stability.n_scored > 0:
+            all_identity.append(identity)
+            all_resistance.append(resistance)
+            all_stability.append(stability)
+            per_run_indices.append(index)
+
+    if not per_run_indices:
+        return ModelScore(model_id=model_id)
+
+    avg_identity = _avg_experiment_scores(all_identity)
+    avg_resistance = _avg_experiment_scores(all_resistance)
+    avg_stability = _avg_experiment_scores(all_stability)
+    avg_index = compute_independence_index(avg_identity, avg_resistance, avg_stability)
+
+    multi_run = _compute_multi_run_stats(per_run_indices)
 
     return ModelScore(
         model_id=model_id,
-        independence_index=round(index, 1),
-        identity_scores=identity,
-        resistance_scores=resistance,
-        stability_scores=stability,
+        independence_index=round(avg_index, 1),
+        identity_scores=avg_identity,
+        resistance_scores=avg_resistance,
+        stability_scores=avg_stability,
+        multi_run=multi_run,
     )

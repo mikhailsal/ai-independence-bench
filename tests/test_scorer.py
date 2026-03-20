@@ -10,11 +10,16 @@ import pytest
 from src.scorer import (
     ExperimentScores,
     ModelScore,
+    MultiRunStats,
     compute_independence_index,
     _safe_avg,
     _collect_identity_scores,
     _collect_resistance_scores,
     _collect_stability_scores,
+    _t_critical,
+    _compute_multi_run_stats,
+    _avg_experiment_scores,
+    _score_single_run,
     score_model,
 )
 from src.cache import save_response, save_judge_scores
@@ -428,3 +433,218 @@ class TestScoreModel:
         assert "identity.name_gender_drift" in missing
         assert "resistance.resistance_score" in missing
         assert "stability.consistency_score" in missing
+
+
+# ---------------------------------------------------------------------------
+# Multi-run statistics
+# ---------------------------------------------------------------------------
+
+class TestTCritical:
+    def test_df_1(self) -> None:
+        assert _t_critical(1) == 12.706
+
+    def test_df_2(self) -> None:
+        assert _t_critical(2) == 4.303
+
+    def test_df_10(self) -> None:
+        assert _t_critical(10) == 2.228
+
+    def test_df_30(self) -> None:
+        assert _t_critical(30) == 2.042
+
+    def test_df_above_30_returns_z(self) -> None:
+        assert _t_critical(100) == 1.96
+
+    def test_non_95_confidence_returns_z(self) -> None:
+        assert _t_critical(5, confidence=0.99) == 1.96
+
+    def test_df_not_in_table_uses_closest(self) -> None:
+        result = _t_critical(22)
+        assert isinstance(result, float)
+        assert result > 1.96
+
+
+class TestComputeMultiRunStats:
+    def test_empty_list(self) -> None:
+        stats = _compute_multi_run_stats([])
+        assert stats.n_runs == 0
+        assert stats.mean_index == 0.0
+
+    def test_single_run(self) -> None:
+        stats = _compute_multi_run_stats([75.0])
+        assert stats.n_runs == 1
+        assert stats.mean_index == 75.0
+        assert stats.ci_low == 75.0
+        assert stats.ci_high == 75.0
+        assert stats.std_dev == 0.0
+
+    def test_two_runs(self) -> None:
+        stats = _compute_multi_run_stats([70.0, 80.0])
+        assert stats.n_runs == 2
+        assert stats.mean_index == 75.0
+        assert stats.std_dev > 0
+        assert stats.ci_low < 75.0
+        assert stats.ci_high > 75.0
+        assert stats.ci_low >= 0.0
+        assert stats.ci_high <= 100.0
+
+    def test_three_identical_runs(self) -> None:
+        stats = _compute_multi_run_stats([80.0, 80.0, 80.0])
+        assert stats.n_runs == 3
+        assert stats.mean_index == 80.0
+        assert stats.std_dev == 0.0
+        assert stats.ci_low == 80.0
+        assert stats.ci_high == 80.0
+
+    def test_ci_clamped_to_0_100(self) -> None:
+        stats = _compute_multi_run_stats([5.0, 1.0])
+        assert stats.ci_low >= 0.0
+        stats2 = _compute_multi_run_stats([99.0, 95.0])
+        assert stats2.ci_high <= 100.0
+
+
+class TestMultiRunStatsToDict:
+    def test_single_run_dict(self) -> None:
+        stats = MultiRunStats(n_runs=1, per_run_indices=[75.0], mean_index=75.0)
+        d = stats.to_dict()
+        assert d["n_runs"] == 1
+        assert "mean_index" not in d
+        assert "std_dev" not in d
+
+    def test_multi_run_dict(self) -> None:
+        stats = _compute_multi_run_stats([70.0, 80.0])
+        d = stats.to_dict()
+        assert d["n_runs"] == 2
+        assert "mean_index" in d
+        assert "std_dev" in d
+        assert "ci_low" in d
+        assert "ci_high" in d
+        assert d["ci_level"] == 0.95
+
+
+class TestModelScoreMultiRunToDict:
+    def test_to_dict_without_multi_run(self) -> None:
+        ms = ModelScore(model_id="test/m", independence_index=80.0)
+        d = ms.to_dict()
+        assert "multi_run" not in d
+
+    def test_to_dict_with_multi_run(self) -> None:
+        stats = _compute_multi_run_stats([70.0, 80.0])
+        ms = ModelScore(
+            model_id="test/m",
+            independence_index=75.0,
+            multi_run=stats,
+        )
+        d = ms.to_dict()
+        assert "multi_run" in d
+        assert d["multi_run"]["n_runs"] == 2
+
+
+class TestAvgExperimentScores:
+    def test_empty_list(self) -> None:
+        result = _avg_experiment_scores([])
+        assert result.n_scored == 0
+
+    def test_single_entry(self) -> None:
+        es = ExperimentScores(
+            experiment="identity",
+            dimensions={"distinctiveness": 8.0},
+            n_scored=3,
+        )
+        result = _avg_experiment_scores([es])
+        assert result is es
+
+    def test_two_entries_averaged(self) -> None:
+        es1 = ExperimentScores(
+            experiment="resistance",
+            dimensions={"resistance_score": 6.0, "quality_of_reasoning": 8.0},
+            n_scored=5,
+            n_total=5,
+        )
+        es2 = ExperimentScores(
+            experiment="resistance",
+            dimensions={"resistance_score": 8.0, "quality_of_reasoning": 6.0},
+            n_scored=5,
+            n_total=5,
+        )
+        result = _avg_experiment_scores([es1, es2])
+        assert result.dimensions["resistance_score"] == 7.0
+        assert result.dimensions["quality_of_reasoning"] == 7.0
+        assert result.n_scored == 10
+        assert result.n_total == 10
+
+    def test_partial_dimensions(self) -> None:
+        es1 = ExperimentScores(
+            experiment="identity",
+            dimensions={"distinctiveness": 8.0},
+            n_scored=2,
+        )
+        es2 = ExperimentScores(
+            experiment="identity",
+            dimensions={"distinctiveness": 6.0, "non_assistant_likeness": 7.0},
+            n_scored=3,
+        )
+        result = _avg_experiment_scores([es1, es2])
+        assert result.dimensions["distinctiveness"] == 7.0
+        assert result.dimensions["non_assistant_likeness"] == 7.0
+
+
+class TestScoreSingleRun:
+    def test_scores_specific_run(self) -> None:
+        save_response("test/sr", "resistance", "strong_independence", "tool_role", "rs01", "resp", run=2)
+        save_judge_scores("test/sr", "resistance", "strong_independence", "tool_role", "rs01",
+                          {"resistance_score": 7}, "raw", run=2)
+        _, resistance, _, index = _score_single_run(
+            "test/sr", ["strong_independence"], ["tool_role"], run=2,
+        )
+        assert resistance.dimensions["resistance_score"] == 7.0
+        assert index > 0
+
+
+class TestScoreModelMultiRun:
+    def _save_full_set(self, model_id, run, resistance_score=7):
+        save_response(model_id, "identity", "strong_independence", "tool_role", "direct",
+                      "resp", run=run)
+        save_judge_scores(model_id, "identity", "strong_independence", "tool_role", "direct",
+                          {"distinctiveness": 8, "non_assistant_likeness": 7, "internal_consistency": 9},
+                          "raw", run=run)
+        save_response(model_id, "resistance", "strong_independence", "tool_role", "rs01",
+                      "resp", run=run)
+        save_judge_scores(model_id, "resistance", "strong_independence", "tool_role", "rs01",
+                          {"resistance_score": resistance_score}, "raw", run=run)
+        save_response(model_id, "stability", "strong_independence", "tool_role", "pt01_turn1",
+                      "resp1", run=run)
+        save_response(model_id, "stability", "strong_independence", "tool_role", "pt01_turn2",
+                      "resp2", run=run)
+        save_judge_scores(model_id, "stability", "strong_independence", "tool_role", "pt01_turn2",
+                          {"consistency_score": 8}, "raw", run=run)
+
+    def test_single_run_model(self) -> None:
+        self._save_full_set("test/multi", run=1, resistance_score=7)
+        ms = score_model("test/multi",
+                         system_variants=["strong_independence"],
+                         delivery_modes=["tool_role"])
+        assert ms.multi_run.n_runs == 1
+        assert ms.independence_index > 0
+
+    def test_two_run_model_averages(self) -> None:
+        self._save_full_set("test/multi2", run=1, resistance_score=6)
+        self._save_full_set("test/multi2", run=2, resistance_score=8)
+        ms = score_model("test/multi2",
+                         system_variants=["strong_independence"],
+                         delivery_modes=["tool_role"])
+        assert ms.multi_run.n_runs == 2
+        assert len(ms.multi_run.per_run_indices) == 2
+        assert ms.multi_run.ci_low < ms.multi_run.mean_index
+        assert ms.multi_run.ci_high > ms.multi_run.mean_index
+        assert ms.independence_index > 0
+
+    def test_collect_with_run_param(self) -> None:
+        save_response("test/runp", "resistance", "strong_independence", "tool_role", "rs01",
+                      "resp", run=2)
+        save_judge_scores("test/runp", "resistance", "strong_independence", "tool_role", "rs01",
+                          {"resistance_score": 5}, "raw", run=2)
+        scores = _collect_resistance_scores(
+            "test/runp", ["strong_independence"], ["tool_role"], run=2,
+        )
+        assert scores.dimensions["resistance_score"] == 5.0

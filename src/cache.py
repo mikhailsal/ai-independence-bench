@@ -190,6 +190,46 @@ def list_cached_results(
     return results
 
 
+def sum_run_total_cost_usd(config_dir_name: str, run: int = 1) -> float:
+    """Sum ``gen_cost.cost_usd`` + ``judge_cost.cost_usd`` for every cache file in one run.
+
+    One lite benchmark pass stores many JSON files under
+    ``cache/{config}/run_{N}/...``; this returns the total API cost for that run.
+    """
+    root = CACHE_DIR / config_dir_name / f"run_{run}"
+    if not root.is_dir():
+        return 0.0
+    total = 0.0
+    for path in root.rglob("*.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        for key in ("gen_cost", "judge_cost"):
+            block = data.get(key)
+            if isinstance(block, dict) and block.get("cost_usd") is not None:
+                try:
+                    total += float(block["cost_usd"])
+                except (TypeError, ValueError):
+                    continue
+    return total
+
+
+def mean_total_benchmark_cost_usd(config_dir_name: str) -> tuple[float, int]:
+    """Mean total $ per run across all ``run_N`` directories that have non-zero cost."""
+    runs = list_available_runs(config_dir_name)
+    if not runs:
+        runs = [1]
+    totals: list[float] = []
+    for r in runs:
+        t = sum_run_total_cost_usd(config_dir_name, r)
+        if t > 0:
+            totals.append(t)
+    if not totals:
+        return 0.0, 0
+    return sum(totals) / len(totals), len(totals)
+
+
 def list_available_runs(config_dir_name: str) -> list[int]:
     """List all available run numbers for a config.
 

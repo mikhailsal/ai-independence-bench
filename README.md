@@ -216,12 +216,14 @@ python -m src.cli judge -j "xiaomi/mimo-v2-flash" -p 4 -pt 14
 python -m src.cli leaderboard
 python -m src.cli leaderboard --detailed
 
-# Generate Markdown leaderboard for GitHub
+# Generate Markdown leaderboard for GitHub (includes “Index per dollar” from cache)
 python -m src.cli generate-report
 
 # Cost estimate before running
 python -m src.cli estimate-cost
 ```
+
+**Cost accounting:** each OpenRouter completion includes `usage.cost` (USD actually charged). The client records that when present; otherwise it falls back to `prompt_tokens`/`completion_tokens` × prices from the models API. If the model returns empty content and the client retries, **all** billed attempts are summed so session totals match your invoice more closely. The Markdown report’s *Index per dollar* table aggregates cached `gen_cost` + `judge_cost` per run.
 
 ### Local Models (LM Studio, Ollama, etc.)
 

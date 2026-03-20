@@ -91,6 +91,48 @@ class CompletionResult:
     # content is preserved here for research and multi-turn conversation realism.
 
 
+def _usage_from_openrouter_response(
+    *,
+    model: str,
+    response: Any,
+    elapsed: float,
+    get_model_pricing: Any,
+) -> UsageInfo:
+    """Build UsageInfo from an OpenRouter chat completion response.
+
+    Prefer OpenRouter's ``usage.cost`` (USD charged) when present — it reflects
+    provider-specific billing (cache tiers, reasoning, etc.). Fall back to
+    token counts × fetched list prices when ``cost`` is absent.
+    """
+    usage = UsageInfo(elapsed_seconds=elapsed)
+    if not response.usage:
+        return usage
+
+    ru = response.usage
+    usage.prompt_tokens = int(ru.prompt_tokens or 0)
+    usage.completion_tokens = int(ru.completion_tokens or 0)
+
+    raw_cost = getattr(ru, "cost", None)
+    used_api_cost = False
+    if isinstance(raw_cost, (int, float)) and not isinstance(raw_cost, bool):
+        usage.cost_usd = float(raw_cost)
+        used_api_cost = True
+    elif isinstance(raw_cost, str) and raw_cost.strip():
+        try:
+            usage.cost_usd = float(raw_cost)
+            used_api_cost = True
+        except ValueError:
+            pass
+
+    if not used_api_cost:
+        pricing = get_model_pricing(model)
+        usage.cost_usd = (
+            usage.prompt_tokens * pricing.prompt_price
+            + usage.completion_tokens * pricing.completion_price
+        )
+    return usage
+
+
 class OpenRouterClient:
     """Thin wrapper around the OpenAI SDK pointed at OpenRouter."""
 
@@ -192,6 +234,8 @@ class OpenRouterClient:
 
         use_reasoning = self._resolve_reasoning_effort(model, reasoning_effort)
 
+        accumulated = UsageInfo()
+
         for attempt in range(1, self.EMPTY_CONTENT_RETRIES + 2):
             result = self._chat_single(
                 model=model,
@@ -201,6 +245,11 @@ class OpenRouterClient:
                 reasoning_effort=use_reasoning,
                 tools=tools,
             )
+
+            accumulated.prompt_tokens += result.usage.prompt_tokens
+            accumulated.completion_tokens += result.usage.completion_tokens
+            accumulated.cost_usd += result.usage.cost_usd
+            accumulated.elapsed_seconds += result.usage.elapsed_seconds
 
             # --- Extract response from tool call (tool_role mode) ---
             if tools and result.tool_calls:
@@ -220,6 +269,7 @@ class OpenRouterClient:
 
             # If we have content, we're done
             if result.content:
+                result.usage = accumulated
                 return result
 
             # No content — retry regardless of token count.
@@ -243,8 +293,10 @@ class OpenRouterClient:
                 continue
 
             # Out of retries — return whatever we have
+            result.usage = accumulated
             return result
 
+        # Loop always returns above (range is never empty).
         return result
 
     def _resolve_reasoning_effort(
@@ -330,17 +382,11 @@ class OpenRouterClient:
                             for tc in msg.tool_calls
                         ]
 
-                # Extract usage (including reasoning token counts)
-                usage = UsageInfo(elapsed_seconds=elapsed)
-                if response.usage:
-                    usage.prompt_tokens = response.usage.prompt_tokens or 0
-                    usage.completion_tokens = response.usage.completion_tokens or 0
-
-                # Compute cost
-                pricing = self.get_model_pricing(model)
-                usage.cost_usd = (
-                    usage.prompt_tokens * pricing.prompt_price
-                    + usage.completion_tokens * pricing.completion_price
+                usage = _usage_from_openrouter_response(
+                    model=model,
+                    response=response,
+                    elapsed=elapsed,
+                    get_model_pricing=self.get_model_pricing,
                 )
 
                 return CompletionResult(

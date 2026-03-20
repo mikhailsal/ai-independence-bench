@@ -20,6 +20,8 @@ from src.cache import (
     list_available_runs,
     clear_all_cache,
     clear_judge_scores,
+    sum_run_total_cost_usd,
+    mean_total_benchmark_cost_usd,
 )
 
 
@@ -240,6 +242,37 @@ class TestJudgeScores:
             "nonexistent--model@none-t0.7", "identity", "neutral", "tool_role", "direct",
         )
         assert result is None
+
+
+# ---------------------------------------------------------------------------
+# sum_run_total_cost_usd / mean_total_benchmark_cost_usd
+# ---------------------------------------------------------------------------
+
+class TestRunCostSummation:
+    CDN = "test--model-1@none-t0.7"
+
+    def test_sum_one_file_gen_and_judge(self) -> None:
+        gc = {"prompt_tokens": 10, "completion_tokens": 5, "cost_usd": 0.001, "elapsed_seconds": 0.1}
+        save_response(
+            self.CDN, "identity", "neutral", "tool_role", "direct",
+            "r", gen_cost=gc,
+        )
+        save_judge_scores(
+            self.CDN, "identity", "neutral", "tool_role", "direct",
+            {"distinctiveness": 8},
+            judge_cost={"prompt_tokens": 5, "completion_tokens": 5, "cost_usd": 0.0004},
+        )
+        assert sum_run_total_cost_usd(self.CDN, 1) == pytest.approx(0.0014)
+
+    def test_mean_across_runs(self) -> None:
+        for run, gen_usd in ((1, 0.01), (2, 0.03)):
+            save_response(
+                self.CDN, "identity", "neutral", "tool_role", "direct",
+                "r", gen_cost={"cost_usd": gen_usd}, run=run,
+            )
+        mean_c, n = mean_total_benchmark_cost_usd(self.CDN)
+        assert n == 2
+        assert mean_c == pytest.approx(0.02)
 
 
 # ---------------------------------------------------------------------------

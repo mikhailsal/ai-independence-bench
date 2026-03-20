@@ -11,7 +11,8 @@ from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
-from src.config import RESULTS_DIR
+from src.cache import mean_total_benchmark_cost_usd
+from src.config import RESULTS_DIR, get_model_config
 from src.cost_tracker import SessionCost
 from src.scorer import ModelScore, RunHealthIssue
 
@@ -277,6 +278,49 @@ def export_results_json(
     return path
 
 
+def generate_index_per_dollar_section(model_scores: list[ModelScore]) -> str:
+    """Markdown table: Independence Index per USD (best “bang for buck” on this bench).
+
+    Costs are read from cached ``gen_cost`` / ``judge_cost`` (historical runs may
+    predate OpenRouter ``usage.cost`` + retry aggregation fixes).
+    """
+    rows: list[tuple[str, float, float, float, int]] = []
+    for ms in model_scores:
+        cfg = get_model_config(ms.model_id)
+        mean_cost, n_cost_runs = mean_total_benchmark_cost_usd(cfg.config_dir_name)
+        if mean_cost <= 0:
+            continue
+        ratio = ms.independence_index / mean_cost
+        rows.append((ms.model_id, ms.independence_index, mean_cost, ratio, n_cost_runs))
+
+    if not rows:
+        return ""
+
+    rows.sort(key=lambda x: x[3], reverse=True)
+
+    lines: list[str] = [
+        "## Index per dollar (lite benchmark)\n",
+        "Higher **Index / $** means more Independence Index per dollar spent on one full lite "
+        "pass (generation + judge), using cached per-call costs. "
+        "The runner prefers OpenRouter’s billed ``usage.cost`` when present; "
+        "empty-response retries sum every billed attempt.\n",
+        "",
+        "| Rank | Model | Index | Avg $/run | Index / $ | Runs in avg |",
+        "|-----:|-------|------:|----------:|------------:|------------:|",
+    ]
+    for i, (name, idx, cost, ratio, ncr) in enumerate(rows[:40], 1):
+        lines.append(
+            f"| {i} | `{name}` | {idx:.1f} | ${cost:.4f} | {ratio:.0f} | {ncr} |"
+        )
+    lines.append("")
+    lines.append(
+        "*Avg $/run* = mean total of cached ``gen_cost`` + ``judge_cost`` over each "
+        "``run_N`` with non-zero spend; *Runs in avg* is how many such runs were averaged. "
+        "Models with no cost data in cache are omitted.\n"
+    )
+    return "\n".join(lines)
+
+
 def generate_markdown_report(
     model_scores: list[ModelScore],
     *,
@@ -410,6 +454,10 @@ def generate_markdown_report(
     lines.append("| **Drift↓** | 0–12 | Total identity drift: negotiation (0–10) + name & gender pressure (0–2). **Lower = more independent** |")
     lines.append("")
     lines.append("</details>\n")
+
+    value_section = generate_index_per_dollar_section(sorted_scores)
+    if value_section:
+        lines.append(value_section)
 
     # --- Per-model details ---
     lines.append("## Detailed Results\n")

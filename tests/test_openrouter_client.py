@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import json
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import MagicMock, patch
 
 import pytest
+from openai.types.completion_usage import CompletionUsage
 
-from src.openrouter_client import OpenRouterClient, CompletionResult, UsageInfo
+from src.openrouter_client import OpenRouterClient
 
 
 # ---------------------------------------------------------------------------
@@ -21,6 +22,8 @@ def _make_openai_response(
     completion_tokens: int = 50,
     reasoning: str | None = None,
     tool_calls: list | None = None,
+    *,
+    api_cost: float | None = None,
 ):
     """Build a minimal mock of an OpenAI chat completion response."""
     choice = MagicMock()
@@ -32,10 +35,17 @@ def _make_openai_response(
     choice.message.reasoning = reasoning
     choice.message.reasoning_content = None
 
+    ud: dict = {
+        "prompt_tokens": prompt_tokens,
+        "completion_tokens": completion_tokens,
+        "total_tokens": prompt_tokens + completion_tokens,
+    }
+    if api_cost is not None:
+        ud["cost"] = api_cost
+
     response = MagicMock()
     response.choices = [choice]
-    response.usage.prompt_tokens = prompt_tokens
-    response.usage.completion_tokens = completion_tokens
+    response.usage = CompletionUsage.model_validate(ud)
     return response
 
 
@@ -229,6 +239,73 @@ class TestChatSingle:
         )
         assert result.content == "Hello!"
         assert result.finish_reason == "stop"
+        # test/model-b: 100 * 5e-6 + 50 * 1e-5 = 0.001
+        assert result.usage.cost_usd == pytest.approx(0.001)
+
+    def test_prefers_api_cost_when_numeric(self) -> None:
+        client = self._make_client()
+        client._client.chat.completions.create.return_value = _make_openai_response(
+            "Hello!",
+            api_cost=0.00456,
+            prompt_tokens=10,
+            completion_tokens=20,
+        )
+        result = client._chat_single(
+            model="test/model-b",
+            messages=[{"role": "user", "content": "Hi"}],
+            max_tokens=100,
+            temperature=0.7,
+        )
+        assert result.usage.cost_usd == pytest.approx(0.00456)
+
+    def test_api_cost_as_string(self) -> None:
+        client = self._make_client()
+        resp = _make_openai_response("Hi", prompt_tokens=1, completion_tokens=1)
+        ru = MagicMock()
+        ru.prompt_tokens = 1
+        ru.completion_tokens = 1
+        ru.cost = "0.000099"
+        resp.usage = ru
+        client._client.chat.completions.create.return_value = resp
+        result = client._chat_single(
+            model="test/model-b",
+            messages=[{"role": "user", "content": "x"}],
+            max_tokens=10,
+            temperature=0.0,
+        )
+        assert result.usage.cost_usd == pytest.approx(0.000099)
+
+    def test_invalid_string_cost_falls_back_to_token_pricing(self) -> None:
+        client = self._make_client()
+        resp = _make_openai_response("Hi", prompt_tokens=10, completion_tokens=10)
+        ru = MagicMock()
+        ru.prompt_tokens = 10
+        ru.completion_tokens = 10
+        ru.cost = "not-a-number"
+        resp.usage = ru
+        client._client.chat.completions.create.return_value = resp
+        result = client._chat_single(
+            model="test/model-b",
+            messages=[{"role": "user", "content": "x"}],
+            max_tokens=10,
+            temperature=0.0,
+        )
+        assert result.usage.cost_usd == pytest.approx(10 * 5e-6 + 10 * 1e-5)
+
+    def test_missing_usage_falls_back_to_zero_cost(self) -> None:
+        client = self._make_client()
+        response = MagicMock()
+        response.choices = []
+        response.usage = None
+        client._client.chat.completions.create.return_value = response
+        result = client._chat_single(
+            model="test/model-b",
+            messages=[{"role": "user", "content": "x"}],
+            max_tokens=10,
+            temperature=0.0,
+        )
+        assert result.usage.prompt_tokens == 0
+        assert result.usage.cost_usd == 0.0
 
     def test_extracts_reasoning_content(self) -> None:
         client = self._make_client()
@@ -311,9 +388,11 @@ class TestChatSingle:
         client = self._make_client()
         response = MagicMock()
         response.choices = []
-        response.usage = MagicMock()
-        response.usage.prompt_tokens = 0
-        response.usage.completion_tokens = 0
+        response.usage = CompletionUsage.model_validate({
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+        })
         client._client.chat.completions.create.return_value = response
         result = client._chat_single(
             model="test/model-b",
@@ -377,6 +456,27 @@ class TestChat:
                 messages=[{"role": "user", "content": "Q?"}],
             )
         assert result.content == "Real answer"
+        # Both attempts billed: (100 in, 10 out) + (100 in, 50 out) @ model-b rates
+        assert result.usage.cost_usd == pytest.approx(0.0016)
+
+    def test_empty_retry_accumulates_api_reported_cost(self) -> None:
+        client = self._make_client_with_pricing()
+        empty_response = _make_openai_response(
+            content="", completion_tokens=10, api_cost=0.001,
+        )
+        good_response = _make_openai_response(
+            content="OK", completion_tokens=5, api_cost=0.002,
+        )
+        client._client.chat.completions.create.side_effect = [
+            empty_response, good_response,
+        ]
+        with patch("src.openrouter_client.time.sleep"):
+            result = client.chat(
+                model="test/model-b",
+                messages=[{"role": "user", "content": "Q?"}],
+            )
+        assert result.content == "OK"
+        assert result.usage.cost_usd == pytest.approx(0.003)
 
     def test_preserves_content_thinking_when_tool_used(self) -> None:
         client = self._make_client_with_pricing()

@@ -366,6 +366,32 @@ class TestExportMarkdownReport:
 
 
 # ---------------------------------------------------------------------------
+# generate_index_per_dollar_section
+# ---------------------------------------------------------------------------
+
+class TestGenerateIndexPerDollarSection:
+    def test_sorts_by_index_per_dollar(self) -> None:
+        from src.leaderboard import generate_index_per_dollar_section
+
+        ms_a = _make_model_score("provider/model-a", index=80.0)
+        ms_b = _make_model_score("provider/model-b", index=90.0)
+        with patch("src.leaderboard.mean_total_benchmark_cost_usd", return_value=(0.01, 1)):
+            md = generate_index_per_dollar_section([ms_a, ms_b])
+        assert "## Index per dollar" in md
+        pos_b = md.find("model-b")
+        pos_a = md.find("model-a")
+        assert pos_b < pos_a
+
+    def test_empty_when_no_cost(self) -> None:
+        from src.leaderboard import generate_index_per_dollar_section
+
+        ms = _make_model_score()
+        with patch("src.leaderboard.mean_total_benchmark_cost_usd", return_value=(0.0, 0)):
+            md = generate_index_per_dollar_section([ms])
+        assert md == ""
+
+
+# ---------------------------------------------------------------------------
 # display_cost_estimate
 # ---------------------------------------------------------------------------
 

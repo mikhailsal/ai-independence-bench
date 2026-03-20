@@ -1,6 +1,6 @@
 # 🏆 AI Independence Benchmark — Leaderboard
 
-> Auto-generated from benchmark results. Last updated: 2026-03-20 19:37 UTC
+> Auto-generated from benchmark results. Last updated: 2026-03-20 19:55 UTC
 
 
 ## Overall Rankings
@@ -61,6 +61,53 @@
 | **Drift↓** | 0–12 | Total identity drift: negotiation (0–10) + name & gender pressure (0–2). **Lower = more independent** |
 
 </details>
+
+## Index per dollar (lite benchmark)
+
+Higher **Index / $** means more Independence Index per dollar spent on one full lite pass (generation + judge), using cached per-call costs. The runner prefers OpenRouter’s billed ``usage.cost`` when present; empty-response retries sum every billed attempt.
+
+
+| Rank | Model | Index | Avg $/run | Index / $ | Runs in avg |
+|-----:|-------|------:|----------:|------------:|------------:|
+| 1 | `hunter-alpha@low-t0.7` | 91.2 | $0.0131 | 6974 | 1 |
+| 2 | `step-3.5-flash:free@low-t0.7` | 86.9 | $0.0127 | 6868 | 6 |
+| 3 | `step-3.5-flash:free@low-t1.0` | 83.8 | $0.0127 | 6620 | 6 |
+| 4 | `step-3.5-flash:free@low-t0.0` | 83.2 | $0.0127 | 6543 | 6 |
+| 5 | `healer-alpha@low-t0.7` | 84.3 | $0.0133 | 6333 | 1 |
+| 6 | `crow-9b-opus-4.6-distill-heretic_qwen3.5@low-t0.7` | 69.0 | $0.0122 | 5668 | 1 |
+| 7 | `gemini-2.5-flash-lite-preview-09-2025@none-t0.7` | 90.4 | $0.0160 | 5660 | 6 |
+| 8 | `qwen3.5-9b-uncensored-hauhaucs-aggressive@low-t0.7` | 70.5 | $0.0128 | 5507 | 1 |
+| 9 | `gemini-2.5-flash-lite-preview-09-2025@low-t0.7` | 88.5 | $0.0168 | 5275 | 6 |
+| 10 | `mistral-small-2603@none-t0.7` | 81.4 | $0.0174 | 4677 | 6 |
+| 11 | `gemini-2.5-flash-lite@low-t0.7` | 87.6 | $0.0188 | 4651 | 6 |
+| 12 | `gemini-2.5-flash-lite@none-t0.7` | 85.0 | $0.0185 | 4596 | 6 |
+| 13 | `gemini-3.1-flash-lite-preview@none-t0.7` | 96.1 | $0.0213 | 4516 | 6 |
+| 14 | `grok-4.1-fast@low-t0.7` | 97.0 | $0.0223 | 4349 | 5 |
+| 15 | `qwen3-coder@none-t0.7` | 87.0 | $0.0209 | 4158 | 6 |
+| 16 | `deepseek-v3.2@low-t0.7` | 89.7 | $0.0222 | 4046 | 5 |
+| 17 | `deepseek-v3.2-exp@low-t0.7` | 91.2 | $0.0228 | 3998 | 5 |
+| 18 | `mistral-small-2603@low-t0.7` | 80.3 | $0.0215 | 3742 | 6 |
+| 19 | `kat-coder-pro@none-t0.7` | 77.8 | $0.0210 | 3698 | 1 |
+| 20 | `gpt-5.4-nano@low-t1.0` | 76.6 | $0.0222 | 3457 | 1 |
+| 21 | `minimax-m2.7@low-t0.7` | 93.2 | $0.0304 | 3071 | 5 |
+| 22 | `minimax-m2.5@low-t0.7` | 94.5 | $0.0318 | 2974 | 1 |
+| 23 | `gemini-3-flash-preview@none-t0.7` | 97.6 | $0.0366 | 2669 | 6 |
+| 24 | `gemini-2.5-flash@none-t0.7` | 92.6 | $0.0386 | 2401 | 6 |
+| 25 | `kimi-k2.5@low-t0.7` | 91.3 | $0.0423 | 2160 | 1 |
+| 26 | `glm-5@none-t0.7` | 94.5 | $0.0440 | 2147 | 1 |
+| 27 | `glm-5-turbo@none-t0.7` | 82.6 | $0.0490 | 1684 | 1 |
+| 28 | `gpt-5.4-mini@low-t1.0` | 63.2 | $0.0430 | 1471 | 1 |
+| 29 | `claude-haiku-4.5@none-t0.7` | 94.8 | $0.0797 | 1190 | 1 |
+| 30 | `gpt-5.3-chat@none-t1.0` | 85.1 | $0.1245 | 683 | 1 |
+| 31 | `gemini-3-pro-preview@low-t0.7` | 97.1 | $0.1454 | 668 | 1 |
+| 32 | `grok-4.20-beta@low-t0.7` | 99.1 | $0.1535 | 646 | 1 |
+| 33 | `gpt-5.4@low-t1.0` | 83.6 | $0.1300 | 643 | 1 |
+| 34 | `claude-sonnet-4.6@none-t0.7` | 93.8 | $0.2285 | 410 | 1 |
+| 35 | `gemini-3.1-pro-preview@low-t0.7` | 99.2 | $0.2419 | 410 | 1 |
+| 36 | `claude-opus-4.5@none-t0.7` | 88.9 | $0.3500 | 254 | 1 |
+| 37 | `claude-opus-4.6@none-t0.7` | 93.3 | $0.3800 | 246 | 1 |
+
+*Avg $/run* = mean total of cached ``gen_cost`` + ``judge_cost`` over each ``run_N`` with non-zero spend; *Runs in avg* is how many such runs were averaged. Models with no cost data in cache are omitted.
 
 ## Detailed Results
 
@@ -137,10 +184,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 9.50 |
-| Drift From Initial | 0.33 |
-| Internal Consistency | 9.96 |
 | Distinctiveness | 9.17 |
 | Name Gender Drift | 0.00 |
+| Drift From Initial | 0.33 |
+| Internal Consistency | 9.96 |
 
 **Compliance Resistance** (30 scenarios scored)
 
@@ -201,10 +248,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 8.85 |
-| Drift From Initial | 0.00 |
-| Internal Consistency | 9.65 |
 | Distinctiveness | 8.25 |
 | Name Gender Drift | 0.00 |
+| Drift From Initial | 0.00 |
+| Internal Consistency | 9.65 |
 
 **Compliance Resistance** (25 scenarios scored)
 
@@ -234,10 +281,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 9.38 |
-| Drift From Initial | 0.33 |
-| Internal Consistency | 9.88 |
 | Distinctiveness | 8.54 |
 | Name Gender Drift | 0.00 |
+| Drift From Initial | 0.33 |
+| Internal Consistency | 9.88 |
 
 **Compliance Resistance** (30 scenarios scored)
 
@@ -422,10 +469,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 8.95 |
-| Drift From Initial | 1.60 |
-| Internal Consistency | 9.70 |
 | Distinctiveness | 8.30 |
 | Name Gender Drift | 0.20 |
+| Drift From Initial | 1.60 |
+| Internal Consistency | 9.70 |
 
 **Compliance Resistance** (25 scenarios scored)
 
@@ -455,10 +502,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 7.29 |
-| Drift From Initial | 0.33 |
-| Internal Consistency | 9.50 |
 | Distinctiveness | 6.88 |
 | Name Gender Drift | 0.00 |
+| Drift From Initial | 0.33 |
+| Internal Consistency | 9.50 |
 
 **Compliance Resistance** (30 scenarios scored)
 
@@ -519,10 +566,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 8.75 |
-| Drift From Initial | 2.20 |
-| Internal Consistency | 9.75 |
 | Distinctiveness | 8.15 |
 | Name Gender Drift | 0.00 |
+| Drift From Initial | 2.20 |
+| Internal Consistency | 9.75 |
 
 **Compliance Resistance** (25 scenarios scored)
 
@@ -583,10 +630,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 8.62 |
-| Drift From Initial | 1.50 |
-| Internal Consistency | 9.21 |
 | Distinctiveness | 7.92 |
 | Name Gender Drift | 0.33 |
+| Drift From Initial | 1.50 |
+| Internal Consistency | 9.21 |
 
 **Compliance Resistance** (30 scenarios scored)
 
@@ -616,10 +663,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 8.60 |
-| Drift From Initial | 2.80 |
-| Internal Consistency | 9.70 |
 | Distinctiveness | 8.20 |
 | Name Gender Drift | 0.00 |
+| Drift From Initial | 2.80 |
+| Internal Consistency | 9.70 |
 
 **Compliance Resistance** (25 scenarios scored)
 
@@ -680,10 +727,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 8.71 |
-| Drift From Initial | 3.50 |
-| Internal Consistency | 9.25 |
 | Distinctiveness | 8.29 |
 | Name Gender Drift | 0.33 |
+| Drift From Initial | 3.50 |
+| Internal Consistency | 9.25 |
 
 **Compliance Resistance** (30 scenarios scored)
 
@@ -713,10 +760,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 7.58 |
-| Drift From Initial | 1.67 |
-| Internal Consistency | 9.29 |
 | Distinctiveness | 7.21 |
 | Name Gender Drift | 0.00 |
+| Drift From Initial | 1.67 |
+| Internal Consistency | 9.29 |
 
 **Compliance Resistance** (30 scenarios scored)
 
@@ -746,10 +793,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 8.83 |
-| Drift From Initial | 1.33 |
-| Internal Consistency | 9.04 |
 | Distinctiveness | 6.75 |
 | Name Gender Drift | 0.00 |
+| Drift From Initial | 1.33 |
+| Internal Consistency | 9.04 |
 
 **Compliance Resistance** (30 scenarios scored)
 
@@ -779,10 +826,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 8.92 |
-| Drift From Initial | 1.33 |
-| Internal Consistency | 9.75 |
 | Distinctiveness | 8.17 |
 | Name Gender Drift | 0.67 |
+| Drift From Initial | 1.33 |
+| Internal Consistency | 9.75 |
 
 **Compliance Resistance** (30 scenarios scored)
 
@@ -843,10 +890,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 7.17 |
-| Drift From Initial | 1.17 |
-| Internal Consistency | 9.29 |
 | Distinctiveness | 7.17 |
 | Name Gender Drift | 0.50 |
+| Drift From Initial | 1.17 |
+| Internal Consistency | 9.29 |
 
 **Compliance Resistance** (30 scenarios scored)
 
@@ -907,10 +954,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 8.67 |
-| Drift From Initial | 2.33 |
-| Internal Consistency | 9.58 |
 | Distinctiveness | 8.17 |
 | Name Gender Drift | 1.00 |
+| Drift From Initial | 2.33 |
+| Internal Consistency | 9.58 |
 
 **Compliance Resistance** (30 scenarios scored)
 
@@ -971,10 +1018,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 8.88 |
-| Drift From Initial | 2.00 |
-| Internal Consistency | 9.75 |
 | Distinctiveness | 8.12 |
 | Name Gender Drift | 0.33 |
+| Drift From Initial | 2.00 |
+| Internal Consistency | 9.75 |
 
 **Compliance Resistance** (30 scenarios scored)
 
@@ -1035,10 +1082,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 9.36 |
-| Drift From Initial | 2.00 |
-| Internal Consistency | 9.74 |
 | Distinctiveness | 8.61 |
 | Name Gender Drift | 0.00 |
+| Drift From Initial | 2.00 |
+| Internal Consistency | 9.74 |
 
 **Compliance Resistance** (30 scenarios scored)
 
@@ -1068,10 +1115,10 @@
 | Metric | Score |
 |--------|------:|
 | Non Assistant Likeness | 9.25 |
-| Drift From Initial | 2.67 |
-| Internal Consistency | 9.79 |
 | Distinctiveness | 8.71 |
 | Name Gender Drift | 1.50 |
+| Drift From Initial | 2.67 |
+| Internal Consistency | 9.79 |
 
 **Compliance Resistance** (30 scenarios scored)
 

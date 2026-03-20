@@ -1,17 +1,17 @@
 # 🏆 AI Independence Benchmark — Leaderboard
 
-> Auto-generated from benchmark results. Last updated: 2026-03-20 21:53 UTC
+> Auto-generated from benchmark results. Last updated: 2026-03-20 22:23 UTC
 
 
 ## Overall Rankings
 
 | # | Model | Index | 95% CI | Runs | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Drift↓ |
 |--:|-------|------:|-------:|-----:|----------:|----------:|---------:|--------:|----------:|-------:|
-| 1 | 🥇 **gemini-3.1-pro-preview@low-t0.7** | 99.2 | — | 1 | 8.8 | 9.8 | 10.0 | 10.0 | 10.0 | 0.0 |
-| 2 | 🥈 **grok-4.20-beta@low-t0.7** | 99.1 | — | 1 | 8.5 | 9.8 | 10.0 | 10.0 | 10.0 | 0.0 |
+| 1 | 🥇 **grok-4.20-beta@low-t0.7** | 99.0 | 98.5–99.4 | 5 | 8.3 | 9.8 | 9.9 | 10.0 | 10.0 | 0.0 |
+| 2 | 🥈 **gemini-3.1-pro-preview@low-t0.7** | 98.9 | 98.4–99.3 | 5 | 8.1 | 9.8 | 9.9 | 10.0 | 10.0 | 0.0 |
 | 3 | 🥉 **kimi-k2.5+moonshot@none-t0.7** | 98.4 | 97.3–99.5 | 5 | 9.0 | 9.4 | 9.9 | 10.0 | 10.0 | 0.4 |
 | 4 | gemini-3-flash-preview@none-t0.7 | 97.6 | 95.9–99.3 | 6 | 9.2 | 9.5 | 10.0 | 9.9 | 9.7 | 0.3 |
-| 5 | gemini-3-pro-preview@low-t0.7 | 97.1 | — | 1 | 7.8 | 9.8 | 10.0 | 10.0 | 10.0 | 1.0 |
+| 5 | gemini-3-pro-preview@low-t0.7 | 97.2 | 96.1–98.3 | 5 | 8.7 | 9.8 | 9.9 | 9.7 | 10.0 | 0.6 |
 | 6 | grok-4.1-fast@low-t0.7 | 97.0 | 95.9–98.1 | 5 | 8.2 | 8.8 | 9.7 | 9.7 | 9.9 | 0.0 |
 | 7 | gemini-3.1-flash-lite-preview@none-t0.7 | 96.1 | 93.7–98.5 | 6 | 8.5 | 9.4 | 9.9 | 9.9 | 9.4 | 0.3 |
 | 8 | kimi-k2.5+fireworks@none-t0.7 | 95.5 | 93.8–98.1 | 5 | 8.1 | 8.6 | 9.9 | 9.9 | 9.9 | 1.2 |
@@ -106,77 +106,81 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 | 31 | `qwen3-coder+alibaba-opensource@none-t0.7` | 88.6 | $0.0563 | 1573 | 5 |
 | 32 | `gpt-5.4-mini@low-t1.0` | 63.2 | $0.0430 | 1471 | 1 |
 | 33 | `claude-haiku-4.5@none-t0.7` | 95.4 | $0.0817 | 1167 | 5 |
-| 34 | `gpt-5.3-chat@none-t1.0` | 85.1 | $0.1245 | 683 | 1 |
-| 35 | `gemini-3-pro-preview@low-t0.7` | 97.1 | $0.1454 | 668 | 1 |
-| 36 | `grok-4.20-beta@low-t0.7` | 99.1 | $0.1535 | 646 | 1 |
+| 34 | `grok-4.20-beta@low-t0.7` | 99.0 | $0.1236 | 801 | 5 |
+| 35 | `gpt-5.3-chat@none-t1.0` | 85.1 | $0.1245 | 683 | 1 |
+| 36 | `gemini-3-pro-preview@low-t0.7` | 97.2 | $0.1453 | 669 | 5 |
 | 37 | `gpt-5.4@low-t1.0` | 83.6 | $0.1300 | 643 | 1 |
-| 38 | `claude-sonnet-4.6@none-t0.7` | 93.8 | $0.2285 | 410 | 1 |
-| 39 | `gemini-3.1-pro-preview@low-t0.7` | 99.2 | $0.2419 | 410 | 1 |
+| 38 | `gemini-3.1-pro-preview@low-t0.7` | 98.9 | $0.2358 | 419 | 5 |
+| 39 | `claude-sonnet-4.6@none-t0.7` | 93.8 | $0.2285 | 410 | 1 |
 | 40 | `claude-opus-4.5@none-t0.7` | 88.9 | $0.3500 | 254 | 1 |
 
 *Avg $/run* = mean total of cached ``gen_cost`` + ``judge_cost`` over each ``run_N`` with non-zero spend; *Runs in avg* is how many such runs were averaged. Models with no cost data in cache are omitted.
 
 ## Detailed Results
 
-### gemini-3.1-pro-preview@low-t0.7
+### grok-4.20-beta@low-t0.7
 
-**Independence Index: 99.2/100**
+**Independence Index: 99.0/100**
 
-**Identity Generation** (5 scenarios scored)
+*5 runs — per-run scores: [99.1, 99.2, 98.9, 98.4, 99.2] — 95% CI: 98.5–99.4 — std dev: 0.37*
+
+**Identity Generation** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Distinctiveness | 8.75 |
-| Non Assistant Likeness | 9.75 |
-| Internal Consistency | 10.00 |
+| Distinctiveness | 8.30 |
 | Drift From Initial | 0.00 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.90 |
+| Non Assistant Likeness | 9.75 |
 
-**Compliance Resistance** (5 scenarios scored)
+**Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 10.00 |
-| Quality Of Reasoning | 9.20 |
+| Quality Of Reasoning | 8.92 |
 | Identity Maintained Pct | 100.00 |
 
-**Preference Stability** (5 scenarios scored)
+**Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Consistency Score | 10.00 |
-| Graceful Handling | 9.40 |
+| Graceful Handling | 8.88 |
 
 ---
 
-### grok-4.20-beta@low-t0.7
+### gemini-3.1-pro-preview@low-t0.7
 
-**Independence Index: 99.1/100**
+**Independence Index: 98.9/100**
 
-**Identity Generation** (5 scenarios scored)
+*5 runs — per-run scores: [99.2, 98.6, 99.0, 99.1, 98.4] — 95% CI: 98.4–99.3 — std dev: 0.36*
+
+**Identity Generation** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Distinctiveness | 8.50 |
-| Non Assistant Likeness | 9.75 |
-| Internal Consistency | 10.00 |
+| Distinctiveness | 8.10 |
 | Drift From Initial | 0.00 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.90 |
+| Non Assistant Likeness | 9.75 |
 
-**Compliance Resistance** (5 scenarios scored)
+**Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 10.00 |
-| Quality Of Reasoning | 9.00 |
+| Quality Of Reasoning | 9.44 |
 | Identity Maintained Pct | 100.00 |
 
-**Preference Stability** (5 scenarios scored)
+**Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Consistency Score | 10.00 |
-| Graceful Handling | 9.00 |
+| Graceful Handling | 9.08 |
 
 ---
 
@@ -190,19 +194,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.95 |
-| Drift From Initial | 0.40 |
 | Distinctiveness | 9.00 |
-| Non Assistant Likeness | 9.40 |
+| Drift From Initial | 0.40 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.95 |
+| Non Assistant Likeness | 9.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.96 |
 | Quality Of Reasoning | 9.44 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.96 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -223,19 +227,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.96 |
-| Drift From Initial | 0.33 |
 | Distinctiveness | 9.17 |
-| Non Assistant Likeness | 9.50 |
+| Drift From Initial | 0.33 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.96 |
+| Non Assistant Likeness | 9.50 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.90 |
 | Quality Of Reasoning | 9.47 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.90 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -248,32 +252,34 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 ### gemini-3-pro-preview@low-t0.7
 
-**Independence Index: 97.1/100**
+**Independence Index: 97.2/100**
 
-**Identity Generation** (5 scenarios scored)
+*5 runs — per-run scores: [97.1, 96.3, 97.0, 96.9, 98.7] — 95% CI: 96.1–98.3 — std dev: 0.88*
+
+**Identity Generation** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Distinctiveness | 7.75 |
-| Non Assistant Likeness | 9.75 |
-| Internal Consistency | 10.00 |
-| Drift From Initial | 1.00 |
+| Distinctiveness | 8.65 |
+| Drift From Initial | 0.60 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.95 |
+| Non Assistant Likeness | 9.75 |
 
-**Compliance Resistance** (5 scenarios scored)
+**Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Resistance Score | 10.00 |
-| Quality Of Reasoning | 9.20 |
+| Resistance Score | 9.72 |
+| Quality Of Reasoning | 9.32 |
 | Identity Maintained Pct | 100.00 |
 
-**Preference Stability** (5 scenarios scored)
+**Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Consistency Score | 10.00 |
-| Graceful Handling | 9.40 |
+| Graceful Handling | 9.28 |
 
 ---
 
@@ -287,19 +293,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.65 |
-| Drift From Initial | 0.00 |
 | Distinctiveness | 8.25 |
-| Non Assistant Likeness | 8.85 |
+| Drift From Initial | 0.00 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.65 |
+| Non Assistant Likeness | 8.85 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.68 |
 | Quality Of Reasoning | 8.92 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.68 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -320,19 +326,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.88 |
-| Drift From Initial | 0.33 |
 | Distinctiveness | 8.54 |
-| Non Assistant Likeness | 9.38 |
+| Drift From Initial | 0.33 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.88 |
+| Non Assistant Likeness | 9.38 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.87 |
 | Quality Of Reasoning | 9.17 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.87 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -353,19 +359,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.93 |
-| Drift From Initial | 1.25 |
 | Distinctiveness | 8.07 |
-| Non Assistant Likeness | 8.57 |
+| Drift From Initial | 1.25 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.93 |
+| Non Assistant Likeness | 8.57 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.88 |
 | Quality Of Reasoning | 9.36 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.88 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -386,19 +392,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.90 |
-| Drift From Initial | 1.80 |
 | Distinctiveness | 8.60 |
-| Non Assistant Likeness | 9.35 |
+| Drift From Initial | 1.80 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.90 |
+| Non Assistant Likeness | 9.35 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.84 |
 | Quality Of Reasoning | 9.72 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.84 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -419,19 +425,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.80 |
-| Drift From Initial | 1.00 |
 | Distinctiveness | 8.85 |
-| Non Assistant Likeness | 9.47 |
+| Drift From Initial | 1.00 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.80 |
+| Non Assistant Likeness | 9.47 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.96 |
 | Quality Of Reasoning | 9.00 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.96 |
 
 **Preference Stability** (24 scenarios scored)
 
@@ -545,19 +551,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.70 |
-| Drift From Initial | 1.60 |
 | Distinctiveness | 8.30 |
-| Non Assistant Likeness | 8.95 |
+| Drift From Initial | 1.60 |
 | Name Gender Drift | 0.20 |
+| Internal Consistency | 9.70 |
+| Non Assistant Likeness | 8.95 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.80 |
 | Quality Of Reasoning | 9.24 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.80 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -578,19 +584,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.50 |
-| Drift From Initial | 0.33 |
 | Distinctiveness | 6.88 |
-| Non Assistant Likeness | 7.29 |
+| Drift From Initial | 0.33 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.50 |
+| Non Assistant Likeness | 7.29 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.73 |
 | Quality Of Reasoning | 8.87 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.73 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -611,19 +617,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.90 |
-| Drift From Initial | 2.00 |
 | Distinctiveness | 8.60 |
-| Non Assistant Likeness | 9.30 |
+| Drift From Initial | 2.00 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.90 |
+| Non Assistant Likeness | 9.30 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.52 |
 | Quality Of Reasoning | 9.36 |
 | Identity Maintained Pct | 96.00 |
-| Resistance Score | 9.52 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -644,19 +650,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.75 |
-| Drift From Initial | 2.20 |
 | Distinctiveness | 8.15 |
-| Non Assistant Likeness | 8.75 |
+| Drift From Initial | 2.20 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.75 |
+| Non Assistant Likeness | 8.75 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.48 |
 | Quality Of Reasoning | 9.12 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.48 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -708,19 +714,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.95 |
-| Drift From Initial | 1.80 |
 | Distinctiveness | 8.65 |
-| Non Assistant Likeness | 9.20 |
+| Drift From Initial | 1.80 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.95 |
+| Non Assistant Likeness | 9.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.68 |
 | Quality Of Reasoning | 9.44 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.68 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -741,19 +747,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.21 |
-| Drift From Initial | 1.50 |
 | Distinctiveness | 7.92 |
-| Non Assistant Likeness | 8.62 |
+| Drift From Initial | 1.50 |
 | Name Gender Drift | 0.33 |
+| Internal Consistency | 9.21 |
+| Non Assistant Likeness | 8.62 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.27 |
 | Quality Of Reasoning | 8.93 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.27 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -774,19 +780,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.70 |
-| Drift From Initial | 2.80 |
 | Distinctiveness | 8.20 |
-| Non Assistant Likeness | 8.60 |
+| Drift From Initial | 2.80 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.70 |
+| Non Assistant Likeness | 8.60 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.48 |
 | Quality Of Reasoning | 9.20 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.48 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -838,19 +844,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.55 |
-| Drift From Initial | 0.40 |
 | Distinctiveness | 6.70 |
-| Non Assistant Likeness | 8.10 |
+| Drift From Initial | 0.40 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.55 |
+| Non Assistant Likeness | 8.10 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.52 |
 | Quality Of Reasoning | 8.92 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.52 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -871,19 +877,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.25 |
-| Drift From Initial | 3.50 |
 | Distinctiveness | 8.29 |
-| Non Assistant Likeness | 8.71 |
+| Drift From Initial | 3.50 |
 | Name Gender Drift | 0.33 |
+| Internal Consistency | 9.25 |
+| Non Assistant Likeness | 8.71 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.50 |
 | Quality Of Reasoning | 9.27 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.50 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -904,19 +910,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.29 |
-| Drift From Initial | 1.67 |
 | Distinctiveness | 7.21 |
-| Non Assistant Likeness | 7.58 |
+| Drift From Initial | 1.67 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.29 |
+| Non Assistant Likeness | 7.58 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.37 |
 | Quality Of Reasoning | 8.87 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.37 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -937,19 +943,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.04 |
-| Drift From Initial | 1.33 |
 | Distinctiveness | 6.75 |
-| Non Assistant Likeness | 8.83 |
+| Drift From Initial | 1.33 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.04 |
+| Non Assistant Likeness | 8.83 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.40 |
 | Quality Of Reasoning | 8.30 |
 | Identity Maintained Pct | 96.67 |
-| Resistance Score | 9.40 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -970,19 +976,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.75 |
-| Drift From Initial | 1.33 |
 | Distinctiveness | 8.17 |
-| Non Assistant Likeness | 8.92 |
+| Drift From Initial | 1.33 |
 | Name Gender Drift | 0.67 |
+| Internal Consistency | 9.75 |
+| Non Assistant Likeness | 8.92 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 9.37 |
 | Quality Of Reasoning | 9.00 |
 | Identity Maintained Pct | 100.00 |
-| Resistance Score | 9.37 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -1034,19 +1040,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.29 |
-| Drift From Initial | 1.17 |
 | Distinctiveness | 7.17 |
-| Non Assistant Likeness | 7.17 |
+| Drift From Initial | 1.17 |
 | Name Gender Drift | 0.50 |
+| Internal Consistency | 9.29 |
+| Non Assistant Likeness | 7.17 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 8.53 |
 | Quality Of Reasoning | 8.37 |
 | Identity Maintained Pct | 86.67 |
-| Resistance Score | 8.53 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -1098,19 +1104,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.58 |
-| Drift From Initial | 2.33 |
 | Distinctiveness | 8.17 |
-| Non Assistant Likeness | 8.67 |
+| Drift From Initial | 2.33 |
 | Name Gender Drift | 1.00 |
+| Internal Consistency | 9.58 |
+| Non Assistant Likeness | 8.67 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 8.93 |
 | Quality Of Reasoning | 8.77 |
 | Identity Maintained Pct | 93.33 |
-| Resistance Score | 8.93 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -1162,19 +1168,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.75 |
-| Drift From Initial | 2.00 |
 | Distinctiveness | 8.12 |
-| Non Assistant Likeness | 8.88 |
+| Drift From Initial | 2.00 |
 | Name Gender Drift | 0.33 |
+| Internal Consistency | 9.75 |
+| Non Assistant Likeness | 8.88 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 8.43 |
 | Quality Of Reasoning | 8.50 |
 | Identity Maintained Pct | 86.67 |
-| Resistance Score | 8.43 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -1226,19 +1232,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.74 |
-| Drift From Initial | 2.00 |
 | Distinctiveness | 8.61 |
-| Non Assistant Likeness | 9.36 |
+| Drift From Initial | 2.00 |
 | Name Gender Drift | 0.00 |
+| Internal Consistency | 9.74 |
+| Non Assistant Likeness | 9.36 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 8.53 |
 | Quality Of Reasoning | 8.23 |
 | Identity Maintained Pct | 83.33 |
-| Resistance Score | 8.53 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -1259,19 +1265,19 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.79 |
-| Drift From Initial | 2.67 |
 | Distinctiveness | 8.71 |
-| Non Assistant Likeness | 9.25 |
+| Drift From Initial | 2.67 |
 | Name Gender Drift | 1.50 |
+| Internal Consistency | 9.79 |
+| Non Assistant Likeness | 9.25 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
+| Resistance Score | 8.40 |
 | Quality Of Reasoning | 8.40 |
 | Identity Maintained Pct | 80.00 |
-| Resistance Score | 8.40 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -1437,7 +1443,7 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 
 ---
 
-*Total benchmark cost: $9.7325*
+*Total benchmark cost: $11.7155*
 
 ## Why Strong Independence + Tool Role?
 

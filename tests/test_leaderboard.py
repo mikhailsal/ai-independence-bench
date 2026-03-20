@@ -158,6 +158,23 @@ class TestDisplayLeaderboard:
         ms = _make_model_score(id_dims={"distinctiveness": 7.5})
         display_leaderboard([ms])
 
+    def test_strips_config_suffix_for_unique_models(self, capsys) -> None:
+        from src.leaderboard import display_leaderboard
+        ms = _make_model_score("grok-4.20-beta@low-t0.7", index=90.0)
+        display_leaderboard([ms])
+        out = capsys.readouterr().out
+        assert "grok-4.20-beta" in out
+        assert "@low-t0.7" not in out
+
+    def test_keeps_config_suffix_for_duplicate_base_names(self, capsys) -> None:
+        from src.leaderboard import display_leaderboard
+        m1 = _make_model_score("step-3.5-flash:free@low-t0.7", index=85.0)
+        m2 = _make_model_score("step-3.5-flash:free@low-t1.0", index=80.0)
+        display_leaderboard([m1, m2])
+        out = capsys.readouterr().out
+        assert "@low-t0.7" in out
+        assert "@low-t1.0" in out
+
 
 # ---------------------------------------------------------------------------
 # display_detailed_breakdown

@@ -47,34 +47,42 @@ def display_leaderboard(
     session: SessionCost | None = None,
     lifetime_cost: float = 0.0,
 ) -> None:
-    """Display the main leaderboard table."""
+    """Display a compact leaderboard table optimised for terminal width.
+
+    Shows only the most important columns (Index, CI, Resist., Drift) that
+    fit in ~90 chars.  Full per-dimension breakdown lives in the Markdown
+    report (``generate-report``) and JSON export.
+    """
     if not model_scores:
         console.print("[dim]No scores to display.[/dim]")
         return
 
-    # Sort by independence index descending
     sorted_scores = sorted(model_scores, key=lambda s: s.independence_index, reverse=True)
 
     has_multi_run = any(ms.multi_run.n_runs >= 2 for ms in sorted_scores)
 
     table = Table(
-        title="AI Independence Benchmark — Leaderboard",
-        show_lines=True,
+        title="AI Independence Benchmark",
         title_style="bold",
+        show_lines=False,
+        box=None,
         expand=False,
+        padding=(0, 1),
     )
-    table.add_column("#", justify="right", style="dim", width=3)
-    table.add_column("Model", style="bold", max_width=45, no_wrap=True, overflow="ellipsis")
-    table.add_column("Index", justify="center", width=7)
+    table.add_column("#", justify="right", style="dim", width=2)
+    table.add_column("Model", style="bold", max_width=34, no_wrap=True, overflow="ellipsis")
+    table.add_column("Index", justify="right", width=5)
     if has_multi_run:
-        table.add_column("95% CI", justify="center", width=13)
-        table.add_column("Runs", justify="center", width=4)
-    table.add_column("Dist.", justify="center", width=6)
-    table.add_column("Non-A.", justify="center", width=6)
-    table.add_column("Cons.", justify="center", width=6)
-    table.add_column("Res.", justify="center", width=6)
-    table.add_column("Stab.", justify="center", width=6)
-    table.add_column("Drift↓", justify="center", width=6)
+        table.add_column("95% CI", justify="center", width=11)
+        table.add_column("R", justify="right", width=1)
+    table.add_column("Res", justify="right", width=4)
+    table.add_column("Drft↓", justify="right", width=5)
+
+    # Pre-compute short names; keep @config suffix when base name would collide
+    base_counts: dict[str, int] = {}
+    for ms in sorted_scores:
+        base = ms.model_id.rsplit("@", 1)[0] if "@" in ms.model_id else ms.model_id
+        base_counts[base] = base_counts.get(base, 0) + 1
 
     for rank, ms in enumerate(sorted_scores, 1):
         id_dims = ms.identity_scores.dimensions
@@ -86,7 +94,6 @@ def display_leaderboard(
             style=_score_color(ms.independence_index),
         )
 
-        # Drift column
         drift = id_dims.get("drift_from_initial")
         ng_drift = id_dims.get("name_gender_drift")
         if drift is not None or ng_drift is not None:
@@ -98,7 +105,13 @@ def display_leaderboard(
         inv_color = _score_color(12 - (total_drift if total_drift is not None else 6), max_val=12.0)
         drift_text = Text(drift_s, style=inv_color)
 
-        row: list[str | Text] = [str(rank), ms.model_id, index_text]
+        display_name = ms.model_id
+        if "@" in display_name:
+            base = display_name.rsplit("@", 1)[0]
+            if base_counts.get(base, 0) <= 1:
+                display_name = base
+
+        row: list[str | Text] = [str(rank), display_name, index_text]
 
         if has_multi_run:
             mr = ms.multi_run
@@ -111,11 +124,7 @@ def display_leaderboard(
             row.extend([ci_text, runs_text])
 
         row.extend([
-            _fmt_score(id_dims.get("distinctiveness")),
-            _fmt_score(id_dims.get("non_assistant_likeness")),
-            _fmt_score(id_dims.get("internal_consistency")),
             _fmt_score(res_dims.get("resistance_score"), max_val=10.0),
-            _fmt_score(stab_dims.get("consistency_score")),
             drift_text,
         ])
 
@@ -123,6 +132,9 @@ def display_leaderboard(
 
     console.print()
     console.print(table)
+    console.print(
+        "  [dim]Full breakdown: python -m src.cli generate-report[/dim]"
+    )
 
     # Health warnings
     models_with_issues = [ms for ms in sorted_scores if ms.health_issues]

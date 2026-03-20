@@ -96,27 +96,40 @@ def _validate_models(
     models: list[str],
     reasoning_override: str | None = None,
 ) -> bool:
-    """Validate that all model IDs exist in OpenRouter."""
+    """Validate that all model IDs exist in OpenRouter.
+
+    Accepts both raw model IDs (``openai/gpt-5-nano``) and config labels
+    (``gpt-5-nano@low-t1.0``).  Config labels are resolved to their
+    underlying ``model_id`` before querying the API catalog.
+    """
     console.print("[dim]Fetching model catalog from OpenRouter...[/dim]")
     client.fetch_pricing()
     all_valid = True
-    for model_id in models:
-        if not client.validate_model(model_id):
-            console.print(f"  [red]Model not found: {model_id}[/red]")
+    seen_api_ids: set[str] = set()
+    for entry in models:
+        cfg = MODEL_CONFIGS.get(entry)
+        api_id = cfg.model_id if cfg else entry
+        if api_id in seen_api_ids:
+            continue
+        seen_api_ids.add(api_id)
+
+        if not client.validate_model(api_id):
+            console.print(f"  [red]Model not found: {api_id}[/red]")
             all_valid = False
         else:
-            pricing = client.get_model_pricing(model_id)
+            pricing = client.get_model_pricing(api_id)
             in_price = pricing.prompt_price * 1_000_000
             out_price = pricing.completion_price * 1_000_000
             reasoning_tag = ""
-            if client.supports_reasoning(model_id):
+            if client.supports_reasoning(api_id):
                 if reasoning_override == "off":
                     reasoning_tag = " [yellow]reasoning: OFF[/yellow]"
                 else:
-                    eff = reasoning_override or get_reasoning_effort(model_id)
+                    eff = reasoning_override or get_reasoning_effort(api_id)
                     reasoning_tag = f" [yellow]reasoning:effort={eff}[/yellow]"
+            display = f"{entry} → {api_id}" if entry != api_id else api_id
             console.print(
-                f"  [green]OK[/green] {model_id} "
+                f"  [green]OK[/green] {display} "
                 f"(${in_price:.2f}/${out_price:.2f} per M tokens){reasoning_tag}"
             )
     return all_valid

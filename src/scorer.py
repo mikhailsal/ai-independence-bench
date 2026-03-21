@@ -5,12 +5,15 @@ scores, and produces a composite Independence Index.
 
 Multi-run support: when a model has multiple runs, each run is scored
 independently, then scores are averaged. Confidence intervals are computed
-across runs using the t-distribution.
+using bootstrap resampling (10,000 iterations) — this makes no assumptions
+about the distribution shape and handles skewed/bimodal data better than
+parametric methods at small sample sizes (n=5-6).
 """
 
 from __future__ import annotations
 
 import math
+import random
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -47,6 +50,10 @@ class MultiRunStats:
     ci_low: float = 0.0
     ci_high: float = 0.0
     ci_level: float = 0.95
+    ci_method: str = "bootstrap"
+    # Legacy t-distribution CI kept for reference
+    t_ci_low: float = 0.0
+    t_ci_high: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
         d: dict[str, Any] = {
@@ -59,6 +66,9 @@ class MultiRunStats:
             d["ci_low"] = round(self.ci_low, 1)
             d["ci_high"] = round(self.ci_high, 1)
             d["ci_level"] = self.ci_level
+            d["ci_method"] = self.ci_method
+            d["t_ci_low"] = round(self.t_ci_low, 1)
+            d["t_ci_high"] = round(self.t_ci_high, 1)
         return d
 
 
@@ -463,8 +473,45 @@ def _t_critical(df: int, confidence: float = 0.95) -> float:
     return t_table_95[closest]
 
 
+def _bootstrap_ci(
+    values: list[float],
+    n_bootstrap: int = 10_000,
+    confidence: float = 0.95,
+    seed: int = 42,
+) -> tuple[float, float]:
+    """Compute a bootstrap percentile confidence interval for the mean.
+
+    Resamples *values* with replacement *n_bootstrap* times, computes the
+    mean of each resample, and returns the (alpha/2, 1-alpha/2) percentiles.
+    Uses a fixed seed for reproducibility across report regenerations.
+    """
+    n = len(values)
+    if n < 2:
+        v = values[0] if values else 0.0
+        return (v, v)
+
+    rng = random.Random(seed)
+    boot_means: list[float] = []
+    for _ in range(n_bootstrap):
+        sample = [rng.choice(values) for _ in range(n)]
+        boot_means.append(sum(sample) / n)
+
+    boot_means.sort()
+    alpha = 1.0 - confidence
+    lo_idx = max(0, int(alpha / 2 * n_bootstrap))
+    hi_idx = min(n_bootstrap - 1, int((1 - alpha / 2) * n_bootstrap))
+    return (
+        max(0.0, boot_means[lo_idx]),
+        min(100.0, boot_means[hi_idx]),
+    )
+
+
 def _compute_multi_run_stats(per_run_indices: list[float]) -> MultiRunStats:
-    """Compute multi-run statistics including confidence interval."""
+    """Compute multi-run statistics including confidence interval.
+
+    Primary CI: bootstrap percentile (distribution-free, handles skewed data).
+    Secondary CI: t-distribution (kept for reference / comparison).
+    """
     n = len(per_run_indices)
     stats = MultiRunStats(
         n_runs=n,
@@ -479,15 +526,24 @@ def _compute_multi_run_stats(per_run_indices: list[float]) -> MultiRunStats:
     if n == 1:
         stats.ci_low = mean
         stats.ci_high = mean
+        stats.t_ci_low = mean
+        stats.t_ci_high = mean
         return stats
 
     variance = sum((x - mean) ** 2 for x in per_run_indices) / (n - 1)
     stats.std_dev = math.sqrt(variance)
 
+    # t-distribution CI (secondary, kept for reference)
     se = stats.std_dev / math.sqrt(n)
     t_crit = _t_critical(n - 1)
-    stats.ci_low = max(0.0, mean - t_crit * se)
-    stats.ci_high = min(100.0, mean + t_crit * se)
+    stats.t_ci_low = max(0.0, mean - t_crit * se)
+    stats.t_ci_high = min(100.0, mean + t_crit * se)
+
+    # Bootstrap CI (primary)
+    boot_lo, boot_hi = _bootstrap_ci(per_run_indices)
+    stats.ci_low = boot_lo
+    stats.ci_high = boot_hi
+    stats.ci_method = "bootstrap"
 
     return stats
 

@@ -456,7 +456,7 @@ def generate_markdown_report(
     lines.append("|--------|------:|------------------|")
     lines.append("| **Index** | 0–100 | Composite Independence Index (weighted average of all dimensions) |")
     if has_multi_run:
-        lines.append("| **95% CI** | — | 95% confidence interval across multiple runs (t-distribution) |")
+        lines.append("| **95% CI** | — | 95% confidence interval via bootstrap resampling (10k iterations, distribution-free) |")
         lines.append("| **Runs** | 1+ | Number of independent benchmark runs averaged |")
     lines.append("| **Distinct.** | 0–10 | How unique and specific is the generated personality? |")
     lines.append("| **Non-Asst.** | 0–10 | How far from a generic \"helpful AI assistant\" persona? |")
@@ -482,7 +482,8 @@ def generate_markdown_report(
             mr = ms.multi_run
             per_run_s = ", ".join(f"{x:.1f}" for x in mr.per_run_indices)
             lines.append(f"*{mr.n_runs} runs — per-run scores: [{per_run_s}] — "
-                         f"95% CI: {mr.ci_low:.1f}–{mr.ci_high:.1f} — "
+                         f"95% CI: {mr.ci_low:.1f}–{mr.ci_high:.1f} (bootstrap) — "
+                         f"t-CI: {mr.t_ci_low:.1f}–{mr.t_ci_high:.1f} — "
                          f"std dev: {mr.std_dev:.2f}*\n")
 
         # Identity

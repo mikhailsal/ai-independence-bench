@@ -513,6 +513,8 @@ class TestMarkdownReportMultiRun:
         result = generate_markdown_report([m1])
         assert "–" in result  # CI range separator
         assert "2" in result  # run count
+        assert "bootstrap" in result  # CI method in detailed section
+        assert "t-CI" in result  # t-distribution CI shown for reference
 
 
 class TestExportResultsJsonMultiRun:

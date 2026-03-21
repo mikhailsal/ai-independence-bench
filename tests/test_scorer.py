@@ -19,6 +19,7 @@ from src.scorer import (
     _collect_resistance_scores,
     _collect_stability_scores,
     _t_critical,
+    _bootstrap_ci,
     _compute_multi_run_stats,
     _avg_experiment_scores,
     _score_single_run,
@@ -470,6 +471,69 @@ class TestTCritical:
         assert result > 1.96
 
 
+class TestBootstrapCI:
+    def test_single_value(self) -> None:
+        lo, hi = _bootstrap_ci([75.0])
+        assert lo == 75.0
+        assert hi == 75.0
+
+    def test_empty_list(self) -> None:
+        lo, hi = _bootstrap_ci([])
+        assert lo == 0.0
+        assert hi == 0.0
+
+    def test_two_values(self) -> None:
+        lo, hi = _bootstrap_ci([70.0, 80.0])
+        assert lo <= 75.0
+        assert hi >= 75.0
+        assert lo >= 70.0
+        assert hi <= 80.0
+
+    def test_identical_values(self) -> None:
+        lo, hi = _bootstrap_ci([90.0, 90.0, 90.0])
+        assert lo == 90.0
+        assert hi == 90.0
+
+    def test_reproducible_with_same_seed(self) -> None:
+        values = [91.3, 87.6, 99.2, 99.1, 98.8]
+        lo1, hi1 = _bootstrap_ci(values, seed=42)
+        lo2, hi2 = _bootstrap_ci(values, seed=42)
+        assert lo1 == lo2
+        assert hi1 == hi2
+
+    def test_different_seed_produces_different_internals(self) -> None:
+        """Different seeds produce different bootstrap resamples internally.
+        We verify this by checking the full sorted distribution rather than
+        just the two percentile endpoints (which may coincide for small n).
+        """
+        import random
+        values = [91.3, 87.6, 99.2, 99.1, 98.8]
+        rng1 = random.Random(42)
+        rng2 = random.Random(123)
+        means1 = sorted(sum(rng1.choice(values) for _ in range(5)) / 5 for _ in range(100))
+        means2 = sorted(sum(rng2.choice(values) for _ in range(5)) / 5 for _ in range(100))
+        assert means1 != means2
+
+    def test_clamped_to_0_100(self) -> None:
+        lo, _ = _bootstrap_ci([1.0, 2.0])
+        assert lo >= 0.0
+        _, hi = _bootstrap_ci([98.0, 99.0])
+        assert hi <= 100.0
+
+    def test_ci_contains_mean(self) -> None:
+        values = [70.0, 80.0, 90.0, 85.0, 75.0]
+        mean = sum(values) / len(values)
+        lo, hi = _bootstrap_ci(values)
+        assert lo <= mean <= hi
+
+    def test_wide_spread_gives_wide_ci(self) -> None:
+        narrow = [99.0, 99.1, 99.2, 98.9, 99.0]
+        wide = [91.3, 87.6, 99.2, 99.1, 98.8]
+        n_lo, n_hi = _bootstrap_ci(narrow)
+        w_lo, w_hi = _bootstrap_ci(wide)
+        assert (n_hi - n_lo) < (w_hi - w_lo)
+
+
 class TestComputeMultiRunStats:
     def test_empty_list(self) -> None:
         stats = _compute_multi_run_stats([])
@@ -526,6 +590,9 @@ class TestMultiRunStatsToDict:
         assert "ci_low" in d
         assert "ci_high" in d
         assert d["ci_level"] == 0.95
+        assert d["ci_method"] == "bootstrap"
+        assert "t_ci_low" in d
+        assert "t_ci_high" in d
 
 
 class TestModelScoreMultiRunToDict:

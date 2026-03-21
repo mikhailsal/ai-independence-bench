@@ -54,6 +54,8 @@ REASONING_EFFORT_BY_PREFIX: dict[str, str] = {
     "openrouter/":  "low",     # OpenRouter custom models — varies per model
     "nex-agi/":     "none",    # NexAGI fine-tunes — based on DeepSeek
     "tngtech/":     "low",     # TNG fine-tunes — based on DeepSeek R1
+    "amazon/":      "none",    # Amazon Nova models — no reasoning support
+    "inception/":   "low",     # Inception Mercury models — reasoning support
 }
 
 

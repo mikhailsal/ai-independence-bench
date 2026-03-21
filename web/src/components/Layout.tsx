@@ -7,6 +7,31 @@ const NAV_ITEMS = [
   { path: '/about', label: 'About' },
 ];
 
+function Logo({ className = 'w-7 h-7' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" fill="none" className={className}>
+      {/* Shield outline */}
+      <path
+        d="M16 2L4 7v9c0 8 5.4 13.5 12 16 6.6-2.5 12-8 12-16V7L16 2z"
+        stroke="currentColor" strokeWidth="1.5" fill="none"
+        className="text-sky-400"
+      />
+      {/* Inner shield glow */}
+      <path
+        d="M16 4L6 8.2v7.8c0 6.8 4.6 11.6 10 13.8 5.4-2.2 10-7 10-13.8V8.2L16 4z"
+        fill="currentColor" fillOpacity="0.08"
+        className="text-sky-400"
+      />
+      {/* Upward arrow — independence/rising */}
+      <path
+        d="M16 22V11M11.5 15.5L16 11l4.5 4.5"
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+        className="text-emerald-400"
+      />
+    </svg>
+  );
+}
+
 function ThemeToggle() {
   const [dark, setDark] = useState(true);
 
@@ -46,9 +71,9 @@ export default function Layout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 font-semibold text-lg hover:opacity-80 transition-opacity">
-            <span className="text-xl">🧠</span>
+            <Logo />
             <span className="hidden sm:inline">AI Independence Bench</span>
-            <span className="sm:hidden">AI Bench</span>
+            <span className="sm:hidden">AIB</span>
           </Link>
 
           {/* Desktop nav */}

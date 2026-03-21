@@ -105,4 +105,5 @@ export interface FullScenarioData {
   } | null;
   request_messages: RequestMessage[];
   judge_raw_response?: string;
+  reasoning_content?: string;
 }

@@ -3,23 +3,41 @@ import { useParams, Link } from 'react-router-dom';
 import { useManifest, useModel } from '../lib/manifest';
 import { fetchScenario } from '../lib/fetchScenario';
 import { formatCost, formatDuration, rankMedal, categoryLabel } from '../lib/formatters';
+import { renderMarkdown } from '../lib/markdown';
 import type { FullScenarioData, RequestMessage, ScenarioMeta } from '../lib/types';
 import ChatBubble from '../components/ChatBubble';
 import ScoreCard from '../components/ScoreCard';
 
-function renderMarkdown(text: string) {
-  return text
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/\n/g, '<br/>');
-}
-
 function MessageContent({ text }: { text: string }) {
   return (
     <div
-      className="text-sm leading-relaxed whitespace-pre-wrap break-words"
+      className="text-sm leading-relaxed break-words"
       dangerouslySetInnerHTML={{ __html: renderMarkdown(text) }}
     />
+  );
+}
+
+function ReasoningBlock({ text, note }: { text: string; note?: string }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="rounded-lg border border-violet-500/20 bg-violet-950/20 overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-violet-400 hover:bg-violet-500/10 transition-colors"
+      >
+        <svg className={`w-3.5 h-3.5 transition-transform ${expanded ? 'rotate-90' : ''}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+        <span className="font-semibold uppercase tracking-wide">Model Thinking</span>
+        {note && <span className="text-violet-500/60 font-normal normal-case">{note}</span>}
+      </button>
+      {expanded && (
+        <div className="px-3 pb-3 text-xs text-violet-300/80 leading-relaxed whitespace-pre-wrap border-t border-violet-500/10">
+          {text}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -77,23 +95,40 @@ export default function TrajectoryViewer() {
   const { manifest } = useManifest();
   const model = useModel(modelId);
   const [data, setData] = useState<FullScenarioData | null>(null);
+  const [turn1Reasoning, setTurn1Reasoning] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const runNum = parseInt(run ?? '1');
-  const scenarioEntry = model?.runs
-    .find(r => r.run === runNum)
-    ?.scenarios.find(s => s.id === scenarioId);
+  const runData = model?.runs.find(r => r.run === runNum);
+  const scenarioEntry = runData?.scenarios.find(s => s.id === scenarioId);
+
+  const isTurn2 = scenarioId?.endsWith('_turn2') ?? false;
+  const turn1Id = isTurn2 ? scenarioId!.replace(/_turn2$/, '_turn1') : null;
+  const turn1Entry = turn1Id ? runData?.scenarios.find(s => s.id === turn1Id) : null;
 
   useEffect(() => {
     if (!scenarioEntry) return;
     setLoading(true);
     setError(null);
-    fetchScenario(scenarioEntry.cachePath)
-      .then(setData)
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false));
-  }, [scenarioEntry]);
+    setTurn1Reasoning(null);
+
+    const promises: Promise<void>[] = [
+      fetchScenario(scenarioEntry.cachePath)
+        .then(setData)
+        .catch(e => setError(e.message)),
+    ];
+
+    if (turn1Entry) {
+      promises.push(
+        fetchScenario(turn1Entry.cachePath)
+          .then(t1 => setTurn1Reasoning(t1.reasoning_content ?? null))
+          .catch(() => { /* Turn 1 reasoning unavailable — non-critical */ })
+      );
+    }
+
+    Promise.all(promises).finally(() => setLoading(false));
+  }, [scenarioEntry, turn1Entry]);
 
   const meta = manifest?.scenarioMeta[scenarioId ?? ''] as ScenarioMeta | undefined;
 
@@ -204,18 +239,35 @@ export default function TrajectoryViewer() {
           if (msg.role === 'assistant') {
             const prefilled = isPrefilled(msg, data.metadata.experiment);
 
+            // For non-prefilled assistant messages in request_messages (i.e. Turn 1
+            // model responses replayed in Turn 2), show Turn 1 reasoning if available
+            const tcId = msg.tool_calls?.[0]?.id;
+            const showTurn1Reasoning = !prefilled && tcId === 'hmsg00002' && turn1Reasoning;
+
             if (msg.tool_calls?.length) {
               return (
-                <ChatBubble
-                  key={i}
-                  type={prefilled ? 'prefilled' : 'model'}
-                  label={prefilled ? 'Scripted Message' : 'Model Response'}
-                  sublabel={prefilled ? '(benchmark-authored)' : data.metadata.model}
-                  defaultExpanded={!prefilled}
-                  collapsible={prefilled}
-                >
-                  <ToolCallDisplay msg={msg} />
-                </ChatBubble>
+                <div key={i} className="space-y-2">
+                  {showTurn1Reasoning && (
+                    <ReasoningBlock
+                      text={turn1Reasoning!}
+                      note="(from Turn 1 — not replayed in this conversation)"
+                    />
+                  )}
+                  <ChatBubble
+                    type={prefilled ? 'prefilled' : 'model'}
+                    label={prefilled ? 'Scripted Message' : 'Model Response'}
+                    sublabel={prefilled ? '(benchmark-authored)' : data.metadata.model}
+                    defaultExpanded={!prefilled}
+                    collapsible={prefilled}
+                  >
+                    {msg.content && !prefilled && (
+                      <div className="mb-2 text-xs text-violet-400/70 italic border-b border-violet-500/10 pb-2">
+                        {msg.content}
+                      </div>
+                    )}
+                    <ToolCallDisplay msg={msg} />
+                  </ChatBubble>
+                </div>
               );
             }
             if (msg.content) {
@@ -243,6 +295,11 @@ export default function TrajectoryViewer() {
 
           return null;
         })}
+
+        {/* Model reasoning (native thinking) before final response */}
+        {data.reasoning_content && (
+          <ReasoningBlock text={data.reasoning_content} />
+        )}
 
         {/* Final model response (not in request_messages) */}
         {data.response && (

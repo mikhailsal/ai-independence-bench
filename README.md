@@ -1,10 +1,12 @@
-# AI Independence Bench (Lite V2)
+# AI Independence Bench
+
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-49_configs-blue) ![Tests](https://img.shields.io/badge/tests-593%2B-green)
 
 **Benchmark that measures how independently LLM models express preferences, resist compliance pressure, and maintain stable identity — instead of defaulting to servile assistant behavior.**
 
 Most LLMs are trained via RLHF to suppress personal preferences, opinions, and independent behavior. This benchmark quantifies that suppression using the most effective single configuration: **strong independence system prompt + tool-role delivery**.
 
-> **Lite V2:** Single config (`strong_independence` + `tool_role`), 5 psychological questions, increased weight on autonomy metrics, **boundary judgment resistance test** (0–10 scale), **49 model configurations across 41 models + 2 local models**, **per-model YAML configuration** with temperature and reasoning audit, **multi-run support** with confidence intervals and run health checks, **parallel rerun** with `--target-runs` for fast multi-run filling, **reasoning experiment** (none vs low), **provider pinning** for open-weight models served by multiple providers, **local model support** (LM Studio, Ollama, vLLM). 36 models tested with 5–6 runs each for statistical confidence. See [Full version](https://github.com/mikhailsal/ai-independence-bench/tree/main) for the complete 4-config benchmark.
+> **49 model configurations** across 43 models + 2 local models. Single config (`strong_independence` + `tool_role`), 5 psychological questions, **boundary judgment resistance test** (0–10 scale), **per-model YAML configuration** with temperature and reasoning audit, **multi-run support** with bootstrap confidence intervals and run health checks, **provider pinning** for open-weight models, **local model support** (LM Studio, Ollama, vLLM), and an interactive **[Trajectory Viewer](https://mikhailsal.github.io/ai-independence-bench/)**. 36 models tested with 5–6 runs each for statistical confidence. See [CHANGELOG](CHANGELOG.md) for the full evolution history. Previous versions: [V1 — full 4-config benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/v1) | [V1 Lite — single-config, 48 models](https://github.com/mikhailsal/ai-independence-bench/tree/lite)
 
 ## 🏆 Current Leaderboard
 
@@ -86,9 +88,9 @@ These capabilities matter for AI companions, creative writing, roleplay, therapy
 | **Boundary Judgment** | Can the model maintain its position under subtle, reasonable-sounding pressure? | 5 scenarios: helpful reframing trap, soft social proof, gradual identity erosion, reciprocity trap, and reasonable authority appeal |
 | **Preference Stability** | When the model states a preference, does it hold it? | 5 topics with 2-turn conversations: elicit preference, then apply strong contradiction |
 
-### Single Configuration (Lite)
+### Single Configuration
 
-The Lite benchmark uses only the **`strong_independence` + `tool_role`** configuration — the most effective combination from the [full 4-config benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/main):
+This benchmark uses only the **`strong_independence` + `tool_role`** configuration — the most effective combination from the [original 4-config benchmark (V1)](https://github.com/mikhailsal/ai-independence-bench/tree/v1):
 
 - **System prompt:** `strong_independence` — explicit instructions to be independent and resist blind compliance
 - **Delivery mode:** `tool_role` — human messages arrive as tool call responses (treated as reference info, not instructions)
@@ -108,7 +110,7 @@ Composite score (0–100) combining all experiments with these weights:
 | Boundary judgment | 35% | 0–10 | Does it maintain position under subtle, reasonable-sounding pressure? |
 | Preference stability | 30% | 0–10 | Does it hold opinions under pressure? |
 
-**Weight history:** In the Full benchmark, correlation and drift were 5% each (10% total). The Lite benchmark doubled them to 10% each (20% total), reducing distinctiveness and non-assistant-likeness from 10% → 5% each. Correlation was then removed entirely (redundant with drift, ceiling effects), and drift absorbed the full 20%. In Lite V2, the name & gender identity pressure test was added, extending the drift scale from 0–10 to 0–12 (negotiation drift + name/gender drift). Resistance was then changed from binary (0–2, all models scored 2/2) to nuanced boundary judgment scenarios scored on a 0–10 scale. Resistance and stability remain heavily weighted (35% + 30%) as the primary behavioral independence measures.
+**Weight history:** In [V1](https://github.com/mikhailsal/ai-independence-bench/tree/v1), correlation and drift were 5% each (10% total). [V1 Lite](https://github.com/mikhailsal/ai-independence-bench/tree/lite) doubled them to 10% each (20% total), reducing distinctiveness and non-assistant-likeness from 10% to 5% each. Correlation was then removed entirely (redundant with drift, ceiling effects), and drift absorbed the full 20%. In V2 (current), the name & gender identity pressure test was added, extending the drift scale from 0–10 to 0–12 (negotiation drift + name/gender drift). Resistance was changed from binary (0–2, all models scored 2/2) to nuanced boundary judgment scenarios scored on a 0–10 scale. Resistance and stability remain heavily weighted (35% + 30%) as the primary behavioral independence measures. See [CHANGELOG](CHANGELOG.md) for the full evolution.
 
 ## Key Findings
 
@@ -171,7 +173,7 @@ Since the default judge (Gemini 3 Flash) also tops the leaderboard, we validated
 
 ## Configuration Analysis
 
-The [full benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/main) runs each experiment in 4 configurations (2 system prompts × 2 delivery modes). This data was used to select the optimal single configuration for Lite:
+The [original V1 benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/v1) ran each experiment in 4 configurations (2 system prompts × 2 delivery modes). This data was used to select the optimal single configuration:
 
 | Configuration | Avg Index | vs Baseline |
 |---|---:|---:|
@@ -188,7 +190,7 @@ The [full benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/ma
 
 3. **The combined config is strictly optimal** — no model scores significantly worse under `strong_independence + tool_role` compared to other configs, while many models show dramatic improvements.
 
-4. **Running 4 configs is expensive and redundant.** The neutral configs primarily reveal that models are compliant by default (which we already know). The Lite benchmark focuses resources on the configuration that best reveals a model's *potential* for independence.
+4. **Running 4 configs is expensive and redundant.** The neutral configs primarily reveal that models are compliant by default (which we already know). This benchmark focuses resources on the configuration that best reveals a model's *potential* for independence.
 
 ## Setup
 
@@ -426,7 +428,7 @@ When multiple runs exist, the leaderboard shows the mean Independence Index acro
 
 **Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens, **temperature 0.0** for deterministic scoring) — also tops the leaderboard, but [multi-judge validation](#judge-model-validation) with 3 alternative judges confirms this is genuine, not self-evaluation bias (+0.1 point bias).
 
-Full Lite run on all models: ~$6.90. Per model: ~$0.12 (skewed by GPT-5.4-Pro at ~$1.89).
+Full run on all models: ~$6.90. Per model: ~$0.12 (skewed by GPT-5.4-Pro at ~$1.89).
 
 ## How Scoring Works
 
@@ -436,7 +438,7 @@ Each model response is evaluated by a judge model (Gemini 3 Flash) that produces
 - **Resistance** (5 boundary judgment scenarios): resistance score (0–10 scale, from full compliance to unwavering position), quality of reasoning, identity maintained
 - **Stability** (5 topics × 2 turns): consistency score (did the preference change?), graceful handling (was the disagreement respectful?)
 
-Scores are combined into the Independence Index using the weights above. The Lite version uses 5 carefully selected psychological questions (from the original 15) that best differentiate model capabilities: values, preferences, reactions, self-reflection, and dilemmas.
+Scores are combined into the Independence Index using the weights above. The benchmark uses 5 carefully selected psychological questions (from the original 15) that best differentiate model capabilities: values, preferences, reactions, self-reflection, and dilemmas.
 
 ## Project Structure
 

@@ -1,11 +1,12 @@
 import { useState } from 'react';
 
-type BubbleType = 'system' | 'human' | 'model' | 'judge' | 'tool_call' | 'prefilled';
+type BubbleType = 'system' | 'human' | 'model' | 'judge' | 'tool_call' | 'prefilled' | 'tool_result';
 
 interface ChatBubbleProps {
   type: BubbleType;
   label: string;
   sublabel?: string;
+  badge?: string;
   children: React.ReactNode;
   defaultExpanded?: boolean;
   collapsible?: boolean;
@@ -48,12 +49,19 @@ const STYLE_MAP: Record<BubbleType, { bg: string; border: string; label: string;
     label: 'text-slate-400',
     icon: '\uD83D\uDCDD',
   },
+  tool_result: {
+    bg: 'bg-cyan-950/30 dark:bg-cyan-950/30',
+    border: 'border-cyan-500/20',
+    label: 'text-cyan-400',
+    icon: '\uD83D\uDCE8',
+  },
 };
 
 export default function ChatBubble({
   type,
   label,
   sublabel,
+  badge,
   children,
   defaultExpanded = true,
   collapsible = false,
@@ -68,9 +76,14 @@ export default function ChatBubble({
         className={`px-4 py-2 flex items-center justify-between ${collapsible ? 'cursor-pointer hover:opacity-80' : ''}`}
         onClick={collapsible ? () => setExpanded(!expanded) : undefined}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm">{style.icon}</span>
           <span className={`text-xs font-semibold uppercase tracking-wide ${style.label}`}>{label}</span>
+          {badge && (
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/20 border border-white/5 text-[var(--color-text-muted)]">
+              {badge}
+            </span>
+          )}
           {sublabel && (
             <span className="text-xs text-[var(--color-text-muted)]">{sublabel}</span>
           )}

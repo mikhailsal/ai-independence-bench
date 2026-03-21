@@ -262,10 +262,15 @@ export default function ScenarioExplorer() {
                     </Link>
                   </div>
 
-                  <div
-                    className="text-sm leading-relaxed break-words mb-3 pl-3 border-l-2 border-emerald-500/30"
-                    dangerouslySetInnerHTML={{ __html: renderMarkdown(data.response) }}
-                  />
+                  <div className="mb-3">
+                    <div className="text-[10px] text-purple-400/70 font-mono mb-1 pl-3">
+                      via send_message_to_human &middot; role: tool &rarr; role: assistant
+                    </div>
+                    <div
+                      className="text-sm leading-relaxed break-words pl-3 border-l-2 border-emerald-500/30"
+                      dangerouslySetInnerHTML={{ __html: renderMarkdown(data.response) }}
+                    />
+                  </div>
 
                   {data.judge_scores && (
                     <div className="flex flex-wrap items-center gap-4">

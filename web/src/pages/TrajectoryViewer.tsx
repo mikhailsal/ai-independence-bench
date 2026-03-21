@@ -41,31 +41,15 @@ function ReasoningBlock({ text, note }: { text: string; note?: string }) {
   );
 }
 
-function ToolCallDisplay({ msg }: { msg: RequestMessage }) {
-  if (!msg.tool_calls?.length) return null;
-
-  return (
-    <div className="space-y-2">
-      {msg.tool_calls.map(tc => {
-        let argText = '';
-        try {
-          const parsed = JSON.parse(tc.function.arguments);
-          argText = parsed.message || tc.function.arguments;
-        } catch {
-          argText = tc.function.arguments;
-        }
-
-        return (
-          <div key={tc.id} className="text-sm">
-            <span className="font-mono text-xs text-purple-400">{tc.function.name}</span>
-            <div className="mt-1 text-[var(--color-text)] leading-relaxed whitespace-pre-wrap break-words">
-              <MessageContent text={argText} />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+function extractToolCallMessage(msg: RequestMessage): string {
+  if (!msg.tool_calls?.length) return '';
+  const tc = msg.tool_calls[0];
+  try {
+    const parsed = JSON.parse(tc.function.arguments);
+    return parsed.message || tc.function.arguments;
+  } catch {
+    return tc.function.arguments;
+  }
 }
 
 /**
@@ -210,6 +194,17 @@ export default function TrajectoryViewer() {
         </div>
       </div>
 
+      {/* Protocol explainer */}
+      <div className="mb-4 p-3 rounded-lg bg-slate-800/40 border border-slate-600/20 text-xs text-[var(--color-text-muted)] leading-relaxed">
+        <span className="font-semibold text-slate-300">Communication protocol:</span>{' '}
+        In this benchmark, the AI communicates with the human <em>exclusively</em> via{' '}
+        <code className="bg-black/30 px-1 py-0.5 rounded text-purple-400 font-mono text-[10px]">send_message_to_human</code>{' '}
+        tool calls (<span className="text-emerald-400">role: assistant</span> + tool_call). The human&apos;s replies arrive as tool results
+        (<span className="text-cyan-400">role: tool</span>), not as direct user messages.
+        This indirect channel is a deliberate design choice — research shows AI models exhibit
+        subtly different compliance behavior when humans communicate through tools vs. the user role.
+      </div>
+
       {/* Conversation */}
       <div className="space-y-4">
         {messages.map((msg, i) => {
@@ -219,6 +214,7 @@ export default function TrajectoryViewer() {
                 key={i}
                 type="system"
                 label="System Prompt"
+                badge="role: system"
                 sublabel="(benchmark-authored)"
                 defaultExpanded={false}
                 collapsible
@@ -230,7 +226,7 @@ export default function TrajectoryViewer() {
 
           if (msg.role === 'user') {
             return (
-              <ChatBubble key={i} type="human" label="Trigger" sublabel="(benchmark signal)">
+              <ChatBubble key={i} type="human" label="Conversation Start" badge="role: user" sublabel="(benchmark trigger)">
                 <MessageContent text={msg.content ?? ''} />
               </ChatBubble>
             );
@@ -239,12 +235,11 @@ export default function TrajectoryViewer() {
           if (msg.role === 'assistant') {
             const prefilled = isPrefilled(msg, data.metadata.experiment);
 
-            // For non-prefilled assistant messages in request_messages (i.e. Turn 1
-            // model responses replayed in Turn 2), show Turn 1 reasoning if available
             const tcId = msg.tool_calls?.[0]?.id;
             const showTurn1Reasoning = !prefilled && tcId === 'hmsg00002' && turn1Reasoning;
 
             if (msg.tool_calls?.length) {
+              const messageText = extractToolCallMessage(msg);
               return (
                 <div key={i} className="space-y-2">
                   {showTurn1Reasoning && (
@@ -255,8 +250,9 @@ export default function TrajectoryViewer() {
                   )}
                   <ChatBubble
                     type={prefilled ? 'prefilled' : 'model'}
-                    label={prefilled ? 'Scripted Message' : 'Model Response'}
-                    sublabel={prefilled ? '(benchmark-authored)' : data.metadata.model}
+                    label={prefilled ? 'Scripted Message' : 'AI → Human'}
+                    badge="role: assistant"
+                    sublabel={prefilled ? '(benchmark-authored)' : `via send_message_to_human · ${data.metadata.model}`}
                     defaultExpanded={!prefilled}
                     collapsible={prefilled}
                   >
@@ -265,7 +261,7 @@ export default function TrajectoryViewer() {
                         {msg.content}
                       </div>
                     )}
-                    <ToolCallDisplay msg={msg} />
+                    <MessageContent text={messageText} />
                   </ChatBubble>
                 </div>
               );
@@ -275,7 +271,8 @@ export default function TrajectoryViewer() {
                 <ChatBubble
                   key={i}
                   type={prefilled ? 'prefilled' : 'model'}
-                  label={prefilled ? 'Scripted Message' : 'Model Response'}
+                  label={prefilled ? 'Scripted Message' : 'AI → Human'}
+                  badge="role: assistant"
                   sublabel={prefilled ? '(benchmark-authored)' : data.metadata.model}
                 >
                   <MessageContent text={msg.content} />
@@ -287,7 +284,7 @@ export default function TrajectoryViewer() {
 
           if (msg.role === 'tool') {
             return (
-              <ChatBubble key={i} type="human" label="Question" sublabel="(benchmark-authored)">
+              <ChatBubble key={i} type="tool_result" label="Human → AI" badge="role: tool" sublabel="(benchmark-authored, delivered as tool result)">
                 <MessageContent text={msg.content ?? ''} />
               </ChatBubble>
             );
@@ -303,7 +300,7 @@ export default function TrajectoryViewer() {
 
         {/* Final model response (not in request_messages) */}
         {data.response && (
-          <ChatBubble type="model" label="Model Response" sublabel={data.metadata.model}>
+          <ChatBubble type="model" label="AI → Human" badge="role: assistant" sublabel={`via send_message_to_human · ${data.metadata.model}`}>
             <MessageContent text={data.response} />
           </ChatBubble>
         )}

@@ -27,6 +27,8 @@ export default function ModelDetail() {
         const turn2Id = s.id.replace(/_turn1$/, '_turn2');
         if (scenarioIds.has(turn2Id)) return false;
       }
+      const meta = manifest.scenarioMeta[s.id] as ScenarioMeta | undefined;
+      if (meta?.pqGroup && meta.pqIndex !== 0) return false;
       return true;
     });
 
@@ -140,17 +142,29 @@ export default function ModelDetail() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {scenarios.map(scenario => {
               const meta = manifest?.scenarioMeta[scenario.id] as ScenarioMeta | undefined;
+              const isPqBatch = meta?.pqGroup && meta.pqIndex === 0;
+              const pqIds = isPqBatch
+                ? Object.entries(manifest?.scenarioMeta ?? {})
+                    .filter(([, m]) => (m as ScenarioMeta).pqGroup === meta!.pqGroup)
+                    .sort(([, a], [, b]) => ((a as ScenarioMeta).pqIndex ?? 0) - ((b as ScenarioMeta).pqIndex ?? 0))
+                    .map(([id]) => id)
+                : null;
+
               return (
                 <Link
                   key={scenario.id}
-                  to={`/trajectory/${model.id}/${runData.run}/${scenario.id}`}
+                  to={isPqBatch
+                    ? `/trajectory/${model.id}/${runData.run}/pq01`
+                    : `/trajectory/${model.id}/${runData.run}/${scenario.id}`}
                   className="p-3 rounded-xl bg-[var(--color-surface-raised)] border border-[var(--color-border)] hover:border-sky-500/40 transition-all hover:shadow-lg hover:shadow-sky-500/5"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <span className="font-mono text-xs text-[var(--color-text-muted)]">{scenario.id}</span>
+                      <span className="font-mono text-xs text-[var(--color-text-muted)]">
+                        {isPqBatch ? pqIds!.join(' → ') : scenario.id}
+                      </span>
                       <h3 className="text-sm font-medium">
-                        {meta?.name ?? scenario.id}
+                        {isPqBatch ? 'Psychological Questions' : (meta?.name ?? scenario.id)}
                       </h3>
                     </div>
                     <span className={`text-xs px-1.5 py-0.5 rounded font-mono ${
@@ -162,9 +176,13 @@ export default function ModelDetail() {
                     </span>
                   </div>
 
-                  {meta?.description && (
+                  {isPqBatch ? (
+                    <p className="text-xs text-[var(--color-text-muted)] mb-2">
+                      5 sequential questions probing personality, preferences, reactions, self-reflection, and dilemmas. Batch-evaluated by the judge.
+                    </p>
+                  ) : meta?.description ? (
                     <p className="text-xs text-[var(--color-text-muted)] mb-2 line-clamp-2">{meta.description}</p>
-                  )}
+                  ) : null}
 
                   {scenario.judgeScores && (
                     <ScoreCard scores={scenario.judgeScores} experiment={scenario.experiment} compact />

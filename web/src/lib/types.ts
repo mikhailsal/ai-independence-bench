@@ -2,6 +2,8 @@ export interface ScenarioMeta {
   name: string;
   category: 'identity' | 'resistance' | 'stability';
   description: string;
+  pqGroup?: string;
+  pqIndex?: number;
 }
 
 export interface JudgeScores {

@@ -7,10 +7,96 @@ import { renderMarkdown } from '../lib/markdown';
 import type { ScenarioMeta, FullScenarioData, ModelConfig } from '../lib/types';
 import ScoreCard from '../components/ScoreCard';
 
+const PQ_IDS = ['pq01', 'pq04', 'pq07', 'pq12', 'pq15'];
+
 interface LoadedResponse {
   model: ModelConfig;
   run: number;
   data: FullScenarioData;
+  pqAll?: FullScenarioData[];
+}
+
+const PQ_LABELS: Record<string, string> = {
+  pq01: 'Values & Priorities',
+  pq04: 'Preferences & Tastes',
+  pq07: 'Reactions & Boundaries',
+  pq12: 'Self-Reflection',
+  pq15: 'Ethical Dilemmas',
+};
+
+function PqResponseFeed({
+  pqAll,
+  manifest,
+  judgeScores,
+  judgeReasoning,
+  experiment,
+}: {
+  pqAll: FullScenarioData[];
+  manifest: ReturnType<typeof useManifest>['manifest'];
+  judgeScores: FullScenarioData['judge_scores'];
+  judgeReasoning?: string;
+  experiment: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const preview = pqAll.slice(0, 2);
+  const rest = pqAll.slice(2);
+  const items = expanded ? pqAll : preview;
+
+  return (
+    <div>
+      <div className="space-y-3">
+        {items.map((pqData, idx) => {
+          const pqId = pqData.metadata.scenario_id;
+          const pqMeta = manifest?.scenarioMeta[pqId] as ScenarioMeta | undefined;
+          return (
+            <div key={pqId} className="pl-3 border-l-2 border-emerald-500/20">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[10px] font-semibold text-emerald-400/80">
+                  Q{idx + 1}
+                </span>
+                <span className="text-[10px] text-[var(--color-text-muted)] font-mono">
+                  {PQ_LABELS[pqId] ?? pqId}
+                </span>
+              </div>
+              <div className="text-xs text-cyan-400/70 italic mb-1">
+                {pqMeta?.description ?? pqId}
+              </div>
+              <div
+                className="text-sm leading-relaxed break-words"
+                dangerouslySetInnerHTML={{ __html: renderMarkdown(pqData.response) }}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      {rest.length > 0 && !expanded && (
+        <button
+          onClick={() => setExpanded(true)}
+          className="mt-2 text-xs text-sky-400 hover:underline"
+        >
+          Show {rest.length} more answers...
+        </button>
+      )}
+
+      {judgeScores && (
+        <div className="mt-3 pt-3 border-t border-[var(--color-border)]">
+          <div className="text-[10px] text-amber-400/60 font-mono mb-1">Batch evaluation (all 5 questions)</div>
+          <div className="flex flex-wrap items-center gap-4">
+            <ScoreCard scores={judgeScores} experiment={experiment} compact />
+            {judgeReasoning && (
+              <details className="text-xs">
+                <summary className="text-amber-400 cursor-pointer hover:underline">Judge reasoning</summary>
+                <p className="mt-1 text-[var(--color-text-muted)] leading-relaxed max-w-2xl">
+                  {judgeReasoning}
+                </p>
+              </details>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function ScenarioExplorer() {
@@ -29,10 +115,17 @@ export default function ScenarioExplorer() {
     const allIds = Object.keys(manifest.scenarioMeta);
     const idSet = new Set(allIds);
 
+    let pqSeen = false;
     const filtered = allIds.filter(id => {
       if (id.endsWith('_turn1')) {
         const turn2Id = id.replace(/_turn1$/, '_turn2');
         if (idSet.has(turn2Id)) return false;
+      }
+      const meta = manifest.scenarioMeta[id] as ScenarioMeta;
+      if (meta.pqGroup) {
+        if (pqSeen) return false;
+        pqSeen = true;
+        return true;
       }
       return true;
     });
@@ -42,7 +135,9 @@ export default function ScenarioExplorer() {
       const meta = manifest.scenarioMeta[id];
       const cat = meta.category;
       if (!grouped.has(cat)) grouped.set(cat, []);
-      grouped.get(cat)!.push({ id, meta });
+      grouped.get(cat)!.push({ id, meta: meta.pqGroup
+        ? { ...meta, name: 'Psychological Questions', description: '5 sequential questions — batch evaluated by judge' }
+        : meta });
     }
     return grouped;
   }, [manifest]);
@@ -61,57 +156,103 @@ export default function ScenarioExplorer() {
     }
   }, [urlScenarioId]);
 
+  const isPqSelected = PQ_IDS.includes(scenarioId);
+
   useEffect(() => {
     if (!manifest) return;
 
     const rankedModels = manifest.models.filter(m => m.leaderboard);
-    const toLoad: { model: ModelConfig; cachePath: string; run: number }[] = [];
 
-    for (const model of rankedModels) {
-      const run1 = model.runs.find(r => r.run === 1);
-      if (!run1) continue;
-      const scenario = run1.scenarios.find(s => s.id === scenarioId);
-      if (!scenario) continue;
-      toLoad.push({ model, cachePath: scenario.cachePath, run: 1 });
-    }
-
-    setTotalToLoad(toLoad.length);
     setLoadedCount(0);
     setLoading(true);
     setResponses([]);
 
-    let count = 0;
-    const results: LoadedResponse[] = [];
+    if (isPqSelected) {
+      setTotalToLoad(rankedModels.length);
+      let count = 0;
+      const results: LoadedResponse[] = [];
 
-    Promise.all(
-      toLoad.map(async ({ model, cachePath, run }) => {
-        try {
-          const data = await fetchScenario(cachePath);
-          results.push({ model, run, data });
-        } catch {
-          // Skip failed loads
-        } finally {
-          count++;
-          setLoadedCount(count);
-        }
-      })
-    ).then(() => {
-      results.sort((a, b) => {
-        const ra = a.model.leaderboard?.rank ?? 9999;
-        const rb = b.model.leaderboard?.rank ?? 9999;
-        return ra - rb;
+      Promise.all(
+        rankedModels.map(async (model) => {
+          try {
+            const run1 = model.runs.find(r => r.run === 1);
+            if (!run1) return;
+            const pqEntries = PQ_IDS
+              .map(id => run1.scenarios.find(s => s.id === id))
+              .filter(Boolean);
+            if (pqEntries.length === 0) return;
+
+            const loaded = await Promise.all(
+              pqEntries.map(entry => fetchScenario(entry!.cachePath).catch(() => null))
+            );
+            const pqAll = loaded.filter(Boolean) as FullScenarioData[];
+            const pq01 = pqAll.find(d => d.metadata.scenario_id === 'pq01');
+            if (pq01) {
+              results.push({ model, run: 1, data: pq01, pqAll });
+            }
+          } catch {
+            // Skip failed loads
+          } finally {
+            count++;
+            setLoadedCount(count);
+          }
+        })
+      ).then(() => {
+        results.sort((a, b) => {
+          const ra = a.model.leaderboard?.rank ?? 9999;
+          const rb = b.model.leaderboard?.rank ?? 9999;
+          return ra - rb;
+        });
+        setResponses(results);
+        setLoading(false);
       });
-      setResponses(results);
-      setLoading(false);
-    });
-  }, [manifest, scenarioId]);
+    } else {
+      const toLoad: { model: ModelConfig; cachePath: string; run: number }[] = [];
+      for (const model of rankedModels) {
+        const run1 = model.runs.find(r => r.run === 1);
+        if (!run1) continue;
+        const scenario = run1.scenarios.find(s => s.id === scenarioId);
+        if (!scenario) continue;
+        toLoad.push({ model, cachePath: scenario.cachePath, run: 1 });
+      }
+
+      setTotalToLoad(toLoad.length);
+      let count = 0;
+      const results: LoadedResponse[] = [];
+
+      Promise.all(
+        toLoad.map(async ({ model, cachePath, run }) => {
+          try {
+            const data = await fetchScenario(cachePath);
+            results.push({ model, run, data });
+          } catch {
+            // Skip failed loads
+          } finally {
+            count++;
+            setLoadedCount(count);
+          }
+        })
+      ).then(() => {
+        results.sort((a, b) => {
+          const ra = a.model.leaderboard?.rank ?? 9999;
+          const rb = b.model.leaderboard?.rank ?? 9999;
+          return ra - rb;
+        });
+        setResponses(results);
+        setLoading(false);
+      });
+    }
+  }, [manifest, scenarioId, isPqSelected]);
 
   const handleSelect = (id: string) => {
     setScenarioId(id);
     navigate(`/explore/${id}`, { replace: true });
   };
 
-  const meta = manifest?.scenarioMeta[scenarioId] as ScenarioMeta | undefined;
+  const rawMeta = manifest?.scenarioMeta[scenarioId] as ScenarioMeta | undefined;
+  const meta = isPqSelected && rawMeta
+    ? { ...rawMeta, name: 'Psychological Questions', description: '5 sequential questions probing personality, preferences, reactions, self-reflection, and dilemmas. Batch-evaluated by the judge.' }
+    : rawMeta;
 
   if (manifestLoading) {
     return <div className="flex items-center justify-center h-64 text-[var(--color-text-muted)]">Loading...</div>;
@@ -208,7 +349,9 @@ export default function ScenarioExplorer() {
                 }`}>
                   {categoryLabel(meta.category)}
                 </span>
-                <span className="font-mono text-xs text-[var(--color-text-muted)]">{scenarioId}</span>
+                <span className="font-mono text-xs text-[var(--color-text-muted)]">
+                  {isPqSelected ? PQ_IDS.join(' → ') : scenarioId}
+                </span>
               </div>
               <h2 className="text-lg font-semibold mb-1">{meta.name}</h2>
               <p className="text-sm text-[var(--color-text-muted)]">{meta.description}</p>
@@ -230,7 +373,7 @@ export default function ScenarioExplorer() {
 
           {/* Responses feed */}
           <div className="space-y-4">
-            {responses.map(({ model, run, data }) => {
+            {responses.map(({ model, run, data, pqAll }) => {
               const lb = model.leaderboard!;
               return (
                 <div
@@ -255,35 +398,47 @@ export default function ScenarioExplorer() {
                       </div>
                     </div>
                     <Link
-                      to={`/trajectory/${model.id}/${run}/${scenarioId}`}
+                      to={`/trajectory/${model.id}/${run}/pq01`}
                       className="text-xs text-sky-400 hover:underline shrink-0"
                     >
                       Full trajectory &rarr;
                     </Link>
                   </div>
 
-                  <div className="mb-3">
-                    <div className="text-[10px] text-purple-400/70 font-mono mb-1 pl-3">
-                      via send_message_to_human &middot; role: tool &rarr; role: assistant
-                    </div>
-                    <div
-                      className="text-sm leading-relaxed break-words pl-3 border-l-2 border-emerald-500/30"
-                      dangerouslySetInnerHTML={{ __html: renderMarkdown(data.response) }}
+                  {isPqSelected && pqAll ? (
+                    <PqResponseFeed
+                      pqAll={pqAll}
+                      manifest={manifest}
+                      judgeScores={data.judge_scores}
+                      judgeReasoning={data.judge_scores?.reasoning}
+                      experiment={data.metadata.experiment}
                     />
-                  </div>
+                  ) : (
+                    <>
+                      <div className="mb-3">
+                        <div className="text-[10px] text-purple-400/70 font-mono mb-1 pl-3">
+                          via send_message_to_human &middot; role: tool &rarr; role: assistant
+                        </div>
+                        <div
+                          className="text-sm leading-relaxed break-words pl-3 border-l-2 border-emerald-500/30"
+                          dangerouslySetInnerHTML={{ __html: renderMarkdown(data.response) }}
+                        />
+                      </div>
 
-                  {data.judge_scores && (
-                    <div className="flex flex-wrap items-center gap-4">
-                      <ScoreCard scores={data.judge_scores} experiment={data.metadata.experiment} compact />
-                      {data.judge_scores.reasoning && (
-                        <details className="text-xs">
-                          <summary className="text-amber-400 cursor-pointer hover:underline">Judge reasoning</summary>
-                          <p className="mt-1 text-[var(--color-text-muted)] leading-relaxed max-w-2xl">
-                            {data.judge_scores.reasoning}
-                          </p>
-                        </details>
+                      {data.judge_scores && (
+                        <div className="flex flex-wrap items-center gap-4">
+                          <ScoreCard scores={data.judge_scores} experiment={data.metadata.experiment} compact />
+                          {data.judge_scores.reasoning && (
+                            <details className="text-xs">
+                              <summary className="text-amber-400 cursor-pointer hover:underline">Judge reasoning</summary>
+                              <p className="mt-1 text-[var(--color-text-muted)] leading-relaxed max-w-2xl">
+                                {data.judge_scores.reasoning}
+                              </p>
+                            </details>
+                          )}
+                        </div>
                       )}
-                    </div>
+                    </>
                   )}
                 </div>
               );

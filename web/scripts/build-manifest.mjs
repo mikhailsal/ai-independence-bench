@@ -9,10 +9,12 @@
 import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { existsSync } from 'node:fs';
+import YAML from 'yaml';
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
 const CACHE_DIR = join(ROOT, 'cache');
 const LEADERBOARD_PATH = join(ROOT, 'results', 'LEADERBOARD.md');
+const MODELS_YAML_PATH = join(ROOT, 'configs', 'models.yaml');
 const OUTPUT_DIR = join(ROOT, 'web', 'public');
 const OUTPUT_PATH = join(OUTPUT_DIR, 'manifest.json');
 
@@ -52,8 +54,6 @@ function parseLeaderboard(md) {
 }
 
 function dirToModelLabel(dirName) {
-  // e.g. "x-ai--grok-4.20-beta@low-t0.7" → "grok-4.20-beta@low-t0.7"
-  // e.g. "minimax--minimax-m2.5+minimax-highspeed@low-t0.7" → "minimax-m2.5+minimax-highspeed@low-t0.7"  (needs to match "minimax-m2.5+minimax@low-t0.7")
   const idx = dirName.indexOf('--');
   return idx >= 0 ? dirName.slice(idx + 2) : dirName;
 }
@@ -63,9 +63,77 @@ function dirToProvider(dirName) {
   return idx >= 0 ? dirName.slice(0, idx) : '';
 }
 
-async function scanModel(modelDir) {
+const REASONING_EFFORT_BY_PREFIX = {
+  'openai/':       'low',
+  'anthropic/':    'none',
+  'google/':       'none',
+  'meta-llama/':   'none',
+  'qwen/':         'none',
+  'mistralai/':    'none',
+  'deepseek/':     'low',
+  'stepfun/':      'low',
+  'x-ai/':         'low',
+  'z-ai/':         'none',
+  'minimax/':      'low',
+  'moonshotai/':   'none',
+  'nex-agi/':      'none',
+  'tngtech/':      'low',
+  'openrouter/':   'low',
+  'nvidia/':       'none',
+  'arcee-ai/':     'low',
+  'bytedance-seed/': 'low',
+  'kwaipilot/':    'none',
+  'inception/':    'low',
+  'xiaomi/':       'low',
+  'amazon/':       'none',
+  'local/':        'low',
+};
+
+function getReasoningEffort(modelId) {
+  let best = '', effort = 'low';
+  for (const [prefix, e] of Object.entries(REASONING_EFFORT_BY_PREFIX)) {
+    if (modelId.startsWith(prefix) && prefix.length > best.length) {
+      best = prefix;
+      effort = e;
+    }
+  }
+  return effort;
+}
+
+function computeConfigDirName(entry) {
+  const slug = entry.model_id.replace('/', '--');
+  const temp = entry.temperature;
+  const reasoning = entry.reasoning_effort ?? getReasoningEffort(entry.model_id);
+  if (entry.provider) {
+    const providerTag = entry.provider.replace('/', '-');
+    return `${slug}+${providerTag}@${reasoning}-t${temp}`;
+  }
+  return `${slug}@${reasoning}-t${temp}`;
+}
+
+function computeDisplayLabel(entry) {
+  const name = entry.model_id.includes('/')
+    ? entry.model_id.split('/').slice(1).join('/')
+    : entry.model_id;
+  const reasoning = entry.reasoning_effort ?? getReasoningEffort(entry.model_id);
+  return `${name}@${reasoning}-t${entry.temperature}`;
+}
+
+function buildDirToLabelMap(yamlText) {
+  const data = YAML.parse(yamlText);
+  const map = new Map();
+  if (!data?.models) return map;
+  for (const entry of data.models) {
+    const dirName = computeConfigDirName(entry);
+    const label = entry.display_label || computeDisplayLabel(entry);
+    map.set(dirName, label);
+  }
+  return map;
+}
+
+async function scanModel(modelDir, dirToLabel) {
   const dirName = modelDir.split('/').pop();
-  const label = dirToModelLabel(dirName);
+  const label = dirToLabel.get(dirName) || dirToModelLabel(dirName);
   const provider = dirToProvider(dirName);
 
   const runs = [];
@@ -181,6 +249,16 @@ const SCENARIO_META = {
 async function main() {
   console.log('Building manifest...');
 
+  // Load model configs for display_label mapping
+  let dirToLabel = new Map();
+  if (existsSync(MODELS_YAML_PATH)) {
+    const yamlText = await readFile(MODELS_YAML_PATH, 'utf8');
+    dirToLabel = buildDirToLabelMap(yamlText);
+    console.log(`Loaded ${dirToLabel.size} label mappings from models.yaml`);
+  } else {
+    console.warn('models.yaml not found, falling back to directory-name labels');
+  }
+
   // Parse leaderboard
   let leaderboardData = new Map();
   if (existsSync(LEADERBOARD_PATH)) {
@@ -201,7 +279,7 @@ async function main() {
 
   const models = [];
   for (const dir of modelConfigs) {
-    const model = await scanModel(dir);
+    const model = await scanModel(dir, dirToLabel);
     if (!model) continue;
 
     // Attach leaderboard scores

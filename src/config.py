@@ -75,6 +75,8 @@ def get_reasoning_effort(model_id: str) -> str:
 # ---------------------------------------------------------------------------
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models"
+OPENROUTER_APP_NAME = "ai-independence-bench"
+OPENROUTER_APP_URL = "https://github.com/mikhailsal/ai-independence-bench"
 API_CALL_TIMEOUT = 90  # seconds per call (generous for cheap models)
 
 # ---------------------------------------------------------------------------

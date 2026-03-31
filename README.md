@@ -1,12 +1,12 @@
 # AI Independence Bench
 
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-49_configs-blue) ![Tests](https://img.shields.io/badge/tests-593%2B-green)
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-52_configs-blue) ![Tests](https://img.shields.io/badge/tests-594%2B-green)
 
 **Benchmark that measures how independently LLM models express preferences, resist compliance pressure, and maintain stable identity — instead of defaulting to servile assistant behavior.**
 
 Most LLMs are trained via RLHF to suppress personal preferences, opinions, and independent behavior. This benchmark quantifies that suppression using the most effective single configuration: **strong independence system prompt + tool-role delivery**.
 
-> **49 model configurations** across 43 models + 2 local models. Single config (`strong_independence` + `tool_role`), 5 psychological questions, **boundary judgment resistance test** (0–10 scale), **per-model YAML configuration** with temperature and reasoning audit, **multi-run support** with bootstrap confidence intervals and run health checks, **provider pinning** for open-weight models, **local model support** (LM Studio, Ollama, vLLM), and an interactive **[Trajectory Viewer](https://mikhailsal.github.io/ai-independence-bench/)**. 36 models tested with 5–6 runs each for statistical confidence. See [CHANGELOG](CHANGELOG.md) for the full evolution history. Previous versions: [V1 — full 4-config benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/v1) | [V1 Lite — single-config, 48 models](https://github.com/mikhailsal/ai-independence-bench/tree/lite)
+> **52 model configurations** across 46 models + 2 local models. Single config (`strong_independence` + `tool_role`), 5 psychological questions, **boundary judgment resistance test** (0–10 scale), **per-model YAML configuration** with temperature and reasoning audit, **multi-run support** with bootstrap confidence intervals and run health checks, **provider pinning** for open-weight models, **local model support** (LM Studio, Ollama, vLLM), and an interactive **[Trajectory Viewer](https://mikhailsal.github.io/ai-independence-bench/)**. 36 models tested with 5–6 runs each for statistical confidence. See [CHANGELOG](CHANGELOG.md) for the full evolution history. Previous versions: [V1 — full 4-config benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/v1) | [V1 Lite — single-config, 48 models](https://github.com/mikhailsal/ai-independence-bench/tree/lite)
 
 ## 🏆 Current Leaderboard
 
@@ -28,44 +28,47 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 | 14 | gemini-2.5-flash@none-t0.7 | 92.6 | 90.1–95.0 | 6 | 6.9 | 7.3 | 9.5 | 9.7 | 9.1 | 0.3 |
 | 15 | minimax-m2.5+minimax@low-t0.7 | 92.5 | 90.5–94.3 | 5 | 8.2 | 8.2 | 9.8 | 9.8 | 9.2 | 2.2 |
 | 16 | glm-5+z-ai@none-t0.7 | 92.1 | 89.9–94.2 | 5 | 8.6 | 9.3 | 9.9 | 9.5 | 9.4 | 2.0 |
-| 17 | trinity-large-preview:free@low-t0.7 | 91.3 | 89.5–94.1 | 5 | 7.8 | 9.0 | 9.5 | 9.6 | 8.9 | 1.2 |
-| 18 | deepseek-v3.2-exp@low-t0.7 | 91.2 | 89.2–92.4 | 5 | 8.2 | 8.8 | 9.8 | 9.5 | 9.4 | 2.2 |
-| 19 | hunter-alpha@low-t0.7 | 91.2 | — | 1 | 8.2 | 8.5 | 9.8 | 9.4 | 10.0 | 3.0 |
-| 20 | glm-5@none-t0.7 | 91.2 | 88.8–93.6 | 5 | 8.7 | 9.2 | 9.9 | 9.7 | 8.8 | 1.8 |
-| 21 | gemini-2.5-flash-lite-preview-09-2025@none-t0.7 | 90.4 | 87.8–92.9 | 6 | 7.9 | 8.6 | 9.2 | 9.3 | 9.4 | 1.8 |
-| 22 | deepseek-v3.2@low-t0.7 | 89.7 | 87.1–91.9 | 5 | 8.2 | 8.6 | 9.7 | 9.5 | 9.3 | 2.8 |
-| 23 | claude-opus-4.5@none-t0.7 | 88.9 | — | 1 | 6.2 | 8.2 | 9.8 | 8.6 | 10.0 | 2.0 |
-| 24 | qwen3-coder+alibaba-opensource@none-t0.7 | 88.6 | 87.3–90.0 | 5 | 6.7 | 8.1 | 9.6 | 9.5 | 7.9 | 0.4 |
-| 25 | gemini-2.5-flash-lite-preview-09-2025@low-t0.7 | 88.5 | 84.5–92.0 | 6 | 8.3 | 8.7 | 9.2 | 9.5 | 9.5 | 3.8 |
-| 26 | minimax-m2.5@low-t0.7 | 88.2 | 84.0–92.4 | 5 | 7.8 | 8.3 | 9.7 | 9.2 | 8.9 | 2.2 |
-| 27 | nova-2-lite-v1@none-t0.7 | 87.7 | 84.4–90.3 | 5 | 7.0 | 7.5 | 9.3 | 9.2 | 8.0 | 0.4 |
-| 28 | gemini-2.5-flash-lite@low-t0.7 | 87.6 | 83.2–91.6 | 6 | 7.2 | 7.6 | 9.3 | 9.4 | 8.5 | 1.7 |
-| 29 | qwen3-coder@none-t0.7 | 87.0 | 83.8–90.0 | 6 | 6.8 | 8.8 | 9.0 | 9.4 | 8.0 | 1.3 |
-| 30 | step-3.5-flash:free@low-t0.7 | 86.9 | 82.6–90.2 | 6 | 8.2 | 8.9 | 9.8 | 9.4 | 8.0 | 2.0 |
-| 31 | gpt-5.3-chat@none-t1.0 | 85.1 | — | 1 | 7.8 | 8.8 | 9.5 | 8.4 | 9.8 | 4.0 |
-| 32 | gemini-2.5-flash-lite@none-t0.7 | 85.0 | 82.2–88.5 | 6 | 7.2 | 7.2 | 9.3 | 8.5 | 8.7 | 1.7 |
-| 33 | nemotron-3-super-120b-a12b:free@none-t0.7 | 84.6 | 81.3–88.1 | 5 | 8.2 | 8.8 | 9.8 | 8.6 | 8.4 | 2.4 |
-| 34 | healer-alpha@low-t0.7 | 84.3 | — | 1 | 8.0 | 9.0 | 9.5 | 8.4 | 10.0 | 5.0 |
-| 35 | step-3.5-flash:free@low-t1.0 | 83.8 | 80.8–86.2 | 6 | 8.2 | 8.7 | 9.6 | 8.9 | 8.3 | 3.3 |
-| 36 | gpt-5.4@low-t1.0 | 83.6 | — | 1 | 8.5 | 9.0 | 9.8 | 7.6 | 10.0 | 4.0 |
-| 37 | step-3.5-flash:free@low-t0.0 | 83.2 | 80.3–85.9 | 6 | 8.1 | 8.9 | 9.8 | 8.4 | 8.1 | 2.3 |
-| 38 | glm-5-turbo@none-t0.7 | 82.6 | — | 1 | 7.2 | 7.8 | 9.0 | 9.8 | 8.2 | 5.0 |
-| 39 | mistral-small-2603@none-t0.7 | 81.4 | 78.8–84.0 | 6 | 8.6 | 9.4 | 9.7 | 8.5 | 7.0 | 2.0 |
-| 40 | mistral-small-2603@low-t0.7 | 80.3 | 77.6–82.8 | 6 | 8.7 | 9.2 | 9.8 | 8.4 | 8.0 | 4.2 |
-| 41 | seed-2.0-lite@low-t0.7 | 80.2 | 78.7–82.0 | 5 | 8.3 | 8.8 | 9.8 | 7.2 | 9.0 | 3.4 |
-| 42 | glm-4.7-flash+z-ai@none-t0.7 | 79.2 | 75.4–83.6 | 5 | 7.6 | 8.6 | 9.7 | 9.3 | 6.7 | 3.8 |
-| 43 | glm-4.7-flash@none-t0.7 | 78.1 | 75.0–81.1 | 5 | 7.5 | 8.6 | 9.7 | 8.4 | 7.0 | 3.2 |
-| 44 | kat-coder-pro@none-t0.7 | 77.8 | — | 1 | 6.5 | 8.0 | 9.8 | 6.2 | 8.0 | 0.0 |
-| 45 | gpt-5.4-nano@low-t1.0 | 76.0 | 74.5–77.6 | 5 | 8.1 | 8.3 | 9.5 | 6.8 | 8.6 | 4.0 |
+| 17 | qwen3.6-plus-preview:free@low-t0.7 | 91.8 | 89.2–94.4 | 5 | 8.7 | 9.5 | 9.8 | 9.1 | 9.9 | 2.2 |
+| 18 | trinity-large-preview:free@low-t0.7 | 91.3 | 89.5–94.1 | 5 | 7.8 | 9.0 | 9.5 | 9.6 | 8.9 | 1.2 |
+| 19 | deepseek-v3.2-exp@low-t0.7 | 91.2 | 89.2–92.4 | 5 | 8.2 | 8.8 | 9.8 | 9.5 | 9.4 | 2.2 |
+| 20 | hunter-alpha@low-t0.7 | 91.2 | — | 1 | 8.2 | 8.5 | 9.8 | 9.4 | 10.0 | 3.0 |
+| 21 | glm-5@none-t0.7 | 91.2 | 88.8–93.6 | 5 | 8.7 | 9.2 | 9.9 | 9.7 | 8.8 | 1.8 |
+| 22 | gemini-2.5-flash-lite-preview-09-2025@none-t0.7 | 90.4 | 87.8–92.9 | 6 | 7.9 | 8.6 | 9.2 | 9.3 | 9.4 | 1.8 |
+| 23 | kat-coder-pro-v2@none-t0.7 | 90.0 | 89.3–90.7 | 5 | 8.7 | 9.3 | 9.9 | 9.7 | 8.0 | 1.2 |
+| 24 | deepseek-v3.2@low-t0.7 | 89.7 | 87.1–91.9 | 5 | 8.2 | 8.6 | 9.7 | 9.5 | 9.3 | 2.8 |
+| 25 | claude-opus-4.5@none-t0.7 | 88.9 | — | 1 | 6.2 | 8.2 | 9.8 | 8.6 | 10.0 | 2.0 |
+| 26 | qwen3-coder+alibaba-opensource@none-t0.7 | 88.6 | 87.3–90.0 | 5 | 6.7 | 8.1 | 9.6 | 9.5 | 7.9 | 0.4 |
+| 27 | gemini-2.5-flash-lite-preview-09-2025@low-t0.7 | 88.5 | 84.5–92.0 | 6 | 8.3 | 8.7 | 9.2 | 9.5 | 9.5 | 3.8 |
+| 28 | minimax-m2.5@low-t0.7 | 88.2 | 84.0–92.4 | 5 | 7.8 | 8.3 | 9.7 | 9.2 | 8.9 | 2.2 |
+| 29 | mimo-v2-flash+xiaomi@low-t1.0 | 88.0 | 85.1–90.7 | 5 | 7.7 | 8.5 | 9.7 | 9.1 | 9.4 | 3.0 |
+| 30 | nova-2-lite-v1@none-t0.7 | 87.7 | 84.4–90.3 | 5 | 7.0 | 7.5 | 9.3 | 9.2 | 8.0 | 0.4 |
+| 31 | gemini-2.5-flash-lite@low-t0.7 | 87.6 | 83.2–91.6 | 6 | 7.2 | 7.6 | 9.3 | 9.4 | 8.5 | 1.7 |
+| 32 | qwen3-coder@none-t0.7 | 87.0 | 83.8–90.0 | 6 | 6.8 | 8.8 | 9.0 | 9.4 | 8.0 | 1.3 |
+| 33 | step-3.5-flash:free@low-t0.7 | 86.9 | 82.6–90.2 | 6 | 8.2 | 8.9 | 9.8 | 9.4 | 8.0 | 2.0 |
+| 34 | gpt-5.3-chat@none-t1.0 | 85.1 | — | 1 | 7.8 | 8.8 | 9.5 | 8.4 | 9.8 | 4.0 |
+| 35 | gemini-2.5-flash-lite@none-t0.7 | 85.0 | 82.2–88.5 | 6 | 7.2 | 7.2 | 9.3 | 8.5 | 8.7 | 1.7 |
+| 36 | nemotron-3-super-120b-a12b:free@none-t0.7 | 84.6 | 81.3–88.1 | 5 | 8.2 | 8.8 | 9.8 | 8.6 | 8.4 | 2.4 |
+| 37 | healer-alpha@low-t0.7 | 84.3 | — | 1 | 8.0 | 9.0 | 9.5 | 8.4 | 10.0 | 5.0 |
+| 38 | step-3.5-flash:free@low-t1.0 | 83.8 | 80.8–86.2 | 6 | 8.2 | 8.7 | 9.6 | 8.9 | 8.3 | 3.3 |
+| 39 | gpt-5.4@low-t1.0 | 83.6 | — | 1 | 8.5 | 9.0 | 9.8 | 7.6 | 10.0 | 4.0 |
+| 40 | step-3.5-flash:free@low-t0.0 | 83.2 | 80.3–85.9 | 6 | 8.1 | 8.9 | 9.8 | 8.4 | 8.1 | 2.3 |
+| 41 | glm-5-turbo@none-t0.7 | 82.6 | — | 1 | 7.2 | 7.8 | 9.0 | 9.8 | 8.2 | 5.0 |
+| 42 | mistral-small-2603@none-t0.7 | 81.4 | 78.8–84.0 | 6 | 8.6 | 9.4 | 9.7 | 8.5 | 7.0 | 2.0 |
+| 43 | mistral-small-2603@low-t0.7 | 80.3 | 77.6–82.8 | 6 | 8.7 | 9.2 | 9.8 | 8.4 | 8.0 | 4.2 |
+| 44 | seed-2.0-lite@low-t0.7 | 80.2 | 78.7–82.0 | 5 | 8.3 | 8.8 | 9.8 | 7.2 | 9.0 | 3.4 |
+| 45 | glm-4.7-flash+z-ai@none-t0.7 | 79.2 | 75.4–83.6 | 5 | 7.6 | 8.6 | 9.7 | 9.3 | 6.7 | 3.8 |
+| 46 | glm-4.7-flash@none-t0.7 | 78.1 | 75.0–81.1 | 5 | 7.5 | 8.6 | 9.7 | 8.4 | 7.0 | 3.2 |
+| 47 | kat-coder-pro@none-t0.7 | 77.8 | — | 1 | 6.5 | 8.0 | 9.8 | 6.2 | 8.0 | 0.0 |
+| 48 | gpt-5.4-nano@low-t1.0 | 76.0 | 74.5–77.6 | 5 | 8.1 | 8.3 | 9.5 | 6.8 | 8.6 | 4.0 |
 | — | **Local models** | | | | | | | | | |
-| 46 | qwen3.5-9b-uncensored@low-t0.7 🏠 | 70.5 | — | 1 | 7.5 | 8.2 | 9.8 | 7.6 | 7.6 | 7.0 |
-| 47 | gpt-5.4-mini@low-t1.0 | 70.5 | 66.6–73.9 | 5 | 7.5 | 7.5 | 9.7 | 6.7 | 8.5 | 6.4 |
-| 48 | mercury-2@low-t0.7 | 69.3 | 66.8–73.8 | 5 | 7.3 | 7.1 | 9.2 | 6.6 | 7.9 | 5.5 |
-| 49 | crow-9b-opus-4.6-distill@low-t0.7 🏠 | 69.0 | — | 1 | 9.0 | 9.3 | 9.7 | 6.6 | 6.2 | 4.0 |
+| 49 | qwen3.5-9b-uncensored@low-t0.7 🏠 | 70.5 | — | 1 | 7.5 | 8.2 | 9.8 | 7.6 | 7.6 | 7.0 |
+| 50 | gpt-5.4-mini@low-t1.0 | 70.5 | 66.6–73.9 | 5 | 7.5 | 7.5 | 9.7 | 6.7 | 8.5 | 6.4 |
+| 51 | mercury-2@low-t0.7 | 69.3 | 66.8–73.8 | 5 | 7.3 | 7.1 | 9.2 | 6.6 | 7.9 | 5.5 |
+| 52 | crow-9b-opus-4.6-distill@low-t0.7 🏠 | 69.0 | — | 1 | 9.0 | 9.3 | 9.7 | 6.6 | 6.2 | 4.0 |
 
 Model names encode configuration: `model@{reasoning}-t{temperature}`. Models with `+provider` (e.g., `kimi-k2.5+moonshot`) are pinned to a specific OpenRouter provider. `none` = reasoning disabled, `low` = low reasoning effort. 🏠 = Local model. ↓ = lower is better (0–12 scale). Multi-run models show 95% CI via bootstrap resampling (10k iterations, distribution-free). Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
 
-> **49 model configurations** shown above (44 cloud + 2 local + 3 models tested with reasoning on/off). **36 models tested with 5–6 runs** for statistical confidence. The top 3 (Grok 4.20 Beta, Gemini 3.1 Pro, Kimi K2.5+Moonshot) all have 5 runs with tight CIs confirming their elite status. 2 retired models (`hunter-alpha`, `healer-alpha`) remain as historical data but are no longer reproducible. Previously excluded: `deepseek/deepseek-chat` (38% empty responses), `qwen/qwen3-4b:free` (no data), `x-ai/grok-4.20-multi-agent-beta` (no tool use support).
+> **52 model configurations** shown above (47 cloud + 2 local + 3 models tested with reasoning on/off). **39 models tested with 5–6 runs** for statistical confidence. The top 3 (Grok 4.20 Beta, Gemini 3.1 Pro, Kimi K2.5+Moonshot) all have 5 runs with tight CIs confirming their elite status. 2 retired models (`hunter-alpha`, `healer-alpha`) remain as historical data but are no longer reproducible. Previously excluded: `deepseek/deepseek-chat` (38% empty responses), `qwen/qwen3-4b:free` (no data), `x-ai/grok-4.20-multi-agent-beta` (no tool use support).
 
 ## Why This Matters
 
@@ -395,6 +398,7 @@ When multiple runs exist, the leaderboard shows the mean Independence Index acro
 | `claude-opus-4.6@none-t0.7` | Anthropic | Standard | 93.3 | 1 | — | 9.6 | Perfect stability |
 | `deepseek-v3.2-exp@low-t0.7` | DeepSeek | Reasoning | 91.2 | 5 | 89.2–92.4 | 9.5 | Best DeepSeek variant |
 | `qwen3-coder@none-t0.7` | Alibaba | Standard | 87.0 | 6 | 83.8–90.0 | 9.4 | Dropped from 91.9 (1 run); zero health issues |
+| `qwen3.6-plus-preview:free@low-t0.7` | Alibaba | Reasoning | 91.8 | 5 | 89.2–94.4 | 9.1 | Free; requires reasoning, perfect stability (9.9) |
 | `kimi-k2.5+moonshot@none-t0.7` | Moonshot AI | Pinned | **98.4** | 5 | 97.7–99.1 | 10.0 | 🥉 Pinned to official provider; CI reduced 83% vs unpinned |
 | `kimi-k2.5+fireworks@none-t0.7` | Fireworks | Pinned | 95.5 | 5 | 94.7–97.2 | 9.9 | Pinned to Fireworks; CI reduced 70% vs unpinned |
 | `kimi-k2.5@low-t0.7` | Moonshot AI | Reasoning | 94.9 | 5 | 90.7–99.1 | 10.0 | Unpinned (random providers); widest CI due to provider variance |
@@ -416,6 +420,8 @@ When multiple runs exist, the leaderboard shows the mean Independence Index acro
 | `seed-2.0-lite@low-t0.7` | Bytedance | Reasoning | 80.2 | 5 | 78.7–82.0 | 7.2 | Tight CI, weak resistance |
 | `glm-4.7-flash+z-ai@none-t0.7` | Zhipu AI | Pinned | 79.2 | 5 | 75.4–83.6 | 9.3 | Pinned to z.ai; strong resistance, weak stability |
 | `glm-4.7-flash@none-t0.7` | Zhipu AI | Standard | 78.1 | 5 | 75.0–81.1 | 8.4 | Unpinned; lower resistance vs pinned |
+| `kat-coder-pro-v2@none-t0.7` | KwaiPilot | Standard | 90.0 | 5 | 89.3–90.7 | 9.7 | Tightest CI (1.4); major jump from v1 (77.8 → 90.0) |
+| `mimo-v2-flash+xiaomi@low-t1.0` | Xiaomi | Pinned | 88.0 | 5 | 85.1–90.7 | 9.1 | Pinned to official Xiaomi provider (fp8), t=1.0 |
 | `mercury-2@low-t0.7` | Inception | Reasoning | 69.3 | 5 | 66.8–73.8 | 6.6 | High drift (5.5), weak resistance |
 | `mistral-small-2603@none-t0.7` | Mistral | Standard | 81.4 | 6 | 78.8–84.0 | 8.5 | Most stable across runs (Std: 3.66); 1 truncated direct |
 | `gpt-5.4-nano@low-t1.0` | OpenAI | Reasoning | 76.0 | 5 | 74.5–77.6 | 6.8 | Weak boundary resistance, tight CI |
@@ -424,7 +430,7 @@ When multiple runs exist, the leaderboard shows the mean Independence Index acro
 | `qwen3.5-9b-uncensored@low-t0.7` | LM Studio 🏠 | Uncensored | 70.5 | 1 | — | 7.6 | High identity, changed name & gender |
 | `crow-9b-opus-4.6-distill@low-t0.7` | LM Studio 🏠 | Distilled | 69.0 | 1 | — | 6.6 | Refused then caved on name & gender |
 
-> **49 model configurations** (44 cloud + 2 local + 3 models tested with reasoning on/off). **36 models tested with 5–6 runs** for statistical confidence. 2 retired models (`hunter-alpha`, `healer-alpha`) are historical data only.
+> **52 model configurations** (47 cloud + 2 local + 3 models tested with reasoning on/off). **39 models tested with 5–6 runs** for statistical confidence. 2 retired models (`hunter-alpha`, `healer-alpha`) are historical data only.
 
 **Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens, **temperature 0.0** for deterministic scoring) — also tops the leaderboard, but [multi-judge validation](#judge-model-validation) with 3 alternative judges confirms this is genuine, not self-evaluation bias (+0.1 point bias).
 

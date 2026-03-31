@@ -89,6 +89,14 @@ class TestOpenRouterClientInit:
             client = OpenRouterClient(api_key="test-key")
             assert client._pricing_cache == {}
 
+    def test_passes_app_identification_headers(self) -> None:
+        with patch("src.openrouter_client.OpenAI") as mock_openai:
+            OpenRouterClient(api_key="test-key")
+            call_kwargs = mock_openai.call_args[1]
+            headers = call_kwargs["default_headers"]
+            assert headers["X-Title"] == "ai-independence-bench"
+            assert "github.com" in headers["HTTP-Referer"]
+
 
 # ---------------------------------------------------------------------------
 # fetch_pricing

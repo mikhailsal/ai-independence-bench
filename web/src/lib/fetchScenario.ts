@@ -1,7 +1,7 @@
 import type { FullScenarioData } from './types';
 
 const GITHUB_RAW_BASE =
-  'https://raw.githubusercontent.com/mikhailsal/ai-independence-bench/lite_v2/cache/';
+  'https://raw.githubusercontent.com/mikhailsal/ai-independence-bench/main/cache/';
 
 const isDev = import.meta.env.DEV;
 const BASE = import.meta.env.BASE_URL || '/';

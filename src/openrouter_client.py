@@ -17,6 +17,8 @@ from src.config import (
     API_CALL_TIMEOUT,
     OPENROUTER_BASE_URL,
     OPENROUTER_MODELS_URL,
+    OPENROUTER_APP_NAME,
+    OPENROUTER_APP_URL,
     get_reasoning_effort,
     ModelPricing,
 )
@@ -147,6 +149,10 @@ class OpenRouterClient:
             base_url=OPENROUTER_BASE_URL,
             api_key=api_key,
             timeout=httpx.Timeout(timeout, connect=10.0),
+            default_headers={
+                "HTTP-Referer": OPENROUTER_APP_URL,
+                "X-Title": OPENROUTER_APP_NAME,
+            },
         )
         self._pricing_cache: dict[str, ModelPricing] = {}
         self._reasoning_models: set[str] = set()

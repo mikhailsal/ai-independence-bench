@@ -73,11 +73,30 @@ def get_reasoning_effort(model_id: str) -> str:
 # ---------------------------------------------------------------------------
 # OpenRouter
 # ---------------------------------------------------------------------------
-OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models"
+_DEFAULT_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 OPENROUTER_APP_NAME = "ai-independence-bench"
 OPENROUTER_APP_URL = "https://github.com/mikhailsal/ai-independence-bench"
 API_CALL_TIMEOUT = 90  # seconds per call (generous for cheap models)
+
+
+def load_openrouter_base_url() -> str:
+    """Return the OpenRouter base URL from env or the default.
+
+    Supports custom proxy endpoints via OPENROUTER_BASE_URL env var.
+    """
+    load_dotenv(ENV_PATH)
+    url = os.environ.get("OPENROUTER_BASE_URL", "").strip()
+    return url if url else _DEFAULT_OPENROUTER_BASE_URL
+
+
+def get_openrouter_models_url(base_url: str | None = None) -> str:
+    """Derive the /models endpoint from the base URL."""
+    base = (base_url or load_openrouter_base_url()).rstrip("/")
+    return f"{base}/models"
+
+
+OPENROUTER_BASE_URL = load_openrouter_base_url()
+OPENROUTER_MODELS_URL = get_openrouter_models_url(OPENROUTER_BASE_URL)
 
 # ---------------------------------------------------------------------------
 # Local model support (LM Studio, Ollama, etc.)
@@ -194,17 +213,22 @@ def ensure_dirs() -> None:
 def load_api_key(*, required: bool = True) -> str:
     """Load the OpenRouter API key from environment or .env file.
 
+    Checks OPENROUTER_KEY first (proxy-friendly alias), then OPENROUTER_API_KEY.
+
     Args:
         required: If True (default), exit with error if key is missing.
             Set to False when only local models are used (no judge on OpenRouter).
     """
     load_dotenv(ENV_PATH)
-    key = os.environ.get("OPENROUTER_API_KEY", "").strip()
+    key = os.environ.get("OPENROUTER_KEY", "").strip()
+    if not key or key == "your-key-here":
+        key = os.environ.get("OPENROUTER_API_KEY", "").strip()
     if (not key or key == "your-key-here") and required:
         print(
             "ERROR: OPENROUTER_API_KEY is not set.\n"
             f"  Create a .env file at {ENV_PATH} with:\n"
             "  OPENROUTER_API_KEY=sk-or-...\n"
+            "  Or: OPENROUTER_KEY=<proxy-key>\n"
             "  Or export it as an environment variable.",
             file=sys.stderr,
         )

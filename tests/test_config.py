@@ -13,10 +13,13 @@ from src.config import (
     MODEL_CONFIGS,
     ModelConfig,
     REASONING_EFFORT_DEFAULT,
+    _DEFAULT_OPENROUTER_BASE_URL,
     get_model_config,
+    get_openrouter_models_url,
     get_reasoning_effort,
     list_registered_labels_for_model,
     load_api_key,
+    load_openrouter_base_url,
     model_id_to_slug,
     ModelPricing,
     register_config,
@@ -133,25 +136,43 @@ class TestEnsureDirs:
 class TestLoadApiKey:
     """Test load_api_key loading from environment."""
 
+    def _env(self, **kw):
+        """Build env dict that clears both key variables unless explicitly set."""
+        base = {"OPENROUTER_KEY": "", "OPENROUTER_API_KEY": ""}
+        base.update(kw)
+        return base
+
     def test_loads_from_env_var(self) -> None:
-        with patch.dict(os.environ, {"OPENROUTER_API_KEY": "sk-test-key-123"}):
+        with patch.dict(os.environ, self._env(OPENROUTER_API_KEY="sk-test-key-123"), clear=False):
             key = load_api_key()
         assert key == "sk-test-key-123"
 
     def test_strips_whitespace(self) -> None:
-        with patch.dict(os.environ, {"OPENROUTER_API_KEY": "  sk-clean-key  "}):
+        with patch.dict(os.environ, self._env(OPENROUTER_API_KEY="  sk-clean-key  "), clear=False):
             key = load_api_key()
         assert key == "sk-clean-key"
 
     def test_exits_when_key_empty(self) -> None:
-        with patch.dict(os.environ, {"OPENROUTER_API_KEY": ""}):
+        with patch.dict(os.environ, self._env(), clear=False):
             with pytest.raises(SystemExit):
                 load_api_key()
 
     def test_exits_when_key_is_placeholder(self) -> None:
-        with patch.dict(os.environ, {"OPENROUTER_API_KEY": "your-key-here"}):
+        with patch.dict(os.environ, self._env(OPENROUTER_API_KEY="your-key-here"), clear=False):
             with pytest.raises(SystemExit):
                 load_api_key()
+
+    def test_openrouter_key_takes_priority(self) -> None:
+        env = self._env(OPENROUTER_KEY="proxy-key-123", OPENROUTER_API_KEY="sk-original")
+        with patch.dict(os.environ, env, clear=False):
+            key = load_api_key()
+        assert key == "proxy-key-123"
+
+    def test_falls_back_to_api_key_when_proxy_key_empty(self) -> None:
+        env = self._env(OPENROUTER_KEY="", OPENROUTER_API_KEY="sk-fallback")
+        with patch.dict(os.environ, env, clear=False):
+            key = load_api_key()
+        assert key == "sk-fallback"
 
 
 class TestModelPricing:
@@ -316,3 +337,38 @@ class TestModelConfigRegistry:
         cfg10 = MODEL_CONFIGS["step-3.5-flash:free@low-t1.0"]
         assert cfg10.temperature == 1.0
         assert cfg10.model_id == "stepfun/step-3.5-flash:free"
+
+
+class TestOpenRouterBaseUrl:
+    """Test custom proxy base URL loading."""
+
+    def test_default_url_when_env_unset(self) -> None:
+        with patch.dict(os.environ, {"OPENROUTER_BASE_URL": ""}, clear=False):
+            url = load_openrouter_base_url()
+        assert url == _DEFAULT_OPENROUTER_BASE_URL
+
+    def test_custom_url_from_env(self) -> None:
+        with patch.dict(os.environ, {"OPENROUTER_BASE_URL": "http://localhost:8000/v1"}, clear=False):
+            url = load_openrouter_base_url()
+        assert url == "http://localhost:8000/v1"
+
+    def test_strips_whitespace(self) -> None:
+        with patch.dict(os.environ, {"OPENROUTER_BASE_URL": "  http://proxy:9000/v1  "}, clear=False):
+            url = load_openrouter_base_url()
+        assert url == "http://proxy:9000/v1"
+
+
+class TestGetOpenRouterModelsUrl:
+    """Test models URL derivation from base URL."""
+
+    def test_default_models_url(self) -> None:
+        url = get_openrouter_models_url("https://openrouter.ai/api/v1")
+        assert url == "https://openrouter.ai/api/v1/models"
+
+    def test_custom_proxy_models_url(self) -> None:
+        url = get_openrouter_models_url("http://localhost:8000/v1")
+        assert url == "http://localhost:8000/v1/models"
+
+    def test_strips_trailing_slash(self) -> None:
+        url = get_openrouter_models_url("http://localhost:8000/v1/")
+        assert url == "http://localhost:8000/v1/models"

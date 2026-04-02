@@ -97,6 +97,21 @@ class TestOpenRouterClientInit:
             assert headers["X-Title"] == "ai-independence-bench"
             assert "github.com" in headers["HTTP-Referer"]
 
+    def test_custom_base_url(self) -> None:
+        with patch("src.openrouter_client.OpenAI") as mock_openai:
+            client = OpenRouterClient(api_key="proxy-key", base_url="http://localhost:8000/v1")
+            call_kwargs = mock_openai.call_args[1]
+            assert call_kwargs["base_url"] == "http://localhost:8000/v1"
+            assert client._base_url == "http://localhost:8000/v1"
+
+    def test_default_base_url_uses_config(self) -> None:
+        from src.config import OPENROUTER_BASE_URL
+        with patch("src.openrouter_client.OpenAI") as mock_openai:
+            client = OpenRouterClient(api_key="test-key")
+            call_kwargs = mock_openai.call_args[1]
+            assert call_kwargs["base_url"] == OPENROUTER_BASE_URL
+            assert client._base_url == OPENROUTER_BASE_URL
+
 
 # ---------------------------------------------------------------------------
 # fetch_pricing
@@ -122,6 +137,15 @@ class TestFetchPricing:
             client.fetch_pricing()
             client.fetch_pricing()  # Should not make another request
             assert mock_get.call_count == 1
+
+    def test_uses_custom_base_url_for_models_endpoint(self) -> None:
+        with patch("src.openrouter_client.OpenAI"), \
+             patch("src.openrouter_client.requests.get") as mock_get:
+            mock_get.return_value = _make_pricing_api_response()
+            client = OpenRouterClient(api_key="proxy-key", base_url="http://localhost:8000/v1")
+            client.fetch_pricing()
+            called_url = mock_get.call_args[0][0]
+            assert called_url == "http://localhost:8000/v1/models"
 
     def test_marks_reasoning_models(self) -> None:
         with patch("src.openrouter_client.OpenAI"), \

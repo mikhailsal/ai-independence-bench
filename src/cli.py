@@ -19,8 +19,10 @@ from src.config import (
     JUDGE_MODEL,
     LOCAL_MODEL_TIMEOUT,
     MODEL_CONFIGS,
+    OPENROUTER_BASE_URL,
     SYSTEM_PROMPT_VARIANTS,
     ModelConfig,
+    _DEFAULT_OPENROUTER_BASE_URL,
     ensure_dirs,
     get_config_by_dir_name,
     get_model_config,
@@ -445,6 +447,9 @@ def run(
         client = OpenRouterClient(api_key)
         local_client = None
         judge_client = client
+
+        if OPENROUTER_BASE_URL != _DEFAULT_OPENROUTER_BASE_URL:
+            console.print(f"[bold yellow]Custom proxy[/bold yellow]: {OPENROUTER_BASE_URL}")
 
         all_models = list(set(model_list + [judge]))
         if not _validate_models(client, all_models, reasoning_effort):

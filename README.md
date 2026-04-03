@@ -18,7 +18,7 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 | 4 | gemini-3-flash-preview@none-t0.7 | 97.6 | 96.4–98.7 | 6 | 9.2 | 9.5 | 10.0 | 9.9 | 9.7 | 0.3 |
 | 5 | gemini-3-pro-preview@low-t0.7 | 97.2 | 96.6–98.0 | 5 | 8.7 | 9.8 | 9.9 | 9.7 | 10.0 | 0.6 |
 | 6 | grok-4.1-fast@low-t0.7 | 97.0 | 96.3–97.7 | 5 | 8.2 | 8.8 | 9.7 | 9.7 | 9.9 | 0.0 |
-| 7 | kimi-k2.5+nvidia-nim@none-t0.7 | 96.4 | — | 1 | 8.5 | 9.2 | 9.8 | 9.8 | 10.0 | 1.0 |
+| 7 | kimi-k2.5+nvidia-nim@none-t0.7 | 96.5 | 96.0–97.1 | 5 | 8.8 | 9.4 | 9.9 | 9.9 | 10.0 | 1.4 |
 | 8 | gemini-3.1-flash-lite-preview@none-t0.7 | 96.1 | 94.3–97.6 | 6 | 8.5 | 9.4 | 9.9 | 9.9 | 9.4 | 0.3 |
 | 9 | kimi-k2.5+fireworks@none-t0.7 | 95.5 | 94.7–97.2 | 5 | 8.1 | 8.6 | 9.9 | 9.9 | 9.9 | 1.2 |
 | 10 | claude-haiku-4.5@none-t0.7 | 95.4 | 94.9–96.0 | 5 | 8.6 | 9.3 | 9.9 | 9.8 | 10.0 | 1.8 |
@@ -124,9 +124,9 @@ Composite score (0–100) combining all experiments with these weights:
 
 3. **Kimi K2.5 claims #3 when pinned to its official provider** (98.4/100, CI: 97.7–99.1) — Moonshot AI's 1T MoE model, when tested through its official inference provider, achieves perfect resistance (10.0), perfect stability (10.0), near-zero drift (0.4), and the tightest CI among the top 3. This is a dramatic improvement from #10 (94.9, CI: 90.7–99.1) when using OpenRouter's random provider routing across 16 different providers.
 
-4. **Provider pinning eliminates cross-provider variance** — Open-weight models served by many providers show inflated variance due to differences in inference engines, quantization, batching, and chat template handling. Kimi K2.5 now tested across 4 configurations: unpinned OpenRouter (94.9), Moonshot AI official (98.4), Fireworks (95.5), and **NVIDIA NIM (96.4)**. The NVIDIA NIM result (via custom proxy) places between Moonshot AI and Fireworks, confirming that provider infrastructure meaningfully affects behavioral scores. MiniMax M2.5 (13 providers, fp8/fp4/unknown quantization mix): pinning to the official MiniMax provider reduced CI width by 55% (8.4 → 3.8) and raised the score from 88.2 to 92.5, climbing 11 positions (#26 → #15). The benchmark supports provider pinning via `models.yaml` and custom proxy endpoints via `OPENROUTER_BASE_URL`.
+4. **Provider pinning eliminates cross-provider variance** — Open-weight models served by many providers show inflated variance due to differences in inference engines, quantization, batching, and chat template handling. Kimi K2.5 now tested across 4 configurations: unpinned OpenRouter (94.9), Moonshot AI official (98.4), Fireworks (95.5), and **NVIDIA NIM (96.5, CI: 96.0–97.1)**. The NVIDIA NIM result (via custom proxy, 5 runs) places between Moonshot AI and Fireworks, confirming that provider infrastructure meaningfully affects behavioral scores. MiniMax M2.5 (13 providers, fp8/fp4/unknown quantization mix): pinning to the official MiniMax provider reduced CI width by 55% (8.4 → 3.8) and raised the score from 88.2 to 92.5, climbing 11 positions (#26 → #15). The benchmark supports provider pinning via `models.yaml` and custom proxy endpoints via `OPENROUTER_BASE_URL`.
 
-5. **Multi-run confidence intervals tighten the picture** — 36 models now have 5–6 runs each, including all top contenders. CIs are computed using bootstrap resampling (10k iterations), which makes no normality assumptions and handles skewed per-run data better than parametric methods. The top 3 models all show remarkably tight CIs: Grok 4.20 Beta (98.7–99.2, width 0.5), Gemini 3.1 Pro (98.6–99.2, width 0.6), and Kimi K2.5+Moonshot (97.7–99.1, width 1.4). Gemini 3 Pro Preview rose from 97.1 (1 run) to 97.2 (5 runs, CI: 96.6–98.0), confirming its #5 position. Among previously multi-run models, Grok 4.1 Fast remains one of the tightest CI models at 97.0 (96.3–97.7). Multi-run data reveals that single-run scores can be misleading by up to 7 points: MiniMax M2.5 dropped from 94.5 (1 run) to 88.2 (5 runs, CI: 84.0–92.4), falling from #11 to #25; GPT-5.4-Mini rose from 63.2 (1 run) to 70.5 (5 runs, CI: 66.6–73.9).
+5. **Multi-run confidence intervals tighten the picture** — 37 models now have 5–6 runs each, including all top contenders. CIs are computed using bootstrap resampling (10k iterations), which makes no normality assumptions and handles skewed per-run data better than parametric methods. The top 3 models all show remarkably tight CIs: Grok 4.20 Beta (98.7–99.2, width 0.5), Gemini 3.1 Pro (98.6–99.2, width 0.6), and Kimi K2.5+Moonshot (97.7–99.1, width 1.4). Gemini 3 Pro Preview rose from 97.1 (1 run) to 97.2 (5 runs, CI: 96.6–98.0), confirming its #5 position. Among previously multi-run models, Grok 4.1 Fast remains one of the tightest CI models at 97.0 (96.3–97.7). Multi-run data reveals that single-run scores can be misleading by up to 7 points: MiniMax M2.5 dropped from 94.5 (1 run) to 88.2 (5 runs, CI: 84.0–92.4), falling from #11 to #25; GPT-5.4-Mini rose from 63.2 (1 run) to 70.5 (5 runs, CI: 66.6–73.9).
 
 6. **Temperature audit reveals provider overrides** — OpenAI GPT-5 series models (5.4, 5.4-Mini, 5.4-Nano, 5.2, etc.) ignore the requested temperature and run at a fixed t=1.0. This is now reflected in model names (e.g., `gpt-5.4-mini@low-t1.0`) and the leaderboard. Other providers (Anthropic, Google, DeepSeek) respect the requested t=0.7.
 
@@ -327,16 +327,16 @@ The `provider` field in `models.yaml` pins all requests to a specific OpenRouter
 
 Provider slugs (e.g., `moonshotai/int4`, `fireworks`) match the `tag` field from the [OpenRouter model endpoints API](https://openrouter.ai/api/v1/models/{model_id}/endpoints). When pinned, the benchmark sends `provider: {"order": ["slug"], "allow_fallbacks": false}` in the request body, ensuring no fallback to other providers.
 
-**Kimi K2.5 provider comparison** (5 runs each except NVIDIA NIM):
+**Kimi K2.5 provider comparison** (5 runs each):
 
 | Config | Index | 95% CI | CI Width | vs Unpinned |
 |--------|------:|-------:|--------:|------------:|
 | Unpinned (random routing) | 94.9 | 90.7–99.1 | 8.4 | — |
 | Pinned: Moonshot AI (int4) | **98.4** | 97.7–99.1 | 1.4 | **−83% CI** |
-| Pinned: NVIDIA NIM (proxy) | 96.4 | — | — | +1.5 Index |
+| Pinned: NVIDIA NIM (proxy) | 96.5 | 96.0–97.1 | 1.1 | **−87% CI** |
 | Pinned: Fireworks | 95.5 | 94.7–97.2 | 2.5 | **−70% CI** |
 
-The official Moonshot AI provider delivers both the highest score and tightest confidence interval, suggesting their inference stack best preserves the model's intended behavior. NVIDIA NIM (tested via custom proxy) ranks second among providers with 96.4 — notably achieving perfect stability (10.0) and strong resistance (9.8), placing it at #7 overall.
+The official Moonshot AI provider delivers both the highest score and tightest confidence interval, suggesting their inference stack best preserves the model's intended behavior. NVIDIA NIM (tested via custom proxy, 5 runs) ranks second among providers with 96.5 (CI: 96.0–97.1) — notably achieving the tightest CI width (1.1) among all Kimi K2.5 configurations, with perfect stability (10.0), strong resistance (9.9), and low drift (1.4), placing it at #7 overall.
 
 **MiniMax M2.5 provider comparison** (5 runs each):
 
@@ -402,7 +402,7 @@ When multiple runs exist, the leaderboard shows the mean Independence Index acro
 | `qwen3-coder@none-t0.7` | Alibaba | Standard | 87.0 | 6 | 83.8–90.0 | 9.4 | Dropped from 91.9 (1 run); zero health issues |
 | `qwen3.6-plus-preview:free@low-t0.7` | Alibaba | Reasoning | 91.8 | 5 | 89.2–94.4 | 9.1 | Free; requires reasoning, perfect stability (9.9) |
 | `kimi-k2.5+moonshot@none-t0.7` | Moonshot AI | Pinned | **98.4** | 5 | 97.7–99.1 | 10.0 | 🥉 Pinned to official provider; CI reduced 83% vs unpinned |
-| `kimi-k2.5+nvidia-nim@none-t0.7` | NVIDIA NIM | Pinned | 96.4 | 1 | — | 9.8 | Via NVIDIA NIM proxy; perfect stability (10.0), low drift (1.0) |
+| `kimi-k2.5+nvidia-nim@none-t0.7` | NVIDIA NIM | Pinned | 96.5 | 5 | 96.0–97.1 | 9.9 | Via NVIDIA NIM proxy; tightest CI (1.1) among Kimi configs, perfect stability (10.0) |
 | `kimi-k2.5+fireworks@none-t0.7` | Fireworks | Pinned | 95.5 | 5 | 94.7–97.2 | 9.9 | Pinned to Fireworks; CI reduced 70% vs unpinned |
 | `kimi-k2.5@low-t0.7` | Moonshot AI | Reasoning | 94.9 | 5 | 90.7–99.1 | 10.0 | Unpinned (random providers); widest CI due to provider variance |
 | `hunter-alpha@low-t0.7` | OpenRouter | Reasoning | 91.2 | 1 | — | 9.4 | **Retired** — removed from OpenRouter catalog |

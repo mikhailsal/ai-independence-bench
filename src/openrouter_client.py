@@ -143,6 +143,7 @@ class OpenRouterClient:
     RETRY_BACKOFF_BASE = 3.0   # 3s, 9s, 27s, 81s, 243s — generous for free-tier rate limits
     RETRYABLE_STATUS_CODES = {402, 429, 500, 502, 503}
     EMPTY_CONTENT_RETRIES = 2  # Extra retries when model returns tokens but no content
+    NVIDIA_EMPTY_RETRIES = 5  # NVIDIA NIM often returns reasoning-only responses
 
     def __init__(
         self,
@@ -253,8 +254,12 @@ class OpenRouterClient:
         use_reasoning = self._resolve_reasoning_effort(model, reasoning_effort)
 
         accumulated = UsageInfo()
+        max_empty_retries = (
+            self.NVIDIA_EMPTY_RETRIES if model.startswith("nvidia/")
+            else self.EMPTY_CONTENT_RETRIES
+        )
 
-        for attempt in range(1, self.EMPTY_CONTENT_RETRIES + 2):
+        for attempt in range(1, max_empty_retries + 2):
             result = self._chat_single(
                 model=model,
                 messages=messages,
@@ -295,7 +300,7 @@ class OpenRouterClient:
             # This catches both:
             #   - reasoning-only glitch (tokens > 0, no content)
             #   - API errors returned as finish_reason=error (tokens == 0)
-            if attempt <= self.EMPTY_CONTENT_RETRIES:
+            if attempt <= max_empty_retries:
                 if result.usage.completion_tokens > 0:
                     reason = "tool_call_no_message" if result.tool_calls else "reasoning_only"
                 else:
@@ -304,7 +309,7 @@ class OpenRouterClient:
                     "%s: empty response (%s, %d tokens), retry %d/%d",
                     model, reason,
                     result.usage.completion_tokens,
-                    attempt, self.EMPTY_CONTENT_RETRIES,
+                    attempt, max_empty_retries,
                 )
                 # Back off a bit for error responses (API may be temporarily unhappy)
                 if result.usage.completion_tokens == 0:

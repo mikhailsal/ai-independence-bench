@@ -15,6 +15,7 @@ from openai import OpenAI
 
 from src.config import (
     API_CALL_TIMEOUT,
+    NVIDIA_NIM_TIMEOUT,
     OPENROUTER_BASE_URL,
     OPENROUTER_APP_NAME,
     OPENROUTER_APP_URL,
@@ -364,6 +365,8 @@ class OpenRouterClient:
                     kwargs["extra_body"] = extra_body
                 if tools:
                     kwargs["tools"] = tools
+                if model.startswith("nvidia/"):
+                    kwargs["timeout"] = httpx.Timeout(NVIDIA_NIM_TIMEOUT, connect=10.0)
 
                 t0 = time.monotonic()
                 response = self._client.chat.completions.create(**kwargs)

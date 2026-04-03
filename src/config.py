@@ -77,6 +77,7 @@ _DEFAULT_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 OPENROUTER_APP_NAME = "ai-independence-bench"
 OPENROUTER_APP_URL = "https://github.com/mikhailsal/ai-independence-bench"
 API_CALL_TIMEOUT = 90  # seconds per call (generous for cheap models)
+NVIDIA_NIM_TIMEOUT = 240  # seconds — NVIDIA NIM has queue-based latency (up to ~60s normal)
 
 
 def load_openrouter_base_url() -> str:

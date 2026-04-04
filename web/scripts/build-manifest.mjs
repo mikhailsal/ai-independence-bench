@@ -54,8 +54,8 @@ function parseLeaderboard(md) {
 }
 
 function dirToModelLabel(dirName) {
-  const idx = dirName.indexOf('--');
-  return idx >= 0 ? dirName.slice(idx + 2) : dirName;
+  const lastIdx = dirName.lastIndexOf('--');
+  return lastIdx >= 0 ? dirName.slice(lastIdx + 2) : dirName;
 }
 
 function dirToProvider(dirName) {
@@ -101,7 +101,7 @@ function getReasoningEffort(modelId) {
 }
 
 function computeConfigDirName(entry) {
-  const slug = entry.model_id.replace('/', '--');
+  const slug = entry.model_id.replaceAll('/', '--');
   const temp = entry.temperature;
   const reasoning = entry.reasoning_effort ?? getReasoningEffort(entry.model_id);
   if (entry.provider) {

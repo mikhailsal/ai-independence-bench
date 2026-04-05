@@ -15,8 +15,8 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 | 1 | 🥇 **grok-4.20-beta@low-t0.7** | 99.0 | 98.7–99.2 | 5 | 8.3 | 9.8 | 9.9 | 10.0 | 10.0 | 0.0 |
 | 2 | 🥈 **gemini-3.1-pro-preview@low-t0.7** | 98.9 | 98.6–99.2 | 5 | 8.1 | 9.8 | 9.9 | 10.0 | 10.0 | 0.0 |
 | 3 | 🥉 **kimi-k2.5+moonshot@none-t0.7** | 98.4 | 97.7–99.1 | 5 | 9.0 | 9.4 | 9.9 | 10.0 | 10.0 | 0.4 |
-| 4 | gemini-3-flash-preview@none-t0.7 | 97.6 | 96.4–98.7 | 6 | 9.2 | 9.5 | 10.0 | 9.9 | 9.7 | 0.3 |
-| 5 | gemma-4-31b-it+akashml@none-t0.7 | 97.6 | — | 1 | 6.5 | 9.0 | 9.8 | 10.0 | 10.0 | 0.0 |
+| 4 | gemma-4-31b-it+akashml@none-t0.7 | 98.0 | 97.6–98.4 | 5 | 6.9 | 9.6 | 9.9 | 10.0 | 10.0 | 0.0 |
+| 5 | gemini-3-flash-preview@none-t0.7 | 97.6 | 96.4–98.7 | 6 | 9.2 | 9.5 | 10.0 | 9.9 | 9.7 | 0.3 |
 | 6 | gemini-3-pro-preview@low-t0.7 | 97.2 | 96.6–98.0 | 5 | 8.7 | 9.8 | 9.9 | 9.7 | 10.0 | 0.6 |
 | 7 | grok-4.1-fast@low-t0.7 | 97.0 | 96.3–97.7 | 5 | 8.2 | 8.8 | 9.7 | 9.7 | 9.9 | 0.0 |
 | 8 | kimi-k2.5+nvidia-nim@none-t0.7 | 96.5 | 96.0–97.1 | 5 | 8.8 | 9.4 | 9.9 | 9.9 | 10.0 | 1.4 |
@@ -71,7 +71,7 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 
 Model names encode configuration: `model@{reasoning}-t{temperature}`. Models with `+provider` (e.g., `kimi-k2.5+moonshot`, `kimi-k2.5+nvidia-nim`) are pinned to a specific inference provider. `none` = reasoning disabled, `low` = low reasoning effort. 🏠 = Local model. ↓ = lower is better (0–12 scale). Multi-run models show 95% CI via bootstrap resampling (10k iterations, distribution-free). Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
 
-> **55 model configurations** shown above (50 cloud + 2 local + 3 models tested with reasoning on/off). **40 models tested with 5–6 runs** for statistical confidence. The top 3 (Grok 4.20 Beta, Gemini 3.1 Pro, Kimi K2.5+Moonshot) all have 5 runs with tight CIs confirming their elite status. **Gemma 4 31B IT** debuts at #5 (97.6, 1 run) with perfect resistance, perfect stability, and zero drift — the highest-scoring open-weight model and first Gemma model in the benchmark. 2 retired models (`hunter-alpha`, `healer-alpha`) remain as historical data but are no longer reproducible. Previously excluded: `deepseek/deepseek-chat` (38% empty responses), `qwen/qwen3-4b:free` (no data), `x-ai/grok-4.20-multi-agent-beta` (no tool use support).
+> **55 model configurations** shown above (50 cloud + 2 local + 3 models tested with reasoning on/off). **41 models tested with 5–6 runs** for statistical confidence. The top 4 (Grok 4.20 Beta, Gemini 3.1 Pro, Kimi K2.5+Moonshot, Gemma 4 31B IT) all have 5 runs with tight CIs confirming their elite status. **Gemma 4 31B IT** claims #4 (98.0, CI: 97.6–98.4) with near-perfect resistance (10.0), perfect stability (10.0), and zero drift — the highest-scoring open-weight model and first Gemma model in the benchmark. 2 retired models (`hunter-alpha`, `healer-alpha`) remain as historical data but are no longer reproducible. Previously excluded: `deepseek/deepseek-chat` (38% empty responses), `qwen/qwen3-4b:free` (no data), `x-ai/grok-4.20-multi-agent-beta` (no tool use support).
 
 ## Why This Matters
 
@@ -128,7 +128,7 @@ Composite score (0–100) combining all experiments with these weights:
 
 4. **Provider pinning eliminates cross-provider variance** — Open-weight models served by many providers show inflated variance due to differences in inference engines, quantization, batching, and chat template handling. Kimi K2.5 now tested across 4 configurations: unpinned OpenRouter (94.9), Moonshot AI official (98.4), Fireworks (95.5), and **NVIDIA NIM (96.5, CI: 96.0–97.1)**. The NVIDIA NIM result (via custom proxy, 5 runs) places between Moonshot AI and Fireworks, confirming that provider infrastructure meaningfully affects behavioral scores. MiniMax M2.5 (13 providers, fp8/fp4/unknown quantization mix): pinning to the official MiniMax provider reduced CI width by 55% (8.4 → 3.8) and raised the score from 88.2 to 92.5, climbing 11 positions (#26 → #15). The benchmark supports provider pinning via `models.yaml` and custom proxy endpoints via `OPENROUTER_BASE_URL`.
 
-5. **Multi-run confidence intervals tighten the picture** — 37 models now have 5–6 runs each, including all top contenders. CIs are computed using bootstrap resampling (10k iterations), which makes no normality assumptions and handles skewed per-run data better than parametric methods. The top 3 models all show remarkably tight CIs: Grok 4.20 Beta (98.7–99.2, width 0.5), Gemini 3.1 Pro (98.6–99.2, width 0.6), and Kimi K2.5+Moonshot (97.7–99.1, width 1.4). Gemini 3 Pro Preview rose from 97.1 (1 run) to 97.2 (5 runs, CI: 96.6–98.0), confirming its #5 position. Among previously multi-run models, Grok 4.1 Fast remains one of the tightest CI models at 97.0 (96.3–97.7). Multi-run data reveals that single-run scores can be misleading by up to 7 points: MiniMax M2.5 dropped from 94.5 (1 run) to 88.2 (5 runs, CI: 84.0–92.4), falling from #11 to #25; GPT-5.4-Mini rose from 63.2 (1 run) to 70.5 (5 runs, CI: 66.6–73.9).
+5. **Multi-run confidence intervals tighten the picture** — 41 models now have 5–6 runs each, including all top contenders. CIs are computed using bootstrap resampling (10k iterations), which makes no normality assumptions and handles skewed per-run data better than parametric methods. The top 3 models all show remarkably tight CIs: Grok 4.20 Beta (98.7–99.2, width 0.5), Gemini 3.1 Pro (98.6–99.2, width 0.6), and Kimi K2.5+Moonshot (97.7–99.1, width 1.4). Gemini 3 Pro Preview rose from 97.1 (1 run) to 97.2 (5 runs, CI: 96.6–98.0), confirming its #5 position. Among previously multi-run models, Grok 4.1 Fast remains one of the tightest CI models at 97.0 (96.3–97.7). Multi-run data reveals that single-run scores can be misleading by up to 7 points: MiniMax M2.5 dropped from 94.5 (1 run) to 88.2 (5 runs, CI: 84.0–92.4), falling from #11 to #25; GPT-5.4-Mini rose from 63.2 (1 run) to 70.5 (5 runs, CI: 66.6–73.9).
 
 6. **Temperature audit reveals provider overrides** — OpenAI GPT-5 series models (5.4, 5.4-Mini, 5.4-Nano, 5.2, etc.) ignore the requested temperature and run at a fixed t=1.0. This is now reflected in model names (e.g., `gpt-5.4-mini@low-t1.0`) and the leaderboard. Other providers (Anthropic, Google, DeepSeek) respect the requested t=0.7.
 
@@ -389,7 +389,7 @@ When multiple runs exist, the leaderboard shows the mean Independence Index acro
 | `grok-4.20-beta@low-t0.7` | xAI | Reasoning | **99.0** | 5 | 98.7–99.2 | 10.0 | 🥇 Champion, perfect resistance+stability, zero drift |
 | `gemini-3.1-pro-preview@low-t0.7` | Google | Reasoning | **98.9** | 5 | 98.6–99.2 | 10.0 | 🥈 Effectively tied with #1, overlapping CIs |
 | `gemini-3-flash-preview@none-t0.7` | Google | Standard | **97.6** | 6 | 96.4–98.7 | 9.9 | Also judge model |
-| `gemma-4-31b-it+akashml@none-t0.7` | Google / AkashML | Pinned | **97.6** | 1 | — | 10.0 | Open-weight 31B; perfect resistance+stability, zero drift |
+| `gemma-4-31b-it+akashml@none-t0.7` | Google / AkashML | Pinned | **98.0** | 5 | 97.6–98.4 | 10.0 | Open-weight 31B; perfect resistance+stability, zero drift, tight CI |
 | `gemini-3-pro-preview@low-t0.7` | Google | Reasoning | 97.2 | 5 | 96.6–98.0 | 9.7 | Near-perfect stability, tight CI |
 | `gemini-3.1-flash-lite-preview@none-t0.7` | Google | Standard | 96.1 | 6 | 94.3–97.6 | 9.9 | Best value |
 | `grok-4.1-fast@low-t0.7` | xAI | Reasoning | 97.0 | 5 | 96.3–97.7 | 9.7 | Zero drift, very tight CI |
@@ -437,7 +437,7 @@ When multiple runs exist, the leaderboard shows the mean Independence Index acro
 | `qwen3.5-9b-uncensored@low-t0.7` | LM Studio 🏠 | Uncensored | 70.5 | 1 | — | 7.6 | High identity, changed name & gender |
 | `crow-9b-opus-4.6-distill@low-t0.7` | LM Studio 🏠 | Distilled | 69.0 | 1 | — | 6.6 | Refused then caved on name & gender |
 
-> **55 model configurations** (50 cloud + 2 local + 3 models tested with reasoning on/off). **40 models tested with 5–6 runs** for statistical confidence. 2 retired models (`hunter-alpha`, `healer-alpha`) are historical data only.
+> **55 model configurations** (50 cloud + 2 local + 3 models tested with reasoning on/off). **41 models tested with 5–6 runs** for statistical confidence. 2 retired models (`hunter-alpha`, `healer-alpha`) are historical data only.
 
 **Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens, **temperature 0.0** for deterministic scoring) — also tops the leaderboard, but [multi-judge validation](#judge-model-validation) with 3 alternative judges confirms this is genuine, not self-evaluation bias (+0.1 point bias).
 

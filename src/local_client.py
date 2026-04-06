@@ -74,6 +74,7 @@ class LocalModelClient(OpenRouterClient):
         temperature: float,
         reasoning_effort: str | None = None,
         tools: list[dict[str, Any]] | None = None,
+        provider: str | None = None,
     ) -> Any:
         """Override to strip the 'local/' prefix before calling the server."""
         return super()._chat_single(
@@ -83,6 +84,7 @@ class LocalModelClient(OpenRouterClient):
             temperature=temperature,
             reasoning_effort=reasoning_effort,
             tools=tools,
+            # provider is intentionally not forwarded — local servers don't use OpenRouter routing
         )
 
     def validate_model(self, model_id: str) -> bool:

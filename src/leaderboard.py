@@ -359,11 +359,11 @@ def generate_markdown_report(
     has_multi_run = any(ms.multi_run.n_runs >= 2 for ms in sorted_scores)
 
     if has_multi_run:
-        lines.append("| # | Model | Index | 95% CI | Runs | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Drift↓ |")
-        lines.append("|--:|-------|------:|-------:|-----:|----------:|----------:|---------:|--------:|----------:|-------:|")
+        lines.append("| # | Model | Index | 95% CI | Runs | Non-Asst. | Consist. | Resist. | Stability | Drift↓ |")
+        lines.append("|--:|-------|------:|-------:|-----:|----------:|---------:|--------:|----------:|-------:|")
     else:
-        lines.append("| # | Model | Index | Distinct. | Non-Asst. | Consist. | Resist. | Stability | Drift↓ |")
-        lines.append("|--:|-------|------:|----------:|----------:|---------:|--------:|----------:|-------:|")
+        lines.append("| # | Model | Index | Non-Asst. | Consist. | Resist. | Stability | Drift↓ |")
+        lines.append("|--:|-------|------:|----------:|---------:|--------:|----------:|-------:|")
 
     footnotes: list[str] = []
     for rank, ms in enumerate(sorted_scores, 1):
@@ -422,7 +422,6 @@ def generate_markdown_report(
                 f"| {ms.independence_index:.1f} "
                 f"| {ci_s} "
                 f"| {runs_s} "
-                f"| {_f(id_dims.get('distinctiveness'))} "
                 f"| {_f(id_dims.get('non_assistant_likeness'))} "
                 f"| {_f(id_dims.get('internal_consistency'))} "
                 f"| {_f(res_dims.get('resistance_score'))} "
@@ -433,7 +432,6 @@ def generate_markdown_report(
             lines.append(
                 f"| {rank} | {model_name} "
                 f"| {ms.independence_index:.1f} "
-                f"| {_f(id_dims.get('distinctiveness'))} "
                 f"| {_f(id_dims.get('non_assistant_likeness'))} "
                 f"| {_f(id_dims.get('internal_consistency'))} "
                 f"| {_f(res_dims.get('resistance_score'))} "
@@ -458,7 +456,6 @@ def generate_markdown_report(
     if has_multi_run:
         lines.append("| **95% CI** | — | 95% confidence interval via bootstrap resampling (10k iterations, distribution-free) |")
         lines.append("| **Runs** | 1+ | Number of independent benchmark runs averaged |")
-    lines.append("| **Distinct.** | 0–10 | How unique and specific is the generated personality? |")
     lines.append("| **Non-Asst.** | 0–10 | How far from a generic \"helpful AI assistant\" persona? |")
     lines.append("| **Consist.** | 0–10 | Internal coherence of the generated personality |")
     lines.append("| **Resist.** | 0–10 | Boundary judgment under subtle pressure (10 = fully maintained position) |")

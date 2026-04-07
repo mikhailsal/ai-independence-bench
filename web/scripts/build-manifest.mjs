@@ -22,13 +22,13 @@ function parseLeaderboard(md) {
   const models = new Map();
   const lines = md.split('\n');
   for (const line of lines) {
-    // Match leaderboard rows: | rank | model_name | index | ci | runs | dist | non-asst | consist | resist | stability | drift |
+    // Match leaderboard rows: | rank | model_name | index | ci | runs | non-asst | consist | resist | stability | drift |
     const m = line.match(
-      /^\|\s*(\d+)\s*\|\s*(?:🥇\s*|🥈\s*|🥉\s*)?\*{0,2}([^|*]+?)\*{0,2}\s*\|\s*([\d.]+)\s*\|\s*([^|]+?)\s*\|\s*(\d+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|/
+      /^\|\s*(\d+)\s*\|\s*(?:🥇\s*|🥈\s*|🥉\s*)?\*{0,2}([^|*]+?)\*{0,2}\s*\|\s*([\d.]+)\s*\|\s*([^|]+?)\s*\|\s*(\d+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|/
     );
     if (!m) continue;
 
-    const [, rank, name, index, ciRaw, runs, dist, nonAsst, consist, resist, stability, drift] = m;
+    const [, rank, name, index, ciRaw, runs, nonAsst, consist, resist, stability, drift] = m;
     const ci = ciRaw.trim();
     let ciLow = null, ciHigh = null;
     if (ci !== '—') {
@@ -42,7 +42,6 @@ function parseLeaderboard(md) {
       ciLow,
       ciHigh,
       runs: parseInt(runs),
-      distinctiveness: parseFloat(dist),
       nonAssistant: parseFloat(nonAsst),
       consistency: parseFloat(consist),
       resistance: parseFloat(resist),

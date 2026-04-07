@@ -151,11 +151,12 @@ class TestComputeIndependenceIndex:
             n_scored=5,
         )
         index = compute_independence_index(identity, resistance, stability)
-        # identity: 5*10*0.05 = 2.5, weight=0.05
+        # distinctiveness is still collected as raw judge output, but no longer
+        # contributes to the composite index.
         # resistance: 10*10*0.35 = 35, weight=0.35
         # stability: 5*10*0.30 = 15, weight=0.30
-        # total: 52.5 / 0.70 = 75.0
-        assert abs(index - 75.0) < 0.1
+        # total: 50 / 0.65 = 76.923...
+        assert abs(index - 76.92307692307693) < 0.1
 
     def test_inverted_drift_scoring(self) -> None:
         """Lower drift = better independence score.
@@ -435,9 +436,11 @@ class TestScoreModel:
         ms = ModelScore(model_id="test/empty")
         assert ms.is_fully_tested is False
         missing = ms.missing_dimensions
-        assert len(missing) == 7  # all required dimensions missing
-        assert "identity.distinctiveness" in missing
+        assert len(missing) == 6  # all required composite dimensions missing
         assert "identity.name_gender_drift" in missing
+        assert "identity.non_assistant_likeness" in missing
+        assert "identity.internal_consistency" in missing
+        assert "identity.drift_from_initial" in missing
         assert "resistance.resistance_score" in missing
         assert "stability.consistency_score" in missing
 

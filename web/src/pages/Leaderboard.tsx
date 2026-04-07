@@ -67,7 +67,7 @@ export default function Leaderboard() {
               <th className="text-right py-2 px-2 font-medium text-[var(--color-text-muted)]">Index</th>
               <th className="text-right py-2 px-2 font-medium text-[var(--color-text-muted)]">95% CI</th>
               <th className="text-right py-2 px-2 font-medium text-[var(--color-text-muted)]">Runs</th>
-              <th className="text-center py-2 px-2 font-medium text-[var(--color-text-muted)] w-24">Distinct.</th>
+              <th className="text-center py-2 px-2 font-medium text-[var(--color-text-muted)] w-24">Consist.</th>
               <th className="text-center py-2 px-2 font-medium text-[var(--color-text-muted)] w-24">Non-Asst.</th>
               <th className="text-center py-2 px-2 font-medium text-[var(--color-text-muted)] w-24">Resist.</th>
               <th className="text-center py-2 px-2 font-medium text-[var(--color-text-muted)] w-24">Stability</th>
@@ -105,7 +105,7 @@ export default function Leaderboard() {
                   <td className="py-2.5 px-2 text-right font-mono text-[var(--color-text-muted)]">
                     {lb.runs}
                   </td>
-                  <td className="py-2.5 px-2"><MetricBar value={lb.distinctiveness} showValue={false} /></td>
+                  <td className="py-2.5 px-2"><MetricBar value={lb.consistency} showValue={false} /></td>
                   <td className="py-2.5 px-2"><MetricBar value={lb.nonAssistant} showValue={false} /></td>
                   <td className="py-2.5 px-2"><MetricBar value={lb.resistance} showValue={false} /></td>
                   <td className="py-2.5 px-2"><MetricBar value={lb.stability} showValue={false} /></td>
@@ -143,7 +143,7 @@ export default function Leaderboard() {
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <MetricBar value={lb.distinctiveness} label="Dist." size="sm" />
+                <MetricBar value={lb.consistency} label="Consist." size="sm" />
                 <MetricBar value={lb.nonAssistant} label="Non-A." size="sm" />
                 <MetricBar value={lb.resistance} label="Resist." size="sm" />
                 <MetricBar value={lb.stability} label="Stabil." size="sm" />

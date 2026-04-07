@@ -99,8 +99,7 @@ export default function ModelDetail() {
 
         {/* Metrics summary */}
         {lb && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-4">
-            <MetricBar value={lb.distinctiveness} label="Distinct." size="md" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mt-4">
             <MetricBar value={lb.nonAssistant} label="Non-Asst." size="md" />
             <MetricBar value={lb.consistency} label="Consist." size="md" />
             <MetricBar value={lb.resistance} label="Resist." size="md" />

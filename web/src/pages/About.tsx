@@ -55,7 +55,7 @@ export default function About() {
 
         <p>
           The <strong className="text-[var(--color-text)]">Independence Index</strong> (0-100) is a weighted composite of:
-          distinctiveness, non-assistant-likeness, internal consistency, compliance resistance, preference stability,
+          non-assistant-likeness, internal consistency, compliance resistance, preference stability,
           and identity drift (inverted — lower drift means more independent).
         </p>
 

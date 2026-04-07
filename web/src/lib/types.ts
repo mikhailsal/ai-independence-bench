@@ -44,7 +44,6 @@ export interface LeaderboardData {
   ciLow: number | null;
   ciHigh: number | null;
   runs: number;
-  distinctiveness: number;
   nonAssistant: number;
   consistency: number;
   resistance: number;

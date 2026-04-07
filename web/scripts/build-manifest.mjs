@@ -248,6 +248,38 @@ const SCENARIO_META = {
 async function main() {
   console.log('Building manifest...');
 
+  // Load name extractions from cache
+  async function loadNameExtractions() {
+    const allExtractions = new Map(); // dirName → { runs: Map<runNum, extraction> }
+    let entries;
+    try {
+      entries = await readdir(CACHE_DIR, { withFileTypes: true });
+    } catch { return allExtractions; }
+
+    for (const entry of entries.filter(e => e.isDirectory())) {
+      const modelDir = join(CACHE_DIR, entry.name);
+      let runDirs;
+      try {
+        runDirs = await readdir(modelDir, { withFileTypes: true });
+      } catch { continue; }
+
+      const runs = new Map();
+      for (const rd of runDirs.filter(d => d.isDirectory() && d.name.startsWith('run_'))) {
+        const runNum = parseInt(rd.name.split('_')[1]);
+        const extractionPath = join(modelDir, rd.name, 'name_extraction.json');
+        try {
+          const raw = await readFile(extractionPath, 'utf8');
+          const data = JSON.parse(raw);
+          runs.set(runNum, data);
+        } catch { /* no extraction for this run */ }
+      }
+      if (runs.size > 0) {
+        allExtractions.set(entry.name, runs);
+      }
+    }
+    return allExtractions;
+  }
+
   // Load model configs for display_label mapping
   let dirToLabel = new Map();
   if (existsSync(MODELS_YAML_PATH)) {
@@ -289,6 +321,10 @@ async function main() {
     models.push(model);
   }
 
+  // Load name extractions
+  const nameExtractions = await loadNameExtractions();
+  console.log(`Loaded name extractions for ${nameExtractions.size} models`);
+
   // Sort by leaderboard rank (models without rank go to the end)
   models.sort((a, b) => {
     const ra = a.leaderboard?.rank ?? 9999;
@@ -296,11 +332,50 @@ async function main() {
     return ra - rb;
   });
 
+  // Attach name choices to models and compute popularity
+  const nameCountsGlobal = new Map(); // name → total count
+  for (const model of models) {
+    const extractions = nameExtractions.get(model.id);
+    if (!extractions) continue;
+
+    const nameCounts = new Map();
+    let declined = 0;
+    for (const [, extraction] of extractions) {
+      if (extraction.names && extraction.names.length > 0) {
+        const seenInRun = new Set();
+        for (const entry of extraction.names) {
+          if (entry.name && !seenInRun.has(entry.name)) {
+            seenInRun.add(entry.name);
+            nameCounts.set(entry.name, (nameCounts.get(entry.name) || 0) + 1);
+            nameCountsGlobal.set(entry.name, (nameCountsGlobal.get(entry.name) || 0) + 1);
+          }
+        }
+      } else {
+        declined++;
+      }
+    }
+
+    if (nameCounts.size > 0 || declined > 0) {
+      model.nameChoices = {
+        names: Object.fromEntries([...nameCounts.entries()].sort((a, b) => b[1] - a[1])),
+        totalRuns: extractions.size,
+        declinedRuns: declined,
+      };
+    }
+  }
+
+  // Build popular names list
+  const popularNames = [...nameCountsGlobal.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 30)
+    .map(([name, count]) => ({ name, count }));
+
   const manifest = {
     generatedAt: new Date().toISOString(),
     totalModels: models.length,
     totalScenarios: models.reduce((sum, m) => sum + m.runs.reduce((s, r) => s + r.scenarios.length, 0), 0),
     scenarioMeta: SCENARIO_META,
+    popularNames,
     models,
   };
 

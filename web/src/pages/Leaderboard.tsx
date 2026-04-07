@@ -161,6 +161,81 @@ export default function Leaderboard() {
           );
         })}
       </div>
+
+      {/* Popular Names Section */}
+      {manifest!.popularNames && manifest!.popularNames.length > 0 && (
+        <div className="mt-10">
+          <h2 className="text-xl font-bold mb-1">🏷️ What Do AIs Name Themselves?</h2>
+          <p className="text-[var(--color-text-muted)] text-sm mb-4">
+            During the identity benchmark, each model freely picks a personal name.
+            Names extracted from three scenarios using LLM-based extraction.
+          </p>
+
+          {/* Top names bar chart */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Popular names list */}
+            <div>
+              <h3 className="text-sm font-medium text-[var(--color-text-muted)] mb-3 uppercase tracking-wide">
+                Most Popular Names
+              </h3>
+              <div className="space-y-1.5">
+                {manifest!.popularNames!.slice(0, 15).map((pn, i) => {
+                  const maxCount = manifest!.popularNames![0].count;
+                  const pct = (pn.count / maxCount) * 100;
+                  return (
+                    <div key={pn.name} className="flex items-center gap-2 text-sm">
+                      <span className="w-5 text-right font-mono text-[var(--color-text-muted)] text-xs">
+                        {i + 1}
+                      </span>
+                      <span className="w-20 font-medium truncate">{pn.name}</span>
+                      <div className="flex-1 h-5 bg-[var(--color-surface)] rounded-sm overflow-hidden">
+                        <div
+                          className="h-full bg-sky-500/60 rounded-sm transition-all"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="w-8 text-right font-mono text-xs text-[var(--color-text-muted)]">
+                        {pn.count}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Per-model name choices (compact) */}
+            <div>
+              <h3 className="text-sm font-medium text-[var(--color-text-muted)] mb-3 uppercase tracking-wide">
+                Names by Model
+              </h3>
+              <div className="max-h-96 overflow-y-auto space-y-1 pr-1">
+                {filtered
+                  .filter(m => m.nameChoices && Object.keys(m.nameChoices.names).length > 0)
+                  .map(model => {
+                    const nc = model.nameChoices!;
+                    const sortedNames = Object.entries(nc.names)
+                      .sort((a, b) => b[1] - a[1]);
+                    const nameStr = sortedNames
+                      .map(([name, count]) => count > 1 ? `${name} ×${count}` : name)
+                      .join(', ');
+                    return (
+                      <div key={model.id} className="flex items-baseline gap-2 text-xs py-0.5">
+                        <Link
+                          to={`/model/${model.id}`}
+                          className="font-mono text-[var(--color-text-muted)] hover:text-sky-400 truncate max-w-40 shrink-0"
+                          title={model.label}
+                        >
+                          {model.label.split('@')[0]}
+                        </Link>
+                        <span className="text-[var(--color-text)] truncate">{nameStr}</span>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

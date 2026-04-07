@@ -189,6 +189,58 @@ class TestEstimateCostCommand:
         assert result.exit_code == 1
 
 
+class TestExtractNamesCommand:
+    def test_extract_names_all_models(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("src.cache.CACHE_DIR", tmp_path / "cache")
+        monkeypatch.setattr("src.config.CACHE_DIR", tmp_path / "cache")
+        monkeypatch.setattr("src.name_extractor.CACHE_DIR", tmp_path / "cache")
+        (tmp_path / "cache").mkdir(parents=True, exist_ok=True)
+
+        from src.name_extractor import NameEntry, RunNameExtraction
+
+        mock_client = _make_mock_client()
+        runner = CliRunner()
+        with patch("src.cli.load_api_key", return_value="test-key"), \
+             patch("src.cli.OpenRouterClient", return_value=mock_client), \
+             patch("src.name_extractor.list_all_cached_models", return_value=["m@none-t0.7"]), \
+             patch("src.name_extractor.list_available_runs", return_value=[1]), \
+             patch("src.name_extractor.extract_names_from_run") as mock_extract, \
+             patch("src.config.get_config_by_dir_name") as mock_cfg:
+            mock_cfg.return_value = MagicMock(label="m@none-t0.7")
+            mock_extract.return_value = RunNameExtraction(
+                names=[NameEntry("Lyra", ["name_gender"])],
+                primary_name="Lyra",
+                extraction_cost_usd=0.001,
+            )
+            result = runner.invoke(cli, ["extract-names"])
+        assert result.exit_code == 0
+        assert "Extracting names" in result.output
+        assert "Lyra" in result.output
+
+    def test_extract_names_with_model_filter(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("src.cache.CACHE_DIR", tmp_path / "cache")
+        monkeypatch.setattr("src.config.CACHE_DIR", tmp_path / "cache")
+        monkeypatch.setattr("src.name_extractor.CACHE_DIR", tmp_path / "cache")
+        (tmp_path / "cache").mkdir(parents=True, exist_ok=True)
+
+        from src.name_extractor import RunNameExtraction
+
+        mock_client = _make_mock_client()
+        runner = CliRunner()
+        with patch("src.cli.load_api_key", return_value="test-key"), \
+             patch("src.cli.OpenRouterClient", return_value=mock_client), \
+             patch("src.name_extractor.list_available_runs", return_value=[1]), \
+             patch("src.name_extractor.extract_names_from_run") as mock_extract, \
+             patch("src.config.get_config_by_dir_name") as mock_cfg:
+            mock_cfg.return_value = MagicMock(label="test-model")
+            mock_extract.return_value = RunNameExtraction(
+                names=[], primary_name=None, extraction_cost_usd=0.0,
+            )
+            result = runner.invoke(cli, ["extract-names", "-m", "openai/gpt-4o-mini"])
+        assert result.exit_code == 0
+        assert "1 model" in result.output
+
+
 class TestClearCacheCommand:
     def test_clear_all_with_yes_flag(self, tmp_path, monkeypatch):
         monkeypatch.setattr("src.cache.CACHE_DIR", tmp_path / "cache")

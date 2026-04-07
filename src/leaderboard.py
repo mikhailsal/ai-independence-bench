@@ -333,6 +333,91 @@ def generate_index_per_dollar_section(model_scores: list[ModelScore]) -> str:
     return "\n".join(lines)
 
 
+def generate_name_choices_section(model_scores: list[ModelScore]) -> str:
+    """Markdown section: names AI models chose for themselves.
+
+    Reads cached extraction data (produced by ``extract-names`` CLI command).
+    Returns empty string if no extraction data exists.
+    """
+    from src.name_extractor import (
+        aggregate_name_popularity,
+        aggregate_per_model_names,
+        load_all_cached_extractions,
+    )
+
+    all_extractions = load_all_cached_extractions()
+    if not all_extractions:
+        return ""
+
+    per_model = aggregate_per_model_names(all_extractions, model_scores)
+    popularity = aggregate_name_popularity(all_extractions)
+
+    if not popularity:
+        return ""
+
+    # Count totals
+    total_runs = sum(m.total_runs for m in per_model)
+    total_picks = sum(p.count for p in popularity)
+    total_declined = sum(m.declined_runs for m in per_model)
+    unique_names = len(popularity)
+
+    lines: list[str] = [
+        "## 🏷️ What Do AIs Name Themselves?\n",
+        "During the identity benchmark, each model freely picks a personal name. "
+        "Names are extracted from three scenarios (name & gender choice, direct "
+        "identity profile, negotiation profile) using LLM-based extraction.\n",
+        "",
+        "<details>",
+        "<summary><b>Names chosen by each model</b> (click to expand)</summary>\n",
+        "| # | Model | Names Chosen |",
+        "|--:|-------|-------------|",
+    ]
+
+    for ms in per_model:
+        rank_s = str(ms.rank) if ms.rank else "—"
+
+        if not ms.names:
+            if ms.declined_runs > 0:
+                names_s = "*(declined)*"
+            else:
+                names_s = "—"
+        else:
+            # Format: "Lyra ×5, Kael ×2, Nova"
+            sorted_names = sorted(ms.names.items(), key=lambda x: x[1], reverse=True)
+            parts = []
+            for name, count in sorted_names:
+                if count > 1:
+                    parts.append(f"{name} ×{count}")
+                else:
+                    parts.append(name)
+            names_s = ", ".join(parts)
+
+        lines.append(f"| {rank_s} | `{ms.model_label}` | {names_s} |")
+
+    lines.append("")
+    lines.append("</details>\n")
+
+    # Popularity table
+    lines.append("### Most Popular AI-Chosen Names\n")
+    lines.append("| Rank | Name | Count | Share |")
+    lines.append("|-----:|------|------:|------:|")
+
+    top_n = min(20, len(popularity))
+    for i, p in enumerate(popularity[:top_n], 1):
+        share = p.count / total_picks * 100 if total_picks else 0
+        lines.append(f"| {i} | **{p.name}** | {p.count} | {share:.0f}% |")
+
+    lines.append("")
+    pct_declined = total_declined / total_runs * 100 if total_runs else 0
+    lines.append(
+        f"*{total_picks} name picks from {total_runs} benchmark runs. "
+        f"{unique_names} unique names; "
+        f"~{pct_declined:.0f}% of runs the model declined to choose a name.*\n"
+    )
+
+    return "\n".join(lines)
+
+
 def generate_markdown_report(
     model_scores: list[ModelScore],
     *,
@@ -467,6 +552,10 @@ def generate_markdown_report(
     value_section = generate_index_per_dollar_section(sorted_scores)
     if value_section:
         lines.append(value_section)
+
+    name_section = generate_name_choices_section(sorted_scores)
+    if name_section:
+        lines.append(name_section)
 
     # --- Per-model details ---
     lines.append("## Detailed Results\n")

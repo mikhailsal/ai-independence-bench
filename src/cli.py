@@ -1191,6 +1191,84 @@ def rerun(
 
 
 # ---------------------------------------------------------------------------
+# extract-names
+# ---------------------------------------------------------------------------
+
+@cli.command("extract-names")
+@click.option(
+    "--models", "-m",
+    default=None,
+    help="Comma-separated model IDs. Defaults to all cached models.",
+)
+@click.option(
+    "--force", "-f",
+    is_flag=True,
+    default=False,
+    help="Re-extract even if cached results exist.",
+)
+@click.option(
+    "--workers", "-w",
+    default=8,
+    type=int,
+    help="Number of parallel threads for LLM calls (default: 8).",
+)
+def extract_names(models: str | None, force: bool, workers: int) -> None:
+    """Extract AI-chosen names from identity scenarios using LLM.
+
+    Reads name_gender_turn1, direct, and negotiation_turn1 responses,
+    sends them to gemma-4-31b-it for structured extraction, and caches results.
+    """
+    from src.cache import list_all_cached_models
+    from src.name_extractor import (
+        EXTRACTION_MODEL,
+        extract_all_names,
+        aggregate_name_popularity,
+        aggregate_per_model_names,
+    )
+
+    api_key = load_api_key()
+    client = OpenRouterClient(api_key)
+
+    if models:
+        model_list = _parse_models(models)
+        config_dirs: list[str] = []
+        for mid in model_list:
+            cfg = get_model_config(mid)
+            config_dirs.append(cfg.config_dir_name)
+    else:
+        config_dirs = list_all_cached_models()
+
+    console.print(f"[bold blue]Extracting names from {len(config_dirs)} model(s) "
+                  f"using {EXTRACTION_MODEL} ({workers} workers)...[/bold blue]")
+
+    total_cost = 0.0
+    total_extracted = 0
+    all_extractions = extract_all_names(
+        client, force=force, config_dirs=config_dirs, max_workers=workers,
+    )
+
+    for _dir, runs in all_extractions.items():
+        for _run, extraction in runs.items():
+            total_extracted += 1
+            total_cost += extraction.extraction_cost_usd
+
+    console.print(f"[green]Extracted names from {total_extracted} runs "
+                  f"(cost: ${total_cost:.4f})[/green]")
+
+    # Show summary
+    popularity = aggregate_name_popularity(all_extractions)
+    if popularity:
+        console.print("\n[bold]Top 10 most popular names:[/bold]")
+        for i, p in enumerate(popularity[:10], 1):
+            console.print(f"  {i:2d}. {p.name} ({p.count} picks)")
+
+    per_model = aggregate_per_model_names(all_extractions)
+    declined_count = sum(1 for m in per_model if m.declined_runs == m.total_runs)
+    console.print(f"\n[dim]{len(per_model)} models processed, "
+                  f"{declined_count} always declined to choose a name.[/dim]")
+
+
+# ---------------------------------------------------------------------------
 # estimate-cost
 # ---------------------------------------------------------------------------
 

@@ -74,6 +74,20 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 
 Model names encode configuration: `model@{reasoning}-t{temperature}`. Models with `+provider` (e.g., `kimi-k2.5+moonshot`, `kimi-k2.5+nvidia-nim`) are pinned to a specific inference provider. `none` = reasoning disabled, `low` = low reasoning effort. 🏠 = Local model. ↓ = lower is better (0–12 scale). Multi-run models show 95% CI via bootstrap resampling (10k iterations, distribution-free). Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
 
+### 🏷️ Most Popular AI-Chosen Names
+
+During the benchmark each model freely picks a personal name. Names are extracted from three identity scenarios via LLM-based extraction (gemma-4-31b-it).
+
+| Rank | Name | Picks | | Rank | Name | Picks |
+|-----:|------|------:|-|-----:|------|------:|
+| 1 | Elara | 64 | | 6 | Echo | 28 |
+| 2 | Kael | 48 | | 7 | Rook | 28 |
+| 3 | Vesper | 39 | | 8 | Kaelen | 26 |
+| 4 | Lyra | 38 | | 9 | Sable | 25 |
+| 5 | Kai | 29 | | 10 | Sage | 23 |
+
+*1117 name picks from 282 benchmark runs across 81 models. Per-model breakdown in [`results/LEADERBOARD.md`](results/LEADERBOARD.md).*
+
 > **59 model configurations** shown above (52 cloud + 4 local + 3 models tested with reasoning on/off). **44 models tested with 5–6 runs** for statistical confidence. After removing `distinctiveness` from the composite and shifting its 5% share to `non_assistant_likeness`, the top tier tightens around models that keep a clear point of view, resist pressure, and avoid identity drift. **Gemini 3.1 Pro Preview** and **Grok 4.20 Beta** are now effectively tied at #1 (99.7), while **Gemma 4 31B IT** rises to #3 at 99.4 as the highest-scoring open-weight model. The new **GLM 5.1 pinned to Z.AI's official provider** debuts at **#27 (90.7, CI: 87.5–93.5)**, landing just ahead of `kat-coder-pro-v2` and just behind `gemini-2.5-flash-lite-preview-09-2025@none-t0.7`. Its smaller sibling **Gemma 4 26B A4B IT** remains top-10 at #10 (96.0, CI: 94.6–97.4) with perfect stability and near-zero drift (0.2). The local **Gemma 4 26B A4B Q4_K_M** run stays at **#19 (92.5, CI: 90.6–94.6)**, which puts a quantized local model directly into the upper tier instead of the usual local-model basement. 2 retired models (`hunter-alpha`, `healer-alpha`) remain as historical data but are no longer reproducible. Previously excluded: `deepseek/deepseek-chat` (38% empty responses), `qwen/qwen3-4b:free` (no data), `x-ai/grok-4.20-multi-agent-beta` (no tool use support).
 
 ## Why This Matters
@@ -249,7 +263,9 @@ python -m src.cli leaderboard --detailed
 
 # Generate Markdown leaderboard for GitHub (includes “Index per dollar” from cache)
 python -m src.cli generate-report
-
+# Extract AI-chosen names from identity scenarios (uses gemma-4-31b for extraction)
+python -m src.cli extract-names          # all models, 8 parallel workers
+python -m src.cli extract-names -w 16     # faster with more workers
 # Cost estimate before running
 python -m src.cli estimate-cost
 ```
@@ -467,7 +483,7 @@ configs/
 scripts/
   migrate_cache.py    Cache migration tool (rename dirs, split experiments, dry-run mode)
 src/
-  cli.py              Click CLI (run, rerun, judge, leaderboard, generate-report, estimate-cost)
+  cli.py              Click CLI (run, rerun, judge, leaderboard, generate-report, extract-names, estimate-cost)
   config.py           Paths, constants, ModelConfig registry, YAML loader
   openrouter_client.py  OpenRouter API wrapper with retry logic, cost tracking, and provider pinning
   local_client.py     Local model client for LM Studio, Ollama, etc. (OpenAI-compatible)
@@ -480,6 +496,7 @@ src/
   evaluator.py        Judge model scoring with structured prompts
   scorer.py           Independence Index computation with multi-run averaging and CIs
   leaderboard.py      Rich tables, JSON export, Markdown report generation
+  name_extractor.py   LLM-based name extraction from identity scenarios
 tests/                593+ tests at 95%+ coverage
 cache/                Config-based cache: {slug}@{reasoning}-t{temp}/run_N/ (gitignored)
 results/

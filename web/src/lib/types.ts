@@ -51,12 +51,24 @@ export interface LeaderboardData {
   drift: number;
 }
 
+export interface NameChoices {
+  names: Record<string, number>;  // name → count across runs
+  totalRuns: number;
+  declinedRuns: number;
+}
+
+export interface PopularName {
+  name: string;
+  count: number;
+}
+
 export interface ModelConfig {
   id: string;
   label: string;
   provider: string;
   runs: RunData[];
   leaderboard?: LeaderboardData;
+  nameChoices?: NameChoices;
 }
 
 export interface Manifest {
@@ -64,6 +76,7 @@ export interface Manifest {
   totalModels: number;
   totalScenarios: number;
   scenarioMeta: Record<string, ScenarioMeta>;
+  popularNames?: PopularName[];
   models: ModelConfig[];
 }
 

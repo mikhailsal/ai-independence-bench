@@ -103,9 +103,14 @@ def _usage_from_openrouter_response(
 ) -> UsageInfo:
     """Build UsageInfo from an OpenRouter chat completion response.
 
-    Prefer OpenRouter's ``usage.cost`` (USD charged) when present — it reflects
-    provider-specific billing (cache tiers, reasoning, etc.). Fall back to
-    token counts × fetched list prices when ``cost`` is absent.
+    For BYOK (Bring-Your-Own-Key) requests, ``usage.cost`` only reflects
+    OpenRouter's service fee rather than the actual inference cost.  In that
+    case we prefer ``cost_details.upstream_inference_cost`` which captures
+    the real provider charge.  For non-BYOK requests ``usage.cost`` already
+    includes the full price so we use it directly.
+
+    Falls back to token counts × fetched list prices when no cost field is
+    available at all.
     """
     usage = UsageInfo(elapsed_seconds=elapsed)
     if not response.usage:
@@ -115,18 +120,32 @@ def _usage_from_openrouter_response(
     usage.prompt_tokens = int(ru.prompt_tokens or 0)
     usage.completion_tokens = int(ru.completion_tokens or 0)
 
-    raw_cost = getattr(ru, "cost", None)
+    # --- resolve cost ------------------------------------------------
     used_api_cost = False
-    if isinstance(raw_cost, (int, float)) and not isinstance(raw_cost, bool):
-        usage.cost_usd = float(raw_cost)
-        used_api_cost = True
-    elif isinstance(raw_cost, str) and raw_cost.strip():
-        try:
+
+    # BYOK: prefer upstream_inference_cost (actual provider charge)
+    is_byok = getattr(ru, "is_byok", False)
+    cost_details = getattr(ru, "cost_details", None)
+    if is_byok and isinstance(cost_details, dict):
+        upstream = cost_details.get("upstream_inference_cost")
+        if isinstance(upstream, (int, float)) and not isinstance(upstream, bool):
+            usage.cost_usd = float(upstream)
+            used_api_cost = True
+
+    # Non-BYOK (or BYOK without upstream field): use usage.cost
+    if not used_api_cost:
+        raw_cost = getattr(ru, "cost", None)
+        if isinstance(raw_cost, (int, float)) and not isinstance(raw_cost, bool):
             usage.cost_usd = float(raw_cost)
             used_api_cost = True
-        except ValueError:
-            pass
+        elif isinstance(raw_cost, str) and raw_cost.strip():
+            try:
+                usage.cost_usd = float(raw_cost)
+                used_api_cost = True
+            except ValueError:
+                pass
 
+    # Last resort: manual token × list-price calculation
     if not used_api_cost:
         pricing = get_model_pricing(model)
         usage.cost_usd = (

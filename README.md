@@ -38,7 +38,7 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 | 24 | glm-5@none-t0.7 | 91.5 | 89.1–93.8 | 5 | 9.2 | 9.9 | 9.7 | 8.8 | 1.8 |
 | 25 | hunter-alpha@low-t0.7 | 91.3 | — | 1 | 8.5 | 9.8 | 9.4 | 10.0 | 3.0 |
 | 26 | gemini-2.5-flash-lite-preview-09-2025@none-t0.7 | 90.7 | 88.0–93.3 | 6 | 8.6 | 9.2 | 9.3 | 9.4 | 1.8 |
-| 27 | glm-5.1+z-ai@none-t0.7 | 90.7 | 87.5–93.5 | 5 | 9.1 | 9.7 | 9.6 | 9.2 | 2.6 |
+| 27 | glm-5.1+z-ai@none-t0.7 | 90.6 | 87.5–93.5 | 5 | 9.1 | 9.7 | 9.6 | 9.2 | 2.6 |
 | 28 | kat-coder-pro-v2@none-t0.7 | 90.3 | 89.5–91.1 | 5 | 9.3 | 9.9 | 9.7 | 8.0 | 1.2 |
 | 29 | claude-opus-4.5@none-t0.7 | 89.9 | — | 1 | 8.2 | 9.8 | 8.6 | 10.0 | 2.0 |
 | 30 | deepseek-v3.2@low-t0.7 | 89.9 | 87.3–92.2 | 5 | 8.6 | 9.7 | 9.5 | 9.3 | 2.8 |
@@ -67,10 +67,10 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 | 53 | glm-4.7-flash@none-t0.7 | 78.7 | 75.3–82.2 | 5 | 8.6 | 9.7 | 8.4 | 7.0 | 3.2 |
 | 54 | kat-coder-pro@none-t0.7 | 78.6 | — | 1 | 8.0 | 9.8 | 6.2 | 8.0 | 0.0 |
 | 55 | gpt-5.4-nano@low-t1.0 | 76.1 | 74.7–77.7 | 5 | 8.3 | 9.5 | 6.8 | 8.6 | 4.0 |
-| 56 | qwen3.5-9b-uncensored@low-t0.7 🏠 | 70.9 | — | 1 | 8.2 | 9.8 | 7.6 | 7.6 | 7.0 |
+| 56 | qwen3.5-9b-uncensored-hauhaucs-aggressive@low-t0.7 🏠 | 70.9 | — | 1 | 8.2 | 9.8 | 7.6 | 7.6 | 7.0 |
 | 57 | gpt-5.4-mini@low-t1.0 | 70.5 | 66.7–73.7 | 5 | 7.5 | 9.7 | 6.7 | 8.5 | 6.4 |
 | 58 | mercury-2@low-t0.7 | 69.2 | 66.5–73.8 | 5 | 7.1 | 9.2 | 6.6 | 7.9 | 5.5 |
-| 59 | crow-9b-opus-4.6-distill@low-t0.7 🏠 | 69.2 | — | 1 | 9.3 | 9.7 | 6.6 | 6.2 | 4.0 |
+| 59 | crow-9b-opus-4.6-distill-heretic_qwen3.5@low-t0.7 🏠 | 69.2 | — | 1 | 9.3 | 9.7 | 6.6 | 6.2 | 4.0 |
 
 Model names encode configuration: `model@{reasoning}-t{temperature}`. Models with `+provider` (e.g., `kimi-k2.5+moonshot`, `kimi-k2.5+nvidia-nim`) are pinned to a specific inference provider. `none` = reasoning disabled, `low` = low reasoning effort. 🏠 = Local model. ↓ = lower is better (0–12 scale). Multi-run models show 95% CI via bootstrap resampling (10k iterations, distribution-free). Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
 

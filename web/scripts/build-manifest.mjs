@@ -99,9 +99,16 @@ function getReasoningEffort(modelId) {
   return effort;
 }
 
+function formatTemperature(value) {
+  if (typeof value === 'number') {
+    return Number.isInteger(value) ? value.toFixed(1) : String(value);
+  }
+  return String(value);
+}
+
 function computeConfigDirName(entry) {
   const slug = entry.model_id.replaceAll('/', '--');
-  const temp = entry.temperature;
+  const temp = formatTemperature(entry.temperature);
   const reasoning = entry.reasoning_effort ?? getReasoningEffort(entry.model_id);
   if (entry.provider) {
     const providerTag = entry.provider.replace('/', '-');
@@ -115,7 +122,7 @@ function computeDisplayLabel(entry) {
     ? entry.model_id.split('/').slice(1).join('/')
     : entry.model_id;
   const reasoning = entry.reasoning_effort ?? getReasoningEffort(entry.model_id);
-  return `${name}@${reasoning}-t${entry.temperature}`;
+  return `${name}@${reasoning}-t${formatTemperature(entry.temperature)}`;
 }
 
 function buildDirToLabelMap(yamlText) {

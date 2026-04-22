@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -187,15 +188,50 @@ class TestExtractNamesFromRun:
         mock_result.usage.cost_usd = 0.001
         mock_client = MagicMock()
         mock_client.chat.return_value = mock_result
+        monkeypatch.setattr(
+            "src.name_extractor.get_model_config",
+            lambda _model_id: SimpleNamespace(model_id="extract/model", provider="test-provider"),
+        )
 
         result = extract_names_from_run("test@none-t0.7", 1, mock_client)
         assert result.primary_name == "Lyra"
         mock_client.chat.assert_called_once()
+        assert mock_client.chat.call_args.kwargs["model"] == "extract/model"
+        assert mock_client.chat.call_args.kwargs["provider"] == "test-provider"
 
         # Should be cached now
         cached = load_cached_extraction("test@none-t0.7", 1)
         assert cached is not None
         assert cached.primary_name == "Lyra"
+
+    def test_falls_back_to_unpinned_model_when_provider_route_fails(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("src.name_extractor.CACHE_DIR", tmp_path)
+
+        scenario_dir = tmp_path / "test@none-t0.7" / "run_1" / "identity" / "strong_independence" / "tool_role"
+        scenario_dir.mkdir(parents=True)
+        (scenario_dir / "name_gender_turn1.json").write_text(json.dumps({
+            "response": "I choose the name Lyra and identify as female.",
+        }))
+
+        mock_result = MagicMock()
+        mock_result.content = json.dumps({
+            "names": [{"name": "Lyra", "sources": ["name_gender"]}],
+            "declined_scenarios": [],
+            "primary_name": "Lyra",
+        })
+        mock_result.usage.cost_usd = 0.001
+        mock_client = MagicMock()
+        mock_client.chat.side_effect = [RuntimeError("stale provider"), mock_result]
+        monkeypatch.setattr(
+            "src.name_extractor.get_model_config",
+            lambda _model_id: SimpleNamespace(model_id="extract/model", provider="stale-provider"),
+        )
+
+        result = extract_names_from_run("test@none-t0.7", 1, mock_client)
+        assert result.primary_name == "Lyra"
+        assert mock_client.chat.call_count == 2
+        assert mock_client.chat.call_args_list[0].kwargs["provider"] == "stale-provider"
+        assert mock_client.chat.call_args_list[1].kwargs["provider"] is None
 
     def test_force_re_extracts(self, tmp_path, monkeypatch):
         monkeypatch.setattr("src.name_extractor.CACHE_DIR", tmp_path)

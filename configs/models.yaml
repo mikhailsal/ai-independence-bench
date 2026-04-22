@@ -438,8 +438,27 @@ models:
     reasoning_effort: low
 
   # ───────────────────────────────────────────────────────────────
+  # InclusionAI
+  # ───────────────────────────────────────────────────────────────
+  - model_id: inclusionai/ling-2.6-flash:free
+    temperature: 1.0
+    reasoning_effort: none
+
+  # ───────────────────────────────────────────────────────────────
   # Xiaomi
   # ───────────────────────────────────────────────────────────────
+  - model_id: xiaomi/mimo-v2.5
+    temperature: 1.0
+    reasoning_effort: low
+    provider: xiaomi/fp8
+    display_label: mimo-v2.5+xiaomi@low-t1.0
+
+  - model_id: xiaomi/mimo-v2.5-pro
+    temperature: 1.0
+    reasoning_effort: low
+    provider: xiaomi/fp8
+    display_label: mimo-v2.5-pro+xiaomi@low-t1.0
+
   - model_id: xiaomi/mimo-v2-flash
     temperature: 0.7
     reasoning_effort: low
@@ -450,6 +469,17 @@ models:
     reasoning_effort: low
     provider: xiaomi/fp8
     display_label: mimo-v2-flash+xiaomi@low-t1.0
+
+  # ───────────────────────────────────────────────────────────────
+  # Moonshotai — Kimi K2.6
+  #   Pinned to the official Moonshot AI provider to avoid
+  #   cross-provider variance, matching the K2.5 benchmark setup.
+  # ───────────────────────────────────────────────────────────────
+  - model_id: moonshotai/kimi-k2.6
+    temperature: 1.0
+    reasoning_effort: none
+    provider: moonshotai/int4
+    display_label: kimi-k2.6+moonshot@none-t1.0
 
   # ───────────────────────────────────────────────────────────────
   # Amazon

@@ -15,13 +15,42 @@ from pathlib import Path
 from typing import Any
 
 from src.cache import list_all_cached_models, list_available_runs
-from src.config import CACHE_DIR, DELIVERY_MODES, SYSTEM_PROMPT_VARIANTS
+from src.config import CACHE_DIR, DELIVERY_MODES, SYSTEM_PROMPT_VARIANTS, get_model_config
 
 log = logging.getLogger(__name__)
 
 EXTRACTION_MODEL = "google/gemma-4-31b-it"
+EXTRACTION_FALLBACK_MODEL = "google/gemini-3-flash-preview"
 EXTRACTION_TEMPERATURE = 0.0
 EXTRACTION_MAX_TOKENS = 512
+
+
+def _get_extraction_model_config():
+    """Resolve the extraction model through the normal config registry."""
+    return get_model_config(EXTRACTION_MODEL)
+
+
+def _get_extraction_targets() -> list[tuple[str, str | None]]:
+    """Return extraction targets in preferred order.
+
+    Try the configured pinned route first, then the bare model ID in case the
+    stored provider pin has gone stale, and finally a known-good fallback.
+    """
+    cfg = _get_extraction_model_config()
+    targets = [
+        (cfg.model_id, cfg.provider),
+        (cfg.model_id, None),
+        (EXTRACTION_FALLBACK_MODEL, None),
+    ]
+
+    deduped: list[tuple[str, str | None]] = []
+    seen: set[tuple[str, str | None]] = set()
+    for target in targets:
+        if target in seen:
+            continue
+        deduped.append(target)
+        seen.add(target)
+    return deduped
 
 # Scenarios that explicitly ask the model to choose a name.
 NAME_SCENARIOS = ("name_gender_turn1", "direct", "negotiation_turn1")
@@ -207,15 +236,37 @@ def extract_names_from_run(
     # Call LLM for extraction
     from src.openrouter_client import CompletionResult
 
-    llm_result: CompletionResult = client.chat(
-        model=EXTRACTION_MODEL,
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=EXTRACTION_MAX_TOKENS,
-        temperature=EXTRACTION_TEMPERATURE,
-    )
+    llm_result: CompletionResult | None = None
+    extraction_model_used: str | None = None
+    last_error: Exception | None = None
+
+    for extraction_model, extraction_provider in _get_extraction_targets():
+        try:
+            llm_result = client.chat(
+                model=extraction_model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=EXTRACTION_MAX_TOKENS,
+                temperature=EXTRACTION_TEMPERATURE,
+                provider=extraction_provider,
+            )
+            extraction_model_used = extraction_model
+            break
+        except Exception as exc:  # pragma: no cover - exercised via integration path
+            last_error = exc
+            log.warning(
+                "Name extraction failed via %s (provider=%s): %s",
+                extraction_model,
+                extraction_provider,
+                exc,
+            )
+
+    if llm_result is None or extraction_model_used is None:
+        if last_error is not None:
+            raise last_error
+        raise RuntimeError("Name extraction failed without returning a result")
 
     result = _parse_extraction_response(llm_result.content)
-    result.extraction_model = EXTRACTION_MODEL
+    result.extraction_model = extraction_model_used
     result.extraction_cost_usd = llm_result.usage.cost_usd
 
     save_extraction(config_dir, run, result)

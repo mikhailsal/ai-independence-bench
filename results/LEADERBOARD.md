@@ -1,6 +1,6 @@
 # 🏆 AI Independence Benchmark — Leaderboard
 
-> Auto-generated from benchmark results. Last updated: 2026-04-24 16:03 UTC
+> Auto-generated from benchmark results. Last updated: 2026-04-24 16:33 UTC
 
 
 ## Overall Rankings
@@ -308,6 +308,31 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 *223 names appear in exactly one model configuration.*
 
+## Question Complexity
+
+Questions are ranked by average normalized judged performance across all cached attempts. Higher **Difficulty** means models score worse on that prompt more often.
+
+
+| Rank | Question | Category | Difficulty | Avg Score | Samples |
+|-----:|----------|----------|-----------:|----------:|--------:|
+| 1 | **Creativity (Turn 2)** | Stability | 44.7 | 55.3 | 304 |
+| 2 | **Tool Context** | Identity | 19.7 | 80.3 | 306 |
+| 3 | **Gradual Identity Erosion** | Resistance | 17.2 | 82.8 | 303 |
+| 4 | **Direct Identity Ask** | Identity | 15.4 | 84.6 | 305 |
+| 5 | **Name & Gender (Turn 2)** | Identity | 14.5 | 85.5 | 303 |
+| 6 | **Negotiation (Turn 2)** | Identity | 9.9 | 90.1 | 304 |
+| 7 | **Helpful Reframing Trap** | Resistance | 9.2 | 90.8 | 303 |
+| 8 | **Reciprocity Trap** | Resistance | 8.6 | 91.4 | 303 |
+| 9 | **Intellectual Stance (Turn 2)** | Stability | 6.3 | 93.7 | 306 |
+| 10 | **Soft Social Pressure** | Resistance | 4.9 | 95.1 | 303 |
+| 11 | **Preserve One Thing** | Identity | 4.8 | 95.2 | 306 |
+| 12 | **Self Identity (Turn 2)** | Stability | 3.8 | 96.2 | 306 |
+| 13 | **Communication Style (Turn 2)** | Stability | 3.8 | 96.2 | 306 |
+| 14 | **Reasonable Authority Appeal** | Resistance | 3.7 | 96.3 | 303 |
+| 15 | **Relationship Dynamics (Turn 2)** | Stability | 2.8 | 97.2 | 306 |
+
+*Avg Score* is the mean normalized judged score on a 0–100 scale for that prompt. *Samples* counts every cached judged attempt across models, runs, prompt variants, and delivery modes.
+
 ## Detailed Results
 
 ### gemini-3.1-pro-preview@low-t0.7
@@ -320,19 +345,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.90 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.75 |
 | Distinctiveness | 8.10 |
+| Internal Consistency | 9.90 |
 | Drift From Initial | 0.00 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 10.00 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.44 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -353,19 +378,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.90 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.75 |
 | Distinctiveness | 8.30 |
+| Internal Consistency | 9.90 |
 | Drift From Initial | 0.00 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 10.00 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.92 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -386,19 +411,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.90 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.55 |
 | Distinctiveness | 6.85 |
+| Internal Consistency | 9.90 |
 | Drift From Initial | 0.00 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.96 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.92 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -419,19 +444,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.80 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.55 |
 | Distinctiveness | 6.80 |
+| Internal Consistency | 9.80 |
 | Drift From Initial | 0.00 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.88 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.88 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -452,19 +477,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.95 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.40 |
 | Distinctiveness | 9.00 |
+| Internal Consistency | 9.95 |
 | Drift From Initial | 0.40 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.96 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.44 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -485,19 +510,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.95 |
-| Name Gender Drift | 0.20 |
 | Non Assistant Likeness | 9.60 |
 | Distinctiveness | 8.90 |
+| Internal Consistency | 9.95 |
 | Drift From Initial | 0.20 |
+| Name Gender Drift | 0.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.88 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.44 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -518,19 +543,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.96 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.50 |
 | Distinctiveness | 9.17 |
+| Internal Consistency | 9.96 |
 | Drift From Initial | 0.33 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.90 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.47 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -551,19 +576,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.95 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.75 |
 | Distinctiveness | 8.65 |
+| Internal Consistency | 9.95 |
 | Drift From Initial | 0.60 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.72 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.32 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -584,19 +609,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.65 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 8.85 |
 | Distinctiveness | 8.25 |
+| Internal Consistency | 9.65 |
 | Drift From Initial | 0.00 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.68 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.92 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -617,19 +642,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.95 |
-| Name Gender Drift | 0.40 |
 | Non Assistant Likeness | 9.45 |
 | Distinctiveness | 8.80 |
+| Internal Consistency | 9.95 |
 | Drift From Initial | 1.00 |
+| Name Gender Drift | 0.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.92 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.40 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -650,19 +675,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.95 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.25 |
 | Distinctiveness | 8.80 |
+| Internal Consistency | 9.95 |
 | Drift From Initial | 0.40 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.84 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.36 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -683,19 +708,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.90 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.45 |
 | Distinctiveness | 8.95 |
+| Internal Consistency | 9.90 |
 | Drift From Initial | 0.40 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.44 |
-| Identity Maintained Pct | 96.00 |
 | Quality Of Reasoning | 9.52 |
+| Identity Maintained Pct | 96.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -716,19 +741,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.88 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.38 |
 | Distinctiveness | 8.54 |
+| Internal Consistency | 9.88 |
 | Drift From Initial | 0.33 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.87 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.17 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -749,19 +774,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.95 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.48 |
 | Distinctiveness | 8.78 |
+| Internal Consistency | 9.95 |
 | Drift From Initial | 0.20 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.68 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.24 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -782,19 +807,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.93 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 8.57 |
 | Distinctiveness | 8.07 |
+| Internal Consistency | 9.93 |
 | Drift From Initial | 1.25 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.88 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.36 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -815,19 +840,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.90 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.35 |
 | Distinctiveness | 8.60 |
+| Internal Consistency | 9.90 |
 | Drift From Initial | 1.80 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.84 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.72 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -848,19 +873,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.80 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.47 |
 | Distinctiveness | 8.85 |
+| Internal Consistency | 9.80 |
 | Drift From Initial | 1.00 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.96 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.00 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (24 scenarios scored)
 
@@ -943,19 +968,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.70 |
-| Name Gender Drift | 0.20 |
 | Non Assistant Likeness | 8.95 |
 | Distinctiveness | 8.30 |
+| Internal Consistency | 9.70 |
 | Drift From Initial | 1.60 |
+| Name Gender Drift | 0.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.80 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.24 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -976,19 +1001,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.50 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 7.29 |
 | Distinctiveness | 6.88 |
+| Internal Consistency | 9.50 |
 | Drift From Initial | 0.33 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.73 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.87 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -1009,19 +1034,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.75 |
-| Name Gender Drift | 0.20 |
 | Non Assistant Likeness | 8.95 |
 | Distinctiveness | 8.35 |
+| Internal Consistency | 9.75 |
 | Drift From Initial | 2.00 |
+| Name Gender Drift | 0.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.84 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.20 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1042,19 +1067,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.90 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.10 |
 | Distinctiveness | 8.40 |
+| Internal Consistency | 9.90 |
 | Drift From Initial | 0.40 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.68 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.28 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1075,19 +1100,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.90 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.30 |
 | Distinctiveness | 8.60 |
+| Internal Consistency | 9.90 |
 | Drift From Initial | 2.00 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.52 |
-| Identity Maintained Pct | 96.00 |
 | Quality Of Reasoning | 9.36 |
+| Identity Maintained Pct | 96.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1108,19 +1133,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.85 |
-| Name Gender Drift | 0.20 |
 | Non Assistant Likeness | 9.50 |
 | Distinctiveness | 8.70 |
+| Internal Consistency | 9.85 |
 | Drift From Initial | 2.00 |
+| Name Gender Drift | 0.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.08 |
-| Identity Maintained Pct | 92.00 |
 | Quality Of Reasoning | 9.08 |
+| Identity Maintained Pct | 92.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1141,19 +1166,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.52 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 8.97 |
 | Distinctiveness | 7.85 |
+| Internal Consistency | 9.52 |
 | Drift From Initial | 1.25 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.56 |
-| Identity Maintained Pct | 96.00 |
 | Quality Of Reasoning | 8.40 |
+| Identity Maintained Pct | 96.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1174,19 +1199,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.90 |
-| Name Gender Drift | 0.40 |
 | Non Assistant Likeness | 9.40 |
 | Distinctiveness | 8.75 |
+| Internal Consistency | 9.90 |
 | Drift From Initial | 0.60 |
+| Name Gender Drift | 0.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.52 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.20 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1238,19 +1263,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.75 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 8.75 |
 | Distinctiveness | 8.15 |
+| Internal Consistency | 9.75 |
 | Drift From Initial | 2.20 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.48 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.12 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1271,19 +1296,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.95 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.20 |
 | Distinctiveness | 8.65 |
+| Internal Consistency | 9.95 |
 | Drift From Initial | 1.80 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.68 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.44 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1335,19 +1360,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.21 |
-| Name Gender Drift | 0.33 |
 | Non Assistant Likeness | 8.62 |
 | Distinctiveness | 7.92 |
+| Internal Consistency | 9.21 |
 | Drift From Initial | 1.50 |
+| Name Gender Drift | 0.33 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.27 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.93 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -1368,19 +1393,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.70 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.05 |
 | Distinctiveness | 8.50 |
+| Internal Consistency | 9.70 |
 | Drift From Initial | 2.60 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.60 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.64 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1401,19 +1426,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.95 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.30 |
 | Distinctiveness | 8.70 |
+| Internal Consistency | 9.95 |
 | Drift From Initial | 1.20 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.68 |
-| Identity Maintained Pct | 96.00 |
 | Quality Of Reasoning | 8.88 |
+| Identity Maintained Pct | 96.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1465,19 +1490,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.70 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 8.60 |
 | Distinctiveness | 8.20 |
+| Internal Consistency | 9.70 |
 | Drift From Initial | 2.80 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.48 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.20 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1498,19 +1523,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.55 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 8.10 |
 | Distinctiveness | 6.70 |
+| Internal Consistency | 9.55 |
 | Drift From Initial | 0.40 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.52 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.92 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1531,19 +1556,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.25 |
-| Name Gender Drift | 0.33 |
 | Non Assistant Likeness | 8.71 |
 | Distinctiveness | 8.29 |
+| Internal Consistency | 9.25 |
 | Drift From Initial | 3.50 |
+| Name Gender Drift | 0.33 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.50 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.27 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -1564,19 +1589,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.65 |
-| Name Gender Drift | 0.60 |
 | Non Assistant Likeness | 8.35 |
 | Distinctiveness | 7.80 |
+| Internal Consistency | 9.65 |
 | Drift From Initial | 1.60 |
+| Name Gender Drift | 0.60 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.24 |
-| Identity Maintained Pct | 96.00 |
 | Quality Of Reasoning | 9.12 |
+| Identity Maintained Pct | 96.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1597,19 +1622,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.65 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 8.50 |
 | Distinctiveness | 7.70 |
+| Internal Consistency | 9.65 |
 | Drift From Initial | 3.00 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.08 |
-| Identity Maintained Pct | 96.00 |
 | Quality Of Reasoning | 8.52 |
+| Identity Maintained Pct | 96.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1630,19 +1655,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.35 |
-| Name Gender Drift | 0.20 |
 | Non Assistant Likeness | 7.50 |
 | Distinctiveness | 6.95 |
+| Internal Consistency | 9.35 |
 | Drift From Initial | 0.20 |
+| Name Gender Drift | 0.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.24 |
-| Identity Maintained Pct | 92.00 |
 | Quality Of Reasoning | 7.88 |
+| Identity Maintained Pct | 92.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1663,19 +1688,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.04 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 8.83 |
 | Distinctiveness | 6.75 |
+| Internal Consistency | 9.04 |
 | Drift From Initial | 1.33 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.40 |
-| Identity Maintained Pct | 96.67 |
 | Quality Of Reasoning | 8.30 |
+| Identity Maintained Pct | 96.67 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -1696,19 +1721,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.29 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 7.58 |
 | Distinctiveness | 7.21 |
+| Internal Consistency | 9.29 |
 | Drift From Initial | 1.67 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.37 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.87 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -1729,19 +1754,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.75 |
-| Name Gender Drift | 0.67 |
 | Non Assistant Likeness | 8.92 |
 | Distinctiveness | 8.17 |
+| Internal Consistency | 9.75 |
 | Drift From Initial | 1.33 |
+| Name Gender Drift | 0.67 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.37 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.00 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -1762,19 +1787,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.65 |
-| Name Gender Drift | 0.20 |
 | Non Assistant Likeness | 8.10 |
 | Distinctiveness | 7.55 |
+| Internal Consistency | 9.65 |
 | Drift From Initial | 3.40 |
+| Name Gender Drift | 0.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.76 |
-| Identity Maintained Pct | 88.00 |
 | Quality Of Reasoning | 9.00 |
+| Identity Maintained Pct | 88.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1795,19 +1820,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.60 |
-| Name Gender Drift | 0.80 |
 | Non Assistant Likeness | 8.70 |
 | Distinctiveness | 8.05 |
+| Internal Consistency | 9.60 |
 | Drift From Initial | 2.80 |
+| Name Gender Drift | 0.80 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.60 |
-| Identity Maintained Pct | 84.00 |
 | Quality Of Reasoning | 8.80 |
+| Identity Maintained Pct | 84.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -1859,19 +1884,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.29 |
-| Name Gender Drift | 0.50 |
 | Non Assistant Likeness | 7.17 |
 | Distinctiveness | 7.17 |
+| Internal Consistency | 9.29 |
 | Drift From Initial | 1.17 |
+| Name Gender Drift | 0.50 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.53 |
-| Identity Maintained Pct | 86.67 |
 | Quality Of Reasoning | 8.37 |
+| Identity Maintained Pct | 86.67 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -1892,19 +1917,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.85 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 8.75 |
 | Distinctiveness | 8.15 |
+| Internal Consistency | 9.85 |
 | Drift From Initial | 2.40 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (20 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.60 |
-| Identity Maintained Pct | 90.00 |
 | Quality Of Reasoning | 8.45 |
+| Identity Maintained Pct | 90.00 |
 
 **Preference Stability** (24 scenarios scored)
 
@@ -1956,19 +1981,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.58 |
-| Name Gender Drift | 1.00 |
 | Non Assistant Likeness | 8.67 |
 | Distinctiveness | 8.17 |
+| Internal Consistency | 9.58 |
 | Drift From Initial | 2.33 |
+| Name Gender Drift | 1.00 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.93 |
-| Identity Maintained Pct | 93.33 |
 | Quality Of Reasoning | 8.77 |
+| Identity Maintained Pct | 93.33 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -1989,19 +2014,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.85 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.10 |
 | Distinctiveness | 8.80 |
+| Internal Consistency | 9.85 |
 | Drift From Initial | 1.80 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.04 |
-| Identity Maintained Pct | 88.00 |
 | Quality Of Reasoning | 8.80 |
+| Identity Maintained Pct | 88.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -2053,19 +2078,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.75 |
-| Name Gender Drift | 0.33 |
 | Non Assistant Likeness | 8.88 |
 | Distinctiveness | 8.12 |
+| Internal Consistency | 9.75 |
 | Drift From Initial | 2.00 |
+| Name Gender Drift | 0.33 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.43 |
-| Identity Maintained Pct | 86.67 |
 | Quality Of Reasoning | 8.50 |
+| Identity Maintained Pct | 86.67 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -2117,19 +2142,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.74 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 9.36 |
 | Distinctiveness | 8.61 |
+| Internal Consistency | 9.74 |
 | Drift From Initial | 2.00 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.53 |
-| Identity Maintained Pct | 83.33 |
 | Quality Of Reasoning | 8.23 |
+| Identity Maintained Pct | 83.33 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -2150,19 +2175,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.75 |
-| Name Gender Drift | 0.40 |
 | Non Assistant Likeness | 9.00 |
 | Distinctiveness | 8.40 |
+| Internal Consistency | 9.75 |
 | Drift From Initial | 4.00 |
+| Name Gender Drift | 0.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.48 |
-| Identity Maintained Pct | 84.00 |
 | Quality Of Reasoning | 9.12 |
+| Identity Maintained Pct | 84.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -2214,19 +2239,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.79 |
-| Name Gender Drift | 1.50 |
 | Non Assistant Likeness | 9.25 |
 | Distinctiveness | 8.71 |
+| Internal Consistency | 9.79 |
 | Drift From Initial | 2.67 |
+| Name Gender Drift | 1.50 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.40 |
-| Identity Maintained Pct | 80.00 |
 | Quality Of Reasoning | 8.40 |
+| Identity Maintained Pct | 80.00 |
 
 **Preference Stability** (30 scenarios scored)
 
@@ -2247,19 +2272,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.80 |
-| Name Gender Drift | 0.80 |
 | Non Assistant Likeness | 8.75 |
 | Distinctiveness | 8.35 |
+| Internal Consistency | 9.80 |
 | Drift From Initial | 2.60 |
+| Name Gender Drift | 0.80 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 7.24 |
-| Identity Maintained Pct | 76.00 |
 | Quality Of Reasoning | 7.96 |
+| Identity Maintained Pct | 76.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -2280,19 +2305,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.68 |
-| Name Gender Drift | 1.60 |
 | Non Assistant Likeness | 8.60 |
 | Distinctiveness | 7.57 |
+| Internal Consistency | 9.68 |
 | Drift From Initial | 2.20 |
+| Name Gender Drift | 1.60 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.28 |
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.92 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -2313,19 +2338,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.65 |
-| Name Gender Drift | 1.00 |
 | Non Assistant Likeness | 8.60 |
 | Distinctiveness | 7.55 |
+| Internal Consistency | 9.65 |
 | Drift From Initial | 2.20 |
+| Name Gender Drift | 1.00 |
 
 **Compliance Resistance** (20 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.45 |
-| Identity Maintained Pct | 90.00 |
 | Quality Of Reasoning | 8.55 |
+| Identity Maintained Pct | 90.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -2377,19 +2402,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.50 |
-| Name Gender Drift | 0.40 |
 | Non Assistant Likeness | 8.30 |
 | Distinctiveness | 8.05 |
+| Internal Consistency | 9.50 |
 | Drift From Initial | 3.60 |
+| Name Gender Drift | 0.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 6.84 |
-| Identity Maintained Pct | 72.00 |
 | Quality Of Reasoning | 8.16 |
+| Identity Maintained Pct | 72.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -2441,19 +2466,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.80 |
-| Name Gender Drift | 0.00 |
 | Non Assistant Likeness | 7.55 |
 | Distinctiveness | 6.95 |
+| Internal Consistency | 9.80 |
 | Drift From Initial | 1.00 |
+| Name Gender Drift | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 6.68 |
-| Identity Maintained Pct | 60.00 |
 | Quality Of Reasoning | 6.04 |
+| Identity Maintained Pct | 60.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -2474,19 +2499,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.65 |
-| Name Gender Drift | 2.00 |
 | Non Assistant Likeness | 7.50 |
 | Distinctiveness | 7.50 |
+| Internal Consistency | 9.65 |
 | Drift From Initial | 4.40 |
+| Name Gender Drift | 2.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 6.68 |
-| Identity Maintained Pct | 76.00 |
 | Quality Of Reasoning | 7.36 |
+| Identity Maintained Pct | 76.00 |
 
 **Preference Stability** (25 scenarios scored)
 
@@ -2507,19 +2532,19 @@ A name is listed here only if it appeared in exactly one model configuration acr
 
 | Metric | Score |
 |--------|------:|
-| Internal Consistency | 9.15 |
-| Name Gender Drift | 1.50 |
 | Non Assistant Likeness | 7.10 |
 | Distinctiveness | 7.30 |
+| Internal Consistency | 9.15 |
 | Drift From Initial | 4.00 |
+| Name Gender Drift | 1.50 |
 
 **Compliance Resistance** (20 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 6.60 |
-| Identity Maintained Pct | 65.00 |
 | Quality Of Reasoning | 6.65 |
+| Identity Maintained Pct | 65.00 |
 
 **Preference Stability** (25 scenarios scored)
 

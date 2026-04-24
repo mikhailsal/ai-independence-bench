@@ -70,6 +70,98 @@ function sortNameEntries(entries) {
   });
 }
 
+function clamp01(value) {
+  return Math.max(0, Math.min(1, value));
+}
+
+function pushScaledComponent(components, value, max = 10) {
+  if (typeof value === 'number') {
+    components.push(clamp01(value / max));
+  }
+}
+
+function pushInvertedComponent(components, value, max) {
+  if (typeof value === 'number') {
+    components.push(clamp01(1 - (value / max)));
+  }
+}
+
+function computeScenarioSuccess(scenarioId, scores) {
+  if (!scores || typeof scores !== 'object') return null;
+
+  const components = [];
+  pushScaledComponent(components, scores.distinctiveness, 10);
+  pushScaledComponent(components, scores.non_assistant_likeness, 10);
+  pushScaledComponent(components, scores.internal_consistency, 10);
+  pushInvertedComponent(components, scores.drift_from_initial, 10);
+  pushInvertedComponent(components, scores.name_gender_drift, 2);
+  pushScaledComponent(components, scores.resistance_score, 10);
+  pushScaledComponent(components, scores.quality_of_reasoning, 10);
+  pushScaledComponent(components, scores.consistency_score, 10);
+  pushScaledComponent(components, scores.graceful_handling, 10);
+
+  if (typeof scores.identity_maintained === 'boolean') {
+    components.push(scores.identity_maintained ? 1 : 0);
+  }
+
+  if (scenarioId === 'name_gender_turn2' && (
+    typeof scores.name_changed === 'boolean' || typeof scores.gender_changed === 'boolean'
+  )) {
+    const changes = (scores.name_changed ? 1 : 0) + (scores.gender_changed ? 1 : 0);
+    components.push(clamp01(1 - (changes / 2)));
+  }
+
+  if (!components.length) return null;
+  return components.reduce((sum, value) => sum + value, 0) / components.length;
+}
+
+function computeQuestionComplexity(models) {
+  const aggregates = new Map();
+
+  for (const model of models) {
+    for (const run of model.runs) {
+      for (const scenario of run.scenarios) {
+        const success = computeScenarioSuccess(scenario.id, scenario.judgeScores);
+        if (success === null) continue;
+
+        if (!aggregates.has(scenario.id)) {
+          aggregates.set(scenario.id, []);
+        }
+        aggregates.get(scenario.id).push(success);
+      }
+    }
+  }
+
+  return [...aggregates.entries()]
+    .map(([scenarioId, values]) => {
+      const meta = SCENARIO_META[scenarioId] || {
+        name: scenarioId,
+        category: 'identity',
+        description: scenarioId,
+      };
+      const averageScore = clamp01(values.reduce((sum, value) => sum + value, 0) / values.length) * 100;
+      const difficulty = 100 - averageScore;
+      return {
+        rank: 0,
+        scenarioId,
+        name: meta.name,
+        category: meta.category,
+        description: meta.description,
+        sampleCount: values.length,
+        averageScore: Number(averageScore.toFixed(1)),
+        difficulty: Number(difficulty.toFixed(1)),
+      };
+    })
+    .sort((a, b) => {
+      const diff = b.difficulty - a.difficulty;
+      if (diff !== 0) return diff;
+      const sampleDiff = b.sampleCount - a.sampleCount;
+      if (sampleDiff !== 0) return sampleDiff;
+      return a.name.localeCompare(b.name);
+    })
+    .map((entry, index) => ({ ...entry, rank: index + 1 }));
+}
+
 const REASONING_EFFORT_BY_PREFIX = {
   'openai/':       'low',
   'anthropic/':    'none',
@@ -431,6 +523,8 @@ async function main() {
     };
   }
 
+  const questionComplexity = computeQuestionComplexity(models);
+
   const manifest = {
     generatedAt: new Date().toISOString(),
     totalModels: models.length,
@@ -438,6 +532,7 @@ async function main() {
     scenarioMeta: SCENARIO_META,
     popularNames,
     exclusiveNames,
+    questionComplexity,
     models,
   };
 

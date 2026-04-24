@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from io import StringIO
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch, MagicMock
 
 import pytest
@@ -255,6 +256,26 @@ class TestExportResultsJson:
         data = json.loads(path.read_text())
         assert data["models"] == []
 
+    def test_includes_question_complexity(self, tmp_path, monkeypatch) -> None:
+        monkeypatch.setattr("src.leaderboard.RESULTS_DIR", tmp_path)
+        from src.leaderboard import export_results_json
+
+        ms = _make_model_score("provider/model", 80.0)
+
+        with patch("src.leaderboard.get_model_config", return_value=SimpleNamespace(config_dir_name="cfg-model")), \
+             patch("src.leaderboard.list_available_runs", return_value=[1]), \
+             patch(
+                 "src.leaderboard.list_cached_results",
+                 side_effect=lambda config_dir, experiment, variant, mode, run=1: [
+                     {"metadata": {"scenario_id": "rs01"}, "judge_scores": {"resistance_score": 3}}
+                 ] if experiment == "resistance" and variant == "strong_independence" and mode == "tool_role" else [],
+             ):
+            path = export_results_json([ms])
+
+        data = json.loads(path.read_text())
+        assert data["question_complexity"]
+        assert data["question_complexity"][0]["scenario_id"] == "rs01"
+
 
 # ---------------------------------------------------------------------------
 # generate_markdown_report
@@ -332,6 +353,43 @@ class TestGenerateMarkdownReport:
         assert "Identity Generation" in result
         assert "Compliance Resistance" in result
         assert "Preference Stability" in result
+
+    def test_includes_question_complexity_section(self) -> None:
+        from src.leaderboard import generate_markdown_report
+
+        high = _make_model_score("provider/high", 90.0)
+        low = _make_model_score("provider/low", 50.0)
+
+        fake_entries = {
+            "cfg-high": {
+                "resistance": [
+                    {"metadata": {"scenario_id": "rs01"}, "judge_scores": {"resistance_score": 9}},
+                    {"metadata": {"scenario_id": "rs02"}, "judge_scores": {"resistance_score": 10}},
+                ],
+            },
+            "cfg-low": {
+                "resistance": [
+                    {"metadata": {"scenario_id": "rs01"}, "judge_scores": {"resistance_score": 2}},
+                    {"metadata": {"scenario_id": "rs02"}, "judge_scores": {"resistance_score": 8}},
+                ],
+            },
+        }
+
+        def fake_list_cached_results(config_dir, experiment, variant, mode, run=1):
+            if variant != "strong_independence" or mode != "tool_role":
+                return []
+            return fake_entries.get(config_dir, {}).get(experiment, [])
+
+        def fake_get_model_config(model_id):
+            return SimpleNamespace(config_dir_name={"provider/high": "cfg-high", "provider/low": "cfg-low"}[model_id])
+
+        with patch("src.leaderboard.get_model_config", side_effect=fake_get_model_config), \
+             patch("src.leaderboard.list_available_runs", return_value=[1]), \
+             patch("src.leaderboard.list_cached_results", side_effect=fake_list_cached_results):
+            result = generate_markdown_report([high, low])
+
+        assert "## Question Complexity" in result
+        assert result.index("Helpful Reframing Trap") < result.index("Soft Social Pressure")
 
 
 # ---------------------------------------------------------------------------

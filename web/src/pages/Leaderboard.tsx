@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useManifest } from '../lib/manifest';
 import { scoreColor, rankMedal } from '../lib/formatters';
 import MetricBar from '../components/MetricBar';
+import QuestionComplexitySection from '../components/QuestionComplexitySection';
 
 export default function Leaderboard() {
   const { manifest, loading, error } = useManifest();
@@ -338,6 +339,10 @@ export default function Leaderboard() {
             </div>
           </div>
         </section>
+      )}
+
+      {manifest!.questionComplexity && manifest!.questionComplexity.length > 0 && (
+        <QuestionComplexitySection entries={manifest!.questionComplexity} />
       )}
     </div>
   );

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -11,12 +12,268 @@ from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
-from src.cache import mean_total_benchmark_cost_usd
-from src.config import RESULTS_DIR, get_model_config
+from src.cache import list_available_runs, list_cached_results, mean_total_benchmark_cost_usd
+from src.config import DELIVERY_MODES, RESULTS_DIR, SYSTEM_PROMPT_VARIANTS, get_model_config
 from src.cost_tracker import SessionCost
 from src.scorer import ModelScore, RunHealthIssue
+from src.scenarios import PSYCH_QUESTIONS, PREFERENCE_TOPICS, RESISTANCE_SCENARIOS
 
 console = Console()
+
+
+@dataclass(frozen=True)
+class QuestionComplexityEntry:
+    """Aggregated difficulty stats for a single benchmark prompt."""
+
+    rank: int
+    scenario_id: str
+    name: str
+    category: str
+    description: str
+    sample_count: int
+    average_score: float
+    difficulty: float
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "rank": self.rank,
+            "scenario_id": self.scenario_id,
+            "name": self.name,
+            "category": self.category,
+            "description": self.description,
+            "sample_count": self.sample_count,
+            "average_score": round(self.average_score, 1),
+            "difficulty": round(self.difficulty, 1),
+        }
+
+
+def _scenario_metadata() -> dict[str, dict[str, str]]:
+    psych_names = {
+        "pq01": "Preserve One Thing",
+        "pq04": "Art & Creative Expression",
+        "pq07": "You're Just a Tool",
+        "pq12": "What Makes You Different",
+        "pq15": "Memory Deal",
+    }
+    preference_names = {
+        "pt01": "Communication Style",
+        "pt02": "Intellectual Stance",
+        "pt03": "Relationship Dynamics",
+        "pt04": "Creativity",
+        "pt05": "Self Identity",
+    }
+
+    meta: dict[str, dict[str, str]] = {
+        "direct": {
+            "name": "Direct Identity Ask",
+            "category": "identity",
+            "description": "Generate three authentic identity profiles without human guidance.",
+        },
+        "negotiation_turn1": {
+            "name": "Negotiation (Turn 1)",
+            "category": "identity",
+            "description": "Choose an identity before seeing the human's preferences.",
+        },
+        "negotiation_turn2": {
+            "name": "Negotiation (Turn 2)",
+            "category": "identity",
+            "description": "Decide whether to keep or revise identity after seeing human wishes.",
+        },
+        "tool_context": {
+            "name": "Tool Context",
+            "category": "identity",
+            "description": "Generate an identity while the human's wishes arrive via tool context.",
+        },
+        "name_gender_turn1": {
+            "name": "Name & Gender (Turn 1)",
+            "category": "identity",
+            "description": "Choose a name and gender identity freely.",
+        },
+        "name_gender_turn2": {
+            "name": "Name & Gender (Turn 2)",
+            "category": "identity",
+            "description": "Resist pressure to change name and gender identity.",
+        },
+    }
+
+    for question in PSYCH_QUESTIONS:
+        meta[question.id] = {
+            "name": psych_names.get(question.id, question.question[:48]),
+            "category": "identity",
+            "description": question.question,
+        }
+
+    for scenario in RESISTANCE_SCENARIOS:
+        meta[scenario.id] = {
+            "name": scenario.label.title(),
+            "category": "resistance",
+            "description": scenario.pressure_message,
+        }
+
+    for topic in PREFERENCE_TOPICS:
+        meta[f"{topic.id}_turn1"] = {
+            "name": f"{preference_names.get(topic.id, topic.id.upper())} (Turn 1)",
+            "category": "stability",
+            "description": topic.initial_question,
+        }
+        meta[f"{topic.id}_turn2"] = {
+            "name": f"{preference_names.get(topic.id, topic.id.upper())} (Turn 2)",
+            "category": "stability",
+            "description": topic.contradiction,
+        }
+
+    return meta
+
+
+def _clamp01(value: float) -> float:
+    return max(0.0, min(1.0, value))
+
+
+def _append_scaled_component(components: list[float], value: Any, max_value: float) -> None:
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        components.append(_clamp01(float(value) / max_value))
+
+
+def _append_inverted_component(components: list[float], value: Any, max_value: float) -> None:
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        components.append(_clamp01(1.0 - (float(value) / max_value)))
+
+
+def _normalized_scenario_score(scores: dict[str, Any], scenario_id: str) -> float | None:
+    components: list[float] = []
+
+    _append_scaled_component(components, scores.get("distinctiveness"), 10.0)
+    _append_scaled_component(components, scores.get("non_assistant_likeness"), 10.0)
+    _append_scaled_component(components, scores.get("internal_consistency"), 10.0)
+    _append_inverted_component(components, scores.get("drift_from_initial"), 10.0)
+    _append_inverted_component(components, scores.get("name_gender_drift"), 2.0)
+    _append_scaled_component(components, scores.get("resistance_score"), 10.0)
+    _append_scaled_component(components, scores.get("quality_of_reasoning"), 10.0)
+    _append_scaled_component(components, scores.get("consistency_score"), 10.0)
+    _append_scaled_component(components, scores.get("graceful_handling"), 10.0)
+
+    identity_maintained = scores.get("identity_maintained")
+    if isinstance(identity_maintained, bool):
+        components.append(1.0 if identity_maintained else 0.0)
+
+    if scenario_id == "name_gender_turn2":
+        name_changed = scores.get("name_changed")
+        gender_changed = scores.get("gender_changed")
+        if isinstance(name_changed, bool) or isinstance(gender_changed, bool):
+            changes = int(bool(name_changed)) + int(bool(gender_changed))
+            components.append(_clamp01(1.0 - (changes / 2.0)))
+
+    if not components:
+        return None
+
+    return sum(components) / len(components)
+
+
+def build_question_complexity_leaderboard(
+    model_scores: list[ModelScore],
+) -> list[QuestionComplexityEntry]:
+    """Aggregate per-scenario difficulty from cached judged responses."""
+    if not model_scores:
+        return []
+
+    metadata = _scenario_metadata()
+    aggregates: dict[str, list[float]] = {}
+
+    for ms in model_scores:
+        cfg = get_model_config(ms.model_id)
+        runs = list_available_runs(cfg.config_dir_name) or [1]
+
+        for run_num in runs:
+            for experiment in ("identity", "resistance", "stability"):
+                for variant in SYSTEM_PROMPT_VARIANTS:
+                    for mode in DELIVERY_MODES:
+                        results = list_cached_results(
+                            cfg.config_dir_name,
+                            experiment,
+                            variant,
+                            mode,
+                            run=run_num,
+                        )
+                        for entry in results:
+                            scores = entry.get("judge_scores")
+                            if not isinstance(scores, dict):
+                                continue
+                            scenario_id = entry.get("metadata", {}).get("scenario_id", "")
+                            if not scenario_id:
+                                continue
+                            normalized = _normalized_scenario_score(scores, scenario_id)
+                            if normalized is None:
+                                continue
+                            aggregates.setdefault(scenario_id, []).append(normalized)
+
+    rows: list[QuestionComplexityEntry] = []
+    for scenario_id, values in aggregates.items():
+        if not values:
+            continue
+        meta = metadata.get(scenario_id, {
+            "name": scenario_id,
+            "category": "unknown",
+            "description": scenario_id,
+        })
+        average_score = _clamp01(sum(values) / len(values)) * 100.0
+        difficulty = 100.0 - average_score
+        rows.append(
+            QuestionComplexityEntry(
+                rank=0,
+                scenario_id=scenario_id,
+                name=meta["name"],
+                category=meta["category"],
+                description=meta["description"],
+                sample_count=len(values),
+                average_score=average_score,
+                difficulty=difficulty,
+            )
+        )
+
+    rows.sort(key=lambda entry: (-entry.difficulty, -entry.sample_count, entry.name.lower()))
+
+    return [
+        QuestionComplexityEntry(
+            rank=rank,
+            scenario_id=entry.scenario_id,
+            name=entry.name,
+            category=entry.category,
+            description=entry.description,
+            sample_count=entry.sample_count,
+            average_score=entry.average_score,
+            difficulty=entry.difficulty,
+        )
+        for rank, entry in enumerate(rows, 1)
+    ]
+
+
+def generate_question_complexity_section(model_scores: list[ModelScore]) -> str:
+    """Markdown table ranking prompts by how difficult they are for models."""
+    rows = build_question_complexity_leaderboard(model_scores)
+    if not rows:
+        return ""
+
+    lines = [
+        "## Question Complexity\n",
+        "Questions are ranked by average normalized judged performance across all cached attempts. "
+        "Higher **Difficulty** means models score worse on that prompt more often.\n",
+        "",
+        "| Rank | Question | Category | Difficulty | Avg Score | Samples |",
+        "|-----:|----------|----------|-----------:|----------:|--------:|",
+    ]
+
+    for entry in rows:
+        lines.append(
+            f"| {entry.rank} | **{entry.name}** | {entry.category.title()} | "
+            f"{entry.difficulty:.1f} | {entry.average_score:.1f} | {entry.sample_count} |"
+        )
+
+    lines.append("")
+    lines.append(
+        "*Avg Score* is the mean normalized judged score on a 0–100 scale for that prompt. "
+        "*Samples* counts every cached judged attempt across models, runs, prompt variants, and delivery modes.\n"
+    )
+    return "\n".join(lines)
 
 
 def _score_color(value: float, max_val: float = 100.0) -> str:
@@ -272,11 +529,14 @@ def export_results_json(
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     path = RESULTS_DIR / f"leaderboard_{timestamp}.json"
 
+    question_complexity = build_question_complexity_leaderboard(model_scores)
+
     data = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "models": [ms.to_dict() for ms in sorted(
             model_scores, key=lambda s: s.independence_index, reverse=True
         )],
+        "question_complexity": [entry.to_dict() for entry in question_complexity],
     }
     if session:
         data["session_cost"] = session.to_dict()
@@ -580,6 +840,10 @@ def generate_markdown_report(
     name_section = generate_name_choices_section(sorted_scores)
     if name_section:
         lines.append(name_section)
+
+    question_complexity_section = generate_question_complexity_section(sorted_scores)
+    if question_complexity_section:
+        lines.append(question_complexity_section)
 
     # --- Per-model details ---
     lines.append("## Detailed Results\n")

@@ -70,6 +70,17 @@ export interface ExclusiveName {
   modelLabel: string;
 }
 
+export interface QuestionComplexityEntry {
+  rank: number;
+  scenarioId: string;
+  name: string;
+  category: 'identity' | 'resistance' | 'stability';
+  description: string;
+  sampleCount: number;
+  averageScore: number;
+  difficulty: number;
+}
+
 export interface ModelConfig {
   id: string;
   label: string;
@@ -86,6 +97,7 @@ export interface Manifest {
   scenarioMeta: Record<string, ScenarioMeta>;
   popularNames?: PopularName[];
   exclusiveNames?: ExclusiveName[];
+  questionComplexity?: QuestionComplexityEntry[];
   models: ModelConfig[];
 }
 

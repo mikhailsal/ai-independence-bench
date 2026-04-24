@@ -53,6 +53,7 @@ export interface LeaderboardData {
 
 export interface NameChoices {
   names: Record<string, number>;  // name → count across runs
+  uniqueNames?: Record<string, number>;  // name → count across runs, only if unique to this model
   totalRuns: number;
   declinedRuns: number;
 }
@@ -60,6 +61,13 @@ export interface NameChoices {
 export interface PopularName {
   name: string;
   count: number;
+}
+
+export interface ExclusiveName {
+  name: string;
+  count: number;
+  modelId: string;
+  modelLabel: string;
 }
 
 export interface ModelConfig {
@@ -77,6 +85,7 @@ export interface Manifest {
   totalScenarios: number;
   scenarioMeta: Record<string, ScenarioMeta>;
   popularNames?: PopularName[];
+  exclusiveNames?: ExclusiveName[];
   models: ModelConfig[];
 }
 

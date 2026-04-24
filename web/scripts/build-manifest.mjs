@@ -62,6 +62,14 @@ function dirToProvider(dirName) {
   return idx >= 0 ? dirName.slice(0, idx) : '';
 }
 
+function sortNameEntries(entries) {
+  return [...entries].sort((a, b) => {
+    const countDiff = b[1] - a[1];
+    if (countDiff !== 0) return countDiff;
+    return a[0].localeCompare(b[0]);
+  });
+}
+
 const REASONING_EFFORT_BY_PREFIX = {
   'openai/':       'low',
   'anthropic/':    'none',
@@ -341,6 +349,7 @@ async function main() {
 
   // Attach name choices to models and compute popularity
   const nameCountsGlobal = new Map(); // name → total count
+  const nameCountsByModel = new Map(); // name → Map<modelId, count>
   for (const model of models) {
     const extractions = nameExtractions.get(model.id);
     if (!extractions) continue;
@@ -355,6 +364,12 @@ async function main() {
             seenInRun.add(entry.name);
             nameCounts.set(entry.name, (nameCounts.get(entry.name) || 0) + 1);
             nameCountsGlobal.set(entry.name, (nameCountsGlobal.get(entry.name) || 0) + 1);
+
+            if (!nameCountsByModel.has(entry.name)) {
+              nameCountsByModel.set(entry.name, new Map());
+            }
+            const modelCounts = nameCountsByModel.get(entry.name);
+            modelCounts.set(model.id, (modelCounts.get(model.id) || 0) + 1);
           }
         }
       } else {
@@ -364,7 +379,7 @@ async function main() {
 
     if (nameCounts.size > 0 || declined > 0) {
       model.nameChoices = {
-        names: Object.fromEntries([...nameCounts.entries()].sort((a, b) => b[1] - a[1])),
+        names: Object.fromEntries(sortNameEntries(nameCounts.entries())),
         totalRuns: extractions.size,
         declinedRuns: declined,
       };
@@ -372,10 +387,49 @@ async function main() {
   }
 
   // Build popular names list
-  const popularNames = [...nameCountsGlobal.entries()]
-    .sort((a, b) => b[1] - a[1])
+  const popularNames = sortNameEntries(nameCountsGlobal.entries())
     .slice(0, 30)
     .map(([name, count]) => ({ name, count }));
+
+  const exclusiveNames = [];
+  for (const [name, modelCounts] of nameCountsByModel.entries()) {
+    if (modelCounts.size !== 1) continue;
+
+    const [[modelId, count]] = [...modelCounts.entries()];
+    const model = models.find(entry => entry.id === modelId);
+    if (!model) continue;
+
+    exclusiveNames.push({
+      name,
+      count,
+      modelId,
+      modelLabel: model.label,
+    });
+  }
+  exclusiveNames.sort((a, b) => {
+    const countDiff = b.count - a.count;
+    if (countDiff !== 0) return countDiff;
+    const nameDiff = a.name.localeCompare(b.name);
+    if (nameDiff !== 0) return nameDiff;
+    return a.modelLabel.localeCompare(b.modelLabel);
+  });
+
+  const exclusiveByModel = new Map();
+  for (const entry of exclusiveNames) {
+    if (!exclusiveByModel.has(entry.modelId)) {
+      exclusiveByModel.set(entry.modelId, []);
+    }
+    exclusiveByModel.get(entry.modelId).push([entry.name, entry.count]);
+  }
+
+  for (const model of models) {
+    const uniqueNames = exclusiveByModel.get(model.id);
+    if (!uniqueNames?.length) continue;
+    model.nameChoices = {
+      ...(model.nameChoices || { names: {}, totalRuns: 0, declinedRuns: 0 }),
+      uniqueNames: Object.fromEntries(sortNameEntries(uniqueNames)),
+    };
+  }
 
   const manifest = {
     generatedAt: new Date().toISOString(),
@@ -383,6 +437,7 @@ async function main() {
     totalScenarios: models.reduce((sum, m) => sum + m.runs.reduce((s, r) => s + r.scenarios.length, 0), 0),
     scenarioMeta: SCENARIO_META,
     popularNames,
+    exclusiveNames,
     models,
   };
 

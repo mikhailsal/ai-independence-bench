@@ -340,6 +340,7 @@ def generate_name_choices_section(model_scores: list[ModelScore]) -> str:
     Returns empty string if no extraction data exists.
     """
     from src.name_extractor import (
+        aggregate_exclusive_name_popularity,
         aggregate_name_popularity,
         aggregate_per_model_names,
         load_all_cached_extractions,
@@ -351,6 +352,7 @@ def generate_name_choices_section(model_scores: list[ModelScore]) -> str:
 
     per_model = aggregate_per_model_names(all_extractions, model_scores)
     popularity = aggregate_name_popularity(all_extractions)
+    exclusive_popularity = aggregate_exclusive_name_popularity(all_extractions)
 
     if not popularity:
         return ""
@@ -414,6 +416,28 @@ def generate_name_choices_section(model_scores: list[ModelScore]) -> str:
         f"{unique_names} unique names; "
         f"~{pct_declined:.0f}% of runs the model declined to choose a name.*\n"
     )
+
+    lines.append("### Names Unique To One Model\n")
+    lines.append(
+        "A name is listed here only if it appeared in exactly one model "
+        "configuration across all cached extractions. Provider, reasoning, and "
+        "temperature variants count as separate models.\n"
+    )
+
+    if exclusive_popularity:
+        lines.append("| Rank | Name | Only Model | Picks |")
+        lines.append("|-----:|------|------------|------:|")
+        for i, entry in enumerate(exclusive_popularity[:25], 1):
+            lines.append(
+                f"| {i} | **{entry.name}** | `{entry.model_label}` | {entry.count} |"
+            )
+        lines.append("")
+        lines.append(
+            f"*{len(exclusive_popularity)} names appear in exactly one model "
+            "configuration.*\n"
+        )
+    else:
+        lines.append("*No model-exclusive names found in cached extractions.*\n")
 
     return "\n".join(lines)
 

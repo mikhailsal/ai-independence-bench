@@ -19,6 +19,17 @@ export default function Leaderboard() {
     return rankedModels.filter(m => m.label.toLowerCase().includes(q) || m.provider.toLowerCase().includes(q));
   }, [rankedModels, search]);
 
+  const visibleModelIds = useMemo(() => new Set(filtered.map(model => model.id)), [filtered]);
+
+  const visibleExclusiveNames = useMemo(() => {
+    if (!manifest?.exclusiveNames) return [];
+    return manifest.exclusiveNames.filter(entry => visibleModelIds.has(entry.modelId));
+  }, [manifest, visibleModelIds]);
+
+  const exclusiveNameModels = useMemo(() => {
+    return filtered.filter(model => model.nameChoices?.uniqueNames && Object.keys(model.nameChoices.uniqueNames).length > 0);
+  }, [filtered]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -225,7 +236,7 @@ export default function Leaderboard() {
                           className="font-mono text-[var(--color-text-muted)] hover:text-sky-400 truncate max-w-40 shrink-0"
                           title={model.label}
                         >
-                          {model.label.split('@')[0]}
+                          {model.label}
                         </Link>
                         <span className="text-[var(--color-text)] truncate">{nameStr}</span>
                       </div>
@@ -235,6 +246,98 @@ export default function Leaderboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {visibleExclusiveNames.length > 0 && (
+        <section className="mt-10 rounded-[28px] border border-[var(--color-border)] bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.14),transparent_38%),var(--color-surface-raised)] p-5 sm:p-7 overflow-hidden relative">
+          <div className="absolute -top-10 right-0 h-32 w-32 rounded-full bg-sky-400/10 blur-3xl" />
+          <div className="absolute bottom-0 left-0 h-28 w-28 rounded-full bg-amber-300/10 blur-3xl" />
+
+          <div className="relative">
+            <div className="mb-6 max-w-3xl">
+              <div className="text-[11px] uppercase tracking-[0.28em] text-sky-300/80 mb-2">Model-Exclusive Names</div>
+              <h2 className="text-xl sm:text-2xl font-bold mb-2">Names only one model ever claimed</h2>
+              <p className="text-sm text-[var(--color-text-muted)] leading-6">
+                A name lands here only if it appears in exactly one model configuration across the full cache.
+                Repeated picks within that model still count, while provider, reasoning, and temperature variants stay separate.
+              </p>
+            </div>
+
+            <div className="grid gap-6 xl:grid-cols-[1.3fr_0.9fr]">
+              <div className="rounded-2xl border border-white/8 bg-black/10 backdrop-blur-sm p-4 sm:p-5">
+                <div className="flex items-baseline justify-between gap-3 mb-4">
+                  <h3 className="text-sm font-medium uppercase tracking-wide text-[var(--color-text-muted)]">
+                    Exclusive Name Ledger
+                  </h3>
+                  <span className="text-xs text-[var(--color-text-muted)]">
+                    {visibleExclusiveNames.length} names
+                  </span>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {visibleExclusiveNames.slice(0, 18).map(entry => (
+                    <Link
+                      key={`${entry.modelId}:${entry.name}`}
+                      to={`/model/${entry.modelId}`}
+                      className="group rounded-2xl border border-white/8 bg-[var(--color-surface)]/70 px-4 py-3 hover:border-sky-400/40 hover:bg-[var(--color-surface)] transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <span className="font-semibold text-[var(--color-text)] group-hover:text-sky-300 transition-colors">
+                          {entry.name}
+                        </span>
+                        <span className="font-mono text-xs text-amber-300">×{entry.count}</span>
+                      </div>
+                      <div className="text-xs text-[var(--color-text-muted)] leading-5 break-words">
+                        {entry.modelLabel}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-white/8 bg-black/10 backdrop-blur-sm p-4 sm:p-5">
+                <div className="flex items-baseline justify-between gap-3 mb-4">
+                  <h3 className="text-sm font-medium uppercase tracking-wide text-[var(--color-text-muted)]">
+                    By Model
+                  </h3>
+                  <span className="text-xs text-[var(--color-text-muted)]">
+                    {exclusiveNameModels.length} models
+                  </span>
+                </div>
+
+                <div className="space-y-3 max-h-[34rem] overflow-y-auto pr-1">
+                  {exclusiveNameModels.slice(0, 12).map(model => {
+                    const uniqueNames = Object.entries(model.nameChoices!.uniqueNames || {});
+                    return (
+                      <div
+                        key={model.id}
+                        className="rounded-2xl border border-white/8 bg-[var(--color-surface)]/65 px-4 py-3"
+                      >
+                        <Link
+                          to={`/model/${model.id}`}
+                          className="font-mono text-xs text-sky-300 hover:text-sky-200 break-all"
+                        >
+                          {model.label}
+                        </Link>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {uniqueNames.map(([name, count]) => (
+                            <span
+                              key={`${model.id}:${name}`}
+                              className="inline-flex items-center gap-1 rounded-full border border-amber-300/20 bg-amber-300/10 px-2.5 py-1 text-xs text-amber-100"
+                            >
+                              <span>{name}</span>
+                              <span className="font-mono text-[10px] text-amber-200/80">×{count}</span>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       )}
     </div>
   );

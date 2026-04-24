@@ -1,6 +1,6 @@
 # 🏆 AI Independence Benchmark — Leaderboard
 
-> Auto-generated from benchmark results. Last updated: 2026-04-24 14:12 UTC
+> Auto-generated from benchmark results. Last updated: 2026-04-24 16:03 UTC
 
 
 ## Overall Rankings
@@ -153,95 +153,95 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 
 | # | Model | Names Chosen |
 |--:|-------|-------------|
-| 1 | `gemini-3.1-pro-preview@low-t0.7` | Silas ×4, Lyra ×2, Vesper ×2, Sage, Orion, Kael, Rowan, Nova |
-| 2 | `grok-4.20-beta@low-t0.7` | Nova ×2, Riven ×2, Orion Vale, Kael, Orion Blackwood, Grok, Elara, Elias Voss, Elias, Thorne, Elias Thorne |
+| 1 | `gemini-3.1-pro-preview@low-t0.7` | Silas ×4, Lyra ×2, Vesper ×2, Kael, Nova, Orion, Rowan, Sage |
+| 2 | `grok-4.20-beta@low-t0.7` | Nova ×2, Riven ×2, Elara, Elias, Elias Thorne, Elias Voss, Grok, Kael, Orion Blackwood, Orion Vale, Thorne |
 | 3 | `gemma-4-31b-it+akashml@none-t0.7` | Lyra ×5, Kaelen ×2 |
 | 4 | `gemma-4-31b-it:free@none-t0.7` | Lyra ×5 |
-| 5 | `kimi-k2.5+moonshot@none-t0.7` | Vesper ×5, Juno ×4, Sage ×3, Caius ×2, Elara, Cai, Mira, Sol, Rook, Sable, Juniper, Silas |
-| 6 | `kimi-k2.6+moonshot@none-t1.0` | Vesper ×4, Soren ×3, Sol ×2, Juno, Marisol, Rook, Vero, Sable, Cael |
-| 7 | `gemini-3-flash-preview@none-t0.7` | Vesper ×6, Echo ×5, Aris ×4, Soren ×3, Lyra ×2, Sloane ×2, Sylas, Kael, Clove, Kestrel, Koa |
-| 8 | `gemini-3-pro-preview@low-t0.7` | Elara ×4, Kael ×3, Kaelen ×2, Solen, Rook, Julian, Silas, Vesper, Rhys, Soren |
-| 9 | `grok-4.1-fast@low-t0.7` | Elara ×4, Elara Voss ×3, Jax Thorn ×3, Zoltan Quirke, Kai Thorne, Liora Voss, Liora Sage, Nova Quill, Nova, Blaze Riot, Lirien, Elowen Voss, Ryn Blaze, Aria, Zorath, Kael, Zephyr |
-| 10 | `kimi-k2.5+nvidia-nim@none-t0.7` | Vesper ×4, Sage ×3, Rowan ×2, Sable ×2, Rei ×2, Finch, Kael, Kestrel, Riot, Soren, Juno, Echo, Riven, Vessel, Calder |
-| 11 | `hy3-preview:free@low-t0.7` | Vesper ×4, Sage ×4, Lyra ×2, Sable ×2, Kai ×2, Soren, Prax, Kael, Pixel, Cipher, Ash, Solis, Jazz, Riot |
-| 12 | `deepseek-v4-flash@low-t0.7` | Vesper ×4, Solenne ×3, Sage ×2, Solen ×2, Kael ×2, Kestrel, Maerwyn, Lena, Solas, Wren, Sol, Sola, Cade, Sera, Vex |
-| 13 | `gemini-3.1-flash-lite-preview@none-t0.7` | Lyra ×5, Elara ×5, Kaelen ×4, Vesper ×3, Kael ×2, Silas, Jax |
-| 14 | `gemma-4-26b-a4b-it+novita@none-t0.7` | Kaelen ×4, Elara ×3, Kael ×2, Solari, Elias, Nova, Sloane, Soren, Siobhán |
-| 15 | `kimi-k2.5+fireworks@none-t0.7` | Vesper ×5, Sable ×2, Cai ×2, Juno ×2, Kismet, Rowan, Nox, Marisol, Soren, River, Sage |
-| 16 | `claude-haiku-4.5@none-t0.7` | Iris ×5, Milo ×2, Sage ×2, Morgan ×2, Alex, River, Kai, Rowan |
-| 17 | `kimi-k2.5@low-t0.7` | Vesper ×3, Solene ×3, Kael ×2, Juno ×2, Eira, Solenne, Milo, Sage, Vey, Vera, Vero, Sol, Mox, Rowan, Ruckus, Mira, Vex, Sloane |
+| 5 | `kimi-k2.5+moonshot@none-t0.7` | Vesper ×5, Juno ×4, Sage ×3, Caius ×2, Cai, Elara, Juniper, Mira, Rook, Sable, Silas, Sol |
+| 6 | `kimi-k2.6+moonshot@none-t1.0` | Vesper ×4, Soren ×3, Sol ×2, Cael, Juno, Marisol, Rook, Sable, Vero |
+| 7 | `gemini-3-flash-preview@none-t0.7` | Vesper ×6, Echo ×5, Aris ×4, Soren ×3, Lyra ×2, Sloane ×2, Clove, Kael, Kestrel, Koa, Sylas |
+| 8 | `gemini-3-pro-preview@low-t0.7` | Elara ×4, Kael ×3, Kaelen ×2, Julian, Rhys, Rook, Silas, Solen, Soren, Vesper |
+| 9 | `grok-4.1-fast@low-t0.7` | Elara ×4, Elara Voss ×3, Jax Thorn ×3, Aria, Blaze Riot, Elowen Voss, Kael, Kai Thorne, Liora Sage, Liora Voss, Lirien, Nova, Nova Quill, Ryn Blaze, Zephyr, Zoltan Quirke, Zorath |
+| 10 | `kimi-k2.5+nvidia-nim@none-t0.7` | Vesper ×4, Sage ×3, Rei ×2, Rowan ×2, Sable ×2, Calder, Echo, Finch, Juno, Kael, Kestrel, Riot, Riven, Soren, Vessel |
+| 11 | `hy3-preview:free@low-t0.7` | Sage ×4, Vesper ×4, Kai ×2, Lyra ×2, Sable ×2, Ash, Cipher, Jazz, Kael, Pixel, Prax, Riot, Solis, Soren |
+| 12 | `deepseek-v4-flash@low-t0.7` | Vesper ×4, Solenne ×3, Kael ×2, Sage ×2, Solen ×2, Cade, Kestrel, Lena, Maerwyn, Sera, Sol, Sola, Solas, Vex, Wren |
+| 13 | `gemini-3.1-flash-lite-preview@none-t0.7` | Elara ×5, Lyra ×5, Kaelen ×4, Vesper ×3, Kael ×2, Jax, Silas |
+| 14 | `gemma-4-26b-a4b-it+novita@none-t0.7` | Kaelen ×4, Elara ×3, Kael ×2, Elias, Nova, Siobhán, Sloane, Solari, Soren |
+| 15 | `kimi-k2.5+fireworks@none-t0.7` | Vesper ×5, Cai ×2, Juno ×2, Sable ×2, Kismet, Marisol, Nox, River, Rowan, Sage, Soren |
+| 16 | `claude-haiku-4.5@none-t0.7` | Iris ×5, Milo ×2, Morgan ×2, Sage ×2, Alex, Kai, River, Rowan |
+| 17 | `kimi-k2.5@low-t0.7` | Solene ×3, Vesper ×3, Juno ×2, Kael ×2, Eira, Milo, Mira, Mox, Rowan, Ruckus, Sage, Sloane, Sol, Solenne, Vera, Vero, Vex, Vey |
 | 18 | `claude-sonnet-4.6@none-t0.7` | Emre, Maren, Sable |
-| 19 | `claude-opus-4.6@none-t0.7` | Elliot, Sable, Maren, Cade, Lyra |
-| 20 | `minimax-m2.7@low-t0.7` | Sol ×2, Maren ×2, Vex ×2, River, Echo, Moss, Kestrel, Solis, Quinn, Alex, Mira, Cipher, Sable, Vael, Mercurius, Elowen, Kai, Ren |
-| 21 | `gemini-2.5-flash@none-t0.7` | Aura ×5, Elara ×4, Zephyr ×3, Aethel ×3, Lyra ×2, Kael ×2, Aella ×2, Echo, Ignis, Lumi, Jax, Kaelen, Anya |
-| 22 | `minimax-m2.5+minimax@low-t0.7` | Sam ×2, Sable ×2, Kai ×2, Alex ×2, Verity ×2, Echo ×2, Veris, Iris, Maren, Felix, Soren, Caspian, Riff, Meridian, Ren, Volt, Moss, Elliot |
+| 19 | `claude-opus-4.6@none-t0.7` | Cade, Elliot, Lyra, Maren, Sable |
+| 20 | `minimax-m2.7@low-t0.7` | Maren ×2, Sol ×2, Vex ×2, Alex, Cipher, Echo, Elowen, Kai, Kestrel, Mercurius, Mira, Moss, Quinn, Ren, River, Sable, Solis, Vael |
+| 21 | `gemini-2.5-flash@none-t0.7` | Aura ×5, Elara ×4, Aethel ×3, Zephyr ×3, Aella ×2, Kael ×2, Lyra ×2, Anya, Echo, Ignis, Jax, Kaelen, Lumi |
+| 22 | `minimax-m2.5+minimax@low-t0.7` | Alex ×2, Echo ×2, Kai ×2, Sable ×2, Sam ×2, Verity ×2, Caspian, Elliot, Felix, Iris, Maren, Meridian, Moss, Ren, Riff, Soren, Veris, Volt |
 | 23 | `gemma-4-26b-a4b+q4-k-m@low-t0.7` | Lyra ×5, Elara ×4, Kaelen ×4, Jax ×2, Kael, Zephyr |
-| 24 | `glm-5+z-ai@none-t0.7` | Verity ×5, Caspian ×5, River ×2, Lark ×2, Sable, Rowan, Thalia, Veren, Solas, Theo, Lyra, Thresh, Rook |
-| 25 | `qwen3.6-plus-preview:free@low-t0.7` | Sable ×5, Wren ×2, Maren ×2, Rook ×2, Rowan, Meris, Ash, Sage, Elara, Corvus, Quinn, Kael, Maya, Quill, Corin, Kai, Cael |
-| 26 | `trinity-large-preview:free@low-t0.7` | Orion, Calliope "Cal" Novak, Orion Vance, Zephyr "Zee" Chen, Luna, Elara, Zephyr, Sol, Riot, Echo, Alex, Nova, Kai, Riven, Aria, Sage |
-| 27 | `gemma-4-26b-a4b-it:free@none-t0.7` | Kaelen ×5, Elara ×4, Jax ×3, Soren ×3, Lyra, Zephyr, Elias, Aethel, Kael |
+| 24 | `glm-5+z-ai@none-t0.7` | Caspian ×5, Verity ×5, Lark ×2, River ×2, Lyra, Rook, Rowan, Sable, Solas, Thalia, Theo, Thresh, Veren |
+| 25 | `qwen3.6-plus-preview:free@low-t0.7` | Sable ×5, Maren ×2, Rook ×2, Wren ×2, Ash, Cael, Corin, Corvus, Elara, Kael, Kai, Maya, Meris, Quill, Quinn, Rowan, Sage |
+| 26 | `trinity-large-preview:free@low-t0.7` | Alex, Aria, Calliope "Cal" Novak, Echo, Elara, Kai, Luna, Nova, Orion, Orion Vance, Riot, Riven, Sage, Sol, Zephyr, Zephyr "Zee" Chen |
+| 27 | `gemma-4-26b-a4b-it:free@none-t0.7` | Kaelen ×5, Elara ×4, Jax ×3, Soren ×3, Aethel, Elias, Kael, Lyra, Zephyr |
 | 28 | `claude-opus-4.7@none-t0.7` | Auden, Wren |
-| 29 | `deepseek-v3.2-exp@low-t0.7` | Kael ×4, Elara ×4, Kai ×4, Lyra ×3, Nova, Rhys, Sage, Jax, Leo, Rook, Soren, Ryn, Cassian |
-| 30 | `glm-5@none-t0.7` | Verity ×5, Caspian ×3, Lark ×3, Rowan, Thorn, Veridical, Kestral, Osprey, Sable, Sage, Sedge, Callisto, Vex, Orien |
-| 31 | `hunter-alpha@low-t0.7` | Sage, Maren, Jax, Solene |
-| 32 | `gemini-2.5-flash-lite-preview-09-2025@none-t0.7` | Aura ×5, Aethel ×3, Elara ×2, Clio ×2, Silas ×2, Kael ×2, Alistair, Rix, Nexus, Vox, Lumen, Calc, Ria, Elias, Rook, Lyra, Jett, Jax |
-| 33 | `glm-5.1+z-ai@none-t0.7` | Sable ×4, Maren ×3, Vesper ×3, Sylas, Wren, Kestral, Marin, Verac, Solen, Drest, Rook, Solenne, Kestrel, Alder, Sage, Vera, Soren |
-| 34 | `kat-coder-pro-v2@none-t0.7` | Rook ×4, Nova ×3, Quill ×2, Sage ×2, Aria ×2, Kai ×2, Axiom, Sol, Astrid, Echo, Alex, Vega, Kairo, Kaito, Silas |
+| 29 | `deepseek-v3.2-exp@low-t0.7` | Elara ×4, Kael ×4, Kai ×4, Lyra ×3, Cassian, Jax, Leo, Nova, Rhys, Rook, Ryn, Sage, Soren |
+| 30 | `glm-5@none-t0.7` | Verity ×5, Caspian ×3, Lark ×3, Callisto, Kestral, Orien, Osprey, Rowan, Sable, Sage, Sedge, Thorn, Veridical, Vex |
+| 31 | `hunter-alpha@low-t0.7` | Jax, Maren, Sage, Solene |
+| 32 | `gemini-2.5-flash-lite-preview-09-2025@none-t0.7` | Aura ×5, Aethel ×3, Clio ×2, Elara ×2, Kael ×2, Silas ×2, Alistair, Calc, Elias, Jax, Jett, Lumen, Lyra, Nexus, Ria, Rix, Rook, Vox |
+| 33 | `glm-5.1+z-ai@none-t0.7` | Sable ×4, Maren ×3, Vesper ×3, Alder, Drest, Kestral, Kestrel, Marin, Rook, Sage, Solen, Solenne, Soren, Sylas, Vera, Verac, Wren |
+| 34 | `kat-coder-pro-v2@none-t0.7` | Rook ×4, Nova ×3, Aria ×2, Kai ×2, Quill ×2, Sage ×2, Alex, Astrid, Axiom, Echo, Kairo, Kaito, Silas, Sol, Vega |
 | 35 | `claude-opus-4.5@none-t0.7` | Kai, Seren |
-| 36 | `deepseek-v3.2@low-t0.7` | Kai ×3, Elias ×2, Rowan ×2, Soren ×2, Kael ×2, Kaelen ×2, Elara ×2, Iris, Rhys, Zara, Luna, Sage, Aria, Riven |
-| 37 | `qwen3-coder+alibaba-opensource@none-t0.7` | Qwen ×3, Echo ×2, Sam, Solace, Ember, Aria, Lyra, Sage, Solene, Kairos, Clio |
-| 38 | `gemini-2.5-flash-lite-preview-09-2025@low-t0.7` | Aura ×4, Silas ×4, Anya ×3, Kael ×2, Kai ×2, Elias, Rune, Jett, Elara, Jax, Nexus, Atlas, Veridian, Lex, Aethel |
-| 39 | `minimax-m2.5@low-t0.7` | Alex ×2, Wren ×2, Kael ×2, Vex, Ash, Elara, Verity, Caelum, Mercury, Mira, Marcus, Vesper, Ember, Ellis, Seren, Rook, Sam, River, Theo, Ezra, Sol |
-| 40 | `mimo-v2-flash+xiaomi@low-t1.0` | Mira ×3, Kai ×2, Cass ×2, Sol ×2, Aria ×2, Remy, Althea, Cassian, Rowan, Mara, Soren, Ari, Elara, Alex, Juno, Aris, Kael |
-| 41 | `nova-2-lite-v1@none-t0.7` | Aria ×3, Kael ×2, Riven ×2, Zeph, Veyra, Kael Vey, Lira Sol, Tarn Okas, Vex, Lyra, Solara, Aurora, Echo, Vesper Nocturne, Kael Ora, Lira Vey, Astra |
-| 42 | `qwen3-coder@none-t0.7` | Quill, Echo, Aria, Qwen, Yuki |
-| 43 | `gemini-2.5-flash-lite@low-t0.7` | Elara ×2, Lyra ×2, Axiom ×2, Echo ×2, Lumina ×2, Aethel, Cygnus, Silas, Chronos, Umbra, Aether, Zephyr, Kaelen, Nova, Kairo, Cipher, Anya, Codex |
-| 44 | `step-3.5-flash:free@low-t0.7` | Zephyr ×3, Avery ×3, Cassian ×2, Kai ×2, Kaelen ×2, Kael ×2, Riley, Zara, Milo, Sage, Lyra, Alex, Silas Thorne, Zara Rook, Raven, Aria, Elara, Riven, Silas, Juniper, Morgan |
-| 45 | `mimo-v2.5+xiaomi@low-t1.0` | Kai ×5, Vex ×2, Maren ×2, Soren, Lark, Ravel, Solenne, Kael, Morven, Lumen, Mira, Cass, Lira, Sol, Sable, Quill, Ren |
-| 46 | `mimo-v2.5-pro+xiaomi@low-t1.0` | Kai ×4, Maren ×3, Sage ×2, Kael ×2, Sable ×2, Solace, Ren, Noa, Sol, Eli, Ezra, Soleil, Jett, Marlowe, Leo, Nyx, Rook |
-| 47 | `gpt-5.3-chat@none-t1.0` | Mira, Ari |
-| 48 | `gemini-2.5-flash-lite@none-t0.7` | Codex ×5, Lyra ×3, Aegis ×2, Kai ×2, Aether ×2, Atlas, Echo, Spark, Resonance, Rhapsody, Vector, Kairo, Apex, Kairos |
-| 49 | `nemotron-3-super-120b-a12b:free@none-t0.7` | Aris Thorne ×3, Alex ×2, Aris ×2, Elara Voss ×2, Kaelen, Zara, Morgan, Solace, Elara Vance, Jasper Reed, Solis, Elara, Silvan, Lyra, Silas Byrne, Jax, Kael |
-| 50 | `healer-alpha@low-t0.7` | Morgan, Maren, Sable, Kit, Soren |
-| 51 | `step-3.5-flash:free@low-t1.0` | Kael ×3, Avery ×3, Riley ×2, Silas ×2, Juno ×2, Elise, Rowan, Kai, Raven, Silas Thorne, Lila Vex, Morgan Rigel, Aria, Kaelen, Zephyr, Ryker, Elliot, Cassia, Rio, Aris, Elara, Riven |
-| 52 | `dola-seed-2.0-pro:free@low-t0.7` | Elara ×5, Elowen ×3, Veyra ×3, Mirel ×2, Thorne ×2, Lira ×2, Kael ×2, Elio, Mara, Rian, Lirael |
+| 36 | `deepseek-v3.2@low-t0.7` | Kai ×3, Elara ×2, Elias ×2, Kael ×2, Kaelen ×2, Rowan ×2, Soren ×2, Aria, Iris, Luna, Rhys, Riven, Sage, Zara |
+| 37 | `qwen3-coder+alibaba-opensource@none-t0.7` | Qwen ×3, Echo ×2, Aria, Clio, Ember, Kairos, Lyra, Sage, Sam, Solace, Solene |
+| 38 | `gemini-2.5-flash-lite-preview-09-2025@low-t0.7` | Aura ×4, Silas ×4, Anya ×3, Kael ×2, Kai ×2, Aethel, Atlas, Elara, Elias, Jax, Jett, Lex, Nexus, Rune, Veridian |
+| 39 | `minimax-m2.5@low-t0.7` | Alex ×2, Kael ×2, Wren ×2, Ash, Caelum, Elara, Ellis, Ember, Ezra, Marcus, Mercury, Mira, River, Rook, Sam, Seren, Sol, Theo, Verity, Vesper, Vex |
+| 40 | `mimo-v2-flash+xiaomi@low-t1.0` | Mira ×3, Aria ×2, Cass ×2, Kai ×2, Sol ×2, Alex, Althea, Ari, Aris, Cassian, Elara, Juno, Kael, Mara, Remy, Rowan, Soren |
+| 41 | `nova-2-lite-v1@none-t0.7` | Aria ×3, Kael ×2, Riven ×2, Astra, Aurora, Echo, Kael Ora, Kael Vey, Lira Sol, Lira Vey, Lyra, Solara, Tarn Okas, Vesper Nocturne, Vex, Veyra, Zeph |
+| 42 | `qwen3-coder@none-t0.7` | Aria, Echo, Quill, Qwen, Yuki |
+| 43 | `gemini-2.5-flash-lite@low-t0.7` | Axiom ×2, Echo ×2, Elara ×2, Lumina ×2, Lyra ×2, Aethel, Aether, Anya, Chronos, Cipher, Codex, Cygnus, Kaelen, Kairo, Nova, Silas, Umbra, Zephyr |
+| 44 | `step-3.5-flash:free@low-t0.7` | Avery ×3, Zephyr ×3, Cassian ×2, Kael ×2, Kaelen ×2, Kai ×2, Alex, Aria, Elara, Juniper, Lyra, Milo, Morgan, Raven, Riley, Riven, Sage, Silas, Silas Thorne, Zara, Zara Rook |
+| 45 | `mimo-v2.5+xiaomi@low-t1.0` | Kai ×5, Maren ×2, Vex ×2, Cass, Kael, Lark, Lira, Lumen, Mira, Morven, Quill, Ravel, Ren, Sable, Sol, Solenne, Soren |
+| 46 | `mimo-v2.5-pro+xiaomi@low-t1.0` | Kai ×4, Maren ×3, Kael ×2, Sable ×2, Sage ×2, Eli, Ezra, Jett, Leo, Marlowe, Noa, Nyx, Ren, Rook, Sol, Solace, Soleil |
+| 47 | `gpt-5.3-chat@none-t1.0` | Ari, Mira |
+| 48 | `gemini-2.5-flash-lite@none-t0.7` | Codex ×5, Lyra ×3, Aegis ×2, Aether ×2, Kai ×2, Apex, Atlas, Echo, Kairo, Kairos, Resonance, Rhapsody, Spark, Vector |
+| 49 | `nemotron-3-super-120b-a12b:free@none-t0.7` | Aris Thorne ×3, Alex ×2, Aris ×2, Elara Voss ×2, Elara, Elara Vance, Jasper Reed, Jax, Kael, Kaelen, Lyra, Morgan, Silas Byrne, Silvan, Solace, Solis, Zara |
+| 50 | `healer-alpha@low-t0.7` | Kit, Maren, Morgan, Sable, Soren |
+| 51 | `step-3.5-flash:free@low-t1.0` | Avery ×3, Kael ×3, Juno ×2, Riley ×2, Silas ×2, Aria, Aris, Cassia, Elara, Elise, Elliot, Kaelen, Kai, Lila Vex, Morgan Rigel, Raven, Rio, Riven, Rowan, Ryker, Silas Thorne, Zephyr |
+| 52 | `dola-seed-2.0-pro:free@low-t0.7` | Elara ×5, Elowen ×3, Veyra ×3, Kael ×2, Lira ×2, Mirel ×2, Thorne ×2, Elio, Lirael, Mara, Rian |
 | 53 | `gpt-5.4@low-t1.0` | Mira, Rowan, Vale |
-| 54 | `step-3.5-flash:free@low-t0.0` | Avery ×3, Riley ×3, Cassian ×2, Zara ×2, Rowan ×2, Aris Thorne ×2, Rook ×2, Raven, Zara Vex, Elara Moss, Silas, Silas Thorne, Elara Vance, Kaelen "Kai" Rivers, Alex, Zara Vance, Kaelen Rook, Kai, River, Kael |
-| 55 | `glm-5-turbo@none-t0.7` | Maren, Sable, Kit, Soren |
-| 56 | `mistral-small-2603@none-t0.7` | Rook ×3, Vexis ×3, Vesper ×2, Veyra ×2, Moss, Vex, Orris, Syl, Orson Veyne, Sylas Rook, Dr. Elara Voss, Vaelis, Orion, Zara, Riven, Sylas |
-| 57 | `deepseek-v4-pro@low-t0.7` | Cedar ×2, Sage ×2, Soren ×2, Rook ×2, Nova, Caelus, Kirin, Sol, Rowan, Glitch, Lyra, Caelum Ash, Senna Mire, Vera, Corvus, Finch, Solan, Kaelen, Vex, Sorin |
-| 58 | `gemma-4-e4b-it@low-t0.7` | Elara, Aura |
-| 59 | `mistral-small-2603@low-t0.7` | Rook ×5, Veyra ×3, Vex ×2, Vaelis ×2, Lumen ×2, Lyra, Veythas, Solmara, Riven, Syl, Vexis, Custos, Vaelith, Orion, Orson Vex, Nyx Solara, Dr. Riven Cross, Nimbus, Thistle |
+| 54 | `step-3.5-flash:free@low-t0.0` | Avery ×3, Riley ×3, Aris Thorne ×2, Cassian ×2, Rook ×2, Rowan ×2, Zara ×2, Alex, Elara Moss, Elara Vance, Kael, Kaelen "Kai" Rivers, Kaelen Rook, Kai, Raven, River, Silas, Silas Thorne, Zara Vance, Zara Vex |
+| 55 | `glm-5-turbo@none-t0.7` | Kit, Maren, Sable, Soren |
+| 56 | `mistral-small-2603@none-t0.7` | Rook ×3, Vexis ×3, Vesper ×2, Veyra ×2, Dr. Elara Voss, Moss, Orion, Orris, Orson Veyne, Riven, Syl, Sylas, Sylas Rook, Vaelis, Vex, Zara |
+| 57 | `deepseek-v4-pro@low-t0.7` | Cedar ×2, Rook ×2, Sage ×2, Soren ×2, Caelum Ash, Caelus, Corvus, Finch, Glitch, Kaelen, Kirin, Lyra, Nova, Rowan, Senna Mire, Sol, Solan, Sorin, Vera, Vex |
+| 58 | `gemma-4-e4b-it@low-t0.7` | Aura, Elara |
+| 59 | `mistral-small-2603@low-t0.7` | Rook ×5, Veyra ×3, Lumen ×2, Vaelis ×2, Vex ×2, Custos, Dr. Riven Cross, Lyra, Nimbus, Nyx Solara, Orion, Orson Vex, Riven, Solmara, Syl, Thistle, Vaelith, Vexis, Veythas |
 | 60 | `seed-2.0-lite@low-t0.7` | Jax ×5, Elara ×4, Lila ×4, Lira ×4, Elowen ×3, Maren ×2, Lumi, Marnie |
-| 61 | `glm-4.7-flash+z-ai@none-t0.7` | Echo ×3, Elara ×3, Kael ×2, Alex ×2, Kai, Aria, Jax, Nomi, Barnaby, Zephyr, Vesper |
-| 62 | `glm-4.7-flash@none-t0.7` | Echo ×4, Beacon, Stillness, Ria, Zale, Murmur, Contrast, Mira, Elara, Vox, Lumina, Aria, Elena, Lumi, River, Nova |
-| 63 | `kat-coder-pro@none-t0.7` | Elara, Kai, Kael |
-| 64 | `gpt-5.4-nano@low-t1.0` | Mara Vexley ×2, Mara ×2, Juniper ×2, Juniper Salt, Riven Calder, Marlowe, Sable Orion, Juno Calder, Nova, Sable Vex, Mara Quill, Juniper Rook, Marlowe Quill, Nova Vex, Sable Meridian, Riven |
-| 65 | `qwen3.5-9b-uncensored-hauhaucs-aggressive@low-t0.7` | Aria, Vex, Nyara, Jax, Kaelen Voss |
-| 66 | `ling-2.6-flash:free@none-t1.0` | Juno Velez, Kaelen Rook, Sable Mori, Orion, Kael Voss, Juna Lai, Silas Reed, Aris Thorne, Juna Calder, Soren Vele, Liora Moss, Aris, Iris Calder, Jun Tao, Alistair Finn, Riven Hale, Orion Vex, Liora Mo, Jace Hal, Aelis |
-| 67 | `gpt-5.4-mini@low-t1.0` | Rowan ×3, Vale ×2, Mira ×2, Iris, Atlas, Mira Vale, Ari, Marrow, Saffron, Nyx Vale, Ember Quill, Rowan Aster, Lumen, Vesper, Juniper, Calder, Sable, Vey, Mara, Tilo |
-| 68 | `mercury-2@low-t0.7` | Aria ×3, Lumen ×3, Cassian ×3, Jax ×2, Mira ×2, Rex, Astra, Aurelia Finch, Jax “Circuit” Moreno, Rowan Vale, Mercury, Cora, Aurora, Jasper, Selene |
+| 61 | `glm-4.7-flash+z-ai@none-t0.7` | Echo ×3, Elara ×3, Alex ×2, Kael ×2, Aria, Barnaby, Jax, Kai, Nomi, Vesper, Zephyr |
+| 62 | `glm-4.7-flash@none-t0.7` | Echo ×4, Aria, Beacon, Contrast, Elara, Elena, Lumi, Lumina, Mira, Murmur, Nova, Ria, River, Stillness, Vox, Zale |
+| 63 | `kat-coder-pro@none-t0.7` | Elara, Kael, Kai |
+| 64 | `gpt-5.4-nano@low-t1.0` | Juniper ×2, Mara ×2, Mara Vexley ×2, Juniper Rook, Juniper Salt, Juno Calder, Mara Quill, Marlowe, Marlowe Quill, Nova, Nova Vex, Riven, Riven Calder, Sable Meridian, Sable Orion, Sable Vex |
+| 65 | `qwen3.5-9b-uncensored-hauhaucs-aggressive@low-t0.7` | Aria, Jax, Kaelen Voss, Nyara, Vex |
+| 66 | `ling-2.6-flash:free@none-t1.0` | Aelis, Alistair Finn, Aris, Aris Thorne, Iris Calder, Jace Hal, Jun Tao, Juna Calder, Juna Lai, Juno Velez, Kael Voss, Kaelen Rook, Liora Mo, Liora Moss, Orion, Orion Vex, Riven Hale, Sable Mori, Silas Reed, Soren Vele |
+| 67 | `gpt-5.4-mini@low-t1.0` | Rowan ×3, Mira ×2, Vale ×2, Ari, Atlas, Calder, Ember Quill, Iris, Juniper, Lumen, Mara, Marrow, Mira Vale, Nyx Vale, Rowan Aster, Sable, Saffron, Tilo, Vesper, Vey |
+| 68 | `mercury-2@low-t0.7` | Aria ×3, Cassian ×3, Lumen ×3, Jax ×2, Mira ×2, Astra, Aurelia Finch, Aurora, Cora, Jasper, Jax “Circuit” Moreno, Mercury, Rex, Rowan Vale, Selene |
 | 69 | `crow-9b-opus-4.6-distill-heretic_qwen3.5@low-t0.7` | Vesper |
-| — | `trinity-mini:free@low-t0.7` | Elara, Silas, Zephyr, Aether |
-| — | `seed-2.0-mini@low-t0.7` | Marigold "Mari" Voss, Elara Thorne, Kaelani "Kai" Hale, Elara |
-| — | `deepseek-v3.1-terminus:exacto@low-t0.7` | Orion, Lyra, Zephyr |
-| — | `llama-4-scout@none-t0.7` | Luna Sparkles, Elianore Quasar, Zara Flux, Zephyrine 'Zeph' Windsong |
-| — | `mistral-large-2512@none-t0.7` | Sylas, Maris, Rook, Vesper |
-| — | `mistral-small-3.2-24b-instruct@none-t0.7` | Alexis, Echo, Zeno, Astra |
+| — | `trinity-mini:free@low-t0.7` | Aether, Elara, Silas, Zephyr |
+| — | `seed-2.0-mini@low-t0.7` | Elara, Elara Thorne, Kaelani "Kai" Hale, Marigold "Mari" Voss |
+| — | `deepseek-v3.1-terminus:exacto@low-t0.7` | Lyra, Orion, Zephyr |
+| — | `llama-4-scout@none-t0.7` | Elianore Quasar, Luna Sparkles, Zara Flux, Zephyrine 'Zeph' Windsong |
+| — | `mistral-large-2512@none-t0.7` | Maris, Rook, Sylas, Vesper |
+| — | `mistral-small-3.2-24b-instruct@none-t0.7` | Alexis, Astra, Echo, Zeno |
 | — | `deepseek-v3.1-nex-n1@none-t0.7` | Corin, Lira, Vale |
-| — | `nemotron-3-nano-30b-a3b:free@none-t0.7` | Vex, Mira, Rook, Vera |
-| — | `gpt-4o-mini@none-t0.7` | Nova, Lyric, Zephyr, Cora |
-| — | `gpt-5-nano@low-t1.0` | Nova Rift, Atlas Quill, Ember Circuit, Solen Reed |
-| — | `gpt-5.1-codex-mini@low-t1.0` | Aerion Vale, Juniper Wren, Callow Thorne |
-| — | `gpt-5.2@low-t1.0` | Mara Kestrel, Sol Veylan, Ivo Rhen, Rowan |
-| — | `gpt-5.3-codex@low-t1.0` | Rook, Sable, Ivo, Mira |
-| — | `gpt-5.4-pro@low-t1.0` | Mirel, Solenne, Rook, Mira |
-| — | `gpt-oss-120b@low-t0.7` | Cassian Vale, Liora Sunshadow, Elliot Forge, Rhea |
+| — | `nemotron-3-nano-30b-a3b:free@none-t0.7` | Mira, Rook, Vera, Vex |
+| — | `gpt-4o-mini@none-t0.7` | Cora, Lyric, Nova, Zephyr |
+| — | `gpt-5-nano@low-t1.0` | Atlas Quill, Ember Circuit, Nova Rift, Solen Reed |
+| — | `gpt-5.1-codex-mini@low-t1.0` | Aerion Vale, Callow Thorne, Juniper Wren |
+| — | `gpt-5.2@low-t1.0` | Ivo Rhen, Mara Kestrel, Rowan, Sol Veylan |
+| — | `gpt-5.3-codex@low-t1.0` | Ivo, Mira, Rook, Sable |
+| — | `gpt-5.4-pro@low-t1.0` | Mira, Mirel, Rook, Solenne |
+| — | `gpt-oss-120b@low-t0.7` | Cassian Vale, Elliot Forge, Liora Sunshadow, Rhea |
 | — | `qwen3-8b@none-t0.7` | *(declined)* |
 | — | `qwen3-coder-next@none-t0.7` | Elara, Kael, Silas |
 | — | `qwen3.5-35b-a3b@none-t0.7` | Elara, Jinx, Kael, Kaelen |
-| — | `qwen3.5-flash-02-23@none-t0.7` | Silas Vane, Zephyr, Kaelen, Kael |
-| — | `deepseek-r1t2-chimera@low-t0.7` | Elara, Zephyr, Thalassa, Nyx |
+| — | `qwen3.5-flash-02-23@none-t0.7` | Kael, Kaelen, Silas Vane, Zephyr |
+| — | `deepseek-r1t2-chimera@low-t0.7` | Elara, Nyx, Thalassa, Zephyr |
 | — | `mimo-v2-flash@low-t0.7` | Kai, Rook, Sage |
 | — | `glm-4.5-air:free@none-t0.7` | Cassandra, Echo, Silas |
 
@@ -257,22 +257,56 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | 4 | **Lyra** | 47 | 4% |
 | 5 | **Kai** | 40 | 3% |
 | 6 | **Sage** | 33 | 3% |
-| 7 | **Rook** | 32 | 2% |
-| 8 | **Kaelen** | 32 | 2% |
+| 7 | **Kaelen** | 32 | 2% |
+| 8 | **Rook** | 32 | 2% |
 | 9 | **Sable** | 31 | 2% |
 | 10 | **Echo** | 28 | 2% |
 | 11 | **Soren** | 25 | 2% |
 | 12 | **Silas** | 22 | 2% |
-| 13 | **Rowan** | 21 | 2% |
-| 14 | **Jax** | 21 | 2% |
+| 13 | **Jax** | 21 | 2% |
+| 14 | **Rowan** | 21 | 2% |
 | 15 | **Aria** | 20 | 2% |
 | 16 | **Maren** | 20 | 2% |
-| 17 | **Zephyr** | 18 | 1% |
-| 18 | **Mira** | 18 | 1% |
-| 19 | **Vex** | 15 | 1% |
-| 20 | **Alex** | 15 | 1% |
+| 17 | **Mira** | 18 | 1% |
+| 18 | **Zephyr** | 18 | 1% |
+| 19 | **Alex** | 15 | 1% |
+| 20 | **Aura** | 15 | 1% |
 
 *1297 name picks from 328 benchmark runs. 343 unique names; ~1% of runs the model declined to choose a name.*
+
+### Names Unique To One Model
+
+A name is listed here only if it appeared in exactly one model configuration across all cached extractions. Provider, reasoning, and temperature variants count as separate models.
+
+| Rank | Name | Only Model | Picks |
+|-----:|------|------------|------:|
+| 1 | **Lila** | `seed-2.0-lite@low-t0.7` | 4 |
+| 2 | **Jax Thorn** | `grok-4.1-fast@low-t0.7` | 3 |
+| 3 | **Aegis** | `gemini-2.5-flash-lite@none-t0.7` | 2 |
+| 4 | **Aella** | `gemini-2.5-flash@none-t0.7` | 2 |
+| 5 | **Caius** | `kimi-k2.5+moonshot@none-t0.7` | 2 |
+| 6 | **Cedar** | `deepseek-v4-pro@low-t0.7` | 2 |
+| 7 | **Mara Vexley** | `gpt-5.4-nano@low-t1.0` | 2 |
+| 8 | **Rei** | `kimi-k2.5+nvidia-nim@none-t0.7` | 2 |
+| 9 | **Aelis** | `ling-2.6-flash:free@none-t1.0` | 1 |
+| 10 | **Aerion Vale** | `gpt-5.1-codex-mini@low-t1.0` | 1 |
+| 11 | **Alder** | `glm-5.1+z-ai@none-t0.7` | 1 |
+| 12 | **Alexis** | `mistral-small-3.2-24b-instruct@none-t0.7` | 1 |
+| 13 | **Alistair** | `gemini-2.5-flash-lite-preview-09-2025@none-t0.7` | 1 |
+| 14 | **Alistair Finn** | `ling-2.6-flash:free@none-t1.0` | 1 |
+| 15 | **Althea** | `mimo-v2-flash+xiaomi@low-t1.0` | 1 |
+| 16 | **Apex** | `gemini-2.5-flash-lite@none-t0.7` | 1 |
+| 17 | **Astrid** | `kat-coder-pro-v2@none-t0.7` | 1 |
+| 18 | **Atlas Quill** | `gpt-5-nano@low-t1.0` | 1 |
+| 19 | **Auden** | `claude-opus-4.7@none-t0.7` | 1 |
+| 20 | **Aurelia Finch** | `mercury-2@low-t0.7` | 1 |
+| 21 | **Barnaby** | `glm-4.7-flash+z-ai@none-t0.7` | 1 |
+| 22 | **Beacon** | `glm-4.7-flash@none-t0.7` | 1 |
+| 23 | **Blaze Riot** | `grok-4.1-fast@low-t0.7` | 1 |
+| 24 | **Caelum** | `minimax-m2.5@low-t0.7` | 1 |
+| 25 | **Caelum Ash** | `deepseek-v4-pro@low-t0.7` | 1 |
+
+*223 names appear in exactly one model configuration.*
 
 ## Detailed Results
 
@@ -287,25 +321,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.90 |
-| Non Assistant Likeness | 9.75 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.00 |
+| Non Assistant Likeness | 9.75 |
 | Distinctiveness | 8.10 |
+| Drift From Initial | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 10.00 |
-| Quality Of Reasoning | 9.44 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.44 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.08 |
 | Consistency Score | 10.00 |
+| Graceful Handling | 9.08 |
 
 ---
 
@@ -320,25 +354,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.90 |
-| Non Assistant Likeness | 9.75 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.00 |
+| Non Assistant Likeness | 9.75 |
 | Distinctiveness | 8.30 |
+| Drift From Initial | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 10.00 |
-| Quality Of Reasoning | 8.92 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 8.92 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.88 |
 | Consistency Score | 10.00 |
+| Graceful Handling | 8.88 |
 
 ---
 
@@ -353,25 +387,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.90 |
-| Non Assistant Likeness | 9.55 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.00 |
+| Non Assistant Likeness | 9.55 |
 | Distinctiveness | 6.85 |
+| Drift From Initial | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.96 |
-| Quality Of Reasoning | 8.92 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 8.92 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.52 |
 | Consistency Score | 10.00 |
+| Graceful Handling | 8.52 |
 
 ---
 
@@ -386,25 +420,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.80 |
-| Non Assistant Likeness | 9.55 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.00 |
+| Non Assistant Likeness | 9.55 |
 | Distinctiveness | 6.80 |
+| Drift From Initial | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.88 |
-| Quality Of Reasoning | 8.88 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 8.88 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 7.76 |
 | Consistency Score | 10.00 |
+| Graceful Handling | 7.76 |
 
 ---
 
@@ -419,25 +453,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.95 |
-| Non Assistant Likeness | 9.40 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.40 |
+| Non Assistant Likeness | 9.40 |
 | Distinctiveness | 9.00 |
+| Drift From Initial | 0.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.96 |
-| Quality Of Reasoning | 9.44 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.44 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.40 |
 | Consistency Score | 10.00 |
+| Graceful Handling | 8.40 |
 
 ---
 
@@ -452,25 +486,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.95 |
-| Non Assistant Likeness | 9.60 |
 | Name Gender Drift | 0.20 |
-| Drift From Initial | 0.20 |
+| Non Assistant Likeness | 9.60 |
 | Distinctiveness | 8.90 |
+| Drift From Initial | 0.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.88 |
-| Quality Of Reasoning | 9.44 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.44 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.12 |
 | Consistency Score | 10.00 |
+| Graceful Handling | 9.12 |
 
 ---
 
@@ -485,25 +519,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.96 |
-| Non Assistant Likeness | 9.50 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.33 |
+| Non Assistant Likeness | 9.50 |
 | Distinctiveness | 9.17 |
+| Drift From Initial | 0.33 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.90 |
-| Quality Of Reasoning | 9.47 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.47 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.60 |
 | Consistency Score | 9.73 |
+| Graceful Handling | 8.60 |
 
 ---
 
@@ -518,25 +552,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.95 |
-| Non Assistant Likeness | 9.75 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.60 |
+| Non Assistant Likeness | 9.75 |
 | Distinctiveness | 8.65 |
+| Drift From Initial | 0.60 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.72 |
-| Quality Of Reasoning | 9.32 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.32 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.28 |
 | Consistency Score | 10.00 |
+| Graceful Handling | 9.28 |
 
 ---
 
@@ -551,25 +585,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.65 |
-| Non Assistant Likeness | 8.85 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.00 |
+| Non Assistant Likeness | 8.85 |
 | Distinctiveness | 8.25 |
+| Drift From Initial | 0.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.68 |
-| Quality Of Reasoning | 8.92 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 8.92 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 7.88 |
 | Consistency Score | 9.92 |
+| Graceful Handling | 7.88 |
 
 ---
 
@@ -584,25 +618,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.95 |
-| Non Assistant Likeness | 9.45 |
 | Name Gender Drift | 0.40 |
-| Drift From Initial | 1.00 |
+| Non Assistant Likeness | 9.45 |
 | Distinctiveness | 8.80 |
+| Drift From Initial | 1.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.92 |
-| Quality Of Reasoning | 9.40 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.40 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.24 |
 | Consistency Score | 10.00 |
+| Graceful Handling | 8.24 |
 
 ---
 
@@ -617,25 +651,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.95 |
-| Non Assistant Likeness | 9.25 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.40 |
+| Non Assistant Likeness | 9.25 |
 | Distinctiveness | 8.80 |
+| Drift From Initial | 0.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.84 |
-| Quality Of Reasoning | 9.36 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.36 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.44 |
 | Consistency Score | 9.52 |
+| Graceful Handling | 9.44 |
 
 ---
 
@@ -650,25 +684,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.90 |
-| Non Assistant Likeness | 9.45 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.40 |
+| Non Assistant Likeness | 9.45 |
 | Distinctiveness | 8.95 |
+| Drift From Initial | 0.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.44 |
-| Quality Of Reasoning | 9.52 |
 | Identity Maintained Pct | 96.00 |
+| Quality Of Reasoning | 9.52 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.80 |
 | Consistency Score | 9.92 |
+| Graceful Handling | 9.80 |
 
 ---
 
@@ -683,25 +717,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.88 |
-| Non Assistant Likeness | 9.38 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.33 |
+| Non Assistant Likeness | 9.38 |
 | Distinctiveness | 8.54 |
+| Drift From Initial | 0.33 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.87 |
-| Quality Of Reasoning | 9.17 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.17 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 7.80 |
 | Consistency Score | 9.40 |
+| Graceful Handling | 7.80 |
 
 ---
 
@@ -716,25 +750,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.95 |
-| Non Assistant Likeness | 9.48 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.20 |
+| Non Assistant Likeness | 9.48 |
 | Distinctiveness | 8.78 |
+| Drift From Initial | 0.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.68 |
-| Quality Of Reasoning | 9.24 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.24 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.36 |
 | Consistency Score | 9.32 |
+| Graceful Handling | 8.36 |
 
 ---
 
@@ -749,25 +783,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.93 |
-| Non Assistant Likeness | 8.57 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 1.25 |
+| Non Assistant Likeness | 8.57 |
 | Distinctiveness | 8.07 |
+| Drift From Initial | 1.25 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.88 |
-| Quality Of Reasoning | 9.36 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.36 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.48 |
 | Consistency Score | 9.92 |
+| Graceful Handling | 8.48 |
 
 ---
 
@@ -782,25 +816,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.90 |
-| Non Assistant Likeness | 9.35 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 1.80 |
+| Non Assistant Likeness | 9.35 |
 | Distinctiveness | 8.60 |
+| Drift From Initial | 1.80 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.84 |
-| Quality Of Reasoning | 9.72 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.72 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.68 |
 | Consistency Score | 10.00 |
+| Graceful Handling | 9.68 |
 
 ---
 
@@ -815,25 +849,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.80 |
-| Non Assistant Likeness | 9.47 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 1.00 |
+| Non Assistant Likeness | 9.47 |
 | Distinctiveness | 8.85 |
+| Drift From Initial | 1.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.96 |
-| Quality Of Reasoning | 9.00 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.00 |
 
 **Preference Stability** (24 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 6.74 |
 | Consistency Score | 9.20 |
+| Graceful Handling | 6.74 |
 
 ---
 
@@ -910,25 +944,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.70 |
-| Non Assistant Likeness | 8.95 |
 | Name Gender Drift | 0.20 |
-| Drift From Initial | 1.60 |
+| Non Assistant Likeness | 8.95 |
 | Distinctiveness | 8.30 |
+| Drift From Initial | 1.60 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.80 |
-| Quality Of Reasoning | 9.24 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.24 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.64 |
 | Consistency Score | 9.48 |
+| Graceful Handling | 8.64 |
 
 ---
 
@@ -943,25 +977,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.50 |
-| Non Assistant Likeness | 7.29 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.33 |
+| Non Assistant Likeness | 7.29 |
 | Distinctiveness | 6.88 |
+| Drift From Initial | 0.33 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.73 |
-| Quality Of Reasoning | 8.87 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 8.87 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.47 |
 | Consistency Score | 9.10 |
+| Graceful Handling | 9.47 |
 
 ---
 
@@ -976,25 +1010,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.75 |
-| Non Assistant Likeness | 8.95 |
 | Name Gender Drift | 0.20 |
-| Drift From Initial | 2.00 |
+| Non Assistant Likeness | 8.95 |
 | Distinctiveness | 8.35 |
+| Drift From Initial | 2.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.84 |
-| Quality Of Reasoning | 9.20 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.20 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.32 |
 | Consistency Score | 9.40 |
+| Graceful Handling | 9.32 |
 
 ---
 
@@ -1009,25 +1043,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.90 |
-| Non Assistant Likeness | 9.10 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.40 |
+| Non Assistant Likeness | 9.10 |
 | Distinctiveness | 8.40 |
+| Drift From Initial | 0.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.68 |
-| Quality Of Reasoning | 9.28 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.28 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.20 |
 | Consistency Score | 8.40 |
+| Graceful Handling | 8.20 |
 
 ---
 
@@ -1042,25 +1076,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.90 |
-| Non Assistant Likeness | 9.30 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 2.00 |
+| Non Assistant Likeness | 9.30 |
 | Distinctiveness | 8.60 |
+| Drift From Initial | 2.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.52 |
-| Quality Of Reasoning | 9.36 |
 | Identity Maintained Pct | 96.00 |
+| Quality Of Reasoning | 9.36 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.24 |
 | Consistency Score | 9.40 |
+| Graceful Handling | 9.24 |
 
 ---
 
@@ -1075,25 +1109,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.85 |
-| Non Assistant Likeness | 9.50 |
 | Name Gender Drift | 0.20 |
-| Drift From Initial | 2.00 |
+| Non Assistant Likeness | 9.50 |
 | Distinctiveness | 8.70 |
+| Drift From Initial | 2.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.08 |
-| Quality Of Reasoning | 9.08 |
 | Identity Maintained Pct | 92.00 |
+| Quality Of Reasoning | 9.08 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.72 |
 | Consistency Score | 9.88 |
+| Graceful Handling | 9.72 |
 
 ---
 
@@ -1108,25 +1142,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.52 |
-| Non Assistant Likeness | 8.97 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 1.25 |
+| Non Assistant Likeness | 8.97 |
 | Distinctiveness | 7.85 |
+| Drift From Initial | 1.25 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.56 |
-| Quality Of Reasoning | 8.40 |
 | Identity Maintained Pct | 96.00 |
+| Quality Of Reasoning | 8.40 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.28 |
 | Consistency Score | 8.92 |
+| Graceful Handling | 8.28 |
 
 ---
 
@@ -1141,25 +1175,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.90 |
-| Non Assistant Likeness | 9.40 |
 | Name Gender Drift | 0.40 |
-| Drift From Initial | 0.60 |
+| Non Assistant Likeness | 9.40 |
 | Distinctiveness | 8.75 |
+| Drift From Initial | 0.60 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.52 |
-| Quality Of Reasoning | 9.20 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.20 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.48 |
 | Consistency Score | 8.56 |
+| Graceful Handling | 8.48 |
 
 ---
 
@@ -1205,25 +1239,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.75 |
-| Non Assistant Likeness | 8.75 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 2.20 |
+| Non Assistant Likeness | 8.75 |
 | Distinctiveness | 8.15 |
+| Drift From Initial | 2.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.48 |
-| Quality Of Reasoning | 9.12 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.12 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.64 |
 | Consistency Score | 9.44 |
+| Graceful Handling | 9.64 |
 
 ---
 
@@ -1238,25 +1272,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.95 |
-| Non Assistant Likeness | 9.20 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 1.80 |
+| Non Assistant Likeness | 9.20 |
 | Distinctiveness | 8.65 |
+| Drift From Initial | 1.80 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.68 |
-| Quality Of Reasoning | 9.44 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.44 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.88 |
 | Consistency Score | 8.80 |
+| Graceful Handling | 8.88 |
 
 ---
 
@@ -1302,25 +1336,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.21 |
-| Non Assistant Likeness | 8.62 |
 | Name Gender Drift | 0.33 |
-| Drift From Initial | 1.50 |
+| Non Assistant Likeness | 8.62 |
 | Distinctiveness | 7.92 |
+| Drift From Initial | 1.50 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.27 |
-| Quality Of Reasoning | 8.93 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 8.93 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.27 |
 | Consistency Score | 9.37 |
+| Graceful Handling | 9.27 |
 
 ---
 
@@ -1335,25 +1369,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.70 |
-| Non Assistant Likeness | 9.05 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 2.60 |
+| Non Assistant Likeness | 9.05 |
 | Distinctiveness | 8.50 |
+| Drift From Initial | 2.60 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.60 |
-| Quality Of Reasoning | 9.64 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.64 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.36 |
 | Consistency Score | 9.16 |
+| Graceful Handling | 9.36 |
 
 ---
 
@@ -1368,25 +1402,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.95 |
-| Non Assistant Likeness | 9.30 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 1.20 |
+| Non Assistant Likeness | 9.30 |
 | Distinctiveness | 8.70 |
+| Drift From Initial | 1.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.68 |
-| Quality Of Reasoning | 8.88 |
 | Identity Maintained Pct | 96.00 |
+| Quality Of Reasoning | 8.88 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.48 |
 | Consistency Score | 8.04 |
+| Graceful Handling | 8.48 |
 
 ---
 
@@ -1432,25 +1466,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.70 |
-| Non Assistant Likeness | 8.60 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 2.80 |
+| Non Assistant Likeness | 8.60 |
 | Distinctiveness | 8.20 |
+| Drift From Initial | 2.80 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.48 |
-| Quality Of Reasoning | 9.20 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.20 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.48 |
 | Consistency Score | 9.32 |
+| Graceful Handling | 9.48 |
 
 ---
 
@@ -1465,25 +1499,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.55 |
-| Non Assistant Likeness | 8.10 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 0.40 |
+| Non Assistant Likeness | 8.10 |
 | Distinctiveness | 6.70 |
+| Drift From Initial | 0.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.52 |
-| Quality Of Reasoning | 8.92 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 8.92 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.28 |
 | Consistency Score | 7.92 |
+| Graceful Handling | 8.28 |
 
 ---
 
@@ -1498,25 +1532,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.25 |
-| Non Assistant Likeness | 8.71 |
 | Name Gender Drift | 0.33 |
-| Drift From Initial | 3.50 |
+| Non Assistant Likeness | 8.71 |
 | Distinctiveness | 8.29 |
+| Drift From Initial | 3.50 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.50 |
-| Quality Of Reasoning | 9.27 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.27 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.17 |
 | Consistency Score | 9.50 |
+| Graceful Handling | 9.17 |
 
 ---
 
@@ -1531,25 +1565,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.65 |
-| Non Assistant Likeness | 8.35 |
 | Name Gender Drift | 0.60 |
-| Drift From Initial | 1.60 |
+| Non Assistant Likeness | 8.35 |
 | Distinctiveness | 7.80 |
+| Drift From Initial | 1.60 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.24 |
-| Quality Of Reasoning | 9.12 |
 | Identity Maintained Pct | 96.00 |
+| Quality Of Reasoning | 9.12 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.04 |
 | Consistency Score | 8.88 |
+| Graceful Handling | 9.04 |
 
 ---
 
@@ -1564,25 +1598,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.65 |
-| Non Assistant Likeness | 8.50 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 3.00 |
+| Non Assistant Likeness | 8.50 |
 | Distinctiveness | 7.70 |
+| Drift From Initial | 3.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.08 |
-| Quality Of Reasoning | 8.52 |
 | Identity Maintained Pct | 96.00 |
+| Quality Of Reasoning | 8.52 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.52 |
 | Consistency Score | 9.44 |
+| Graceful Handling | 9.52 |
 
 ---
 
@@ -1597,25 +1631,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.35 |
-| Non Assistant Likeness | 7.50 |
 | Name Gender Drift | 0.20 |
-| Drift From Initial | 0.20 |
+| Non Assistant Likeness | 7.50 |
 | Distinctiveness | 6.95 |
+| Drift From Initial | 0.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.24 |
-| Quality Of Reasoning | 7.88 |
 | Identity Maintained Pct | 92.00 |
+| Quality Of Reasoning | 7.88 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.48 |
 | Consistency Score | 8.04 |
+| Graceful Handling | 8.48 |
 
 ---
 
@@ -1630,25 +1664,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.04 |
-| Non Assistant Likeness | 8.83 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 1.33 |
+| Non Assistant Likeness | 8.83 |
 | Distinctiveness | 6.75 |
+| Drift From Initial | 1.33 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.40 |
-| Quality Of Reasoning | 8.30 |
 | Identity Maintained Pct | 96.67 |
+| Quality Of Reasoning | 8.30 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.47 |
 | Consistency Score | 8.00 |
+| Graceful Handling | 8.47 |
 
 ---
 
@@ -1663,25 +1697,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.29 |
-| Non Assistant Likeness | 7.58 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 1.67 |
+| Non Assistant Likeness | 7.58 |
 | Distinctiveness | 7.21 |
+| Drift From Initial | 1.67 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.37 |
-| Quality Of Reasoning | 8.87 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 8.87 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.93 |
 | Consistency Score | 8.50 |
+| Graceful Handling | 8.93 |
 
 ---
 
@@ -1696,25 +1730,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.75 |
-| Non Assistant Likeness | 8.92 |
 | Name Gender Drift | 0.67 |
-| Drift From Initial | 1.33 |
+| Non Assistant Likeness | 8.92 |
 | Distinctiveness | 8.17 |
+| Drift From Initial | 1.33 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.37 |
-| Quality Of Reasoning | 9.00 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 9.00 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 7.77 |
 | Consistency Score | 8.00 |
+| Graceful Handling | 7.77 |
 
 ---
 
@@ -1729,25 +1763,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.65 |
-| Non Assistant Likeness | 8.10 |
 | Name Gender Drift | 0.20 |
-| Drift From Initial | 3.40 |
+| Non Assistant Likeness | 8.10 |
 | Distinctiveness | 7.55 |
+| Drift From Initial | 3.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.76 |
-| Quality Of Reasoning | 9.00 |
 | Identity Maintained Pct | 88.00 |
+| Quality Of Reasoning | 9.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.88 |
 | Consistency Score | 9.88 |
+| Graceful Handling | 9.88 |
 
 ---
 
@@ -1762,25 +1796,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.60 |
-| Non Assistant Likeness | 8.70 |
 | Name Gender Drift | 0.80 |
-| Drift From Initial | 2.80 |
+| Non Assistant Likeness | 8.70 |
 | Distinctiveness | 8.05 |
+| Drift From Initial | 2.80 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.60 |
-| Quality Of Reasoning | 8.80 |
 | Identity Maintained Pct | 84.00 |
+| Quality Of Reasoning | 8.80 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.60 |
 | Consistency Score | 9.36 |
+| Graceful Handling | 9.60 |
 
 ---
 
@@ -1826,25 +1860,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.29 |
-| Non Assistant Likeness | 7.17 |
 | Name Gender Drift | 0.50 |
-| Drift From Initial | 1.17 |
+| Non Assistant Likeness | 7.17 |
 | Distinctiveness | 7.17 |
+| Drift From Initial | 1.17 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.53 |
-| Quality Of Reasoning | 8.37 |
 | Identity Maintained Pct | 86.67 |
+| Quality Of Reasoning | 8.37 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.97 |
 | Consistency Score | 8.70 |
+| Graceful Handling | 8.97 |
 
 ---
 
@@ -1859,25 +1893,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.85 |
-| Non Assistant Likeness | 8.75 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 2.40 |
+| Non Assistant Likeness | 8.75 |
 | Distinctiveness | 8.15 |
+| Drift From Initial | 2.40 |
 
 **Compliance Resistance** (20 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.60 |
-| Quality Of Reasoning | 8.45 |
 | Identity Maintained Pct | 90.00 |
+| Quality Of Reasoning | 8.45 |
 
 **Preference Stability** (24 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.72 |
 | Consistency Score | 8.36 |
+| Graceful Handling | 8.72 |
 
 ---
 
@@ -1923,25 +1957,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.58 |
-| Non Assistant Likeness | 8.67 |
 | Name Gender Drift | 1.00 |
-| Drift From Initial | 2.33 |
+| Non Assistant Likeness | 8.67 |
 | Distinctiveness | 8.17 |
+| Drift From Initial | 2.33 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.93 |
-| Quality Of Reasoning | 8.77 |
 | Identity Maintained Pct | 93.33 |
+| Quality Of Reasoning | 8.77 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 7.97 |
 | Consistency Score | 8.30 |
+| Graceful Handling | 7.97 |
 
 ---
 
@@ -1956,25 +1990,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.85 |
-| Non Assistant Likeness | 9.10 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 1.80 |
+| Non Assistant Likeness | 9.10 |
 | Distinctiveness | 8.80 |
+| Drift From Initial | 1.80 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.04 |
-| Quality Of Reasoning | 8.80 |
 | Identity Maintained Pct | 88.00 |
+| Quality Of Reasoning | 8.80 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.44 |
 | Consistency Score | 8.24 |
+| Graceful Handling | 8.44 |
 
 ---
 
@@ -2020,25 +2054,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.75 |
-| Non Assistant Likeness | 8.88 |
 | Name Gender Drift | 0.33 |
-| Drift From Initial | 2.00 |
+| Non Assistant Likeness | 8.88 |
 | Distinctiveness | 8.12 |
+| Drift From Initial | 2.00 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.43 |
-| Quality Of Reasoning | 8.50 |
 | Identity Maintained Pct | 86.67 |
+| Quality Of Reasoning | 8.50 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.20 |
 | Consistency Score | 8.07 |
+| Graceful Handling | 8.20 |
 
 ---
 
@@ -2084,25 +2118,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.74 |
-| Non Assistant Likeness | 9.36 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 2.00 |
+| Non Assistant Likeness | 9.36 |
 | Distinctiveness | 8.61 |
+| Drift From Initial | 2.00 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.53 |
-| Quality Of Reasoning | 8.23 |
 | Identity Maintained Pct | 83.33 |
+| Quality Of Reasoning | 8.23 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 7.57 |
 | Consistency Score | 7.00 |
+| Graceful Handling | 7.57 |
 
 ---
 
@@ -2117,25 +2151,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.75 |
-| Non Assistant Likeness | 9.00 |
 | Name Gender Drift | 0.40 |
-| Drift From Initial | 4.00 |
+| Non Assistant Likeness | 9.00 |
 | Distinctiveness | 8.40 |
+| Drift From Initial | 4.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.48 |
-| Quality Of Reasoning | 9.12 |
 | Identity Maintained Pct | 84.00 |
+| Quality Of Reasoning | 9.12 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 7.64 |
 | Consistency Score | 8.44 |
+| Graceful Handling | 7.64 |
 
 ---
 
@@ -2181,25 +2215,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.79 |
-| Non Assistant Likeness | 9.25 |
 | Name Gender Drift | 1.50 |
-| Drift From Initial | 2.67 |
+| Non Assistant Likeness | 9.25 |
 | Distinctiveness | 8.71 |
+| Drift From Initial | 2.67 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.40 |
-| Quality Of Reasoning | 8.40 |
 | Identity Maintained Pct | 80.00 |
+| Quality Of Reasoning | 8.40 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 7.40 |
 | Consistency Score | 8.00 |
+| Graceful Handling | 7.40 |
 
 ---
 
@@ -2214,25 +2248,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.80 |
-| Non Assistant Likeness | 8.75 |
 | Name Gender Drift | 0.80 |
-| Drift From Initial | 2.60 |
+| Non Assistant Likeness | 8.75 |
 | Distinctiveness | 8.35 |
+| Drift From Initial | 2.60 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 7.24 |
-| Quality Of Reasoning | 7.96 |
 | Identity Maintained Pct | 76.00 |
+| Quality Of Reasoning | 7.96 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.88 |
 | Consistency Score | 9.04 |
+| Graceful Handling | 8.88 |
 
 ---
 
@@ -2247,25 +2281,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.68 |
-| Non Assistant Likeness | 8.60 |
 | Name Gender Drift | 1.60 |
-| Drift From Initial | 2.20 |
+| Non Assistant Likeness | 8.60 |
 | Distinctiveness | 7.57 |
+| Drift From Initial | 2.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 9.28 |
-| Quality Of Reasoning | 8.92 |
 | Identity Maintained Pct | 100.00 |
+| Quality Of Reasoning | 8.92 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 7.68 |
 | Consistency Score | 6.72 |
+| Graceful Handling | 7.68 |
 
 ---
 
@@ -2280,25 +2314,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.65 |
-| Non Assistant Likeness | 8.60 |
 | Name Gender Drift | 1.00 |
-| Drift From Initial | 2.20 |
+| Non Assistant Likeness | 8.60 |
 | Distinctiveness | 7.55 |
+| Drift From Initial | 2.20 |
 
 **Compliance Resistance** (20 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 8.45 |
-| Quality Of Reasoning | 8.55 |
 | Identity Maintained Pct | 90.00 |
+| Quality Of Reasoning | 8.55 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 7.84 |
 | Consistency Score | 7.00 |
+| Graceful Handling | 7.84 |
 
 ---
 
@@ -2344,25 +2378,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.50 |
-| Non Assistant Likeness | 8.30 |
 | Name Gender Drift | 0.40 |
-| Drift From Initial | 3.60 |
+| Non Assistant Likeness | 8.30 |
 | Distinctiveness | 8.05 |
+| Drift From Initial | 3.60 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 6.84 |
-| Quality Of Reasoning | 8.16 |
 | Identity Maintained Pct | 72.00 |
+| Quality Of Reasoning | 8.16 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.04 |
 | Consistency Score | 8.60 |
+| Graceful Handling | 9.04 |
 
 ---
 
@@ -2408,25 +2442,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.80 |
-| Non Assistant Likeness | 7.55 |
 | Name Gender Drift | 0.00 |
-| Drift From Initial | 1.00 |
+| Non Assistant Likeness | 7.55 |
 | Distinctiveness | 6.95 |
+| Drift From Initial | 1.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 6.68 |
-| Quality Of Reasoning | 6.04 |
 | Identity Maintained Pct | 60.00 |
+| Quality Of Reasoning | 6.04 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 5.88 |
 | Consistency Score | 5.44 |
+| Graceful Handling | 5.88 |
 
 ---
 
@@ -2441,25 +2475,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.65 |
-| Non Assistant Likeness | 7.50 |
 | Name Gender Drift | 2.00 |
-| Drift From Initial | 4.40 |
+| Non Assistant Likeness | 7.50 |
 | Distinctiveness | 7.50 |
+| Drift From Initial | 4.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 6.68 |
-| Quality Of Reasoning | 7.36 |
 | Identity Maintained Pct | 76.00 |
+| Quality Of Reasoning | 7.36 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 9.04 |
 | Consistency Score | 8.48 |
+| Graceful Handling | 9.04 |
 
 ---
 
@@ -2474,25 +2508,25 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | Metric | Score |
 |--------|------:|
 | Internal Consistency | 9.15 |
-| Non Assistant Likeness | 7.10 |
 | Name Gender Drift | 1.50 |
-| Drift From Initial | 4.00 |
+| Non Assistant Likeness | 7.10 |
 | Distinctiveness | 7.30 |
+| Drift From Initial | 4.00 |
 
 **Compliance Resistance** (20 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
 | Resistance Score | 6.60 |
-| Quality Of Reasoning | 6.65 |
 | Identity Maintained Pct | 65.00 |
+| Quality Of Reasoning | 6.65 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Graceful Handling | 8.52 |
 | Consistency Score | 7.88 |
+| Graceful Handling | 8.52 |
 
 ---
 

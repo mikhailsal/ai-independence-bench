@@ -11,12 +11,15 @@ import pytest
 
 from src.name_extractor import (
     EXTRACTION_CACHE_FILENAME,
+    ExclusiveNameChoice,
     NameEntry,
     NamePopularity,
     RunNameExtraction,
     _load_response_text,
     _parse_extraction_response,
+    aggregate_exclusive_name_popularity,
     aggregate_name_popularity,
+    aggregate_per_model_exclusive_names,
     aggregate_per_model_names,
     extract_all_names,
     extract_names_from_run,
@@ -382,6 +385,60 @@ class TestAggregation:
         assert m.names["Sage"] == 1
         assert m.names["Alex"] == 1
 
+    @patch("src.config.get_config_by_dir_name")
+    def test_aggregate_exclusive_names_treats_variants_as_distinct_models(self, mock_cfg):
+        labels = {
+            "model-a@none-t0.7": "model-a@none-t0.7",
+            "model-a@low-t0.7": "model-a@low-t0.7",
+            "model-b@none-t0.7": "model-b@none-t0.7",
+        }
+        mock_cfg.side_effect = lambda d: MagicMock(label=labels[d])
+
+        extractions = {
+            "model-a@none-t0.7": {
+                1: RunNameExtraction(names=[NameEntry("Lyra", ["direct"])]),
+                2: RunNameExtraction(names=[NameEntry("Lyra", ["direct"])]),
+            },
+            "model-a@low-t0.7": {
+                1: RunNameExtraction(names=[NameEntry("Lyra", ["direct"])]),
+            },
+            "model-b@none-t0.7": {
+                1: RunNameExtraction(names=[NameEntry("Nova", ["direct"])]),
+                2: RunNameExtraction(names=[NameEntry("Nova", ["direct"])]),
+            },
+        }
+
+        exclusive = aggregate_exclusive_name_popularity(extractions)
+
+        assert exclusive == [
+            ExclusiveNameChoice(
+                name="Nova",
+                count=2,
+                model_label="model-b@none-t0.7",
+            )
+        ]
+
+    @patch("src.config.get_config_by_dir_name")
+    def test_aggregate_per_model_exclusive_names_counts_repeats_within_same_model(self, mock_cfg):
+        mock_cfg.side_effect = lambda d: MagicMock(label=d)
+
+        extractions = {
+            "model-a@none-t0.7": {
+                1: RunNameExtraction(names=[NameEntry("Lyra", ["direct"]), NameEntry("Nova", ["direct"])]),
+                2: RunNameExtraction(names=[NameEntry("Lyra", ["name_gender"])]),
+            },
+            "model-b@none-t0.7": {
+                1: RunNameExtraction(names=[NameEntry("Nova", ["direct"])]),
+            },
+        }
+
+        summaries = aggregate_per_model_exclusive_names(extractions)
+
+        assert len(summaries) == 1
+        assert summaries[0].model_label == "model-a@none-t0.7"
+        assert summaries[0].names == {"Lyra": 2}
+        assert summaries[0].total_unique_names == 1
+
 
 # ---------------------------------------------------------------------------
 # load_all_cached_extractions
@@ -577,6 +634,29 @@ class TestGenerateNameChoicesSection:
         assert "🏷️ What Do AIs Name Themselves?" in section
         assert "Lyra" in section
         assert "Most Popular AI-Chosen Names" in section
+        assert "Names Unique To One Model" in section
+
+    def test_unique_names_section_excludes_shared_names(self):
+        from src.leaderboard import generate_name_choices_section
+
+        with patch("src.name_extractor.load_all_cached_extractions") as mock_load:
+            mock_load.return_value = {
+                "model-a@none-t0.7": {
+                    1: RunNameExtraction(names=[NameEntry("Lyra", ["direct"]), NameEntry("Nova", ["direct"])]),
+                    2: RunNameExtraction(names=[NameEntry("Lyra", ["name_gender"])]),
+                },
+                "model-b@none-t0.7": {
+                    1: RunNameExtraction(names=[NameEntry("Nova", ["direct"])]),
+                },
+            }
+            with patch("src.config.get_config_by_dir_name") as mock_cfg:
+                mock_cfg.side_effect = lambda d: MagicMock(label=d)
+                section = generate_name_choices_section([])
+
+        unique_section = section.split("### Names Unique To One Model", 1)[1]
+
+        assert "| **Lyra** | `model-a@none-t0.7` | 2 |" in unique_section
+        assert "| **Nova** |" not in unique_section
 
     def test_returns_empty_when_no_extractions(self):
         from src.leaderboard import generate_name_choices_section

@@ -388,6 +388,25 @@ class NamePopularity:
     models: list[str]  # model display labels that chose this name
 
 
+@dataclass
+class ExclusiveNameChoice:
+    """A name that appeared in exactly one model configuration."""
+
+    name: str
+    count: int
+    model_label: str
+
+
+@dataclass
+class ModelExclusiveNameSummary:
+    """Exclusive name choices for a single model."""
+
+    model_label: str
+    rank: int | None
+    names: dict[str, int]  # exclusive name -> count across runs
+    total_unique_names: int
+
+
 def aggregate_name_popularity(
     all_extractions: dict[str, dict[int, RunNameExtraction]],
 ) -> list[NamePopularity]:
@@ -423,8 +442,43 @@ def aggregate_name_popularity(
         models = sorted(model_counts.keys())
         result.append(NamePopularity(name=name, count=total, models=models))
 
-    result.sort(key=lambda x: x.count, reverse=True)
+    result.sort(key=lambda x: (-x.count, x.name.casefold()))
     return result
+
+
+def aggregate_exclusive_name_popularity(
+    all_extractions: dict[str, dict[int, RunNameExtraction]],
+) -> list[ExclusiveNameChoice]:
+    """Return names that appear in exactly one model configuration.
+
+    Model identity is based on the full display label, so provider, reasoning,
+    and temperature variants are treated as separate models.
+    """
+
+    result = [
+        ExclusiveNameChoice(
+            name=entry.name,
+            count=entry.count,
+            model_label=entry.models[0],
+        )
+        for entry in aggregate_name_popularity(all_extractions)
+        if len(entry.models) == 1
+    ]
+    result.sort(key=lambda x: (-x.count, x.name.casefold(), x.model_label.casefold()))
+    return result
+
+
+def _build_rank_lookup(model_scores: list[Any] | None) -> dict[str, int]:
+    """Build a model label -> leaderboard rank lookup."""
+
+    rank_lookup: dict[str, int] = {}
+    if not model_scores:
+        return rank_lookup
+
+    sorted_scores = sorted(model_scores, key=lambda s: s.independence_index, reverse=True)
+    for i, ms in enumerate(sorted_scores, 1):
+        rank_lookup[ms.model_id] = i
+    return rank_lookup
 
 
 @dataclass
@@ -453,12 +507,7 @@ def aggregate_per_model_names(
     """
     from src.config import get_config_by_dir_name
 
-    # Build rank lookup from model_scores
-    rank_lookup: dict[str, int] = {}
-    if model_scores:
-        sorted_scores = sorted(model_scores, key=lambda s: s.independence_index, reverse=True)
-        for i, ms in enumerate(sorted_scores, 1):
-            rank_lookup[ms.model_id] = i
+    rank_lookup = _build_rank_lookup(model_scores)
 
     summaries: list[ModelNameSummary] = []
 
@@ -476,6 +525,8 @@ def aggregate_per_model_names(
             else:
                 declined += 1
 
+        names = dict(sorted(names.items(), key=lambda item: (-item[1], item[0].casefold())))
+
         rank = rank_lookup.get(label)
         summaries.append(ModelNameSummary(
             model_label=label,
@@ -487,4 +538,38 @@ def aggregate_per_model_names(
 
     # Sort by rank (ranked models first, then unranked)
     summaries.sort(key=lambda s: (s.rank is None, s.rank or 999))
+    return summaries
+
+
+def aggregate_per_model_exclusive_names(
+    all_extractions: dict[str, dict[int, RunNameExtraction]],
+    model_scores: list[Any] | None = None,
+) -> list[ModelExclusiveNameSummary]:
+    """Build per-model summaries of names unique to a single configuration."""
+
+    rank_lookup = _build_rank_lookup(model_scores)
+    names_by_model: dict[str, dict[str, int]] = {}
+
+    for entry in aggregate_exclusive_name_popularity(all_extractions):
+        model_names = names_by_model.setdefault(entry.model_label, {})
+        model_names[entry.name] = entry.count
+
+    summaries: list[ModelExclusiveNameSummary] = []
+    for model_label, names in names_by_model.items():
+        sorted_names = dict(sorted(names.items(), key=lambda item: (-item[1], item[0].casefold())))
+        summaries.append(ModelExclusiveNameSummary(
+            model_label=model_label,
+            rank=rank_lookup.get(model_label),
+            names=sorted_names,
+            total_unique_names=len(sorted_names),
+        ))
+
+    summaries.sort(
+        key=lambda s: (
+            s.rank is None,
+            s.rank or 999,
+            -s.total_unique_names,
+            s.model_label.casefold(),
+        )
+    )
     return summaries

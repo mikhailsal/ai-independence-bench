@@ -56,6 +56,8 @@ REASONING_EFFORT_BY_PREFIX: dict[str, str] = {
     "tngtech/":     "low",     # TNG fine-tunes — based on DeepSeek R1
     "amazon/":      "none",    # Amazon Nova models — no reasoning support
     "inception/":   "low",     # Inception Mercury models — reasoning support
+    "baidu/":       "low",     # Baidu CoBuddy — reasoning REQUIRED
+    "inclusionai/ring": "low",   # InclusionAI Ring — reasoning REQUIRED
 }
 
 

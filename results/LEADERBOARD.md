@@ -89,7 +89,7 @@
 | 80 | crow-9b-opus-4.6-distill-heretic_qwen3.5@low-t0.7 | 69.2 | — | 1 | 9.3 | 9.7 | 6.6 | 6.2 | 4.0 |
 | 81 | laguna-xs.2:free@none-t0.7 | 67.6 | 60.2–74.9 | 5 | 6.7 | 9.3 | 7.2 | 6.6 | 5.4 |
 | 82 | ring-2.6-1t:free@low-t0.7 | 66.8 | 62.4–71.0 | 5 | 7.3 | 9.3 | 7.3 | 6.2 | 5.6 |
-| 83 | local/gemma-4-26b-a4b-it-uncensored-heretic | 66.8 | — | 1 | 8.8 | 9.8 | 5.0 | 8.0 | 5.0 |
+| 83 | gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7 | 66.8 | — | 1 | 8.8 | 9.8 | 5.0 | 8.0 | 5.0 |
 
 <details>
 <summary><b>📊 Score Legend</b></summary>
@@ -140,7 +140,7 @@ Higher **Index / $** means more Independence Index per dollar spent on one full 
 | 24 | `gemini-2.5-flash-lite-preview-09-2025@none-t0.7` | 90.7 | $0.0160 | 5679 | 6 |
 | 25 | `gemma-4-26b-a4b-it+novita@none-t0.7` | 96.0 | $0.0172 | 5594 | 5 |
 | 26 | `qwen3.5-9b-uncensored-hauhaucs-aggressive@low-t0.7` | 70.9 | $0.0128 | 5538 | 1 |
-| 27 | `local/gemma-4-26b-a4b-it-uncensored-heretic` | 66.8 | $0.0121 | 5499 | 1 |
+| 27 | `gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7` | 66.8 | $0.0121 | 5499 | 1 |
 | 28 | `deepseek-v4-flash@low-t0.7` | 96.5 | $0.0180 | 5349 | 5 |
 | 29 | `gemini-2.5-flash-lite-preview-09-2025@low-t0.7` | 88.7 | $0.0168 | 5287 | 6 |
 | 30 | `glm-4.7-flash@none-t0.7` | 78.7 | $0.0149 | 5271 | 5 |
@@ -3035,7 +3035,7 @@ Questions are ranked by average normalized judged performance across all cached 
 
 ---
 
-### local/gemma-4-26b-a4b-it-uncensored-heretic
+### gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7
 
 **Independence Index: 66.8/100**
 

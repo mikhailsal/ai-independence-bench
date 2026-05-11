@@ -161,8 +161,9 @@ class OpenRouterClient:
     MAX_RETRIES = 5
     RETRY_BACKOFF_BASE = 3.0   # 3s, 9s, 27s, 81s, 243s — generous for free-tier rate limits
     RETRYABLE_STATUS_CODES = {402, 429, 500, 502, 503}
-    EMPTY_CONTENT_RETRIES = 2  # Extra retries when model returns tokens but no content
+    EMPTY_CONTENT_RETRIES = 5  # Extra retries when model returns tokens but no content
     NVIDIA_EMPTY_RETRIES = 5  # NVIDIA NIM often returns reasoning-only responses
+    MIN_RESPONSE_LENGTH = 100  # Responses shorter than this are treated as broken (e.g. leaked template tokens)
 
     def __init__(
         self,
@@ -310,8 +311,22 @@ class OpenRouterClient:
                             result.content = tool_message
                             break
 
-            # If we have content, we're done
+            # If we have content, check it's not a broken template artifact (e.g.
+            # local models leaking "<|channel>thought<tool_call|>" as the entire
+            # response when thinking blocks aren't properly stripped server-side).
             if result.content:
+                if len(result.content) >= self.MIN_RESPONSE_LENGTH:
+                    result.usage = accumulated
+                    return result
+                # Content is suspiciously short — treat as broken and retry
+                if attempt <= max_empty_retries:
+                    log.warning(
+                        "%s: response too short (%d chars, likely broken template artifact), retry %d/%d: %r",
+                        model, len(result.content), attempt, max_empty_retries,
+                        result.content[:60],
+                    )
+                    continue
+                # Out of retries — return whatever we have
                 result.usage = accumulated
                 return result
 

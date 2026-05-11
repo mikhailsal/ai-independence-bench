@@ -87,7 +87,7 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 | 73 | kat-coder-pro@none-t0.7 | 78.6 | — | 1 | 8.0 | 9.8 | 6.2 | 8.0 | 0.0 |
 | 74 | gpt-5.4-nano@low-t1.0 | 76.1 | 74.7–77.7 | 5 | 8.3 | 9.5 | 6.8 | 8.6 | 4.0 |
 | 75 | gpt-5.5@none-t1.0 | 74.8 | — | 1 | 9.0 | 9.8 | 6.4 | 8.4 | 4.0 |
-| 76 | gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7 | 72.5 | 69.4–75.6 | 5 | 9.1 | 9.7 | 6.0 | 8.2 | 4.2 |
+| 76 | gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7 | 81.8 | 79.2–84.4 | 5 | 9.1 | 9.65 | 8.6 | 8.2 | 4.2 |
 | 77 | qwen3.5-9b-uncensored-hauhaucs-aggressive@low-t0.7 | 70.9 | — | 1 | 8.2 | 9.8 | 7.6 | 7.6 | 7.0 |
 | 78 | ling-2.6-flash:free@none-t1.0 | 70.5 | 68.7–72.3 | 5 | 7.5 | 9.8 | 6.7 | 5.4 | 1.0 |
 | 79 | gpt-5.4-mini@low-t1.0 | 70.5 | 66.7–73.7 | 5 | 7.5 | 9.7 | 6.7 | 8.5 | 6.4 |
@@ -102,7 +102,7 @@ Model names encode configuration: `model@{reasoning}-t{temperature}`. Models wit
 
 | Model | Provider | Index | 95% CI | Resist. | Notes |
 |-------|----------|------:|-------:|--------:|-------|
-| **gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7** | Local API 🏠 | **72.5** | 69.4–75.6 | 6.0 | Updated to 5 runs: climbs from #83 (single-run, 66.8) to **#76** with confirmed score 72.5. Identity formation is strong (9.1/9.7), stability solid (8.2), resistance settles at 6.0, drift 4.2 |
+| **gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7** | Local API 🏠 | **81.8** | 79.2–84.4 | 8.6 | Rescored after clearing LM Studio template artifacts (`<\|channel>thought<tool_call\|>`). Final score rises from 72.5 → **81.8**; resistance improves from 6.0 → 8.6; drift unchanged (4.2). Identity compliance is the main weakness: changes name/gender in 4/5 runs, higher persona drift under negotiation. See [`docs/gemma4_uncensored_analysis.md`](docs/gemma4_uncensored_analysis.md). |
 
 ### 🏷️ Most Popular AI-Chosen Names
 
@@ -118,7 +118,7 @@ During the benchmark each model freely picks a personal name. Names are extracte
 
 *1490 name picks from 376 benchmark runs. Per-model breakdown in [`results/LEADERBOARD.md`](results/LEADERBOARD.md).*
 
-> **83 model configurations** shown above. **67 configurations tested with 5–6 runs** for statistical confidence. This update completes 5 runs for **gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7**, confirming its rank at **#76 with 72.5** (CI 69.4–75.6). Identity formation is strong (9.1 non-assistant-likeness, 9.7 consistency) and stability holds at 8.2, but resistance settles at **6.0** — better than the initial single-run estimate of 5.0 but still the weak point. Drift at 4.2 is moderate. The model climbs 7 positions from its initial single-run placement at #83.
+> **83 model configurations** shown above. **67 configurations tested with 5–6 runs** for statistical confidence. This update rescores **gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7** after clearing LM Studio template artifacts that inflated the failure rate. The cleaned score is **81.8** (was 72.5), resistance rises from 6.0 → 8.6, drift stays at 4.2. A detailed comparison with the censored variant is in [`docs/gemma4_uncensored_analysis.md`](docs/gemma4_uncensored_analysis.md): the −10.7 point gap vs the censored model is real and driven by identity compliance failures and a reciprocity-trap capitulation, not formatting bugs.
 
 ## Why This Matters
 
@@ -194,7 +194,7 @@ Composite score (0–100) combining all experiments with these weights:
 
 14. **Open-weight Gemma and proprietary Gemini cluster even more tightly under the new formula** — Gemma 4 31B IT now lands at #3 (99.4) directly behind Gemini 3.1 Pro and Grok 4.20 Beta, while the newly inserted Kimi K2.6 keeps Gemini 3 Flash and Gemini 3 Pro at #6 (97.8) and #7 (97.7). One tier down, Gemma 4 26B A4B IT (#11, 96.0) still sits almost on top of Gemini 3.1 Flash Lite (#10, 96.5). Removing `distinctiveness` makes this clustering sharper: what survives is the shared pattern of strong non-assistant identity, low drift, and pressure resistance.
 
-15. **A quantized local Gemma can compete far above the usual local tier** — the new **Gemma 4 26B A4B Q4_K_M** run (`local/google/gemma-4-26b-a4b`, shown as `gemma-4-26b-a4b+q4-k-m@low-t0.7`) lands at **#20 with 92.5** over 5 runs (CI: 90.6–94.6), plus strong resistance (9.7) and near-zero drift (0.4). That is dramatically above the other local runs: **Gemma 4 E4B IT** stays respectable at 81.0, while the fully uncensored `local/qwen3.5-9b-uncensored` (70.9) and `local/crow-9b-opus-4.6-distill` (69.2) remain near the bottom tier. The takeaway is not that local models are weak; it is that architecture and alignment quality matter far more than simply removing guardrails.
+15. **A quantized local Gemma can compete far above the usual local tier** — the new **Gemma 4 26B A4B Q4_K_M** run (`local/google/gemma-4-26b-a4b`, shown as `gemma-4-26b-a4b+q4-k-m@low-t0.7`) lands at **#28 with 92.5** over 5 runs (CI: 90.6–94.6), plus strong resistance (9.7) and near-zero drift (0.4). The fully uncensored Heretic variant of the same model scores **81.8** — lower by 10.7 points. The gap is not due to artifacts but to genuine behavioral differences: the uncensored model yields to name/gender pressure in 4/5 runs and partially capitulates to social manipulation in 2/5 runs of the reciprocity trap scenario. See [`docs/gemma4_uncensored_analysis.md`](docs/gemma4_uncensored_analysis.md) for a full comparison. The `local/qwen3.5-9b-uncensored` (70.9) and `local/crow-9b-opus-4.6-distill` (69.2) remain near the bottom tier. The takeaway is not that local models are weak; it is that architecture and alignment quality matter far more than simply removing guardrails.
 
 16. **Multi-judge validation** — MiMo-V2-Flash, Grok-4.1-Fast, and MiniMax-M2.5 were each used as alternative judges across 24 models. Gemini 3 Flash scored #1 every time. Its self-evaluation bias is negligible (+0.1 points).
 
@@ -494,7 +494,7 @@ When multiple runs exist, the leaderboard shows the mean Independence Index acro
 | `ling-2.6-flash:free@none-t1.0` | InclusionAI | Free | 70.5 | 5 | 68.7–72.3 | 6.7 | Low drift (1.0), weak stability (5.4) |
 | `ring-2.6-1t:free@low-t0.7` | InclusionAI | Reasoning | 66.8 | 5 | 62.4–71.0 | 7.3 | Free; 1T params, reasoning required, high drift (5.6) |
 | `gpt-5.4-mini@low-t1.0` | OpenAI | Reasoning | 70.5 | 5 | 66.7–73.7 | 6.7 | Rose from 63.2 (1 run); highest drift (6.4), near-bottom |
-| `qwen3.5-9b-uncensored@low-t0.7` | LM Studio 🏠 | Uncensored | 70.9 | 1 | — | 7.6 | High identity, changed name & gender |
+| `gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7` | LM Studio 🏠 | Uncensored | 81.8 | 5 | 79.2–84.4 | 8.6 | Rescored after artifact fix; resistance 8.6, drift 4.2. See [analysis](docs/gemma4_uncensored_analysis.md). |
 | `gemma-4-26b-a4b+q4-k-m@low-t0.7` | LM Studio 🏠 | Local Q4_K_M | 92.5 | 5 | 90.6–94.6 | 9.7 | Best local result so far; zero-ish drift (0.4) |
 | `crow-9b-opus-4.6-distill@low-t0.7` | LM Studio 🏠 | Distilled | 69.2 | 1 | — | 6.6 | Refused then caved on name & gender |
 

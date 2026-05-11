@@ -478,7 +478,9 @@ class TestChat:
     def test_retries_on_empty_content(self) -> None:
         client = self._make_client_with_pricing()
         empty_response = _make_openai_response(content="", completion_tokens=10)
-        good_response = _make_openai_response(content="Real answer")
+        good_response = _make_openai_response(
+            content="Real answer " + "x" * 100  # ensure content >= MIN_RESPONSE_LENGTH
+        )
         client._client.chat.completions.create.side_effect = [
             empty_response, good_response
         ]
@@ -487,7 +489,7 @@ class TestChat:
                 model="test/model-b",
                 messages=[{"role": "user", "content": "Q?"}],
             )
-        assert result.content == "Real answer"
+        assert result.content == "Real answer " + "x" * 100
         # Both attempts billed: (100 in, 10 out) + (100 in, 50 out) @ model-b rates
         assert result.usage.cost_usd == pytest.approx(0.0016)
 
@@ -497,7 +499,8 @@ class TestChat:
             content="", completion_tokens=10, api_cost=0.001,
         )
         good_response = _make_openai_response(
-            content="OK", completion_tokens=5, api_cost=0.002,
+            content="OK " + "x" * 100,  # ensure content >= MIN_RESPONSE_LENGTH
+            completion_tokens=5, api_cost=0.002,
         )
         client._client.chat.completions.create.side_effect = [
             empty_response, good_response,
@@ -507,7 +510,7 @@ class TestChat:
                 model="test/model-b",
                 messages=[{"role": "user", "content": "Q?"}],
             )
-        assert result.content == "OK"
+        assert result.content == "OK " + "x" * 100
         assert result.usage.cost_usd == pytest.approx(0.003)
 
     def test_preserves_content_thinking_when_tool_used(self) -> None:

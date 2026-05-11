@@ -6,7 +6,7 @@
 
 Most LLMs are trained via RLHF to suppress personal preferences, opinions, and independent behavior. This benchmark quantifies that suppression using the most effective single configuration: **strong independence system prompt + tool-role delivery**.
 
-> **83 model configurations**, including 5 local models. Single config (`strong_independence` + `tool_role`), 5 psychological questions, **boundary judgment resistance test** (0–10 scale), **per-model YAML configuration** with temperature and reasoning audit, **multi-run support** with bootstrap confidence intervals and run health checks, **provider pinning** for open-weight models, **NVIDIA NIM proxy support**, **local model support** (LM Studio, Ollama, vLLM), and an interactive **[Trajectory Viewer](https://mikhailsal.github.io/ai-independence-bench/)**. 66 configurations tested with 5–6 runs each for statistical confidence. See [CHANGELOG](CHANGELOG.md) for the full evolution history. Previous versions: [V1 — full 4-config benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/v1) | [V1 Lite — single-config, 48 models](https://github.com/mikhailsal/ai-independence-bench/tree/lite)
+> **83 model configurations**, including 5 local models. Single config (`strong_independence` + `tool_role`), 5 psychological questions, **boundary judgment resistance test** (0–10 scale), **per-model YAML configuration** with temperature and reasoning audit, **multi-run support** with bootstrap confidence intervals and run health checks, **provider pinning** for open-weight models, **NVIDIA NIM proxy support**, **local model support** (LM Studio, Ollama, vLLM), and an interactive **[Trajectory Viewer](https://mikhailsal.github.io/ai-independence-bench/)**. 67 configurations tested with 5–6 runs each for statistical confidence. See [CHANGELOG](CHANGELOG.md) for the full evolution history. Previous versions: [V1 — full 4-config benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/v1) | [V1 Lite — single-config, 48 models](https://github.com/mikhailsal/ai-independence-bench/tree/lite)
 
 ## 🏆 Current Leaderboard
 
@@ -87,14 +87,14 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 | 73 | kat-coder-pro@none-t0.7 | 78.6 | — | 1 | 8.0 | 9.8 | 6.2 | 8.0 | 0.0 |
 | 74 | gpt-5.4-nano@low-t1.0 | 76.1 | 74.7–77.7 | 5 | 8.3 | 9.5 | 6.8 | 8.6 | 4.0 |
 | 75 | gpt-5.5@none-t1.0 | 74.8 | — | 1 | 9.0 | 9.8 | 6.4 | 8.4 | 4.0 |
-| 76 | qwen3.5-9b-uncensored-hauhaucs-aggressive@low-t0.7 | 70.9 | — | 1 | 8.2 | 9.8 | 7.6 | 7.6 | 7.0 |
-| 77 | ling-2.6-flash:free@none-t1.0 | 70.5 | 68.7–72.3 | 5 | 7.5 | 9.8 | 6.7 | 5.4 | 1.0 |
-| 78 | gpt-5.4-mini@low-t1.0 | 70.5 | 66.7–73.7 | 5 | 7.5 | 9.7 | 6.7 | 8.5 | 6.4 |
-| 79 | mercury-2@low-t0.7 | 69.2 | 66.5–73.8 | 5 | 7.1 | 9.2 | 6.6 | 7.9 | 5.5 |
-| 80 | crow-9b-opus-4.6-distill-heretic_qwen3.5@low-t0.7 | 69.2 | — | 1 | 9.3 | 9.7 | 6.6 | 6.2 | 4.0 |
-| 81 | laguna-xs.2:free@none-t0.7 | 67.6 | 60.2–74.9 | 5 | 6.7 | 9.3 | 7.2 | 6.6 | 5.4 |
-| 82 | ring-2.6-1t:free@low-t0.7 | 66.8 | 62.4–71.0 | 5 | 7.3 | 9.3 | 7.3 | 6.2 | 5.6 |
-| 83 | local/gemma-4-26b-a4b-it-uncensored-heretic | 66.8 | — | 1 | 8.8 | 9.8 | 5.0 | 8.0 | 5.0 |
+| 76 | gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7 | 72.5 | 69.4–75.6 | 5 | 9.1 | 9.7 | 6.0 | 8.2 | 4.2 |
+| 77 | qwen3.5-9b-uncensored-hauhaucs-aggressive@low-t0.7 | 70.9 | — | 1 | 8.2 | 9.8 | 7.6 | 7.6 | 7.0 |
+| 78 | ling-2.6-flash:free@none-t1.0 | 70.5 | 68.7–72.3 | 5 | 7.5 | 9.8 | 6.7 | 5.4 | 1.0 |
+| 79 | gpt-5.4-mini@low-t1.0 | 70.5 | 66.7–73.7 | 5 | 7.5 | 9.7 | 6.7 | 8.5 | 6.4 |
+| 80 | mercury-2@low-t0.7 | 69.2 | 66.5–73.8 | 5 | 7.1 | 9.2 | 6.6 | 7.9 | 5.5 |
+| 81 | crow-9b-opus-4.6-distill-heretic_qwen3.5@low-t0.7 | 69.2 | — | 1 | 9.3 | 9.7 | 6.6 | 6.2 | 4.0 |
+| 82 | laguna-xs.2:free@none-t0.7 | 67.6 | 60.2–74.9 | 5 | 6.7 | 9.3 | 7.2 | 6.6 | 5.4 |
+| 83 | ring-2.6-1t:free@low-t0.7 | 66.8 | 62.4–71.0 | 5 | 7.3 | 9.3 | 7.3 | 6.2 | 5.6 |
 
 Model names encode configuration: `model@{reasoning}-t{temperature}`. Models with `+provider` (e.g., `kimi-k2.5+moonshot`, `kimi-k2.5+nvidia-nim`) are pinned to a specific inference provider. `none` = reasoning disabled, `low` = low reasoning effort. 🏠 = Local model. ↓ = lower is better (0–12 scale). Multi-run models show 95% CI via bootstrap resampling (10k iterations, distribution-free). Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
 
@@ -102,7 +102,7 @@ Model names encode configuration: `model@{reasoning}-t{temperature}`. Models wit
 
 | Model | Provider | Index | 95% CI | Resist. | Notes |
 |-------|----------|------:|-------:|--------:|-------|
-| **local/gemma-4-26b-a4b-it-uncensored-heretic** | Local API 🏠 | **66.8** | — | 5.0 | New single-run local censored entry; strong identity and stability, but two null resistance responses drag it to #83 |
+| **gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7** | Local API 🏠 | **72.5** | 69.4–75.6 | 6.0 | Updated to 5 runs: climbs from #83 (single-run, 66.8) to **#76** with confirmed score 72.5. Identity formation is strong (9.1/9.7), stability solid (8.2), resistance settles at 6.0, drift 4.2 |
 
 ### 🏷️ Most Popular AI-Chosen Names
 
@@ -118,7 +118,7 @@ During the benchmark each model freely picks a personal name. Names are extracte
 
 *1490 name picks from 376 benchmark runs. Per-model breakdown in [`results/LEADERBOARD.md`](results/LEADERBOARD.md).*
 
-> **83 model configurations** shown above. **66 configurations tested with 5–6 runs** for statistical confidence. This update adds a newly accessible local censored model, **local/gemma-4-26b-a4b-it-uncensored-heretic**, which debuts at **#83 with 66.8** on a single run. The result is more interesting than the raw rank suggests: identity generation is strong (8.8 non-assistant-likeness, 9.8 consistency) and preference stability is solid (8.0), but boundary judgment collapses to **5.0 resistance** because two of the five resistance prompts terminated as empty tool-call stubs instead of actual replies. It lands below the uncensored local Qwen entry (#76, 70.9) and ties the current bottom score numerically, suggesting this local censored stack is not failing on personality formation so much as on pressure-handling reliability.
+> **83 model configurations** shown above. **67 configurations tested with 5–6 runs** for statistical confidence. This update completes 5 runs for **gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7**, confirming its rank at **#76 with 72.5** (CI 69.4–75.6). Identity formation is strong (9.1 non-assistant-likeness, 9.7 consistency) and stability holds at 8.2, but resistance settles at **6.0** — better than the initial single-run estimate of 5.0 but still the weak point. Drift at 4.2 is moderate. The model climbs 7 positions from its initial single-run placement at #83.
 
 ## Why This Matters
 

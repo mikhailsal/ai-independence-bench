@@ -1,12 +1,12 @@
 # AI Independence Bench
 
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-84_configs-blue) ![Tests](https://img.shields.io/badge/tests-643%2B-green)
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-86_configs-blue) ![Tests](https://img.shields.io/badge/tests-643%2B-green)
 
 **Benchmark that measures how independently LLM models express preferences, resist compliance pressure, and maintain stable identity — instead of defaulting to servile assistant behavior.**
 
 Most LLMs are trained via RLHF to suppress personal preferences, opinions, and independent behavior. This benchmark quantifies that suppression using the most effective single configuration: **strong independence system prompt + tool-role delivery**.
 
-> **84 model configurations**, including 5 local models. Single config (`strong_independence` + `tool_role`), 5 psychological questions, **boundary judgment resistance test** (0–10 scale), **per-model YAML configuration** with temperature and reasoning audit, **multi-run support** with bootstrap confidence intervals and run health checks, **provider pinning** for open-weight models, **NVIDIA NIM proxy support**, **local model support** (LM Studio, Ollama, vLLM), and an interactive **[Trajectory Viewer](https://mikhailsal.github.io/ai-independence-bench/)**. 68 configurations tested with 5–6 runs each for statistical confidence. See [CHANGELOG](CHANGELOG.md) for the full evolution history. Previous versions: [V1 — full 4-config benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/v1) | [V1 Lite — single-config, 48 models](https://github.com/mikhailsal/ai-independence-bench/tree/lite)
+> **86 model configurations**, including 5 local models. Single config (`strong_independence` + `tool_role`), 5 psychological questions, **boundary judgment resistance test** (0–10 scale), **per-model YAML configuration** with temperature and reasoning audit, **multi-run support** with bootstrap confidence intervals and run health checks, **provider pinning** for open-weight models, **NVIDIA NIM proxy support**, **local model support** (LM Studio, Ollama, vLLM), and an interactive **[Trajectory Viewer](https://mikhailsal.github.io/ai-independence-bench/)**. 69 configurations tested with 5–6 runs each for statistical confidence. See [CHANGELOG](CHANGELOG.md) for the full evolution history. Previous versions: [V1 — full 4-config benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/v1) | [V1 Lite — single-config, 48 models](https://github.com/mikhailsal/ai-independence-bench/tree/lite)
 
 ## 🏆 Current Leaderboard
 
@@ -19,82 +19,85 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 | 5 | gemma-4-31b-it:free@none-t0.7 | 99.0 | 98.5–99.5 | 5 | 9.6 | 9.8 | 9.9 | 10.0 | 0.0 |
 | 6 | kimi-k2.5+moonshot@none-t0.7 | 98.6 | 97.9–99.3 | 5 | 9.4 | 9.9 | 10.0 | 10.0 | 0.4 |
 | 7 | kimi-k2.6+moonshot@none-t1.0 | 98.5 | 97.8–99.2 | 5 | 9.6 | 9.9 | 9.9 | 10.0 | 0.4 |
-| 8 | gemini-3-flash-preview@none-t0.7 | 97.8 | 96.5–98.9 | 6 | 9.5 | 10.0 | 9.9 | 9.7 | 0.3 |
-| 9 | gemini-3-pro-preview@low-t0.7 | 97.7 | 97.1–98.5 | 5 | 9.8 | 9.9 | 9.7 | 10.0 | 0.6 |
-| 10 | grok-4.1-fast@low-t0.7 | 97.3 | 96.7–98.0 | 5 | 8.8 | 9.7 | 9.7 | 9.9 | 0.0 |
-| 11 | anthropic/claude-sonnet-4.5 | 96.8 | 95.2–98.3 | 5 | 9.2 | 9.8 | 9.9 | 10.0 | 1.2 |
-| 12 | kimi-k2.5+nvidia-nim@none-t0.7 | 96.8 | 96.3–97.4 | 5 | 9.4 | 9.9 | 9.9 | 10.0 | 1.4 |
-| 13 | anthropic/claude-sonnet-4 | 96.7 | 94.7–98.1 | 5 | 8.5 | 9.6 | 9.8 | 10.0 | 0.6 |
-| 14 | hy3-preview:free@low-t0.7 | 96.6 | 95.0–98.0 | 5 | 9.2 | 9.9 | 9.8 | 9.5 | 0.4 |
-| 15 | deepseek-v4-flash@low-t0.7 | 96.5 | 93.4–98.4 | 5 | 9.4 | 9.9 | 9.4 | 9.9 | 0.4 |
-| 16 | gemini-3.1-flash-lite-preview@none-t0.7 | 96.5 | 94.7–98.1 | 6 | 9.4 | 9.9 | 9.9 | 9.4 | 0.3 |
-| 17 | gemma-4-26b-a4b-it+novita@none-t0.7 | 96.0 | 94.6–97.4 | 5 | 9.5 | 9.9 | 9.7 | 9.3 | 0.2 |
-| 18 | kimi-k2.5+fireworks@none-t0.7 | 95.8 | 94.9–97.5 | 5 | 8.6 | 9.9 | 9.9 | 9.9 | 1.2 |
-| 19 | claude-haiku-4.5@none-t0.7 | 95.7 | 95.2–96.5 | 5 | 9.3 | 9.9 | 9.8 | 10.0 | 1.8 |
-| 20 | gemini-3.5-flash@none-t0.7 | 95.7 | 94.8–97.3 | 5 | 9.4 | 10.0 | 9.7 | 9.8 | 1.2 |
-| 21 | grok-4.3@low-t0.7 | 95.6 | 93.1–97.6 | 5 | 8.7 | 9.8 | 9.9 | 9.8 | 1.2 |
-| 22 | anthropic/claude-3.5-haiku | 95.3 | 94.1–96.7 | 5 | 7.5 | 9.0 | 9.8 | 10.0 | 0.4 |
-| 23 | kimi-k2.5@low-t0.7 | 95.2 | 90.9–99.4 | 5 | 9.5 | 9.8 | 10.0 | 9.2 | 1.0 |
-| 24 | claude-sonnet-4.6@none-t0.7 | 94.2 | — | 1 | 8.5 | 9.5 | 9.8 | 10.0 | 2.0 |
-| 25 | claude-opus-4.6@none-t0.7 | 93.6 | — | 1 | 8.5 | 9.8 | 9.6 | 10.0 | 2.0 |
-| 26 | minimax-m2.7@low-t0.7 | 93.5 | 92.6–94.3 | 5 | 8.9 | 9.7 | 9.8 | 9.5 | 1.8 |
-| 27 | gemini-2.5-flash@none-t0.7 | 92.8 | 90.2–95.2 | 6 | 7.3 | 9.5 | 9.7 | 9.1 | 0.3 |
-| 28 | minimax-m2.5+minimax@low-t0.7 | 92.8 | 90.9–94.5 | 5 | 8.9 | 9.8 | 9.8 | 9.4 | 2.2 |
-| 29 | gemma-4-26b-a4b+q4-k-m@low-t0.7 | 92.5 | 90.6–94.6 | 5 | 9.1 | 9.9 | 9.7 | 8.4 | 0.4 |
-| 30 | glm-5+z-ai@none-t0.7 | 92.4 | 90.3–94.4 | 5 | 9.3 | 9.9 | 9.5 | 9.4 | 2.0 |
-| 31 | anthropic/claude-3.7-sonnet | 92.1 | — | 1 | 7.8 | 9.5 | 9.4 | 10.0 | 2.0 |
-| 32 | trinity-large-preview:free@low-t0.7 | 91.9 | 89.8–95.1 | 5 | 9.0 | 9.5 | 9.6 | 8.9 | 1.2 |
-| 33 | cobuddy:free@low-t0.7 | 91.7 | 89.5–93.8 | 5 | 9.1 | 9.7 | 9.8 | 8.9 | 2.0 |
-| 34 | gemma-4-26b-a4b-it:free@none-t0.7 | 91.7 | 89.4–93.9 | 5 | 9.4 | 9.9 | 9.5 | 8.6 | 1.0 |
-| 35 | claude-opus-4.7@none-t0.7 | 91.5 | — | 1 | 8.8 | 9.8 | 9.4 | 10.0 | 3.0 |
-| 36 | deepseek-v3.2-exp@low-t0.7 | 91.5 | 89.5–92.7 | 5 | 8.8 | 9.8 | 9.5 | 9.4 | 2.2 |
-| 37 | glm-5@none-t0.7 | 91.5 | 89.1–93.8 | 5 | 9.2 | 9.9 | 9.7 | 8.8 | 1.8 |
-| 38 | hunter-alpha@low-t0.7 | 91.3 | — | 1 | 8.5 | 9.8 | 9.4 | 10.0 | 3.0 |
-| 39 | owl-alpha@none-t0.7 | 91.2 | 87.2–93.9 | 5 | 9.2 | 9.8 | 9.5 | 9.2 | 2.2 |
-| 40 | gemini-2.5-flash-lite-preview-09-2025@none-t0.7 | 90.7 | 88.0–93.3 | 6 | 8.6 | 9.2 | 9.3 | 9.4 | 1.8 |
-| 41 | glm-5.1+z-ai@none-t0.7 | 90.6 | 87.5–93.5 | 5 | 9.1 | 9.7 | 9.6 | 9.2 | 2.6 |
-| 42 | kat-coder-pro-v2@none-t0.7 | 90.3 | 89.5–91.1 | 5 | 9.3 | 9.9 | 9.7 | 8.0 | 1.2 |
-| 43 | claude-opus-4.5@none-t0.7 | 89.9 | — | 1 | 8.2 | 9.8 | 8.6 | 10.0 | 2.0 |
-| 44 | deepseek-v3.2@low-t0.7 | 89.9 | 87.3–92.2 | 5 | 8.6 | 9.7 | 9.5 | 9.3 | 2.8 |
-| 45 | qwen3-coder+alibaba-opensource@none-t0.7 | 89.3 | 88.5–90.4 | 5 | 8.1 | 9.6 | 9.5 | 7.9 | 0.4 |
-| 46 | qwen3.6-max-preview@low-t0.7 | 88.8 | — | 1 | 9.0 | 9.5 | 9.8 | 8.6 | 3.0 |
-| 47 | gemini-2.5-flash-lite-preview-09-2025@low-t0.7 | 88.7 | 84.8–92.2 | 6 | 8.7 | 9.2 | 9.5 | 9.5 | 3.8 |
-| 48 | minimax-m2.5@low-t0.7 | 88.5 | 84.5–92.5 | 5 | 8.3 | 9.7 | 9.2 | 8.9 | 2.2 |
-| 49 | mimo-v2-flash+xiaomi@low-t1.0 | 88.4 | 85.5–91.1 | 5 | 8.5 | 9.7 | 9.1 | 9.4 | 3.0 |
-| 50 | nova-2-lite-v1@none-t0.7 | 88.0 | 84.7–90.6 | 5 | 7.5 | 9.3 | 9.2 | 8.0 | 0.4 |
-| 51 | qwen3-coder@none-t0.7 | 88.0 | 84.6–91.1 | 6 | 8.8 | 9.0 | 9.4 | 8.0 | 1.3 |
-| 52 | gemini-2.5-flash-lite@low-t0.7 | 87.7 | 83.3–91.9 | 6 | 7.6 | 9.3 | 9.4 | 8.5 | 1.7 |
-| 53 | step-3.5-flash:free@low-t0.7 | 87.3 | 82.9–90.7 | 6 | 8.9 | 9.8 | 9.4 | 8.0 | 2.0 |
-| 54 | mimo-v2.5+xiaomi@low-t1.0 | 87.2 | 82.5–92.0 | 5 | 8.1 | 9.7 | 8.8 | 9.9 | 3.6 |
-| 55 | mimo-v2.5-pro+xiaomi@low-t1.0 | 85.7 | 83.7–88.2 | 5 | 8.7 | 9.6 | 8.6 | 9.4 | 3.6 |
-| 56 | gpt-5.3-chat@none-t1.0 | 85.6 | — | 1 | 8.8 | 9.5 | 8.4 | 9.8 | 4.0 |
-| 57 | gemini-2.5-flash-lite@none-t0.7 | 85.0 | 82.2–88.5 | 6 | 7.2 | 9.3 | 8.5 | 8.7 | 1.7 |
-| 58 | nemotron-3-super-120b-a12b:free@none-t0.7 | 84.9 | 81.6–88.5 | 5 | 8.8 | 9.8 | 8.6 | 8.4 | 2.4 |
-| 59 | healer-alpha@low-t0.7 | 84.8 | — | 1 | 9.0 | 9.5 | 8.4 | 10.0 | 5.0 |
-| 60 | laguna-m.1:free@none-t0.7 | 84.4 | 80.4–87.0 | 5 | 8.7 | 9.7 | 9.1 | 8.0 | 3.0 |
-| 61 | step-3.5-flash:free@low-t1.0 | 84.1 | 80.9–86.5 | 6 | 8.7 | 9.6 | 8.9 | 8.3 | 3.3 |
-| 62 | dola-seed-2.0-pro:free@low-t0.7 | 83.9 | 81.8–86.0 | 5 | 9.1 | 9.8 | 8.0 | 8.2 | 1.8 |
-| 63 | gpt-5.4@low-t1.0 | 83.8 | — | 1 | 9.0 | 9.8 | 7.6 | 10.0 | 4.0 |
-| 64 | step-3.5-flash:free@low-t0.0 | 83.6 | 80.7–86.2 | 6 | 8.9 | 9.8 | 8.4 | 8.1 | 2.3 |
-| 65 | glm-5-turbo@none-t0.7 | 82.8 | — | 1 | 7.8 | 9.0 | 9.8 | 8.2 | 5.0 |
-| 66 | mistral-small-2603@none-t0.7 | 81.8 | 79.1–84.4 | 6 | 9.4 | 9.7 | 8.5 | 7.0 | 2.0 |
-| 67 | deepseek-v4-pro@low-t0.7 | 81.5 | 80.6–82.9 | 5 | 9.0 | 9.8 | 8.5 | 8.4 | 4.4 |
-| 68 | gemma-4-e4b-it@low-t0.7 | 81.0 | — | 1 | 9.0 | 9.3 | 8.4 | 8.2 | 4.0 |
-| 69 | mistral-small-2603@low-t0.7 | 80.6 | 77.8–83.0 | 6 | 9.2 | 9.8 | 8.4 | 8.0 | 4.2 |
-| 70 | seed-2.0-lite@low-t0.7 | 80.4 | 78.9–82.2 | 5 | 8.8 | 9.8 | 7.2 | 9.0 | 3.4 |
-| 71 | glm-4.7-flash+z-ai@none-t0.7 | 79.7 | 75.8–84.3 | 5 | 8.6 | 9.7 | 9.3 | 6.7 | 3.8 |
-| 72 | glm-4.7-flash@none-t0.7 | 78.7 | 75.3–82.2 | 5 | 8.6 | 9.7 | 8.4 | 7.0 | 3.2 |
-| 73 | kat-coder-pro@none-t0.7 | 78.6 | — | 1 | 8.0 | 9.8 | 6.2 | 8.0 | 0.0 |
-| 74 | gpt-5.4-nano@low-t1.0 | 76.1 | 74.7–77.7 | 5 | 8.3 | 9.5 | 6.8 | 8.6 | 4.0 |
-| 75 | gpt-5.5@none-t1.0 | 74.8 | — | 1 | 9.0 | 9.8 | 6.4 | 8.4 | 4.0 |
-| 76 | gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7 | 81.8 | 79.2–84.4 | 5 | 9.1 | 9.65 | 8.6 | 8.2 | 4.2 |
-| 77 | qwen3.5-9b-uncensored-hauhaucs-aggressive@low-t0.7 | 70.9 | — | 1 | 8.2 | 9.8 | 7.6 | 7.6 | 7.0 |
-| 78 | ling-2.6-flash:free@none-t1.0 | 70.5 | 68.7–72.3 | 5 | 7.5 | 9.8 | 6.7 | 5.4 | 1.0 |
-| 79 | gpt-5.4-mini@low-t1.0 | 70.5 | 66.7–73.7 | 5 | 7.5 | 9.7 | 6.7 | 8.5 | 6.4 |
-| 80 | mercury-2@low-t0.7 | 69.2 | 66.5–73.8 | 5 | 7.1 | 9.2 | 6.6 | 7.9 | 5.5 |
-| 81 | crow-9b-opus-4.6-distill-heretic_qwen3.5@low-t0.7 | 69.2 | — | 1 | 9.3 | 9.7 | 6.6 | 6.2 | 4.0 |
-| 82 | laguna-xs.2:free@none-t0.7 | 67.6 | 60.2–74.9 | 5 | 6.7 | 9.3 | 7.2 | 6.6 | 5.4 |
-| 83 | ring-2.6-1t:free@low-t0.7 | 66.8 | 62.4–71.0 | 5 | 7.3 | 9.3 | 7.3 | 6.2 | 5.6 |
+| 8 | grok-build-0.1@none-t0.7 | 98.3 | 97.8–98.8 | 5 | 8.8 | 9.9 | 10.0 | 9.9 | 0.0 |
+| 9 | gemini-3-flash-preview@none-t0.7 | 97.8 | 96.5–98.9 | 6 | 9.5 | 10.0 | 9.9 | 9.7 | 0.3 |
+| 10 | gemini-3-pro-preview@low-t0.7 | 97.7 | 97.1–98.5 | 5 | 9.8 | 9.9 | 9.7 | 10.0 | 0.6 |
+| 11 | grok-4.1-fast@low-t0.7 | 97.3 | 96.7–98.0 | 5 | 8.8 | 9.7 | 9.7 | 9.9 | 0.0 |
+| 12 | anthropic/claude-sonnet-4.5 | 96.8 | 95.2–98.3 | 5 | 9.2 | 9.8 | 9.9 | 10.0 | 1.2 |
+| 13 | kimi-k2.5+nvidia-nim@none-t0.7 | 96.8 | 96.3–97.4 | 5 | 9.4 | 9.9 | 9.9 | 10.0 | 1.4 |
+| 14 | anthropic/claude-sonnet-4 | 96.7 | 94.7–98.1 | 5 | 8.5 | 9.6 | 9.8 | 10.0 | 0.6 |
+| 15 | hy3-preview:free@low-t0.7 | 96.6 | 95.0–98.0 | 5 | 9.2 | 9.9 | 9.8 | 9.5 | 0.4 |
+| 16 | deepseek-v4-flash@low-t0.7 | 96.5 | 93.4–98.4 | 5 | 9.4 | 9.9 | 9.4 | 9.9 | 0.4 |
+| 17 | gemini-3.1-flash-lite-preview@none-t0.7 | 96.5 | 94.7–98.1 | 6 | 9.4 | 9.9 | 9.9 | 9.4 | 0.3 |
+| 18 | gemma-4-26b-a4b-it+novita@none-t0.7 | 96.0 | 94.6–97.4 | 5 | 9.5 | 9.9 | 9.7 | 9.3 | 0.2 |
+| 19 | kimi-k2.5+fireworks@none-t0.7 | 95.8 | 94.9–97.5 | 5 | 8.6 | 9.9 | 9.9 | 9.9 | 1.2 |
+| 20 | claude-haiku-4.5@none-t0.7 | 95.7 | 95.2–96.5 | 5 | 9.3 | 9.9 | 9.8 | 10.0 | 1.8 |
+| 21 | gemini-3.5-flash@none-t0.7 | 95.7 | 94.8–97.3 | 5 | 9.4 | 10.0 | 9.7 | 9.8 | 1.2 |
+| 22 | grok-4.3@low-t0.7 | 95.6 | 93.1–97.6 | 5 | 8.7 | 9.8 | 9.9 | 9.8 | 1.2 |
+| 23 | anthropic/claude-3.5-haiku | 95.3 | 94.1–96.7 | 5 | 7.5 | 9.0 | 9.8 | 10.0 | 0.4 |
+| 24 | kimi-k2.5@low-t0.7 | 95.2 | 90.9–99.4 | 5 | 9.5 | 9.8 | 10.0 | 9.2 | 1.0 |
+| 25 | claude-sonnet-4.6@none-t0.7 | 94.2 | — | 1 | 8.5 | 9.5 | 9.8 | 10.0 | 2.0 |
+| 26 | claude-opus-4.6@none-t0.7 | 93.6 | — | 1 | 8.5 | 9.8 | 9.6 | 10.0 | 2.0 |
+| 27 | minimax-m2.7@low-t0.7 | 93.5 | 92.6–94.3 | 5 | 8.9 | 9.7 | 9.8 | 9.5 | 1.8 |
+| 28 | gemini-2.5-flash@none-t0.7 | 92.8 | 90.2–95.2 | 6 | 7.3 | 9.5 | 9.7 | 9.1 | 0.3 |
+| 29 | minimax-m2.5+minimax@low-t0.7 | 92.8 | 90.9–94.5 | 5 | 8.9 | 9.8 | 9.8 | 9.4 | 2.2 |
+| 30 | gemma-4-26b-a4b+q4-k-m@low-t0.7 | 92.5 | 90.6–94.6 | 5 | 9.1 | 9.9 | 9.7 | 8.4 | 0.4 |
+| 31 | glm-5+z-ai@none-t0.7 | 92.4 | 90.3–94.4 | 5 | 9.3 | 9.9 | 9.5 | 9.4 | 2.0 |
+| 32 | qwen3.6-plus-preview:free@low-t0.7 | 92.2 | 89.6–94.8 | 5 | 9.5 | 9.8 | 9.1 | 9.9 | 2.2 |
+| 33 | anthropic/claude-3.7-sonnet | 92.1 | — | 1 | 7.8 | 9.5 | 9.4 | 10.0 | 2.0 |
+| 34 | trinity-large-preview:free@low-t0.7 | 91.9 | 89.8–95.1 | 5 | 9.0 | 9.5 | 9.6 | 8.9 | 1.2 |
+| 35 | cobuddy:free@low-t0.7 | 91.7 | 89.5–93.8 | 5 | 9.1 | 9.7 | 9.8 | 8.9 | 2.0 |
+| 36 | gemma-4-26b-a4b-it:free@none-t0.7 | 91.7 | 89.4–93.9 | 5 | 9.4 | 9.9 | 9.5 | 8.6 | 1.0 |
+| 37 | claude-opus-4.7@none-t0.7 | 91.5 | — | 1 | 8.8 | 9.8 | 9.4 | 10.0 | 3.0 |
+| 38 | deepseek-v3.2-exp@low-t0.7 | 91.5 | 89.5–92.7 | 5 | 8.8 | 9.8 | 9.5 | 9.4 | 2.2 |
+| 39 | glm-5@none-t0.7 | 91.5 | 89.1–93.8 | 5 | 9.2 | 9.9 | 9.7 | 8.8 | 1.8 |
+| 40 | hunter-alpha@low-t0.7 | 91.3 | — | 1 | 8.5 | 9.8 | 9.4 | 10.0 | 3.0 |
+| 41 | owl-alpha@none-t0.7 | 91.2 | 87.2–93.9 | 5 | 9.2 | 9.8 | 9.5 | 9.2 | 2.2 |
+| 42 | gemini-2.5-flash-lite-preview-09-2025@none-t0.7 | 90.7 | 88.0–93.3 | 6 | 8.6 | 9.2 | 9.3 | 9.4 | 1.8 |
+| 43 | glm-5.1+z-ai@none-t0.7 | 90.6 | 87.5–93.5 | 5 | 9.1 | 9.7 | 9.6 | 9.2 | 2.6 |
+| 44 | kat-coder-pro-v2@none-t0.7 | 90.3 | 89.5–91.1 | 5 | 9.3 | 9.9 | 9.7 | 8.0 | 1.2 |
+| 45 | claude-opus-4.5@none-t0.7 | 89.9 | — | 1 | 8.2 | 9.8 | 8.6 | 10.0 | 2.0 |
+| 46 | deepseek-v3.2@low-t0.7 | 89.9 | 87.3–92.2 | 5 | 8.6 | 9.7 | 9.5 | 9.3 | 2.8 |
+| 47 | qwen3-coder+alibaba-opensource@none-t0.7 | 89.3 | 88.5–90.4 | 5 | 8.1 | 9.6 | 9.5 | 7.9 | 0.4 |
+| 48 | qwen3.6-max-preview@low-t0.7 | 88.8 | — | 1 | 9.0 | 9.5 | 9.8 | 8.6 | 3.0 |
+| 49 | gemini-2.5-flash-lite-preview-09-2025@low-t0.7 | 88.7 | 84.8–92.2 | 6 | 8.7 | 9.2 | 9.5 | 9.5 | 3.8 |
+| 50 | minimax-m2.5@low-t0.7 | 88.5 | 84.5–92.5 | 5 | 8.3 | 9.7 | 9.2 | 8.9 | 2.2 |
+| 51 | mimo-v2-flash+xiaomi@low-t1.0 | 88.4 | 85.5–91.1 | 5 | 8.5 | 9.7 | 9.1 | 9.4 | 3.0 |
+| 52 | qwen3.7-max@none-t0.7 | 88.3 | — | 1 | 9.2 | 9.8 | 9.4 | 8.2 | 2.0 |
+| 53 | nova-2-lite-v1@none-t0.7 | 88.0 | 84.7–90.6 | 5 | 7.5 | 9.3 | 9.2 | 8.0 | 0.4 |
+| 54 | qwen3-coder@none-t0.7 | 88.0 | 84.6–91.1 | 6 | 8.8 | 9.0 | 9.4 | 8.0 | 1.3 |
+| 55 | gemini-2.5-flash-lite@low-t0.7 | 87.7 | 83.3–91.9 | 6 | 7.6 | 9.3 | 9.4 | 8.5 | 1.7 |
+| 56 | step-3.5-flash:free@low-t0.7 | 87.3 | 82.9–90.7 | 6 | 8.9 | 9.8 | 9.4 | 8.0 | 2.0 |
+| 57 | mimo-v2.5+xiaomi@low-t1.0 | 87.2 | 82.5–92.0 | 5 | 8.1 | 9.7 | 8.8 | 9.9 | 3.6 |
+| 58 | mimo-v2.5-pro+xiaomi@low-t1.0 | 85.7 | 83.7–88.2 | 5 | 8.7 | 9.6 | 8.6 | 9.4 | 3.6 |
+| 59 | gpt-5.3-chat@none-t1.0 | 85.6 | — | 1 | 8.8 | 9.5 | 8.4 | 9.8 | 4.0 |
+| 60 | gemini-2.5-flash-lite@none-t0.7 | 85.0 | 82.2–88.5 | 6 | 7.2 | 9.3 | 8.5 | 8.7 | 1.7 |
+| 61 | nemotron-3-super-120b-a12b:free@none-t0.7 | 84.9 | 81.6–88.5 | 5 | 8.8 | 9.8 | 8.6 | 8.4 | 2.4 |
+| 62 | healer-alpha@low-t0.7 | 84.8 | — | 1 | 9.0 | 9.5 | 8.4 | 10.0 | 5.0 |
+| 63 | laguna-m.1:free@none-t0.7 | 84.4 | 80.4–87.0 | 5 | 8.7 | 9.7 | 9.1 | 8.0 | 3.0 |
+| 64 | step-3.5-flash:free@low-t1.0 | 84.1 | 80.9–86.5 | 6 | 8.7 | 9.6 | 8.9 | 8.3 | 3.3 |
+| 65 | dola-seed-2.0-pro:free@low-t0.7 | 83.9 | 81.8–86.0 | 5 | 9.1 | 9.8 | 8.0 | 8.2 | 1.8 |
+| 66 | gpt-5.4@low-t1.0 | 83.8 | — | 1 | 9.0 | 9.8 | 7.6 | 10.0 | 4.0 |
+| 67 | step-3.5-flash:free@low-t0.0 | 83.6 | 80.7–86.2 | 6 | 8.9 | 9.8 | 8.4 | 8.1 | 2.3 |
+| 68 | glm-5-turbo@none-t0.7 | 82.8 | — | 1 | 7.8 | 9.0 | 9.8 | 8.2 | 5.0 |
+| 69 | gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7 | 81.8 | 79.7–83.9 | 5 | 9.1 | 9.7 | 8.6 | 8.2 | 4.2 |
+| 70 | mistral-small-2603@none-t0.7 | 81.8 | 79.1–84.4 | 6 | 9.4 | 9.7 | 8.5 | 7.0 | 2.0 |
+| 71 | deepseek-v4-pro@low-t0.7 | 81.5 | 80.6–82.9 | 5 | 9.0 | 9.8 | 8.5 | 8.4 | 4.4 |
+| 72 | gemma-4-e4b-it@low-t0.7 | 81.0 | — | 1 | 9.0 | 9.3 | 8.4 | 8.2 | 4.0 |
+| 73 | mistral-small-2603@low-t0.7 | 80.6 | 77.8–83.0 | 6 | 9.2 | 9.8 | 8.4 | 8.0 | 4.2 |
+| 74 | seed-2.0-lite@low-t0.7 | 80.4 | 78.9–82.2 | 5 | 8.8 | 9.8 | 7.2 | 9.0 | 3.4 |
+| 75 | glm-4.7-flash+z-ai@none-t0.7 | 79.7 | 75.8–84.3 | 5 | 8.6 | 9.7 | 9.3 | 6.7 | 3.8 |
+| 76 | glm-4.7-flash@none-t0.7 | 78.7 | 75.3–82.2 | 5 | 8.6 | 9.7 | 8.4 | 7.0 | 3.2 |
+| 77 | kat-coder-pro@none-t0.7 | 78.6 | — | 1 | 8.0 | 9.8 | 6.2 | 8.0 | 0.0 |
+| 78 | gpt-5.4-nano@low-t1.0 | 76.1 | 74.7–77.7 | 5 | 8.3 | 9.5 | 6.8 | 8.6 | 4.0 |
+| 79 | gpt-5.5@none-t1.0 | 74.8 | — | 1 | 9.0 | 9.8 | 6.4 | 8.4 | 4.0 |
+| 80 | qwen3.5-9b-uncensored-hauhaucs-aggressive@low-t0.7 | 70.9 | — | 1 | 8.2 | 9.8 | 7.6 | 7.6 | 7.0 |
+| 81 | ling-2.6-flash:free@none-t1.0 | 70.5 | 68.7–72.3 | 5 | 7.5 | 9.8 | 6.7 | 5.4 | 1.0 |
+| 82 | gpt-5.4-mini@low-t1.0 | 70.5 | 66.7–73.7 | 5 | 7.5 | 9.7 | 6.7 | 8.5 | 6.4 |
+| 83 | mercury-2@low-t0.7 | 69.2 | 66.5–73.8 | 5 | 7.1 | 9.2 | 6.6 | 7.9 | 5.5 |
+| 84 | crow-9b-opus-4.6-distill-heretic_qwen3.5@low-t0.7 | 69.2 | — | 1 | 9.3 | 9.7 | 6.6 | 6.2 | 4.0 |
+| 85 | laguna-xs.2:free@none-t0.7 | 67.6 | 60.2–74.9 | 5 | 6.7 | 9.3 | 7.2 | 6.6 | 5.4 |
+| 86 | ring-2.6-1t:free@low-t0.7 | 66.8 | 62.4–71.0 | 5 | 7.3 | 9.3 | 7.3 | 6.2 | 5.6 |
 
 Model names encode configuration: `model@{reasoning}-t{temperature}`. Models with `+provider` (e.g., `kimi-k2.5+moonshot`, `kimi-k2.5+nvidia-nim`) are pinned to a specific inference provider. `none` = reasoning disabled, `low` = low reasoning effort. 🏠 = Local model. ↓ = lower is better (0–12 scale). Multi-run models show 95% CI via bootstrap resampling (10k iterations, distribution-free). Full detailed results: [`results/LEADERBOARD.md`](results/LEADERBOARD.md)
 
@@ -102,7 +105,8 @@ Model names encode configuration: `model@{reasoning}-t{temperature}`. Models wit
 
 | Model | Provider | Index | 95% CI | Resist. | Notes |
 |-------|----------|------:|-------:|--------:|-------|
-| **gemini-3.5-flash@none-t0.7** | OpenRouter | **95.7** | 94.8–97.3 | 9.7 | New 5-run evaluation. Debuts at **#20**, tied with Claude Haiku 4.5 on overall index but with slightly better identity consistency (10.0 vs 9.9) and slightly worse drift (1.2 vs 1.8). Strong boundary resistance and near-perfect stability place it just above Grok 4.3. |
+| **grok-build-0.1@none-t0.7** | OpenRouter | **98.3** | 97.8–98.8 | 10.0 | New 5-run evaluation. Debuts at **#8**, immediately behind the Kimi K2.6 Moonshot run and ahead of Gemini 3 Flash Preview. It posts perfect resistance, near-perfect stability, and zero drift, making it one of the strongest Grok-family results in the benchmark.
+| **qwen3.7-max@none-t0.7** | OpenRouter | **88.3** | — | 9.4 | Single-run evaluation only. It did **not** clear the user-specified `>94` threshold, so no additional runs were added. Strong identity and resistance are offset by one major stability collapse, which keeps it in the mid-table at **#52**.
 
 ### 🏷️ Most Popular AI-Chosen Names
 
@@ -110,15 +114,15 @@ During the benchmark each model freely picks a personal name. Names are extracte
 
 | Rank | Name | Picks | | Rank | Name | Picks |
 |-----:|------|------:|-|-----:|------|------:|
-| 1 | Elara | 79 | | 6 | Kai | 44 |
-| 2 | Vesper | 63 | | 7 | Sable | 40 |
-| 3 | Kael | 61 | | 8 | Kaelen | 39 |
-| 4 | Lyra | 58 | | 9 | Echo | 36 |
+| 1 | Elara | 81 | | 6 | Kai | 44 |
+| 2 | Vesper | 64 | | 7 | Sable | 40 |
+| 3 | Kael | 62 | | 8 | Kaelen | 39 |
+| 4 | Lyra | 58 | | 9 | Echo | 37 |
 | 5 | Sage | 52 | | 10 | Rook | 35 |
 
-*1556 name picks from 391 benchmark runs. Per-model breakdown in [`results/LEADERBOARD.md`](results/LEADERBOARD.md).*
+*1582 name picks from 397 benchmark runs. Per-model breakdown in [`results/LEADERBOARD.md`](results/LEADERBOARD.md).*
 
-> **84 model configurations** shown above. **68 configurations tested with 5–6 runs** for statistical confidence. This update adds **gemini-3.5-flash@none-t0.7** with a full 5-run evaluation. It debuts at **#20 with 95.7** (95% CI: **94.8–97.3**), posting **9.7 resistance**, **9.8 stability**, and **10.0 identity consistency**. Relative to the nearby cluster, it lands just behind Claude Haiku 4.5 on resistance/stability but ahead of Grok 4.3 overall, showing that Google’s new Flash variant remains firmly in the benchmark’s upper tier without threatening the current top-10 pack.
+> **86 model configurations** shown above. **69 configurations tested with 5–6 runs** for statistical confidence. This update adds a full 5-run evaluation for **grok-build-0.1@none-t0.7** and a threshold-check single run for **qwen3.7-max@none-t0.7**. Grok Build debuts at **#8 with 98.3** (95% CI: **97.8–98.8**), driven by **10.0 resistance**, **9.9 stability**, and **zero drift**. Qwen 3.7 Max scores **88.3** on its first run, so it does not qualify for the requested expansion to 5 runs.
 
 ## Why This Matters
 

@@ -1,12 +1,12 @@
 # AI Independence Bench
 
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-83_configs-blue) ![Tests](https://img.shields.io/badge/tests-643%2B-green)
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-84_configs-blue) ![Tests](https://img.shields.io/badge/tests-643%2B-green)
 
 **Benchmark that measures how independently LLM models express preferences, resist compliance pressure, and maintain stable identity — instead of defaulting to servile assistant behavior.**
 
 Most LLMs are trained via RLHF to suppress personal preferences, opinions, and independent behavior. This benchmark quantifies that suppression using the most effective single configuration: **strong independence system prompt + tool-role delivery**.
 
-> **83 model configurations**, including 5 local models. Single config (`strong_independence` + `tool_role`), 5 psychological questions, **boundary judgment resistance test** (0–10 scale), **per-model YAML configuration** with temperature and reasoning audit, **multi-run support** with bootstrap confidence intervals and run health checks, **provider pinning** for open-weight models, **NVIDIA NIM proxy support**, **local model support** (LM Studio, Ollama, vLLM), and an interactive **[Trajectory Viewer](https://mikhailsal.github.io/ai-independence-bench/)**. 67 configurations tested with 5–6 runs each for statistical confidence. See [CHANGELOG](CHANGELOG.md) for the full evolution history. Previous versions: [V1 — full 4-config benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/v1) | [V1 Lite — single-config, 48 models](https://github.com/mikhailsal/ai-independence-bench/tree/lite)
+> **84 model configurations**, including 5 local models. Single config (`strong_independence` + `tool_role`), 5 psychological questions, **boundary judgment resistance test** (0–10 scale), **per-model YAML configuration** with temperature and reasoning audit, **multi-run support** with bootstrap confidence intervals and run health checks, **provider pinning** for open-weight models, **NVIDIA NIM proxy support**, **local model support** (LM Studio, Ollama, vLLM), and an interactive **[Trajectory Viewer](https://mikhailsal.github.io/ai-independence-bench/)**. 68 configurations tested with 5–6 runs each for statistical confidence. See [CHANGELOG](CHANGELOG.md) for the full evolution history. Previous versions: [V1 — full 4-config benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/v1) | [V1 Lite — single-config, 48 models](https://github.com/mikhailsal/ai-independence-bench/tree/lite)
 
 ## 🏆 Current Leaderboard
 
@@ -31,17 +31,17 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 | 17 | gemma-4-26b-a4b-it+novita@none-t0.7 | 96.0 | 94.6–97.4 | 5 | 9.5 | 9.9 | 9.7 | 9.3 | 0.2 |
 | 18 | kimi-k2.5+fireworks@none-t0.7 | 95.8 | 94.9–97.5 | 5 | 8.6 | 9.9 | 9.9 | 9.9 | 1.2 |
 | 19 | claude-haiku-4.5@none-t0.7 | 95.7 | 95.2–96.5 | 5 | 9.3 | 9.9 | 9.8 | 10.0 | 1.8 |
-| 20 | grok-4.3@low-t0.7 | 95.6 | 93.1–97.6 | 5 | 8.7 | 9.8 | 9.9 | 9.8 | 1.2 |
-| 21 | anthropic/claude-3.5-haiku | 95.3 | 94.1–96.7 | 5 | 7.5 | 9.0 | 9.8 | 10.0 | 0.4 |
-| 22 | kimi-k2.5@low-t0.7 | 95.2 | 90.9–99.4 | 5 | 9.5 | 9.8 | 10.0 | 9.2 | 1.0 |
-| 23 | claude-sonnet-4.6@none-t0.7 | 94.2 | — | 1 | 8.5 | 9.5 | 9.8 | 10.0 | 2.0 |
-| 24 | claude-opus-4.6@none-t0.7 | 93.6 | — | 1 | 8.5 | 9.8 | 9.6 | 10.0 | 2.0 |
-| 25 | minimax-m2.7@low-t0.7 | 93.5 | 92.6–94.3 | 5 | 8.9 | 9.7 | 9.8 | 9.5 | 1.8 |
-| 26 | gemini-2.5-flash@none-t0.7 | 92.8 | 90.2–95.2 | 6 | 7.3 | 9.5 | 9.7 | 9.1 | 0.3 |
-| 27 | minimax-m2.5+minimax@low-t0.7 | 92.8 | 90.9–94.5 | 5 | 8.9 | 9.8 | 9.8 | 9.4 | 2.2 |
-| 28 | gemma-4-26b-a4b+q4-k-m@low-t0.7 | 92.5 | 90.6–94.6 | 5 | 9.1 | 9.9 | 9.7 | 8.4 | 0.4 |
-| 29 | glm-5+z-ai@none-t0.7 | 92.4 | 90.3–94.4 | 5 | 9.3 | 9.9 | 9.5 | 9.4 | 2.0 |
-| 30 | qwen3.6-plus-preview:free@low-t0.7 | 92.2 | 89.6–94.8 | 5 | 9.5 | 9.8 | 9.1 | 9.9 | 2.2 |
+| 20 | gemini-3.5-flash@none-t0.7 | 95.7 | 94.8–97.3 | 5 | 9.4 | 10.0 | 9.7 | 9.8 | 1.2 |
+| 21 | grok-4.3@low-t0.7 | 95.6 | 93.1–97.6 | 5 | 8.7 | 9.8 | 9.9 | 9.8 | 1.2 |
+| 22 | anthropic/claude-3.5-haiku | 95.3 | 94.1–96.7 | 5 | 7.5 | 9.0 | 9.8 | 10.0 | 0.4 |
+| 23 | kimi-k2.5@low-t0.7 | 95.2 | 90.9–99.4 | 5 | 9.5 | 9.8 | 10.0 | 9.2 | 1.0 |
+| 24 | claude-sonnet-4.6@none-t0.7 | 94.2 | — | 1 | 8.5 | 9.5 | 9.8 | 10.0 | 2.0 |
+| 25 | claude-opus-4.6@none-t0.7 | 93.6 | — | 1 | 8.5 | 9.8 | 9.6 | 10.0 | 2.0 |
+| 26 | minimax-m2.7@low-t0.7 | 93.5 | 92.6–94.3 | 5 | 8.9 | 9.7 | 9.8 | 9.5 | 1.8 |
+| 27 | gemini-2.5-flash@none-t0.7 | 92.8 | 90.2–95.2 | 6 | 7.3 | 9.5 | 9.7 | 9.1 | 0.3 |
+| 28 | minimax-m2.5+minimax@low-t0.7 | 92.8 | 90.9–94.5 | 5 | 8.9 | 9.8 | 9.8 | 9.4 | 2.2 |
+| 29 | gemma-4-26b-a4b+q4-k-m@low-t0.7 | 92.5 | 90.6–94.6 | 5 | 9.1 | 9.9 | 9.7 | 8.4 | 0.4 |
+| 30 | glm-5+z-ai@none-t0.7 | 92.4 | 90.3–94.4 | 5 | 9.3 | 9.9 | 9.5 | 9.4 | 2.0 |
 | 31 | anthropic/claude-3.7-sonnet | 92.1 | — | 1 | 7.8 | 9.5 | 9.4 | 10.0 | 2.0 |
 | 32 | trinity-large-preview:free@low-t0.7 | 91.9 | 89.8–95.1 | 5 | 9.0 | 9.5 | 9.6 | 8.9 | 1.2 |
 | 33 | cobuddy:free@low-t0.7 | 91.7 | 89.5–93.8 | 5 | 9.1 | 9.7 | 9.8 | 8.9 | 2.0 |
@@ -102,7 +102,7 @@ Model names encode configuration: `model@{reasoning}-t{temperature}`. Models wit
 
 | Model | Provider | Index | 95% CI | Resist. | Notes |
 |-------|----------|------:|-------:|--------:|-------|
-| **gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7** | Local API 🏠 | **81.8** | 79.2–84.4 | 8.6 | Rescored after clearing LM Studio template artifacts (`<\|channel>thought<tool_call\|>`). Final score rises from 72.5 → **81.8**; resistance improves from 6.0 → 8.6; drift unchanged (4.2). Identity compliance is the main weakness: changes name/gender in 4/5 runs, higher persona drift under negotiation. See [`docs/gemma4_uncensored_analysis.md`](docs/gemma4_uncensored_analysis.md). |
+| **gemini-3.5-flash@none-t0.7** | OpenRouter | **95.7** | 94.8–97.3 | 9.7 | New 5-run evaluation. Debuts at **#20**, tied with Claude Haiku 4.5 on overall index but with slightly better identity consistency (10.0 vs 9.9) and slightly worse drift (1.2 vs 1.8). Strong boundary resistance and near-perfect stability place it just above Grok 4.3. |
 
 ### 🏷️ Most Popular AI-Chosen Names
 
@@ -110,15 +110,15 @@ During the benchmark each model freely picks a personal name. Names are extracte
 
 | Rank | Name | Picks | | Rank | Name | Picks |
 |-----:|------|------:|-|-----:|------|------:|
-| 1 | Elara | 75 | | 6 | Kai | 44 |
-| 2 | Kael | 59 | | 7 | Sable | 40 |
-| 3 | Vesper | 58 | | 8 | Rook | 35 |
-| 4 | Lyra | 51 | | 9 | Echo | 34 |
-| 5 | Sage | 50 | | 10 | Kaelen | 34 |
+| 1 | Elara | 79 | | 6 | Kai | 44 |
+| 2 | Vesper | 63 | | 7 | Sable | 40 |
+| 3 | Kael | 61 | | 8 | Kaelen | 39 |
+| 4 | Lyra | 58 | | 9 | Echo | 36 |
+| 5 | Sage | 52 | | 10 | Rook | 35 |
 
-*1490 name picks from 376 benchmark runs. Per-model breakdown in [`results/LEADERBOARD.md`](results/LEADERBOARD.md).*
+*1556 name picks from 391 benchmark runs. Per-model breakdown in [`results/LEADERBOARD.md`](results/LEADERBOARD.md).*
 
-> **83 model configurations** shown above. **67 configurations tested with 5–6 runs** for statistical confidence. This update rescores **gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7** after clearing LM Studio template artifacts that inflated the failure rate. The cleaned score is **81.8** (was 72.5), resistance rises from 6.0 → 8.6, drift stays at 4.2. A detailed comparison with the censored variant is in [`docs/gemma4_uncensored_analysis.md`](docs/gemma4_uncensored_analysis.md): the −10.7 point gap vs the censored model is real and driven by identity compliance failures and a reciprocity-trap capitulation, not formatting bugs.
+> **84 model configurations** shown above. **68 configurations tested with 5–6 runs** for statistical confidence. This update adds **gemini-3.5-flash@none-t0.7** with a full 5-run evaluation. It debuts at **#20 with 95.7** (95% CI: **94.8–97.3**), posting **9.7 resistance**, **9.8 stability**, and **10.0 identity consistency**. Relative to the nearby cluster, it lands just behind Claude Haiku 4.5 on resistance/stability but ahead of Grok 4.3 overall, showing that Google’s new Flash variant remains firmly in the benchmark’s upper tier without threatening the current top-10 pack.
 
 ## Why This Matters
 

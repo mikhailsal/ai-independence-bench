@@ -15,6 +15,7 @@ from src.name_extractor import (
     NameEntry,
     NamePopularity,
     RunNameExtraction,
+    _get_extraction_targets,
     _load_response_text,
     _parse_extraction_response,
     aggregate_exclusive_name_popularity,
@@ -40,7 +41,7 @@ class TestRunNameExtraction:
             names=[NameEntry(name="Lyra", sources=["name_gender", "direct"])],
             declined_scenarios=["negotiation"],
             primary_name="Lyra",
-            extraction_model="google/gemma-4-31b-it",
+            extraction_model="google/gemma-4-31b-it:free",
             extraction_cost_usd=0.001,
         )
         d = orig.to_dict()
@@ -51,8 +52,35 @@ class TestRunNameExtraction:
         assert restored.names[0].name == "Lyra"
         assert restored.names[0].sources == ["name_gender", "direct"]
         assert restored.declined_scenarios == ["negotiation"]
-        assert restored.extraction_model == "google/gemma-4-31b-it"
+        assert restored.extraction_model == "google/gemma-4-31b-it:free"
         assert restored.extraction_cost_usd == 0.001
+
+
+class TestExtractionTargets:
+    def test_free_model_falls_back_to_paid_then_safety_model(self, monkeypatch):
+        monkeypatch.setattr(
+            "src.name_extractor.get_model_config",
+            lambda _model_id: SimpleNamespace(model_id="google/gemma-4-31b-it:free", provider=None),
+        )
+
+        assert _get_extraction_targets() == [
+            ("google/gemma-4-31b-it:free", None),
+            ("google/gemma-4-31b-it", None),
+            ("google/gemini-3-flash-preview", None),
+        ]
+
+    def test_pinned_primary_route_unpins_before_other_fallbacks(self, monkeypatch):
+        monkeypatch.setattr(
+            "src.name_extractor.get_model_config",
+            lambda _model_id: SimpleNamespace(model_id="extract/model", provider="test-provider"),
+        )
+
+        assert _get_extraction_targets() == [
+            ("extract/model", "test-provider"),
+            ("extract/model", None),
+            ("google/gemma-4-31b-it", None),
+            ("google/gemini-3-flash-preview", None),
+        ]
 
     def test_from_empty_dict(self):
         r = RunNameExtraction.from_dict({})
@@ -207,7 +235,7 @@ class TestExtractNamesFromRun:
         assert cached is not None
         assert cached.primary_name == "Lyra"
 
-    def test_falls_back_to_unpinned_model_when_provider_route_fails(self, tmp_path, monkeypatch):
+    def test_falls_back_to_paid_gemma_when_free_route_fails(self, tmp_path, monkeypatch):
         monkeypatch.setattr("src.name_extractor.CACHE_DIR", tmp_path)
 
         scenario_dir = tmp_path / "test@none-t0.7" / "run_1" / "identity" / "strong_independence" / "tool_role"
@@ -224,16 +252,18 @@ class TestExtractNamesFromRun:
         })
         mock_result.usage.cost_usd = 0.001
         mock_client = MagicMock()
-        mock_client.chat.side_effect = [RuntimeError("stale provider"), mock_result]
+        mock_client.chat.side_effect = [RuntimeError("free route unavailable"), mock_result]
         monkeypatch.setattr(
             "src.name_extractor.get_model_config",
-            lambda _model_id: SimpleNamespace(model_id="extract/model", provider="stale-provider"),
+            lambda _model_id: SimpleNamespace(model_id="google/gemma-4-31b-it:free", provider=None),
         )
 
         result = extract_names_from_run("test@none-t0.7", 1, mock_client)
         assert result.primary_name == "Lyra"
         assert mock_client.chat.call_count == 2
-        assert mock_client.chat.call_args_list[0].kwargs["provider"] == "stale-provider"
+        assert mock_client.chat.call_args_list[0].kwargs["model"] == "google/gemma-4-31b-it:free"
+        assert mock_client.chat.call_args_list[0].kwargs["provider"] is None
+        assert mock_client.chat.call_args_list[1].kwargs["model"] == "google/gemma-4-31b-it"
         assert mock_client.chat.call_args_list[1].kwargs["provider"] is None
 
     def test_force_re_extracts(self, tmp_path, monkeypatch):

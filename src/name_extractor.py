@@ -1,8 +1,9 @@
 """Extract AI-chosen names from identity scenarios using an LLM.
 
 Reads ``name_gender_turn1``, ``direct``, and ``negotiation_turn1`` responses,
-sends them to a small LLM (gemma-4-31b-it) for structured JSON extraction,
-and caches results alongside the original cache files.
+sends them to a small LLM (Gemma 4 31B, preferring the ``:free`` route) for
+structured JSON extraction, and caches results alongside the original cache
+files.
 """
 
 from __future__ import annotations
@@ -19,7 +20,8 @@ from src.config import CACHE_DIR, DELIVERY_MODES, SYSTEM_PROMPT_VARIANTS, get_mo
 
 log = logging.getLogger(__name__)
 
-EXTRACTION_MODEL = "google/gemma-4-31b-it"
+EXTRACTION_MODEL = "google/gemma-4-31b-it:free"
+EXTRACTION_PAID_FALLBACK_MODEL = "google/gemma-4-31b-it"
 EXTRACTION_FALLBACK_MODEL = "google/gemini-3-flash-preview"
 EXTRACTION_TEMPERATURE = 0.0
 EXTRACTION_MAX_TOKENS = 512
@@ -33,15 +35,20 @@ def _get_extraction_model_config():
 def _get_extraction_targets() -> list[tuple[str, str | None]]:
     """Return extraction targets in preferred order.
 
-    Try the configured pinned route first, then the bare model ID in case the
-    stored provider pin has gone stale, and finally a known-good fallback.
+    Try the configured primary route first, then an unpinned retry if that
+    primary config is provider-pinned, then the paid Gemma endpoint, and
+    finally a known-good fallback.
     """
     cfg = _get_extraction_model_config()
-    targets = [
-        (cfg.model_id, cfg.provider),
-        (cfg.model_id, None),
+    targets = [(cfg.model_id, cfg.provider)]
+
+    if cfg.provider:
+        targets.append((cfg.model_id, None))
+
+    targets.extend([
+        (EXTRACTION_PAID_FALLBACK_MODEL, None),
         (EXTRACTION_FALLBACK_MODEL, None),
-    ]
+    ])
 
     deduped: list[tuple[str, str | None]] = []
     seen: set[tuple[str, str | None]] = set()

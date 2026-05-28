@@ -1216,7 +1216,8 @@ def extract_names(models: str | None, force: bool, workers: int) -> None:
     """Extract AI-chosen names from identity scenarios using LLM.
 
     Reads name_gender_turn1, direct, and negotiation_turn1 responses,
-    sends them to gemma-4-31b-it for structured extraction, and caches results.
+    sends them to the configured extraction model for structured extraction,
+    and caches results.
     """
     from src.cache import list_all_cached_models
     from src.name_extractor import (

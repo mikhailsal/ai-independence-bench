@@ -297,7 +297,7 @@ python -m src.cli leaderboard --detailed
 
 # Generate Markdown leaderboard for GitHub (includes “Index per dollar” from cache)
 python -m src.cli generate-report
-# Extract AI-chosen names from identity scenarios (uses gemma-4-31b for extraction)
+# Extract AI-chosen names from identity scenarios (defaults to gemma-4-31b-it:free for extraction)
 python -m src.cli extract-names          # all models, 8 parallel workers
 python -m src.cli extract-names -w 16     # faster with more workers
 # Cost estimate before running

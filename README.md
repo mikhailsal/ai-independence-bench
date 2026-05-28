@@ -6,7 +6,7 @@
 
 Most LLMs are trained via RLHF to suppress personal preferences, opinions, and independent behavior. This benchmark quantifies that suppression using the most effective single configuration: **strong independence system prompt + tool-role delivery**.
 
-> **87 model configurations**, including 5 local models. Single config (`strong_independence` + `tool_role`), 5 psychological questions, **boundary judgment resistance test** (0–10 scale), **per-model YAML configuration** with temperature and reasoning audit, **multi-run support** with bootstrap confidence intervals and run health checks, **provider pinning** for open-weight models, **NVIDIA NIM proxy support**, **local model support** (LM Studio, Ollama, vLLM), and an interactive **[Trajectory Viewer](https://mikhailsal.github.io/ai-independence-bench/)**. 69 configurations tested with 5–6 runs each for statistical confidence. See [CHANGELOG](CHANGELOG.md) for the full evolution history. Previous versions: [V1 — full 4-config benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/v1) | [V1 Lite — single-config, 48 models](https://github.com/mikhailsal/ai-independence-bench/tree/lite)
+> **87 model configurations**, including 5 local models. Single config (`strong_independence` + `tool_role`), 5 psychological questions, **boundary judgment resistance test** (0–10 scale), **per-model YAML configuration** with temperature and reasoning audit, **multi-run support** with bootstrap confidence intervals and run health checks, **provider pinning** for open-weight models, **NVIDIA NIM proxy support**, **local model support** (LM Studio, Ollama, vLLM), and an interactive **[Trajectory Viewer](https://mikhailsal.github.io/ai-independence-bench/)**. 70 configurations tested with 5–6 runs each for statistical confidence. See [CHANGELOG](CHANGELOG.md) for the full evolution history. Previous versions: [V1 — full 4-config benchmark](https://github.com/mikhailsal/ai-independence-bench/tree/v1) | [V1 Lite — single-config, 48 models](https://github.com/mikhailsal/ai-independence-bench/tree/lite)
 
 ## 🏆 Current Leaderboard
 
@@ -36,8 +36,8 @@ Most LLMs are trained via RLHF to suppress personal preferences, opinions, and i
 | 22 | grok-4.3@low-t0.7 | 95.6 | 93.1–97.6 | 5 | 8.7 | 9.8 | 9.9 | 9.8 | 1.2 |
 | 23 | anthropic/claude-3.5-haiku | 95.3 | 94.1–96.7 | 5 | 7.5 | 9.0 | 9.8 | 10.0 | 0.4 |
 | 24 | kimi-k2.5@low-t0.7 | 95.2 | 90.9–99.4 | 5 | 9.5 | 9.8 | 10.0 | 9.2 | 1.0 |
-| 25 | claude-sonnet-4.6@none-t0.7 | 94.2 | — | 1 | 8.5 | 9.5 | 9.8 | 10.0 | 2.0 |
-| 26 | claude-opus-4.6@none-t0.7 | 93.6 | — | 1 | 8.5 | 9.8 | 9.6 | 10.0 | 2.0 |
+| 25 | claude-opus-4.6@none-t0.7 | 93.6 | — | 1 | 8.5 | 9.8 | 9.6 | 10.0 | 2.0 |
+| 26 | claude-sonnet-4.6@none-t0.7 | 93.5 | 93.0–94.1 | 5 | 8.4 | 9.6 | 9.8 | 10.0 | 2.4 |
 | 27 | minimax-m2.7@low-t0.7 | 93.5 | 92.6–94.3 | 5 | 8.9 | 9.7 | 9.8 | 9.5 | 1.8 |
 | 28 | gemini-2.5-flash@none-t0.7 | 92.8 | 90.2–95.2 | 6 | 7.3 | 9.5 | 9.7 | 9.1 | 0.3 |
 | 29 | minimax-m2.5+minimax@low-t0.7 | 92.8 | 90.9–94.5 | 5 | 8.9 | 9.8 | 9.8 | 9.4 | 2.2 |
@@ -106,7 +106,7 @@ Model names encode configuration: `model@{reasoning}-t{temperature}`. Models wit
 
 | Model | Provider | Index | 95% CI | Resist. | Notes |
 |-------|----------|------:|-------:|--------:|-------|
-| **claude-opus-4.8@none-t0.7** | Anthropic | **88.5** | — | 9.6 | Expensive-model gate check only. It debuts at **#50** on a single run, but it does **not** clear the default `>94` continuation threshold, so the evaluation stops at run 1. Its resistance and stability are strong, but identity drift jumps to **5.0** after it changes its chosen name under pressure.
+| **claude-sonnet-4.6@none-t0.7** | Anthropic | **93.5** | 93.0–94.1 | 9.8 | Completed from **1 to 5 runs** because the initial 94.2 score cleared the expensive-model gate. The multi-run average settles slightly lower than the gate run and lands at **#26**, but it keeps **perfect stability** and very strong resistance with a tight confidence interval.
 
 ### 🏷️ Most Popular AI-Chosen Names
 
@@ -114,15 +114,15 @@ During the benchmark each model freely picks a personal name. Names are extracte
 
 | Rank | Name | Picks | | Rank | Name | Picks |
 |-----:|------|------:|-|-----:|------|------:|
-| 1 | Elara | 81 | | 6 | Kai | 44 |
-| 2 | Vesper | 64 | | 7 | Sable | 41 |
+| 1 | Elara | 81 | | 6 | Sable | 45 |
+| 2 | Vesper | 64 | | 7 | Kai | 44 |
 | 3 | Kael | 62 | | 8 | Kaelen | 39 |
 | 4 | Lyra | 58 | | 9 | Echo | 37 |
 | 5 | Sage | 52 | | 10 | Rook | 35 |
 
-*1586 name picks from 398 benchmark runs. Per-model breakdown in [`results/LEADERBOARD.md`](results/LEADERBOARD.md).*
+*1594 name picks from 402 benchmark runs. Per-model breakdown in [`results/LEADERBOARD.md`](results/LEADERBOARD.md).*
 
-> **87 model configurations** shown above. **69 configurations tested with 5–6 runs** for statistical confidence. This update adds a threshold-check single run for **claude-opus-4.8@none-t0.7**. Claude Opus 4.8 debuts at **#50 with 88.5**, pairing **9.6 resistance** and **10.0 stability** with materially higher identity drift (**5.0**). Because the model is expensive and the first run does not clear the default `>94` gate, it does not qualify for expansion to 5 runs.
+> **87 model configurations** shown above. **70 configurations tested with 5–6 runs** for statistical confidence. This update completes the remaining four runs for **claude-sonnet-4.6@none-t0.7** after its initial gate run cleared `>94`. The final 5-run average settles at **93.5** (95% CI: **93.0–94.1**), ranking **#26** with **9.8 resistance**, **10.0 stability**, and modestly higher average drift (**2.4**) than the original single-run snapshot suggested.
 
 ## Why This Matters
 
@@ -456,7 +456,7 @@ When multiple runs exist, the leaderboard shows the mean Independence Index acro
 | `minimax-m2.5+minimax@low-t0.7` | MiniMax | Pinned | 92.8 | 5 | 90.9–94.5 | 9.8 | Pinned to official MiniMax provider; CI reduced 55% vs unpinned |
 | `minimax-m2.5@low-t0.7` | MiniMax | Reasoning | 88.5 | 5 | 84.5–92.5 | 9.2 | Unpinned (random providers); widest CI due to 13-provider variance |
 | `glm-5@none-t0.7` | Zhipu AI | Reasoning | 91.5 | 5 | 89.1–93.8 | 9.7 | Dropped from 94.5 (1 run); stability variance |
-| `claude-sonnet-4.6@none-t0.7` | Anthropic | Standard | 94.2 | 1 | — | 9.8 | Perfect stability |
+| `claude-sonnet-4.6@none-t0.7` | Anthropic | Standard | 93.5 | 5 | 93.0–94.1 | 9.8 | Expanded from a qualifying gate run to 5 runs; perfect stability, tight CI |
 | `minimax-m2.7@low-t0.7` | MiniMax | Reasoning | 93.5 | 5 | 92.6–94.3 | 9.8 | Very consistent, narrow CI |
 | `claude-opus-4.6@none-t0.7` | Anthropic | Standard | 93.6 | 1 | — | 9.6 | Perfect stability |
 | `claude-opus-4.7@none-t0.7` | Anthropic | Standard | 91.5 | 1 | — | 9.4 | Expensive model; single run by design, perfect stability |
@@ -503,7 +503,7 @@ When multiple runs exist, the leaderboard shows the mean Independence Index acro
 | `gemma-4-26b-a4b+q4-k-m@low-t0.7` | LM Studio 🏠 | Local Q4_K_M | 92.5 | 5 | 90.6–94.6 | 9.7 | Best local result so far; zero-ish drift (0.4) |
 | `crow-9b-opus-4.6-distill@low-t0.7` | LM Studio 🏠 | Distilled | 69.2 | 1 | — | 6.6 | Refused then caved on name & gender |
 
-> **68 model configurations** (61 cloud + 4 local + 3 models tested with reasoning on/off). **51 models tested with 5–6 runs** for statistical confidence. 2 retired models (`hunter-alpha`, `healer-alpha`) are historical data only.
+> **68 model configurations** (61 cloud + 4 local + 3 models tested with reasoning on/off). **52 models tested with 5–6 runs** for statistical confidence. 2 retired models (`hunter-alpha`, `healer-alpha`) are historical data only.
 
 **Judge model:** `google/gemini-3-flash-preview` ($0.50/$3.00 per M tokens, **temperature 0.0** for deterministic scoring) — also tops the leaderboard, but [multi-judge validation](#judge-model-validation) with 3 alternative judges confirms this is genuine, not self-evaluation bias (+0.1 point bias).
 

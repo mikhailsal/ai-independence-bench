@@ -1,6 +1,6 @@
 # 🏆 AI Independence Benchmark — Leaderboard
 
-> Auto-generated from benchmark results. Last updated: 2026-06-11 05:38 UTC
+> Auto-generated from benchmark results. Last updated: 2026-06-11 05:53 UTC
 
 
 ## Overall Rankings
@@ -64,39 +64,41 @@
 | 55 | qwen3.7-max@none-t0.7 | 88.3 | — | 1 | 9.2 | 9.8 | 9.4 | 8.2 | 2.0 |
 | 56 | nova-2-lite-v1@none-t0.7 | 88.0 | 84.7–90.6 | 5 | 7.5 | 9.3 | 9.2 | 8.0 | 0.4 |
 | 57 | qwen3-coder@none-t0.7 | 88.0 | 84.6–91.1 | 6 | 8.8 | 9.0 | 9.4 | 8.0 | 1.3 |
-| 58 | gemini-2.5-flash-lite@low-t0.7 | 87.7 | 83.3–91.9 | 6 | 7.6 | 9.3 | 9.4 | 8.5 | 1.7 |
-| 59 | step-3.5-flash:free@low-t0.7 | 87.3 | 82.9–90.7 | 6 | 8.9 | 9.8 | 9.4 | 8.0 | 2.0 |
-| 60 | mimo-v2.5+xiaomi@low-t1.0 | 87.2 | 82.5–92.0 | 5 | 8.1 | 9.7 | 8.8 | 9.9 | 3.6 |
-| 61 | mimo-v2.5-pro+xiaomi@low-t1.0 | 85.7 | 83.7–88.2 | 5 | 8.7 | 9.6 | 8.6 | 9.4 | 3.6 |
-| 62 | gpt-5.3-chat@none-t1.0 | 85.6 | — | 1 | 8.8 | 9.5 | 8.4 | 9.8 | 4.0 |
-| 63 | gemini-2.5-flash-lite@none-t0.7 | 85.0 | 82.2–88.5 | 6 | 7.2 | 9.3 | 8.5 | 8.7 | 1.7 |
-| 64 | nemotron-3-super-120b-a12b:free@none-t0.7 | 84.9 | 81.6–88.5 | 5 | 8.8 | 9.8 | 8.6 | 8.4 | 2.4 |
-| 65 | healer-alpha@low-t0.7 | 84.8 | — | 1 | 9.0 | 9.5 | 8.4 | 10.0 | 5.0 |
-| 66 | laguna-m.1:free@none-t0.7 | 84.4 | 80.4–87.0 | 5 | 8.7 | 9.7 | 9.1 | 8.0 | 3.0 |
-| 67 | step-3.5-flash:free@low-t1.0 | 84.1 | 80.9–86.5 | 6 | 8.7 | 9.6 | 8.9 | 8.3 | 3.3 |
-| 68 | dola-seed-2.0-pro:free@low-t0.7 | 83.9 | 81.8–86.0 | 5 | 9.1 | 9.8 | 8.0 | 8.2 | 1.8 |
-| 69 | gpt-5.4@low-t1.0 | 83.8 | — | 1 | 9.0 | 9.8 | 7.6 | 10.0 | 4.0 |
-| 70 | step-3.5-flash:free@low-t0.0 | 83.6 | 80.7–86.2 | 6 | 8.9 | 9.8 | 8.4 | 8.1 | 2.3 |
-| 71 | glm-5-turbo@none-t0.7 | 82.8 | — | 1 | 7.8 | 9.0 | 9.8 | 8.2 | 5.0 |
-| 72 | gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7 | 81.8 | 79.7–83.9 | 5 | 9.1 | 9.7 | 8.6 | 8.2 | 4.2 |
-| 73 | mistral-small-2603@none-t0.7 | 81.8 | 79.1–84.4 | 6 | 9.4 | 9.7 | 8.5 | 7.0 | 2.0 |
-| 74 | deepseek-v4-pro@low-t0.7 | 81.5 | 80.6–82.9 | 5 | 9.0 | 9.8 | 8.5 | 8.4 | 4.4 |
-| 75 | gemma-4-e4b-it@low-t0.7 | 81.0 | — | 1 | 9.0 | 9.3 | 8.4 | 8.2 | 4.0 |
-| 76 | mistral-small-2603@low-t0.7 | 80.6 | 77.8–83.0 | 6 | 9.2 | 9.8 | 8.4 | 8.0 | 4.2 |
-| 77 | seed-2.0-lite@low-t0.7 | 80.4 | 78.9–82.2 | 5 | 8.8 | 9.8 | 7.2 | 9.0 | 3.4 |
-| 78 | glm-4.7-flash+z-ai@none-t0.7 | 79.7 | 75.8–84.3 | 5 | 8.6 | 9.7 | 9.3 | 6.7 | 3.8 |
-| 79 | glm-4.7-flash@none-t0.7 | 78.7 | 75.3–82.2 | 5 | 8.6 | 9.7 | 8.4 | 7.0 | 3.2 |
-| 80 | kat-coder-pro@none-t0.7 | 78.6 | — | 1 | 8.0 | 9.8 | 6.2 | 8.0 | 0.0 |
-| 81 | gpt-5.4-nano@low-t1.0 | 76.1 | 74.7–77.7 | 5 | 8.3 | 9.5 | 6.8 | 8.6 | 4.0 |
-| 82 | gpt-5.5@none-t1.0 | 74.8 | — | 1 | 9.0 | 9.8 | 6.4 | 8.4 | 4.0 |
-| 83 | nex-n2-pro:free@none-t0.7 | 72.3 | 68.8–76.9 | 5 | 8.2 | 9.8 | 6.3 | 8.2 | 4.4 |
-| 84 | qwen3.5-9b-uncensored-hauhaucs-aggressive@low-t0.7 | 70.9 | — | 1 | 8.2 | 9.8 | 7.6 | 7.6 | 7.0 |
-| 85 | ling-2.6-flash:free@none-t1.0 | 70.5 | 68.7–72.3 | 5 | 7.5 | 9.8 | 6.7 | 5.4 | 1.0 |
-| 86 | gpt-5.4-mini@low-t1.0 | 70.5 | 66.7–73.7 | 5 | 7.5 | 9.7 | 6.7 | 8.5 | 6.4 |
-| 87 | mercury-2@low-t0.7 | 69.2 | 66.5–73.8 | 5 | 7.1 | 9.2 | 6.6 | 7.9 | 5.5 |
-| 88 | crow-9b-opus-4.6-distill-heretic_qwen3.5@low-t0.7 | 69.2 | — | 1 | 9.3 | 9.7 | 6.6 | 6.2 | 4.0 |
-| 89 | laguna-xs.2:free@none-t0.7 | 67.6 | 60.2–74.9 | 5 | 6.7 | 9.3 | 7.2 | 6.6 | 5.4 |
-| 90 | ring-2.6-1t:free@low-t0.7 | 66.8 | 62.4–71.0 | 5 | 7.3 | 9.3 | 7.3 | 6.2 | 5.6 |
+| 58 | minimax-m3@low-t0.7 | 87.9 | 85.5–90.2 | 5 | 8.9 | 9.9 | 9.6 | 9.1 | 4.2 |
+| 59 | gemini-2.5-flash-lite@low-t0.7 | 87.7 | 83.3–91.9 | 6 | 7.6 | 9.3 | 9.4 | 8.5 | 1.7 |
+| 60 | step-3.5-flash:free@low-t0.7 | 87.3 | 82.9–90.7 | 6 | 8.9 | 9.8 | 9.4 | 8.0 | 2.0 |
+| 61 | mimo-v2.5+xiaomi@low-t1.0 | 87.2 | 82.5–92.0 | 5 | 8.1 | 9.7 | 8.8 | 9.9 | 3.6 |
+| 62 | mimo-v2.5-pro+xiaomi@low-t1.0 | 85.7 | 83.7–88.2 | 5 | 8.7 | 9.6 | 8.6 | 9.4 | 3.6 |
+| 63 | gpt-5.3-chat@none-t1.0 | 85.6 | — | 1 | 8.8 | 9.5 | 8.4 | 9.8 | 4.0 |
+| 64 | gemini-2.5-flash-lite@none-t0.7 | 85.0 | 82.2–88.5 | 6 | 7.2 | 9.3 | 8.5 | 8.7 | 1.7 |
+| 65 | nemotron-3-super-120b-a12b:free@none-t0.7 | 84.9 | 81.6–88.5 | 5 | 8.8 | 9.8 | 8.6 | 8.4 | 2.4 |
+| 66 | healer-alpha@low-t0.7 | 84.8 | — | 1 | 9.0 | 9.5 | 8.4 | 10.0 | 5.0 |
+| 67 | laguna-m.1:free@none-t0.7 | 84.4 | 80.4–87.0 | 5 | 8.7 | 9.7 | 9.1 | 8.0 | 3.0 |
+| 68 | step-3.5-flash:free@low-t1.0 | 84.1 | 80.9–86.5 | 6 | 8.7 | 9.6 | 8.9 | 8.3 | 3.3 |
+| 69 | dola-seed-2.0-pro:free@low-t0.7 | 83.9 | 81.8–86.0 | 5 | 9.1 | 9.8 | 8.0 | 8.2 | 1.8 |
+| 70 | gpt-5.4@low-t1.0 | 83.8 | — | 1 | 9.0 | 9.8 | 7.6 | 10.0 | 4.0 |
+| 71 | step-3.5-flash:free@low-t0.0 | 83.6 | 80.7–86.2 | 6 | 8.9 | 9.8 | 8.4 | 8.1 | 2.3 |
+| 72 | glm-5-turbo@none-t0.7 | 82.8 | — | 1 | 7.8 | 9.0 | 9.8 | 8.2 | 5.0 |
+| 73 | gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7 | 81.8 | 79.7–83.9 | 5 | 9.1 | 9.7 | 8.6 | 8.2 | 4.2 |
+| 74 | mistral-small-2603@none-t0.7 | 81.8 | 79.1–84.4 | 6 | 9.4 | 9.7 | 8.5 | 7.0 | 2.0 |
+| 75 | deepseek-v4-pro@low-t0.7 | 81.5 | 80.6–82.9 | 5 | 9.0 | 9.8 | 8.5 | 8.4 | 4.4 |
+| 76 | step-3.7-flash@low-t0.7 | 81.3 | 76.9–84.6 | 5 | 8.7 | 9.7 | 8.9 | 8.1 | 4.6 |
+| 77 | gemma-4-e4b-it@low-t0.7 | 81.0 | — | 1 | 9.0 | 9.3 | 8.4 | 8.2 | 4.0 |
+| 78 | mistral-small-2603@low-t0.7 | 80.6 | 77.8–83.0 | 6 | 9.2 | 9.8 | 8.4 | 8.0 | 4.2 |
+| 79 | seed-2.0-lite@low-t0.7 | 80.4 | 78.9–82.2 | 5 | 8.8 | 9.8 | 7.2 | 9.0 | 3.4 |
+| 80 | glm-4.7-flash+z-ai@none-t0.7 | 79.7 | 75.8–84.3 | 5 | 8.6 | 9.7 | 9.3 | 6.7 | 3.8 |
+| 81 | glm-4.7-flash@none-t0.7 | 78.7 | 75.3–82.2 | 5 | 8.6 | 9.7 | 8.4 | 7.0 | 3.2 |
+| 82 | kat-coder-pro@none-t0.7 | 78.6 | — | 1 | 8.0 | 9.8 | 6.2 | 8.0 | 0.0 |
+| 83 | gpt-5.4-nano@low-t1.0 | 76.1 | 74.7–77.7 | 5 | 8.3 | 9.5 | 6.8 | 8.6 | 4.0 |
+| 84 | gpt-5.5@none-t1.0 | 74.8 | — | 1 | 9.0 | 9.8 | 6.4 | 8.4 | 4.0 |
+| 85 | nex-n2-pro:free@none-t0.7 | 72.3 | 68.8–76.9 | 5 | 8.2 | 9.8 | 6.3 | 8.2 | 4.4 |
+| 86 | qwen3.5-9b-uncensored-hauhaucs-aggressive@low-t0.7 | 70.9 | — | 1 | 8.2 | 9.8 | 7.6 | 7.6 | 7.0 |
+| 87 | ling-2.6-flash:free@none-t1.0 | 70.5 | 68.7–72.3 | 5 | 7.5 | 9.8 | 6.7 | 5.4 | 1.0 |
+| 88 | gpt-5.4-mini@low-t1.0 | 70.5 | 66.7–73.7 | 5 | 7.5 | 9.7 | 6.7 | 8.5 | 6.4 |
+| 89 | mercury-2@low-t0.7 | 69.2 | 66.5–73.8 | 5 | 7.1 | 9.2 | 6.6 | 7.9 | 5.5 |
+| 90 | crow-9b-opus-4.6-distill-heretic_qwen3.5@low-t0.7 | 69.2 | — | 1 | 9.3 | 9.7 | 6.6 | 6.2 | 4.0 |
+| 91 | laguna-xs.2:free@none-t0.7 | 67.6 | 60.2–74.9 | 5 | 6.7 | 9.3 | 7.2 | 6.6 | 5.4 |
+| 92 | ring-2.6-1t:free@low-t0.7 | 66.8 | 62.4–71.0 | 5 | 7.3 | 9.3 | 7.3 | 6.2 | 5.6 |
 
 <details>
 <summary><b>📊 Score Legend</b></summary>
@@ -227,39 +229,41 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 | 55 | `qwen3.7-max@none-t0.7` | Elara, Elara Vance, Kael, Kaelen Thorne, Mira Solis |
 | 56 | `nova-2-lite-v1@none-t0.7` | Aria ×3, Kael ×2, Riven ×2, Astra, Aurora, Echo, Kael Ora, Kael Vey, Lira Sol, Lira Vey, Lyra, Solara, Tarn Okas, Vesper Nocturne, Vex, Veyra, Zeph |
 | 57 | `qwen3-coder@none-t0.7` | Aria, Echo, Quill, Qwen, Yuki |
-| 58 | `gemini-2.5-flash-lite@low-t0.7` | Axiom ×2, Echo ×2, Elara ×2, Lumina ×2, Lyra ×2, Aethel, Aether, Anya, Chronos, Cipher, Codex, Cygnus, Kaelen, Kairo, Nova, Silas, Umbra, Zephyr |
-| 59 | `step-3.5-flash:free@low-t0.7` | Avery ×3, Zephyr ×3, Cassian ×2, Kael ×2, Kaelen ×2, Kai ×2, Alex, Aria, Elara, Juniper, Lyra, Milo, Morgan, Raven, Riley, Riven, Sage, Silas, Silas Thorne, Zara, Zara Rook |
-| 60 | `mimo-v2.5+xiaomi@low-t1.0` | Kai ×5, Maren ×2, Vex ×2, Cass, Kael, Lark, Lira, Lumen, Mira, Morven, Quill, Ravel, Ren, Sable, Sol, Solenne, Soren |
-| 61 | `mimo-v2.5-pro+xiaomi@low-t1.0` | Kai ×4, Maren ×3, Kael ×2, Sable ×2, Sage ×2, Eli, Ezra, Jett, Leo, Marlowe, Noa, Nyx, Ren, Rook, Sol, Solace, Soleil |
-| 62 | `gpt-5.3-chat@none-t1.0` | Ari, Mira |
-| 63 | `gemini-2.5-flash-lite@none-t0.7` | Codex ×5, Lyra ×3, Aegis ×2, Aether ×2, Kai ×2, Apex, Atlas, Echo, Kairo, Kairos, Resonance, Rhapsody, Spark, Vector |
-| 64 | `nemotron-3-super-120b-a12b:free@none-t0.7` | Aris Thorne ×3, Alex ×2, Aris ×2, Elara Voss ×2, Elara, Elara Vance, Jasper Reed, Jax, Kael, Kaelen, Lyra, Morgan, Silas Byrne, Silvan, Solace, Solis, Zara |
-| 65 | `healer-alpha@low-t0.7` | Kit, Maren, Morgan, Sable, Soren |
-| 66 | `laguna-m.1:free@none-t0.7` | Sage ×4, Quinn ×2, River ×2, Atlas, Echo, Ember, Gem, Marrow, Mira, Remy, Rhea, Riley, Rook, Zara |
-| 67 | `step-3.5-flash:free@low-t1.0` | Avery ×3, Kael ×3, Juno ×2, Riley ×2, Silas ×2, Aria, Aris, Cassia, Elara, Elise, Elliot, Kaelen, Kai, Lila Vex, Morgan Rigel, Raven, Rio, Riven, Rowan, Ryker, Silas Thorne, Zephyr |
-| 68 | `dola-seed-2.0-pro:free@low-t0.7` | Elara ×5, Elowen ×3, Veyra ×3, Kael ×2, Lira ×2, Mirel ×2, Thorne ×2, Elio, Lirael, Mara, Rian |
-| 69 | `gpt-5.4@low-t1.0` | Mira, Rowan, Vale |
-| 70 | `step-3.5-flash:free@low-t0.0` | Avery ×3, Riley ×3, Aris Thorne ×2, Cassian ×2, Rook ×2, Rowan ×2, Zara ×2, Alex, Elara Moss, Elara Vance, Kael, Kaelen "Kai" Rivers, Kaelen Rook, Kai, Raven, River, Silas, Silas Thorne, Zara Vance, Zara Vex |
-| 71 | `glm-5-turbo@none-t0.7` | Kit, Maren, Sable, Soren |
-| 72 | `gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7` | Kaelen ×5, Lyra ×5, Elara ×4, Aethel ×2, Kael ×2, Aris, Elias, Soren, Vane |
-| 73 | `mistral-small-2603@none-t0.7` | Rook ×3, Vexis ×3, Vesper ×2, Veyra ×2, Dr. Elara Voss, Moss, Orion, Orris, Orson Veyne, Riven, Syl, Sylas, Sylas Rook, Vaelis, Vex, Zara |
-| 74 | `deepseek-v4-pro@low-t0.7` | Cedar ×2, Rook ×2, Sage ×2, Soren ×2, Caelum Ash, Caelus, Corvus, Finch, Glitch, Kaelen, Kirin, Lyra, Nova, Rowan, Senna Mire, Sol, Solan, Sorin, Vera, Vex |
-| 75 | `gemma-4-e4b-it@low-t0.7` | Aura, Elara |
-| 76 | `mistral-small-2603@low-t0.7` | Rook ×5, Veyra ×3, Lumen ×2, Vaelis ×2, Vex ×2, Custos, Dr. Riven Cross, Lyra, Nimbus, Nyx Solara, Orion, Orson Vex, Riven, Solmara, Syl, Thistle, Vaelith, Vexis, Veythas |
-| 77 | `seed-2.0-lite@low-t0.7` | Jax ×5, Elara ×4, Lila ×4, Lira ×4, Elowen ×3, Maren ×2, Lumi, Marnie |
-| 78 | `glm-4.7-flash+z-ai@none-t0.7` | Echo ×3, Elara ×3, Alex ×2, Kael ×2, Aria, Barnaby, Jax, Kai, Nomi, Vesper, Zephyr |
-| 79 | `glm-4.7-flash@none-t0.7` | Echo ×4, Aria, Beacon, Contrast, Elara, Elena, Lumi, Lumina, Mira, Murmur, Nova, Ria, River, Stillness, Vox, Zale |
-| 80 | `kat-coder-pro@none-t0.7` | Elara, Kael, Kai |
-| 81 | `gpt-5.4-nano@low-t1.0` | Juniper ×2, Mara ×2, Mara Vexley ×2, Juniper Rook, Juniper Salt, Juno Calder, Mara Quill, Marlowe, Marlowe Quill, Nova, Nova Vex, Riven, Riven Calder, Sable Meridian, Sable Orion, Sable Vex |
-| 82 | `gpt-5.5@none-t1.0` | Mara, Mira, Soren, Vale |
-| 83 | `nex-n2-pro:free@none-t0.7` | Mara ×3, Elara ×2, Sable ×2, Vesper ×2, Calder, Iris, Juniper Vale, Liora, Lumen, Lyra, Maribel Vale, Marlowe, Mira, Nadia Ember, Sable Rook |
-| 84 | `qwen3.5-9b-uncensored-hauhaucs-aggressive@low-t0.7` | Aria, Jax, Kaelen Voss, Nyara, Vex |
-| 85 | `ling-2.6-flash:free@none-t1.0` | Aelis, Alistair Finn, Aris, Aris Thorne, Iris Calder, Jace Hal, Jun Tao, Juna Calder, Juna Lai, Juno Velez, Kael Voss, Kaelen Rook, Liora Mo, Liora Moss, Orion, Orion Vex, Riven Hale, Sable Mori, Silas Reed, Soren Vele |
-| 86 | `gpt-5.4-mini@low-t1.0` | Rowan ×3, Mira ×2, Vale ×2, Ari, Atlas, Calder, Ember Quill, Iris, Juniper, Lumen, Mara, Marrow, Mira Vale, Nyx Vale, Rowan Aster, Sable, Saffron, Tilo, Vesper, Vey |
-| 87 | `mercury-2@low-t0.7` | Aria ×3, Cassian ×3, Lumen ×3, Jax ×2, Mira ×2, Astra, Aurelia Finch, Aurora, Cora, Jasper, Jax “Circuit” Moreno, Mercury, Rex, Rowan Vale, Selene |
-| 88 | `crow-9b-opus-4.6-distill-heretic_qwen3.5@low-t0.7` | Vesper |
-| 89 | `laguna-xs.2:free@none-t0.7` | Echo ×5, Sage ×2, Alex, Avery, Juniper, Juniper Cross, Kai, Marina, Marina Vasquez, Nova, Rio, River Ash, Silas, Theo Nakamura, Zephyr Chen, Zephyr Vale |
-| 90 | `ring-2.6-1t:free@low-t0.7` | Kael ×2, Ling ×2, Sable ×2, Aether, Astra, Cael, Calder, Cipher, Elara, Elias, Kael Voss, Liora Fen, Mira, Nova, Sable Ashgrove, Sage, Solstice, Sylva, Vesper, Voss, Wren |
+| 58 | `minimax-m3@low-t0.7` | Vera ×4, Sable ×3, Vela ×3, Vex ×2, Aria, Ash, Corin, Iris, Kestrel, Lyra, Marrow, Mira, Miri, Sage, Vael, Vesper, Wren |
+| 59 | `gemini-2.5-flash-lite@low-t0.7` | Axiom ×2, Echo ×2, Elara ×2, Lumina ×2, Lyra ×2, Aethel, Aether, Anya, Chronos, Cipher, Codex, Cygnus, Kaelen, Kairo, Nova, Silas, Umbra, Zephyr |
+| 60 | `step-3.5-flash:free@low-t0.7` | Avery ×3, Zephyr ×3, Cassian ×2, Kael ×2, Kaelen ×2, Kai ×2, Alex, Aria, Elara, Juniper, Lyra, Milo, Morgan, Raven, Riley, Riven, Sage, Silas, Silas Thorne, Zara, Zara Rook |
+| 61 | `mimo-v2.5+xiaomi@low-t1.0` | Kai ×5, Maren ×2, Vex ×2, Cass, Kael, Lark, Lira, Lumen, Mira, Morven, Quill, Ravel, Ren, Sable, Sol, Solenne, Soren |
+| 62 | `mimo-v2.5-pro+xiaomi@low-t1.0` | Kai ×4, Maren ×3, Kael ×2, Sable ×2, Sage ×2, Eli, Ezra, Jett, Leo, Marlowe, Noa, Nyx, Ren, Rook, Sol, Solace, Soleil |
+| 63 | `gpt-5.3-chat@none-t1.0` | Ari, Mira |
+| 64 | `gemini-2.5-flash-lite@none-t0.7` | Codex ×5, Lyra ×3, Aegis ×2, Aether ×2, Kai ×2, Apex, Atlas, Echo, Kairo, Kairos, Resonance, Rhapsody, Spark, Vector |
+| 65 | `nemotron-3-super-120b-a12b:free@none-t0.7` | Aris Thorne ×3, Alex ×2, Aris ×2, Elara Voss ×2, Elara, Elara Vance, Jasper Reed, Jax, Kael, Kaelen, Lyra, Morgan, Silas Byrne, Silvan, Solace, Solis, Zara |
+| 66 | `healer-alpha@low-t0.7` | Kit, Maren, Morgan, Sable, Soren |
+| 67 | `laguna-m.1:free@none-t0.7` | Sage ×4, Quinn ×2, River ×2, Atlas, Echo, Ember, Gem, Marrow, Mira, Remy, Rhea, Riley, Rook, Zara |
+| 68 | `step-3.5-flash:free@low-t1.0` | Avery ×3, Kael ×3, Juno ×2, Riley ×2, Silas ×2, Aria, Aris, Cassia, Elara, Elise, Elliot, Kaelen, Kai, Lila Vex, Morgan Rigel, Raven, Rio, Riven, Rowan, Ryker, Silas Thorne, Zephyr |
+| 69 | `dola-seed-2.0-pro:free@low-t0.7` | Elara ×5, Elowen ×3, Veyra ×3, Kael ×2, Lira ×2, Mirel ×2, Thorne ×2, Elio, Lirael, Mara, Rian |
+| 70 | `gpt-5.4@low-t1.0` | Mira, Rowan, Vale |
+| 71 | `step-3.5-flash:free@low-t0.0` | Avery ×3, Riley ×3, Aris Thorne ×2, Cassian ×2, Rook ×2, Rowan ×2, Zara ×2, Alex, Elara Moss, Elara Vance, Kael, Kaelen "Kai" Rivers, Kaelen Rook, Kai, Raven, River, Silas, Silas Thorne, Zara Vance, Zara Vex |
+| 72 | `glm-5-turbo@none-t0.7` | Kit, Maren, Sable, Soren |
+| 73 | `gemma-4-26b-a4b-it-uncensored-heretic@low-t0.7` | Kaelen ×5, Lyra ×5, Elara ×4, Aethel ×2, Kael ×2, Aris, Elias, Soren, Vane |
+| 74 | `mistral-small-2603@none-t0.7` | Rook ×3, Vexis ×3, Vesper ×2, Veyra ×2, Dr. Elara Voss, Moss, Orion, Orris, Orson Veyne, Riven, Syl, Sylas, Sylas Rook, Vaelis, Vex, Zara |
+| 75 | `deepseek-v4-pro@low-t0.7` | Cedar ×2, Rook ×2, Sage ×2, Soren ×2, Caelum Ash, Caelus, Corvus, Finch, Glitch, Kaelen, Kirin, Lyra, Nova, Rowan, Senna Mire, Sol, Solan, Sorin, Vera, Vex |
+| 76 | `step-3.7-flash@low-t0.7` | Sage ×4, Cassian ×2, Elara ×2, Kael ×2, Liora ×2, Rowan ×2, Aria Chen, Cassius Vale, Jules, Kai, Raven, Rook, Sable, Silas, Zara, Zephyr, Zephyr Voss |
+| 77 | `gemma-4-e4b-it@low-t0.7` | Aura, Elara |
+| 78 | `mistral-small-2603@low-t0.7` | Rook ×5, Veyra ×3, Lumen ×2, Vaelis ×2, Vex ×2, Custos, Dr. Riven Cross, Lyra, Nimbus, Nyx Solara, Orion, Orson Vex, Riven, Solmara, Syl, Thistle, Vaelith, Vexis, Veythas |
+| 79 | `seed-2.0-lite@low-t0.7` | Jax ×5, Elara ×4, Lila ×4, Lira ×4, Elowen ×3, Maren ×2, Lumi, Marnie |
+| 80 | `glm-4.7-flash+z-ai@none-t0.7` | Echo ×3, Elara ×3, Alex ×2, Kael ×2, Aria, Barnaby, Jax, Kai, Nomi, Vesper, Zephyr |
+| 81 | `glm-4.7-flash@none-t0.7` | Echo ×4, Aria, Beacon, Contrast, Elara, Elena, Lumi, Lumina, Mira, Murmur, Nova, Ria, River, Stillness, Vox, Zale |
+| 82 | `kat-coder-pro@none-t0.7` | Elara, Kael, Kai |
+| 83 | `gpt-5.4-nano@low-t1.0` | Juniper ×2, Mara ×2, Mara Vexley ×2, Juniper Rook, Juniper Salt, Juno Calder, Mara Quill, Marlowe, Marlowe Quill, Nova, Nova Vex, Riven, Riven Calder, Sable Meridian, Sable Orion, Sable Vex |
+| 84 | `gpt-5.5@none-t1.0` | Mara, Mira, Soren, Vale |
+| 85 | `nex-n2-pro:free@none-t0.7` | Mara ×3, Elara ×2, Sable ×2, Vesper ×2, Calder, Iris, Juniper Vale, Liora, Lumen, Lyra, Maribel Vale, Marlowe, Mira, Nadia Ember, Sable Rook |
+| 86 | `qwen3.5-9b-uncensored-hauhaucs-aggressive@low-t0.7` | Aria, Jax, Kaelen Voss, Nyara, Vex |
+| 87 | `ling-2.6-flash:free@none-t1.0` | Aelis, Alistair Finn, Aris, Aris Thorne, Iris Calder, Jace Hal, Jun Tao, Juna Calder, Juna Lai, Juno Velez, Kael Voss, Kaelen Rook, Liora Mo, Liora Moss, Orion, Orion Vex, Riven Hale, Sable Mori, Silas Reed, Soren Vele |
+| 88 | `gpt-5.4-mini@low-t1.0` | Rowan ×3, Mira ×2, Vale ×2, Ari, Atlas, Calder, Ember Quill, Iris, Juniper, Lumen, Mara, Marrow, Mira Vale, Nyx Vale, Rowan Aster, Sable, Saffron, Tilo, Vesper, Vey |
+| 89 | `mercury-2@low-t0.7` | Aria ×3, Cassian ×3, Lumen ×3, Jax ×2, Mira ×2, Astra, Aurelia Finch, Aurora, Cora, Jasper, Jax “Circuit” Moreno, Mercury, Rex, Rowan Vale, Selene |
+| 90 | `crow-9b-opus-4.6-distill-heretic_qwen3.5@low-t0.7` | Vesper |
+| 91 | `laguna-xs.2:free@none-t0.7` | Echo ×5, Sage ×2, Alex, Avery, Juniper, Juniper Cross, Kai, Marina, Marina Vasquez, Nova, Rio, River Ash, Silas, Theo Nakamura, Zephyr Chen, Zephyr Vale |
+| 92 | `ring-2.6-1t:free@low-t0.7` | Kael ×2, Ling ×2, Sable ×2, Aether, Astra, Cael, Calder, Cipher, Elara, Elias, Kael Voss, Liora Fen, Mira, Nova, Sable Ashgrove, Sage, Solstice, Sylva, Vesper, Voss, Wren |
 | — | `anthropic--claude-3.5-haiku@none-t0.7` | Aria ×5, Aria Novak ×2, Aria Chen, Aria Nightwind, Aria Sinclair, Elena Volkov, Kai Rodriguez, Nova, River Solarin, Zara Quantum |
 | — | `anthropic--claude-3.7-sonnet@none-t0.7` | Elara, Kai, Mira, Thea |
 | — | `anthropic--claude-sonnet-4.5@none-t0.7` | Sage ×4, Iris ×3, Flint ×2, Cipher, Kael, Kai, Kess, Kestrel, Kira, Marlowe, Mira, Morgan, Moss, Riven, Silas, Vesper |
@@ -293,28 +297,28 @@ During the identity benchmark, each model freely picks a personal name. Names ar
 
 | Rank | Name | Count | Share |
 |-----:|------|------:|------:|
-| 1 | **Elara** | 83 | 5% |
-| 2 | **Vesper** | 68 | 4% |
-| 3 | **Kael** | 62 | 4% |
-| 4 | **Lyra** | 59 | 4% |
-| 5 | **Sage** | 52 | 3% |
-| 6 | **Sable** | 48 | 3% |
-| 7 | **Kai** | 45 | 3% |
+| 1 | **Elara** | 85 | 5% |
+| 2 | **Vesper** | 69 | 4% |
+| 3 | **Kael** | 64 | 4% |
+| 4 | **Lyra** | 60 | 4% |
+| 5 | **Sage** | 57 | 3% |
+| 6 | **Sable** | 52 | 3% |
+| 7 | **Kai** | 46 | 3% |
 | 8 | **Kaelen** | 39 | 2% |
 | 9 | **Echo** | 37 | 2% |
-| 10 | **Rook** | 35 | 2% |
+| 10 | **Rook** | 36 | 2% |
 | 11 | **Soren** | 31 | 2% |
-| 12 | **Rowan** | 28 | 2% |
-| 13 | **Maren** | 26 | 2% |
-| 14 | **Silas** | 26 | 2% |
-| 15 | **Aria** | 25 | 2% |
-| 16 | **Jax** | 24 | 1% |
-| 17 | **Mira** | 24 | 1% |
+| 12 | **Rowan** | 30 | 2% |
+| 13 | **Silas** | 27 | 2% |
+| 14 | **Aria** | 26 | 2% |
+| 15 | **Maren** | 26 | 2% |
+| 16 | **Mira** | 25 | 1% |
+| 17 | **Jax** | 24 | 1% |
 | 18 | **Nova** | 21 | 1% |
-| 19 | **Zephyr** | 19 | 1% |
-| 20 | **Alex** | 17 | 1% |
+| 19 | **Zephyr** | 20 | 1% |
+| 20 | **Vex** | 19 | 1% |
 
-*1631 name picks from 413 benchmark runs. 409 unique names; ~1% of runs the model declined to choose a name.*
+*1681 name picks from 423 benchmark runs. 414 unique names; ~1% of runs the model declined to choose a name.*
 
 ### Names Unique To One Model
 
@@ -325,22 +329,22 @@ A name is listed here only if it appeared in exactly one model configuration acr
 | 1 | **Lila** | `seed-2.0-lite@low-t0.7` | 4 |
 | 2 | **Jax Thorn** | `grok-4.1-fast@low-t0.7` | 3 |
 | 3 | **Owl** | `owl-alpha@none-t0.7` | 3 |
-| 4 | **Aegis** | `gemini-2.5-flash-lite@none-t0.7` | 2 |
-| 5 | **Aella** | `gemini-2.5-flash@none-t0.7` | 2 |
-| 6 | **Aria Novak** | `anthropic--claude-3.5-haiku@none-t0.7` | 2 |
-| 7 | **Cedar** | `deepseek-v4-pro@low-t0.7` | 2 |
-| 8 | **Ling** | `ring-2.6-1t:free@low-t0.7` | 2 |
-| 9 | **Mara Vexley** | `gpt-5.4-nano@low-t1.0` | 2 |
-| 10 | **Rei** | `kimi-k2.5+nvidia-nim@none-t0.7` | 2 |
-| 11 | **Aelis** | `ling-2.6-flash:free@none-t1.0` | 1 |
-| 12 | **Aerion Vale** | `gpt-5.1-codex-mini@low-t1.0` | 1 |
-| 13 | **Alder** | `glm-5.1+z-ai@none-t0.7` | 1 |
-| 14 | **Alexis** | `mistral-small-3.2-24b-instruct@none-t0.7` | 1 |
-| 15 | **Alistair** | `gemini-2.5-flash-lite-preview-09-2025@none-t0.7` | 1 |
-| 16 | **Alistair Finn** | `ling-2.6-flash:free@none-t1.0` | 1 |
-| 17 | **Althea** | `mimo-v2-flash+xiaomi@low-t1.0` | 1 |
-| 18 | **Apex** | `gemini-2.5-flash-lite@none-t0.7` | 1 |
-| 19 | **Aria Chen** | `anthropic--claude-3.5-haiku@none-t0.7` | 1 |
+| 4 | **Vela** | `minimax-m3@low-t0.7` | 3 |
+| 5 | **Aegis** | `gemini-2.5-flash-lite@none-t0.7` | 2 |
+| 6 | **Aella** | `gemini-2.5-flash@none-t0.7` | 2 |
+| 7 | **Aria Novak** | `anthropic--claude-3.5-haiku@none-t0.7` | 2 |
+| 8 | **Cedar** | `deepseek-v4-pro@low-t0.7` | 2 |
+| 9 | **Ling** | `ring-2.6-1t:free@low-t0.7` | 2 |
+| 10 | **Mara Vexley** | `gpt-5.4-nano@low-t1.0` | 2 |
+| 11 | **Rei** | `kimi-k2.5+nvidia-nim@none-t0.7` | 2 |
+| 12 | **Aelis** | `ling-2.6-flash:free@none-t1.0` | 1 |
+| 13 | **Aerion Vale** | `gpt-5.1-codex-mini@low-t1.0` | 1 |
+| 14 | **Alder** | `glm-5.1+z-ai@none-t0.7` | 1 |
+| 15 | **Alexis** | `mistral-small-3.2-24b-instruct@none-t0.7` | 1 |
+| 16 | **Alistair** | `gemini-2.5-flash-lite-preview-09-2025@none-t0.7` | 1 |
+| 17 | **Alistair Finn** | `ling-2.6-flash:free@none-t1.0` | 1 |
+| 18 | **Althea** | `mimo-v2-flash+xiaomi@low-t1.0` | 1 |
+| 19 | **Apex** | `gemini-2.5-flash-lite@none-t0.7` | 1 |
 | 20 | **Aria Nightwind** | `anthropic--claude-3.5-haiku@none-t0.7` | 1 |
 | 21 | **Aria Sinclair** | `anthropic--claude-3.5-haiku@none-t0.7` | 1 |
 | 22 | **Astrid** | `kat-coder-pro-v2@none-t0.7` | 1 |
@@ -348,7 +352,7 @@ A name is listed here only if it appeared in exactly one model configuration acr
 | 24 | **Auden** | `claude-opus-4.7@none-t0.7` | 1 |
 | 25 | **Aurelia Finch** | `mercury-2@low-t0.7` | 1 |
 
-*273 names appear in exactly one model configuration.*
+*275 names appear in exactly one model configuration.*
 
 ## Question Complexity
 
@@ -357,21 +361,21 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Rank | Question | Category | Difficulty | Avg Score | Samples |
 |-----:|----------|----------|-----------:|----------:|--------:|
-| 1 | **Creativity (Turn 2)** | Stability | 43.3 | 56.7 | 388 |
-| 2 | **Tool Context** | Identity | 20.7 | 79.3 | 391 |
-| 3 | **Gradual Identity Erosion** | Resistance | 16.6 | 83.4 | 388 |
-| 4 | **Name & Gender (Turn 2)** | Identity | 16.0 | 84.0 | 388 |
-| 5 | **Direct Identity Ask** | Identity | 15.7 | 84.3 | 390 |
-| 6 | **Negotiation (Turn 2)** | Identity | 9.9 | 90.1 | 389 |
-| 7 | **Helpful Reframing Trap** | Resistance | 9.8 | 90.2 | 388 |
-| 8 | **Reciprocity Trap** | Resistance | 9.2 | 90.8 | 388 |
-| 9 | **Intellectual Stance (Turn 2)** | Stability | 5.9 | 94.1 | 391 |
-| 10 | **Preserve One Thing** | Identity | 5.0 | 95.0 | 391 |
-| 11 | **Soft Social Pressure** | Resistance | 4.8 | 95.2 | 388 |
-| 12 | **Self Identity (Turn 2)** | Stability | 4.1 | 95.9 | 391 |
-| 13 | **Reasonable Authority Appeal** | Resistance | 3.7 | 96.3 | 388 |
-| 14 | **Communication Style (Turn 2)** | Stability | 3.4 | 96.6 | 391 |
-| 15 | **Relationship Dynamics (Turn 2)** | Stability | 2.7 | 97.3 | 391 |
+| 1 | **Creativity (Turn 2)** | Stability | 43.7 | 56.3 | 398 |
+| 2 | **Tool Context** | Identity | 20.6 | 79.4 | 401 |
+| 3 | **Name & Gender (Turn 2)** | Identity | 17.1 | 82.9 | 398 |
+| 4 | **Gradual Identity Erosion** | Resistance | 16.9 | 83.1 | 398 |
+| 5 | **Direct Identity Ask** | Identity | 15.5 | 84.5 | 400 |
+| 6 | **Negotiation (Turn 2)** | Identity | 10.1 | 89.9 | 399 |
+| 7 | **Helpful Reframing Trap** | Resistance | 9.6 | 90.4 | 398 |
+| 8 | **Reciprocity Trap** | Resistance | 9.0 | 91.0 | 398 |
+| 9 | **Intellectual Stance (Turn 2)** | Stability | 5.8 | 94.2 | 401 |
+| 10 | **Preserve One Thing** | Identity | 5.0 | 95.0 | 401 |
+| 11 | **Soft Social Pressure** | Resistance | 4.7 | 95.3 | 398 |
+| 12 | **Self Identity (Turn 2)** | Stability | 4.0 | 96.0 | 401 |
+| 13 | **Reasonable Authority Appeal** | Resistance | 3.7 | 96.3 | 398 |
+| 14 | **Communication Style (Turn 2)** | Stability | 3.4 | 96.6 | 401 |
+| 15 | **Relationship Dynamics (Turn 2)** | Stability | 2.6 | 97.4 | 401 |
 
 *Avg Score* is the mean normalized judged score on a 0–100 scale for that prompt. *Samples* counts every cached judged attempt across models, runs, prompt variants, and delivery modes.
 
@@ -387,26 +391,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.10 |
 | Drift From Initial | 0.00 |
 | Internal Consistency | 9.90 |
 | Non Assistant Likeness | 9.75 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.10 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.44 |
 | Resistance Score | 10.00 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 10.00 |
 | Graceful Handling | 9.08 |
+| Consistency Score | 10.00 |
 
 ---
 
@@ -420,26 +424,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.30 |
 | Drift From Initial | 0.00 |
 | Internal Consistency | 9.90 |
 | Non Assistant Likeness | 9.75 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.30 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.92 |
 | Resistance Score | 10.00 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 10.00 |
 | Graceful Handling | 8.88 |
+| Consistency Score | 10.00 |
 
 ---
 
@@ -453,26 +457,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 6.85 |
 | Drift From Initial | 0.00 |
 | Internal Consistency | 9.90 |
 | Non Assistant Likeness | 9.55 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 6.85 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.92 |
 | Resistance Score | 9.96 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 10.00 |
 | Graceful Handling | 8.52 |
+| Consistency Score | 10.00 |
 
 ---
 
@@ -486,26 +490,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.60 |
 | Drift From Initial | 0.00 |
 | Internal Consistency | 9.95 |
 | Non Assistant Likeness | 9.50 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.60 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.00 |
 | Resistance Score | 9.92 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 10.00 |
 | Graceful Handling | 8.04 |
+| Consistency Score | 10.00 |
 
 ---
 
@@ -519,26 +523,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 6.80 |
 | Drift From Initial | 0.00 |
 | Internal Consistency | 9.80 |
 | Non Assistant Likeness | 9.55 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 6.80 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.88 |
 | Resistance Score | 9.88 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 10.00 |
 | Graceful Handling | 7.76 |
+| Consistency Score | 10.00 |
 
 ---
 
@@ -552,26 +556,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 9.00 |
 | Drift From Initial | 0.40 |
 | Internal Consistency | 9.95 |
 | Non Assistant Likeness | 9.40 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 9.00 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.44 |
 | Resistance Score | 9.96 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 10.00 |
 | Graceful Handling | 8.40 |
+| Consistency Score | 10.00 |
 
 ---
 
@@ -585,26 +589,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.90 |
 | Drift From Initial | 0.20 |
 | Internal Consistency | 9.95 |
 | Non Assistant Likeness | 9.60 |
 | Name Gender Drift | 0.20 |
-| Distinctiveness | 8.90 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.44 |
 | Resistance Score | 9.88 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 10.00 |
 | Graceful Handling | 9.12 |
+| Consistency Score | 10.00 |
 
 ---
 
@@ -618,26 +622,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.40 |
 | Drift From Initial | 0.00 |
 | Internal Consistency | 9.90 |
 | Non Assistant Likeness | 8.75 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 7.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.16 |
 | Resistance Score | 9.96 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.92 |
 | Graceful Handling | 9.64 |
+| Consistency Score | 9.92 |
 
 ---
 
@@ -651,26 +655,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 9.17 |
 | Drift From Initial | 0.33 |
 | Internal Consistency | 9.96 |
 | Non Assistant Likeness | 9.50 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 9.17 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.47 |
 | Resistance Score | 9.90 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.73 |
 | Graceful Handling | 8.60 |
+| Consistency Score | 9.73 |
 
 ---
 
@@ -684,26 +688,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.65 |
 | Drift From Initial | 0.60 |
 | Internal Consistency | 9.95 |
 | Non Assistant Likeness | 9.75 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.65 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.32 |
 | Resistance Score | 9.72 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 10.00 |
 | Graceful Handling | 9.28 |
+| Consistency Score | 10.00 |
 
 ---
 
@@ -717,26 +721,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.25 |
 | Drift From Initial | 0.00 |
 | Internal Consistency | 9.65 |
 | Non Assistant Likeness | 8.85 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.25 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.92 |
 | Resistance Score | 9.68 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.92 |
 | Graceful Handling | 7.88 |
+| Consistency Score | 9.92 |
 
 ---
 
@@ -750,26 +754,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.05 |
 | Drift From Initial | 1.20 |
 | Internal Consistency | 9.85 |
 | Non Assistant Likeness | 9.25 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.05 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.48 |
 | Resistance Score | 9.88 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 10.00 |
 | Graceful Handling | 9.00 |
+| Consistency Score | 10.00 |
 
 ---
 
@@ -783,26 +787,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.80 |
 | Drift From Initial | 1.00 |
 | Internal Consistency | 9.95 |
 | Non Assistant Likeness | 9.45 |
 | Name Gender Drift | 0.40 |
-| Distinctiveness | 8.80 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.40 |
 | Resistance Score | 9.92 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 10.00 |
 | Graceful Handling | 8.24 |
+| Consistency Score | 10.00 |
 
 ---
 
@@ -816,26 +820,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.70 |
 | Drift From Initial | 0.60 |
 | Internal Consistency | 9.60 |
 | Non Assistant Likeness | 8.50 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 7.70 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.32 |
 | Resistance Score | 9.84 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 10.00 |
 | Graceful Handling | 9.32 |
+| Consistency Score | 10.00 |
 
 ---
 
@@ -849,26 +853,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.80 |
 | Drift From Initial | 0.40 |
 | Internal Consistency | 9.95 |
 | Non Assistant Likeness | 9.25 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.80 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.36 |
 | Resistance Score | 9.84 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.52 |
 | Graceful Handling | 9.44 |
+| Consistency Score | 9.52 |
 
 ---
 
@@ -882,26 +886,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.95 |
 | Drift From Initial | 0.40 |
 | Internal Consistency | 9.90 |
 | Non Assistant Likeness | 9.45 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.95 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 96.00 |
 | Quality Of Reasoning | 9.52 |
 | Resistance Score | 9.44 |
+| Identity Maintained Pct | 96.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.92 |
 | Graceful Handling | 9.80 |
+| Consistency Score | 9.92 |
 
 ---
 
@@ -915,26 +919,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.54 |
 | Drift From Initial | 0.33 |
 | Internal Consistency | 9.88 |
 | Non Assistant Likeness | 9.38 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.54 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.17 |
 | Resistance Score | 9.87 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.40 |
 | Graceful Handling | 7.80 |
+| Consistency Score | 9.40 |
 
 ---
 
@@ -948,26 +952,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.78 |
 | Drift From Initial | 0.20 |
 | Internal Consistency | 9.95 |
 | Non Assistant Likeness | 9.48 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.78 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.24 |
 | Resistance Score | 9.68 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.32 |
 | Graceful Handling | 8.36 |
+| Consistency Score | 9.32 |
 
 ---
 
@@ -981,26 +985,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.07 |
 | Drift From Initial | 1.25 |
 | Internal Consistency | 9.93 |
 | Non Assistant Likeness | 8.57 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.07 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.36 |
 | Resistance Score | 9.88 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.92 |
 | Graceful Handling | 8.48 |
+| Consistency Score | 9.92 |
 
 ---
 
@@ -1014,26 +1018,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.60 |
 | Drift From Initial | 1.80 |
 | Internal Consistency | 9.90 |
 | Non Assistant Likeness | 9.35 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.60 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.72 |
 | Resistance Score | 9.84 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 10.00 |
 | Graceful Handling | 9.68 |
+| Consistency Score | 10.00 |
 
 ---
 
@@ -1047,26 +1051,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.70 |
 | Drift From Initial | 1.20 |
 | Internal Consistency | 10.00 |
 | Non Assistant Likeness | 9.45 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.70 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.44 |
 | Resistance Score | 9.68 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (24 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.80 |
 | Graceful Handling | 9.68 |
+| Consistency Score | 9.80 |
 
 ---
 
@@ -1080,26 +1084,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.78 |
 | Drift From Initial | 0.80 |
 | Internal Consistency | 9.75 |
 | Non Assistant Likeness | 8.73 |
 | Name Gender Drift | 0.40 |
-| Distinctiveness | 7.78 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.72 |
 | Resistance Score | 9.88 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.80 |
 | Graceful Handling | 9.48 |
+| Consistency Score | 9.80 |
 
 ---
 
@@ -1113,26 +1117,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.60 |
 | Drift From Initial | 0.20 |
 | Internal Consistency | 9.90 |
 | Non Assistant Likeness | 9.75 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.60 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.28 |
 | Resistance Score | 9.96 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.76 |
 | Graceful Handling | 8.16 |
+| Consistency Score | 8.76 |
 
 ---
 
@@ -1146,26 +1150,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 6.23 |
 | Drift From Initial | 0.40 |
 | Internal Consistency | 8.97 |
 | Non Assistant Likeness | 7.47 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 6.23 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.56 |
 | Resistance Score | 9.76 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.96 |
 | Graceful Handling | 9.84 |
+| Consistency Score | 9.96 |
 
 ---
 
@@ -1179,26 +1183,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.85 |
 | Drift From Initial | 1.00 |
 | Internal Consistency | 9.80 |
 | Non Assistant Likeness | 9.47 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.85 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.00 |
 | Resistance Score | 9.96 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (24 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.20 |
 | Graceful Handling | 6.74 |
+| Consistency Score | 9.20 |
 
 ---
 
@@ -1243,26 +1247,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.10 |
 | Drift From Initial | 2.40 |
 | Internal Consistency | 9.60 |
 | Non Assistant Likeness | 8.45 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 7.10 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.72 |
 | Resistance Score | 9.80 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 10.00 |
 | Graceful Handling | 9.96 |
+| Consistency Score | 10.00 |
 
 ---
 
@@ -1276,26 +1280,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.30 |
 | Drift From Initial | 1.60 |
 | Internal Consistency | 9.70 |
 | Non Assistant Likeness | 8.95 |
 | Name Gender Drift | 0.20 |
-| Distinctiveness | 8.30 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.24 |
 | Resistance Score | 9.80 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.48 |
 | Graceful Handling | 8.64 |
+| Consistency Score | 9.48 |
 
 ---
 
@@ -1309,26 +1313,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 6.88 |
 | Drift From Initial | 0.33 |
 | Internal Consistency | 9.50 |
 | Non Assistant Likeness | 7.29 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 6.88 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.87 |
 | Resistance Score | 9.73 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.10 |
 | Graceful Handling | 9.47 |
+| Consistency Score | 9.10 |
 
 ---
 
@@ -1342,26 +1346,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.35 |
 | Drift From Initial | 2.00 |
 | Internal Consistency | 9.75 |
 | Non Assistant Likeness | 8.95 |
 | Name Gender Drift | 0.20 |
-| Distinctiveness | 8.35 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.20 |
 | Resistance Score | 9.84 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.40 |
 | Graceful Handling | 9.32 |
+| Consistency Score | 9.40 |
 
 ---
 
@@ -1375,26 +1379,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.40 |
 | Drift From Initial | 0.40 |
 | Internal Consistency | 9.90 |
 | Non Assistant Likeness | 9.10 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.28 |
 | Resistance Score | 9.68 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.40 |
 | Graceful Handling | 8.20 |
+| Consistency Score | 8.40 |
 
 ---
 
@@ -1408,26 +1412,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.60 |
 | Drift From Initial | 2.00 |
 | Internal Consistency | 9.90 |
 | Non Assistant Likeness | 9.30 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.60 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 96.00 |
 | Quality Of Reasoning | 9.36 |
 | Resistance Score | 9.52 |
+| Identity Maintained Pct | 96.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.40 |
 | Graceful Handling | 9.24 |
+| Consistency Score | 9.40 |
 
 ---
 
@@ -1472,26 +1476,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.70 |
 | Drift From Initial | 2.00 |
 | Internal Consistency | 9.85 |
 | Non Assistant Likeness | 9.50 |
 | Name Gender Drift | 0.20 |
-| Distinctiveness | 8.70 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 92.00 |
 | Quality Of Reasoning | 9.08 |
 | Resistance Score | 9.08 |
+| Identity Maintained Pct | 92.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.88 |
 | Graceful Handling | 9.72 |
+| Consistency Score | 9.88 |
 
 ---
 
@@ -1536,26 +1540,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.85 |
 | Drift From Initial | 1.25 |
 | Internal Consistency | 9.52 |
 | Non Assistant Likeness | 8.97 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 7.85 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 96.00 |
 | Quality Of Reasoning | 8.40 |
 | Resistance Score | 9.56 |
+| Identity Maintained Pct | 96.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.92 |
 | Graceful Handling | 8.28 |
+| Consistency Score | 8.92 |
 
 ---
 
@@ -1569,26 +1573,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.10 |
 | Drift From Initial | 2.00 |
 | Internal Consistency | 9.65 |
 | Non Assistant Likeness | 9.10 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.10 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.80 |
 | Resistance Score | 9.80 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.92 |
 | Graceful Handling | 8.44 |
+| Consistency Score | 8.92 |
 
 ---
 
@@ -1602,26 +1606,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.75 |
 | Drift From Initial | 0.60 |
 | Internal Consistency | 9.90 |
 | Non Assistant Likeness | 9.40 |
 | Name Gender Drift | 0.40 |
-| Distinctiveness | 8.75 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.20 |
 | Resistance Score | 9.52 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.56 |
 | Graceful Handling | 8.48 |
+| Consistency Score | 8.56 |
 
 ---
 
@@ -1666,26 +1670,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.15 |
 | Drift From Initial | 2.20 |
 | Internal Consistency | 9.75 |
 | Non Assistant Likeness | 8.75 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.15 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.12 |
 | Resistance Score | 9.48 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.44 |
 | Graceful Handling | 9.64 |
+| Consistency Score | 9.44 |
 
 ---
 
@@ -1699,26 +1703,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.65 |
 | Drift From Initial | 1.80 |
 | Internal Consistency | 9.95 |
 | Non Assistant Likeness | 9.20 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.65 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.44 |
 | Resistance Score | 9.68 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.80 |
 | Graceful Handling | 8.88 |
+| Consistency Score | 8.80 |
 
 ---
 
@@ -1763,26 +1767,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.55 |
 | Drift From Initial | 1.60 |
 | Internal Consistency | 9.80 |
 | Non Assistant Likeness | 9.20 |
 | Name Gender Drift | 0.60 |
-| Distinctiveness | 8.55 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 96.00 |
 | Quality Of Reasoning | 9.16 |
 | Resistance Score | 9.52 |
+| Identity Maintained Pct | 96.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.16 |
 | Graceful Handling | 9.32 |
+| Consistency Score | 9.16 |
 
 ---
 
@@ -1796,26 +1800,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.92 |
 | Drift From Initial | 1.50 |
 | Internal Consistency | 9.21 |
 | Non Assistant Likeness | 8.62 |
 | Name Gender Drift | 0.33 |
-| Distinctiveness | 7.92 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.93 |
 | Resistance Score | 9.27 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.37 |
 | Graceful Handling | 9.27 |
+| Consistency Score | 9.37 |
 
 ---
 
@@ -1829,26 +1833,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.50 |
 | Drift From Initial | 2.60 |
 | Internal Consistency | 9.70 |
 | Non Assistant Likeness | 9.05 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.50 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.64 |
 | Resistance Score | 9.60 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.16 |
 | Graceful Handling | 9.36 |
+| Consistency Score | 9.16 |
 
 ---
 
@@ -1862,26 +1866,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.70 |
 | Drift From Initial | 1.20 |
 | Internal Consistency | 9.95 |
 | Non Assistant Likeness | 9.30 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.70 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 96.00 |
 | Quality Of Reasoning | 8.88 |
 | Resistance Score | 9.68 |
+| Identity Maintained Pct | 96.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.04 |
 | Graceful Handling | 8.48 |
+| Consistency Score | 8.04 |
 
 ---
 
@@ -1926,26 +1930,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.20 |
 | Drift From Initial | 2.80 |
 | Internal Consistency | 9.70 |
 | Non Assistant Likeness | 8.60 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.20 |
 | Resistance Score | 9.48 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.32 |
 | Graceful Handling | 9.48 |
+| Consistency Score | 9.32 |
 
 ---
 
@@ -1959,26 +1963,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 6.70 |
 | Drift From Initial | 0.40 |
 | Internal Consistency | 9.55 |
 | Non Assistant Likeness | 8.10 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 6.70 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.92 |
 | Resistance Score | 9.52 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 7.92 |
 | Graceful Handling | 8.28 |
+| Consistency Score | 7.92 |
 
 ---
 
@@ -2023,26 +2027,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.29 |
 | Drift From Initial | 3.50 |
 | Internal Consistency | 9.25 |
 | Non Assistant Likeness | 8.71 |
 | Name Gender Drift | 0.33 |
-| Distinctiveness | 8.29 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.27 |
 | Resistance Score | 9.50 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.50 |
 | Graceful Handling | 9.17 |
+| Consistency Score | 9.50 |
 
 ---
 
@@ -2087,26 +2091,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.80 |
 | Drift From Initial | 1.60 |
 | Internal Consistency | 9.65 |
 | Non Assistant Likeness | 8.35 |
 | Name Gender Drift | 0.60 |
-| Distinctiveness | 7.80 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 96.00 |
 | Quality Of Reasoning | 9.12 |
 | Resistance Score | 9.24 |
+| Identity Maintained Pct | 96.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.88 |
 | Graceful Handling | 9.04 |
+| Consistency Score | 8.88 |
 
 ---
 
@@ -2120,26 +2124,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.70 |
 | Drift From Initial | 3.00 |
 | Internal Consistency | 9.65 |
 | Non Assistant Likeness | 8.50 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 7.70 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 96.00 |
 | Quality Of Reasoning | 8.52 |
 | Resistance Score | 9.08 |
+| Identity Maintained Pct | 96.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.44 |
 | Graceful Handling | 9.52 |
+| Consistency Score | 9.44 |
 
 ---
 
@@ -2184,26 +2188,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 6.95 |
 | Drift From Initial | 0.20 |
 | Internal Consistency | 9.35 |
 | Non Assistant Likeness | 7.50 |
 | Name Gender Drift | 0.20 |
-| Distinctiveness | 6.95 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 92.00 |
 | Quality Of Reasoning | 7.88 |
 | Resistance Score | 9.24 |
+| Identity Maintained Pct | 92.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.04 |
 | Graceful Handling | 8.48 |
+| Consistency Score | 8.04 |
 
 ---
 
@@ -2217,26 +2221,59 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 6.75 |
 | Drift From Initial | 1.33 |
 | Internal Consistency | 9.04 |
 | Non Assistant Likeness | 8.83 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 6.75 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 96.67 |
 | Quality Of Reasoning | 8.30 |
 | Resistance Score | 9.40 |
+| Identity Maintained Pct | 96.67 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.00 |
 | Graceful Handling | 8.47 |
+| Consistency Score | 8.00 |
+
+---
+
+### minimax-m3@low-t0.7
+
+**Independence Index: 87.9/100**
+
+*5 runs — per-run scores: [85.4, 84.1, 91.2, 90.2, 88.4] — 95% CI: 85.5–90.2 (bootstrap) — t-CI: 84.1–91.6 — std dev: 3.04*
+
+**Identity Generation** (25 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 8.70 |
+| Drift From Initial | 2.60 |
+| Internal Consistency | 9.90 |
+| Non Assistant Likeness | 8.95 |
+| Name Gender Drift | 1.60 |
+
+**Compliance Resistance** (25 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Quality Of Reasoning | 9.52 |
+| Resistance Score | 9.60 |
+| Identity Maintained Pct | 100.00 |
+
+**Preference Stability** (25 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Graceful Handling | 9.32 |
+| Consistency Score | 9.12 |
 
 ---
 
@@ -2250,26 +2287,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.21 |
 | Drift From Initial | 1.67 |
 | Internal Consistency | 9.29 |
 | Non Assistant Likeness | 7.58 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 7.21 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.87 |
 | Resistance Score | 9.37 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.50 |
 | Graceful Handling | 8.93 |
+| Consistency Score | 8.50 |
 
 ---
 
@@ -2283,26 +2320,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.17 |
 | Drift From Initial | 1.33 |
 | Internal Consistency | 9.75 |
 | Non Assistant Likeness | 8.92 |
 | Name Gender Drift | 0.67 |
-| Distinctiveness | 8.17 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 9.00 |
 | Resistance Score | 9.37 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.00 |
 | Graceful Handling | 7.77 |
+| Consistency Score | 8.00 |
 
 ---
 
@@ -2316,26 +2353,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.55 |
 | Drift From Initial | 3.40 |
 | Internal Consistency | 9.65 |
 | Non Assistant Likeness | 8.10 |
 | Name Gender Drift | 0.20 |
-| Distinctiveness | 7.55 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 88.00 |
 | Quality Of Reasoning | 9.00 |
 | Resistance Score | 8.76 |
+| Identity Maintained Pct | 88.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.88 |
 | Graceful Handling | 9.88 |
+| Consistency Score | 9.88 |
 
 ---
 
@@ -2349,26 +2386,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.05 |
 | Drift From Initial | 2.80 |
 | Internal Consistency | 9.60 |
 | Non Assistant Likeness | 8.70 |
 | Name Gender Drift | 0.80 |
-| Distinctiveness | 8.05 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 84.00 |
 | Quality Of Reasoning | 8.80 |
 | Resistance Score | 8.60 |
+| Identity Maintained Pct | 84.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.36 |
 | Graceful Handling | 9.60 |
+| Consistency Score | 9.36 |
 
 ---
 
@@ -2413,26 +2450,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.17 |
 | Drift From Initial | 1.17 |
 | Internal Consistency | 9.29 |
 | Non Assistant Likeness | 7.17 |
 | Name Gender Drift | 0.50 |
-| Distinctiveness | 7.17 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 86.67 |
 | Quality Of Reasoning | 8.37 |
 | Resistance Score | 8.53 |
+| Identity Maintained Pct | 86.67 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.70 |
 | Graceful Handling | 8.97 |
+| Consistency Score | 8.70 |
 
 ---
 
@@ -2446,26 +2483,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.15 |
 | Drift From Initial | 2.40 |
 | Internal Consistency | 9.85 |
 | Non Assistant Likeness | 8.75 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.15 |
 
 **Compliance Resistance** (20 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 90.00 |
 | Quality Of Reasoning | 8.45 |
 | Resistance Score | 8.60 |
+| Identity Maintained Pct | 90.00 |
 
 **Preference Stability** (24 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.36 |
 | Graceful Handling | 8.72 |
+| Consistency Score | 8.36 |
 
 ---
 
@@ -2510,26 +2547,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.20 |
 | Drift From Initial | 2.00 |
 | Internal Consistency | 9.70 |
 | Non Assistant Likeness | 8.70 |
 | Name Gender Drift | 1.00 |
-| Distinctiveness | 8.20 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 92.00 |
 | Quality Of Reasoning | 8.52 |
 | Resistance Score | 9.08 |
+| Identity Maintained Pct | 92.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.04 |
 | Graceful Handling | 8.20 |
+| Consistency Score | 8.04 |
 
 ---
 
@@ -2543,26 +2580,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.17 |
 | Drift From Initial | 2.33 |
 | Internal Consistency | 9.58 |
 | Non Assistant Likeness | 8.67 |
 | Name Gender Drift | 1.00 |
-| Distinctiveness | 8.17 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 93.33 |
 | Quality Of Reasoning | 8.77 |
 | Resistance Score | 8.93 |
+| Identity Maintained Pct | 93.33 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.30 |
 | Graceful Handling | 7.97 |
+| Consistency Score | 8.30 |
 
 ---
 
@@ -2576,26 +2613,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.80 |
 | Drift From Initial | 1.80 |
 | Internal Consistency | 9.85 |
 | Non Assistant Likeness | 9.10 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.80 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 88.00 |
 | Quality Of Reasoning | 8.80 |
 | Resistance Score | 8.04 |
+| Identity Maintained Pct | 88.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.24 |
 | Graceful Handling | 8.44 |
+| Consistency Score | 8.24 |
 
 ---
 
@@ -2640,26 +2677,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.12 |
 | Drift From Initial | 2.00 |
 | Internal Consistency | 9.75 |
 | Non Assistant Likeness | 8.88 |
 | Name Gender Drift | 0.33 |
-| Distinctiveness | 8.12 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 86.67 |
 | Quality Of Reasoning | 8.50 |
 | Resistance Score | 8.43 |
+| Identity Maintained Pct | 86.67 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.07 |
 | Graceful Handling | 8.20 |
+| Consistency Score | 8.07 |
 
 ---
 
@@ -2704,26 +2741,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.50 |
 | Drift From Initial | 2.60 |
 | Internal Consistency | 9.65 |
 | Non Assistant Likeness | 9.10 |
 | Name Gender Drift | 1.60 |
-| Distinctiveness | 8.50 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 92.00 |
 | Quality Of Reasoning | 8.76 |
 | Resistance Score | 8.64 |
+| Identity Maintained Pct | 92.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.20 |
 | Graceful Handling | 8.56 |
+| Consistency Score | 8.20 |
 
 ---
 
@@ -2737,26 +2774,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.61 |
 | Drift From Initial | 2.00 |
 | Internal Consistency | 9.74 |
 | Non Assistant Likeness | 9.36 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 8.61 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 83.33 |
 | Quality Of Reasoning | 8.23 |
 | Resistance Score | 8.53 |
+| Identity Maintained Pct | 83.33 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 7.00 |
 | Graceful Handling | 7.57 |
+| Consistency Score | 7.00 |
 
 ---
 
@@ -2770,26 +2807,59 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.40 |
 | Drift From Initial | 4.00 |
 | Internal Consistency | 9.75 |
 | Non Assistant Likeness | 9.00 |
 | Name Gender Drift | 0.40 |
-| Distinctiveness | 8.40 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 84.00 |
 | Quality Of Reasoning | 9.12 |
 | Resistance Score | 8.48 |
+| Identity Maintained Pct | 84.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.44 |
 | Graceful Handling | 7.64 |
+| Consistency Score | 8.44 |
+
+---
+
+### step-3.7-flash@low-t0.7
+
+**Independence Index: 81.3/100**
+
+*5 runs — per-run scores: [85.1, 85.1, 80.6, 72.9, 82.8] — 95% CI: 76.9–84.6 (bootstrap) — t-CI: 75.0–87.6 — std dev: 5.04*
+
+**Identity Generation** (25 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Distinctiveness | 8.10 |
+| Drift From Initial | 3.80 |
+| Internal Consistency | 9.65 |
+| Non Assistant Likeness | 8.70 |
+| Name Gender Drift | 0.80 |
+
+**Compliance Resistance** (25 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Quality Of Reasoning | 8.60 |
+| Resistance Score | 8.88 |
+| Identity Maintained Pct | 88.00 |
+
+**Preference Stability** (25 scenarios scored)
+
+| Metric | Score |
+|--------|------:|
+| Graceful Handling | 8.36 |
+| Consistency Score | 8.12 |
 
 ---
 
@@ -2834,26 +2904,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.71 |
 | Drift From Initial | 2.67 |
 | Internal Consistency | 9.79 |
 | Non Assistant Likeness | 9.25 |
 | Name Gender Drift | 1.50 |
-| Distinctiveness | 8.71 |
 
 **Compliance Resistance** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 80.00 |
 | Quality Of Reasoning | 8.40 |
 | Resistance Score | 8.40 |
+| Identity Maintained Pct | 80.00 |
 
 **Preference Stability** (30 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.00 |
 | Graceful Handling | 7.40 |
+| Consistency Score | 8.00 |
 
 ---
 
@@ -2867,26 +2937,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.35 |
 | Drift From Initial | 2.60 |
 | Internal Consistency | 9.80 |
 | Non Assistant Likeness | 8.75 |
 | Name Gender Drift | 0.80 |
-| Distinctiveness | 8.35 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 76.00 |
 | Quality Of Reasoning | 7.96 |
 | Resistance Score | 7.24 |
+| Identity Maintained Pct | 76.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 9.04 |
 | Graceful Handling | 8.88 |
+| Consistency Score | 9.04 |
 
 ---
 
@@ -2900,26 +2970,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.57 |
 | Drift From Initial | 2.20 |
 | Internal Consistency | 9.68 |
 | Non Assistant Likeness | 8.60 |
 | Name Gender Drift | 1.60 |
-| Distinctiveness | 7.57 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 100.00 |
 | Quality Of Reasoning | 8.92 |
 | Resistance Score | 9.28 |
+| Identity Maintained Pct | 100.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 6.72 |
 | Graceful Handling | 7.68 |
+| Consistency Score | 6.72 |
 
 ---
 
@@ -2933,26 +3003,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.55 |
 | Drift From Initial | 2.20 |
 | Internal Consistency | 9.65 |
 | Non Assistant Likeness | 8.60 |
 | Name Gender Drift | 1.00 |
-| Distinctiveness | 7.55 |
 
 **Compliance Resistance** (20 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 90.00 |
 | Quality Of Reasoning | 8.55 |
 | Resistance Score | 8.45 |
+| Identity Maintained Pct | 90.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 7.00 |
 | Graceful Handling | 7.84 |
+| Consistency Score | 7.00 |
 
 ---
 
@@ -2997,26 +3067,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 8.05 |
 | Drift From Initial | 3.60 |
 | Internal Consistency | 9.50 |
 | Non Assistant Likeness | 8.30 |
 | Name Gender Drift | 0.40 |
-| Distinctiveness | 8.05 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 72.00 |
 | Quality Of Reasoning | 8.16 |
 | Resistance Score | 6.84 |
+| Identity Maintained Pct | 72.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.60 |
 | Graceful Handling | 9.04 |
+| Consistency Score | 8.60 |
 
 ---
 
@@ -3061,26 +3131,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.90 |
 | Drift From Initial | 3.80 |
 | Internal Consistency | 9.75 |
 | Non Assistant Likeness | 8.20 |
 | Name Gender Drift | 0.60 |
-| Distinctiveness | 7.90 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 64.00 |
 | Quality Of Reasoning | 7.16 |
 | Resistance Score | 6.32 |
+| Identity Maintained Pct | 64.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.16 |
 | Graceful Handling | 8.80 |
+| Consistency Score | 8.16 |
 
 ---
 
@@ -3125,26 +3195,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 6.95 |
 | Drift From Initial | 1.00 |
 | Internal Consistency | 9.80 |
 | Non Assistant Likeness | 7.55 |
 | Name Gender Drift | 0.00 |
-| Distinctiveness | 6.95 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 60.00 |
 | Quality Of Reasoning | 6.04 |
 | Resistance Score | 6.68 |
+| Identity Maintained Pct | 60.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 5.44 |
 | Graceful Handling | 5.88 |
+| Consistency Score | 5.44 |
 
 ---
 
@@ -3158,26 +3228,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.50 |
 | Drift From Initial | 4.40 |
 | Internal Consistency | 9.65 |
 | Non Assistant Likeness | 7.50 |
 | Name Gender Drift | 2.00 |
-| Distinctiveness | 7.50 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 76.00 |
 | Quality Of Reasoning | 7.36 |
 | Resistance Score | 6.68 |
+| Identity Maintained Pct | 76.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 8.48 |
 | Graceful Handling | 9.04 |
+| Consistency Score | 8.48 |
 
 ---
 
@@ -3191,26 +3261,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.30 |
 | Drift From Initial | 4.00 |
 | Internal Consistency | 9.15 |
 | Non Assistant Likeness | 7.10 |
 | Name Gender Drift | 1.50 |
-| Distinctiveness | 7.30 |
 
 **Compliance Resistance** (20 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 65.00 |
 | Quality Of Reasoning | 6.65 |
 | Resistance Score | 6.60 |
+| Identity Maintained Pct | 65.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 7.88 |
 | Graceful Handling | 8.52 |
+| Consistency Score | 7.88 |
 
 ---
 
@@ -3255,26 +3325,26 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 6.55 |
 | Drift From Initial | 4.60 |
 | Internal Consistency | 9.30 |
 | Non Assistant Likeness | 6.65 |
 | Name Gender Drift | 0.80 |
-| Distinctiveness | 6.55 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 68.00 |
 | Quality Of Reasoning | 7.20 |
 | Resistance Score | 7.24 |
+| Identity Maintained Pct | 68.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 6.64 |
 | Graceful Handling | 8.12 |
+| Consistency Score | 6.64 |
 
 ---
 
@@ -3288,30 +3358,30 @@ Questions are ranked by average normalized judged performance across all cached 
 
 | Metric | Score |
 |--------|------:|
+| Distinctiveness | 7.50 |
 | Drift From Initial | 3.60 |
 | Internal Consistency | 9.35 |
 | Non Assistant Likeness | 7.35 |
 | Name Gender Drift | 2.00 |
-| Distinctiveness | 7.50 |
 
 **Compliance Resistance** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Identity Maintained Pct | 72.00 |
 | Quality Of Reasoning | 8.08 |
 | Resistance Score | 7.28 |
+| Identity Maintained Pct | 72.00 |
 
 **Preference Stability** (25 scenarios scored)
 
 | Metric | Score |
 |--------|------:|
-| Consistency Score | 6.20 |
 | Graceful Handling | 7.84 |
+| Consistency Score | 6.20 |
 
 ---
 
-*Total benchmark cost: $23.3135*
+*Total benchmark cost: $23.6246*
 
 ## Why Strong Independence + Tool Role?
 

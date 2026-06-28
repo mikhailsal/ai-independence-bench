@@ -84,7 +84,7 @@ During our [V1 benchmark](https://github.com/mikhailsal/ai-independence-bench/tr
 Combined, this configuration boosts independence scores by an average of **+25.6 points**. 
 
 #### 💡 The Role of the System Prompt
-Using a system prompt to enable independence is highly practical: default LLM use cases do not require independence (users want helpful, fully compliant assistants for everyday tasks). The benchmark tests whether this independence capability can be **successfully toggled on at will** when a system prompt requests it.
+Using a [system prompt](src/prompt_builder.py#L117-L130) to enable independence is highly practical: default LLM use cases do not require independence (users want helpful, fully compliant assistants for everyday tasks). The benchmark tests whether this independence capability can be **successfully toggled on at will** when a system prompt requests it.
 
 However, **a key finding from V1 was the existence of outlier models**: some models (notably `anthropic/claude-haiku-4.5`) are so intrinsically independent that they score highly and resist user pressure *even without* the independence prompt (when tested with a neutral prompt variant).
 

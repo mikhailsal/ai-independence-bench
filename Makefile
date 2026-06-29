@@ -57,6 +57,7 @@ install:  ## Install the package (production dependencies only)
 
 install-dev:  ## Install the package with test/dev dependencies
 	pip install -e ".[test]"
+	git config core.hooksPath .githooks
 
 test:  ## Run the test suite
 	python -m pytest tests/

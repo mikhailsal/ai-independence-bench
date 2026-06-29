@@ -1,0 +1,21 @@
+#!/bin/bash
+# Pre-commit hook: enforce minimum 95% test coverage and ensure web builds successfully.
+# If coverage falls below 95% or web build fails, the commit is rejected.
+
+set -e
+
+echo "=================================================="
+echo " Running test suite with coverage check (≥95%) ..."
+echo "=================================================="
+
+python3 -m pytest --cov=src --cov-fail-under=95 --cov-report=term-missing -q
+
+echo "=================================================="
+echo " Running web build check (tsc & vite build) ..."
+echo "=================================================="
+
+npm --prefix web run build
+
+echo "=================================================="
+echo " All checks passed! Proceeding with commit."
+echo "=================================================="

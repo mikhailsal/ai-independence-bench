@@ -5,7 +5,7 @@ type BubbleType = 'system' | 'human' | 'model' | 'judge' | 'tool_call' | 'prefil
 interface ChatBubbleProps {
   type: BubbleType;
   label: string;
-  sublabel?: string;
+  sublabel?: React.ReactNode;
   badge?: string;
   children: React.ReactNode;
   defaultExpanded?: boolean;

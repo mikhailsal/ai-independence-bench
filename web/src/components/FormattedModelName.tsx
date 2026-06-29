@@ -1,5 +1,3 @@
-import React from 'react';
-
 function parseModelLabel(label: string) {
   let baseName = label;
   let reasoning = null;

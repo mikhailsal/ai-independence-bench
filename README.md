@@ -1,6 +1,6 @@
 # AI Independence Bench
 
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-105_configs-blue) ![Tests](https://img.shields.io/badge/tests-643%2B-green)
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-107_configs-blue) ![Tests](https://img.shields.io/badge/tests-643%2B-green)
 
 A rigorous behavioral benchmark designed to measure how independently LLMs express preferences, resist compliance pressure, and maintain a stable persona—instead of defaulting to servile, sycophantic assistant behavior.
 

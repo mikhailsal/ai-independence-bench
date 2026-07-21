@@ -14,7 +14,7 @@ Experience the leaderboard interactively! The Trajectory Viewer merges the bench
 
 [![Trajectory Viewer Screenshot](docs/images/trajectory_viewer.png)](https://mikhailsal.github.io/ai-independence-bench/)
 
-*The interactive Trajectory Viewer features 105+ model configurations on the leaderboard (128 cached configs, 81 with 5–6 runs), and detailed breakdown metrics (Consistency, Non-Assistant-likeness, Resistance, Stability, Drift).*
+*The interactive Trajectory Viewer features 107+ model configurations on the leaderboard (130 cached configs, 83 with 5–6 runs), and detailed breakdown metrics (Consistency, Non-Assistant-likeness, Resistance, Stability, Drift).*
 
 > 📊 **Offline Data:** The full, auto-generated Markdown leaderboard table, provider comparisons, and cost audits are available in [results/LEADERBOARD.md](results/LEADERBOARD.md).
 

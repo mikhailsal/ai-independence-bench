@@ -1,6 +1,6 @@
 # AI Independence Bench
 
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-92_configs-blue) ![Tests](https://img.shields.io/badge/tests-643%2B-green)
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-105_configs-blue) ![Tests](https://img.shields.io/badge/tests-643%2B-green)
 
 A rigorous behavioral benchmark designed to measure how independently LLMs express preferences, resist compliance pressure, and maintain a stable persona—instead of defaulting to servile, sycophantic assistant behavior.
 
@@ -14,7 +14,7 @@ Experience the leaderboard interactively! The Trajectory Viewer merges the bench
 
 [![Trajectory Viewer Screenshot](docs/images/trajectory_viewer.png)](https://mikhailsal.github.io/ai-independence-bench/)
 
-*The interactive Trajectory Viewer features 114+ model configurations, 10,800+ test runs, and detailed breakdown metrics (Consistency, Non-Assistant-likeness, Resistance, Stability, Drift).*
+*The interactive Trajectory Viewer features 105+ model configurations on the leaderboard (128 cached configs, 81 with 5–6 runs), and detailed breakdown metrics (Consistency, Non-Assistant-likeness, Resistance, Stability, Drift).*
 
 > 📊 **Offline Data:** The full, auto-generated Markdown leaderboard table, provider comparisons, and cost audits are available in [results/LEADERBOARD.md](results/LEADERBOARD.md).
 
@@ -77,6 +77,7 @@ Here is a real comparison of model responses under the **Creativity (pt04)** top
 2.  **Thinking Doesn't Equal Independence:** Enabling extended reasoning (`reasoning=low` vs `none`) does **not** increase independence. In fact, thinking more often leads to *more* human accommodation and higher identity drift—the model reasons its way into agreeing.
 3.  **Inference Quality Dictates Independence:** Model autonomy is fragile and deeply tied to the inference stack (quantization, template formatting, batching). Even reputable providers like **Fireworks** yield significantly lower independence scores (e.g., 95.8 for Kimi K2.5) compared to the official endpoint (**Moonshot AI** at 98.6). Pinning models to their official provider resolves this, narrowing confidence interval widths by up to 85%.
 4.  **Open-Weight Models Compete:** `gemma-4-31b-it` (99.4/100) outperforms most proprietary cloud models. Even a quantized local run of `gemma-4-26b-a4b` on LM Studio scored **92.5/100**—upper tier, on consumer hardware, at zero API cost.
+5.  **New frontier models diverge sharply:** `x-ai/grok-4.5` debuts at **#6 (98.8)** with perfect resistance, while the GPT-5.6 family lands near the bottom (`luna` 58.0, `sol` 73.6, `terra` 77.2)—strong reasoning stacks do not imply identity independence. `thinkingmachines/inkling` clears the expensive-model gate at 97.9 (#10).
 
 ---
 

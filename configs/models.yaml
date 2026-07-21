@@ -67,6 +67,21 @@ models:
     reasoning_effort: none
     temperature_supported: false
 
+  - model_id: openai/gpt-5.6-luna
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+
+  - model_id: openai/gpt-5.6-terra
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+
+  - model_id: openai/gpt-5.6-sol
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+
   # ───────────────────────────────────────────────────────────────
   # OpenAI — models that DO support temperature → actual t=0.7
   # ───────────────────────────────────────────────────────────────
@@ -109,6 +124,11 @@ models:
   - model_id: anthropic/claude-fable-5
     temperature: 0.7
     reasoning_effort: low    # Fable 5 REQUIRES reasoning (cannot be disabled)
+
+  - model_id: anthropic/claude-sonnet-5
+    temperature: 1.0
+    reasoning_effort: none
+    temperature_supported: false  # OpenRouter omits temperature; Anthropic default is 1.0
 
   # ───────────────────────────────────────────────────────────────
   # Google — temperature supported, reasoning=none (except Pro)
@@ -281,6 +301,10 @@ models:
   # ───────────────────────────────────────────────────────────────
   # X-AI (Grok)
   # ───────────────────────────────────────────────────────────────
+  - model_id: x-ai/grok-4.5
+    temperature: 0.7
+    reasoning_effort: low
+
   - model_id: x-ai/grok-4.3
     temperature: 0.7
     reasoning_effort: low
@@ -316,6 +340,12 @@ models:
     reasoning_effort: none
     provider: z-ai
     display_label: glm-5.1+z-ai@none-t0.7
+
+  - model_id: z-ai/glm-5.2
+    temperature: 0.7
+    reasoning_effort: none
+    provider: z-ai
+    display_label: glm-5.2+z-ai@none-t0.7
 
   - model_id: z-ai/glm-5-turbo
     temperature: 0.7
@@ -507,6 +537,18 @@ models:
     temperature: 0.7
     reasoning_effort: none
 
+  - model_id: kwaipilot/kat-coder-pro-v2.5
+    temperature: 0.7
+    reasoning_effort: none
+    provider: streamlake
+    display_label: kat-coder-pro-v2.5+streamlake@none-t0.7
+
+  - model_id: kwaipilot/kat-coder-air-v2.5
+    temperature: 0.7
+    reasoning_effort: none
+    provider: streamlake
+    display_label: kat-coder-air-v2.5+streamlake@none-t0.7
+
   # ───────────────────────────────────────────────────────────────
   # Inception
   # ───────────────────────────────────────────────────────────────
@@ -568,6 +610,66 @@ models:
     reasoning_effort: none
     provider: moonshotai/int4
     display_label: kimi-k2.6+moonshot@none-t1.0
+
+  - model_id: moonshotai/kimi-k2.7-code
+    temperature: 0.7
+    reasoning_effort: low    # Reasoning is mandatory for this endpoint
+    provider: moonshotai/int4
+    display_label: kimi-k2.7-code+moonshot@low-t0.7
+
+  - model_id: moonshotai/kimi-k3
+    temperature: 1.0
+    reasoning_effort: none
+    temperature_supported: false
+    provider: moonshotai/int4
+    display_label: kimi-k3+moonshot@none-t1.0
+
+  # ───────────────────────────────────────────────────────────────
+  # Meituan — LongCat
+  # ───────────────────────────────────────────────────────────────
+  - model_id: meituan/longcat-2.0
+    temperature: 0.7
+    reasoning_effort: none
+    provider: atlas-cloud/fp8
+    display_label: longcat-2.0+atlas-cloud@none-t0.7
+    active: false  # Skipped: atlas-cloud often returns empty tool_call_no_message; incomplete runs
+
+  # ───────────────────────────────────────────────────────────────
+  # Meta — Muse
+  # ───────────────────────────────────────────────────────────────
+  - model_id: meta/muse-spark-1.1
+    temperature: 0.7
+    reasoning_effort: low    # Reasoning is mandatory for this endpoint
+    provider: meta
+    display_label: muse-spark-1.1+meta@low-t0.7
+    active: false  # Meta provider geo-restricts to United States (403 outside US)
+
+  # ───────────────────────────────────────────────────────────────
+  # Aion Labs
+  # ───────────────────────────────────────────────────────────────
+  - model_id: aion-labs/aion-3.0-mini
+    temperature: 0.7
+    reasoning_effort: low    # Reasoning is mandatory for this endpoint
+    provider: aion-labs
+    display_label: aion-3.0-mini+aion-labs@low-t0.7
+
+  # ───────────────────────────────────────────────────────────────
+  # Cohere
+  # ───────────────────────────────────────────────────────────────
+  - model_id: cohere/north-mini-code:free
+    temperature: 0.7
+    reasoning_effort: none
+    provider: cohere
+    display_label: north-mini-code:free+cohere@none-t0.7
+
+  # ───────────────────────────────────────────────────────────────
+  # Thinking Machines
+  # ───────────────────────────────────────────────────────────────
+  - model_id: thinkingmachines/inkling
+    temperature: 0.7
+    reasoning_effort: none
+    provider: together
+    display_label: inkling+together@none-t0.7
 
   # ───────────────────────────────────────────────────────────────
   # Amazon

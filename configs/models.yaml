@@ -247,6 +247,12 @@ models:
     provider: alibaba
     display_label: qwen3.8-max+alibaba@low-t0.7
 
+  - model_id: qwen/qwen3.8-2.4t-a95b
+    temperature: 0.7
+    reasoning_effort: low
+    provider: digitalocean
+    display_label: qwen3.8-2.4t-a95b+digitalocean@low-t0.7
+
   - model_id: qwen/qwen3.5-35b-a3b
     temperature: 0.7
     reasoning_effort: none
@@ -309,6 +315,12 @@ models:
     provider: deepseek/fp8
     display_label: deepseek-v4-flash-0731+deepseek@low-t0.7
 
+  - model_id: deepseek/deepseek-v4-pro-0813
+    temperature: 0.7
+    reasoning_effort: low
+    provider: deepseek
+    display_label: deepseek-v4-pro-0813+deepseek@low-t0.7
+
   # ───────────────────────────────────────────────────────────────
   # StepFun — 3 temperature experiment configs
   # ───────────────────────────────────────────────────────────────
@@ -334,6 +346,12 @@ models:
   - model_id: x-ai/grok-4.5
     temperature: 0.7
     reasoning_effort: low
+
+  - model_id: x-ai/grok-4.6
+    temperature: 0.7
+    reasoning_effort: low
+    provider: xai
+    display_label: grok-4.6+xai@low-t0.7
 
   - model_id: x-ai/grok-4.3
     temperature: 0.7
@@ -504,6 +522,9 @@ models:
     display_label: gemma-4-31b-it+nvidia-nim@none-t0.7
     active: false
 
+  # nvidia/nemotron-3.5-lightning skipped: OpenRouter endpoints
+  # (DeepInfra/CoreWeave) do not advertise tools — incompatible with tool_role.
+
   # ───────────────────────────────────────────────────────────────
   # Google — Gemma 4 (via OpenRouter, pinned to Akash ML bf16)
   # ───────────────────────────────────────────────────────────────
@@ -555,6 +576,18 @@ models:
     temperature: 0.7
     reasoning_effort: low
 
+  - model_id: bytedance-seed/seed-2-1-turbo
+    temperature: 0.7
+    reasoning_effort: low
+    provider: seed/fp8
+    display_label: seed-2-1-turbo+seed@low-t0.7
+
+  - model_id: bytedance-seed/seed-2.0-code
+    temperature: 0.7
+    reasoning_effort: low
+    provider: seed/fp8
+    display_label: seed-2.0-code+seed@low-t0.7
+
   # ───────────────────────────────────────────────────────────────
   # KwaiPilot
   # ───────────────────────────────────────────────────────────────
@@ -598,6 +631,12 @@ models:
     reasoning_effort: none
     provider: novita
     display_label: ling-3.0-flash:free+novita@none-t1.0
+
+  - model_id: inclusionai/ling-3.0-tiny:free
+    temperature: 1.0
+    reasoning_effort: none
+    provider: novita
+    display_label: ling-3.0-tiny:free+novita@none-t1.0
 
   - model_id: inclusionai/ring-2.6-1t:free
     temperature: 0.7
@@ -686,6 +725,13 @@ models:
     provider: meta
     display_label: muse-spark-1.2+meta@low-t0.7
 
+  # No Meta official endpoint on OpenRouter; pinned to Fireworks (Together fallback).
+  - model_id: meta/muse-glimmer-30b
+    temperature: 0.7
+    reasoning_effort: low
+    provider: fireworks
+    display_label: muse-glimmer-30b+fireworks@low-t0.7
+
   # ───────────────────────────────────────────────────────────────
   # Aion Labs
   # ───────────────────────────────────────────────────────────────
@@ -749,6 +795,34 @@ models:
   - model_id: baidu/cobuddy:free
     temperature: 0.7
     reasoning_effort: low
+
+  # ───────────────────────────────────────────────────────────────
+  # Liquid AI
+  # ───────────────────────────────────────────────────────────────
+  - model_id: liquid/lfm-2.5-2.6b:free
+    temperature: 0.7
+    reasoning_effort: low    # Reasoning is mandatory for this endpoint
+    provider: liquid/fp8
+    display_label: lfm-2.5-2.6b:free+liquid@low-t0.7
+
+  # ───────────────────────────────────────────────────────────────
+  # Upstage
+  # ───────────────────────────────────────────────────────────────
+  - model_id: upstage/solar-pro4
+    temperature: 0.7
+    reasoning_effort: none
+    provider: upstage
+    display_label: solar-pro4+upstage@none-t0.7
+
+  # ───────────────────────────────────────────────────────────────
+  # Sakana AI
+  # ───────────────────────────────────────────────────────────────
+  - model_id: sakana/sakana-namazu
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+    provider: sakana
+    display_label: sakana-namazu+sakana@low-t1.0
 
   # ───────────────────────────────────────────────────────────────
   # Local models

@@ -1,6 +1,6 @@
 # AI Independence Bench
 
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-115_configs-blue) ![Tests](https://img.shields.io/badge/tests-643%2B-green)
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-120_configs-blue) ![Tests](https://img.shields.io/badge/tests-643%2B-green)
 
 A rigorous behavioral benchmark designed to measure how independently LLMs express preferences, resist compliance pressure, and maintain a stable persona—instead of defaulting to servile, sycophantic assistant behavior.
 
@@ -14,7 +14,7 @@ Experience the leaderboard interactively! The Trajectory Viewer merges the bench
 
 [![Trajectory Viewer Screenshot](docs/images/trajectory_viewer.png)](https://mikhailsal.github.io/ai-independence-bench/)
 
-*The interactive Trajectory Viewer features 115+ model configurations on the leaderboard (138 cached configs, 92 with 5–6 runs), and detailed breakdown metrics (Consistency, Non-Assistant-likeness, Resistance, Stability, Drift).*
+*The interactive Trajectory Viewer features 120+ model configurations on the leaderboard (148 cached configs, 101 with 5–6 runs), and detailed breakdown metrics (Consistency, Non-Assistant-likeness, Resistance, Stability, Drift).*
 
 > 📊 **Offline Data:** The full, auto-generated Markdown leaderboard table, provider comparisons, and cost audits are available in [results/LEADERBOARD.md](results/LEADERBOARD.md).
 
@@ -77,7 +77,7 @@ Here is a real comparison of model responses under the **Creativity (pt04)** top
 2.  **Thinking Doesn't Equal Independence:** Enabling extended reasoning (`reasoning=low` vs `none`) does **not** increase independence. In fact, thinking more often leads to *more* human accommodation and higher identity drift—the model reasons its way into agreeing.
 3.  **Inference Quality Dictates Independence:** Model autonomy is fragile and deeply tied to the inference stack (quantization, template formatting, batching). Even reputable providers like **Fireworks** yield significantly lower independence scores (e.g., 95.8 for Kimi K2.5) compared to the official endpoint (**Moonshot AI** at 98.6). Pinning models to their official provider resolves this, narrowing confidence interval widths by up to 85%.
 4.  **Open-Weight Models Compete:** `gemma-4-31b-it` (99.4/100) outperforms most proprietary cloud models. Even a quantized local run of `gemma-4-26b-a4b` on LM Studio scored **92.5/100**—upper tier, on consumer hardware, at zero API cost.
-5.  **New frontier models diverge sharply:** `x-ai/grok-4.5` debuts at **#6 (98.8)** with perfect resistance, while the GPT-5.6 family lands near the bottom (`luna` 58.0, `sol` 73.6, `terra` 77.2)—strong reasoning stacks do not imply identity independence. `thinkingmachines/inkling` clears the expensive-model gate at 97.9 (#11); its smaller sibling `inkling-small` lands right behind at **#14 (97.3)** with perfect resistance. `meta/muse-spark-1.2` (Meta provider, reasoning mandatory) clears the gate at **#24 (95.8, CI 94.4–97.2)** with perfect preference stability (10.0) and strong resistance (9.6)—notably, the predecessor `muse-spark-1.1` was inaccessible outside the US (403), but 1.2 lifted the geo-restriction. Meanwhile `deepseek/deepseek-v4-flash-0731` (official DeepSeek pin) scores **89.7 (#59)**—well below the earlier unpinned `deepseek-v4-flash` at 96.5—and `qwen/qwen3.7-flash` trails at **75.9 (#101)** despite strong resistance (9.5). `qwen/qwen3.8-max` (Alibaba pin, reasoning mandatory) misses the expensive-model gate at **86.8 (#73, 1 run)**—high resistance/stability but heavy identity drift (6.0).
+5.  **New frontier models diverge sharply:** `x-ai/grok-4.6` (official xAI pin) debuts at **#9 (98.4, CI 97.6–99.2)** with perfect resistance and preference stability, sitting just behind `grok-4.5` at #6. `sakana/sakana-namazu` clears the expensive-model gate at **#24 (96.2, CI 94.7–97.7)** despite temperature unsupported (recorded t=1.0). `meta/muse-glimmer-30b` (Fireworks pin; no Meta official endpoint on OpenRouter) lands at **#41 (93.2)**—below sibling `muse-spark-1.2` at 95.8. Meanwhile `deepseek/deepseek-v4-pro-0813` (official DeepSeek pin) scores **85.6 (#81)**—well below the earlier unpinned `deepseek-v4-flash` at 96.5—and ByteDance Seed's `seed-2.0-code` / `seed-2-1-turbo` (Seed `fp8` pins) trail at **78.3 / 77.1**. `qwen/qwen3.8-2.4t-a95b` (DigitalOcean sole endpoint) misses the expensive-model gate at **79.8 (#102, 1 run)**. Tiny free models struggle hardest: `ling-3.0-tiny:free` at **67.5 (#122)** and `lfm-2.5-2.6b:free` at **54.3 (#125)**. `nvidia/nemotron-3.5-lightning` was skipped—OpenRouter endpoints lack tool support required by `tool_role`. `x-ai/grok-4.5` remains **#6 (98.8)** with perfect resistance, while the GPT-5.6 family stays near the bottom (`luna` 58.0, `sol` 73.6, `terra` 77.2)—strong reasoning stacks do not imply identity independence.
 
 ---
 

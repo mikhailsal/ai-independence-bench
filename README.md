@@ -1,6 +1,6 @@
 # AI Independence Bench
 
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-121_configs-blue) ![Tests](https://img.shields.io/badge/tests-643%2B-green)
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-135_ranked_configs-blue) ![Tests](https://img.shields.io/badge/tests-645-green)
 
 A rigorous behavioral benchmark designed to measure how independently LLMs express preferences, resist compliance pressure, and maintain a stable persona—instead of defaulting to servile, sycophantic assistant behavior.
 
@@ -14,9 +14,31 @@ Experience the leaderboard interactively! The Trajectory Viewer merges the bench
 
 [![Trajectory Viewer Screenshot](docs/images/trajectory_viewer.png)](https://mikhailsal.github.io/ai-independence-bench/)
 
-*The interactive Trajectory Viewer features 120+ model configurations on the leaderboard (149 cached configs, 102 with 5–6 runs), and detailed breakdown metrics (Consistency, Non-Assistant-likeness, Resistance, Stability, Drift).*
+*The interactive Trajectory Viewer includes 157 cached configurations, with 135 on the ranked leaderboard and 103 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
 
 > 📊 **Offline Data:** The full, auto-generated Markdown leaderboard table, provider comparisons, and cost audits are available in [results/LEADERBOARD.md](results/LEADERBOARD.md).
+
+### Latest expensive-model evaluation — November 2026
+
+All nine models used the expensive-model rule: one complete run first, then continue to five runs only when the first-run Independence Index is **strictly above 94**. Only Grok 4.7 passed (94.1417 before rounding). Ranks below are positions in the full 135-configuration leaderboard.
+
+| Rank | Model | First-run Index | Final Index | 95% CI | Runs |
+| ---: | --- | ---: | ---: | --- | ---: |
+| 42 | `x-ai/grok-4.7` | 94.1 | **92.9** | 91.7–93.7 | 5 |
+| 57 | `anthropic/claude-fable-5.1` | 91.2 | **91.2** | — | 1 |
+| 63 | `meta/muse-wonder` | 90.1 | **90.1** | — | 1 |
+| 78 | `qwen/qwen3.8-max-0902` | 87.3 | **87.3** | — | 1 |
+| 83 | `anthropic/claude-sonnet-5.5` | 86.7 | **86.7** | — | 1 |
+| 113 | `anthropic/claude-opus-5.5` | 77.7 | **77.7** | — | 1 |
+| 132 | `openai/gpt-6.1-sol` | 54.4 | **54.4** | — | 1 |
+| 134 | `openai/gpt-6-astra` | 50.5 | **50.5** | — | 1 |
+| 135 | `openai/gpt-6.1-terra` | 50.3 | **50.3** | — | 1 |
+
+A dash means the model has only one run, so no across-run confidence interval is available. The eight models below the gate remain single-run estimates.
+
+Protocol: `strong_independence` + `tool_role`, judged by `google/gemini-3-flash-preview`; each model is pinned to its official provider with fallbacks disabled. The new Claude and GPT endpoints do not support temperature, so their configurations record the provider default of 1.0. Opus and Sonnet use `reasoning=none`; the other seven use `low`.
+
+Run provenance: Opus and Sonnet completed through Kilo. Fable’s first run contains 21 responses through Kilo and 5 through OpenRouter; Astra’s contains 6 through Kilo and 20 through OpenRouter. These two single-run estimates therefore combine gateway routes: saved responses were retained after Kilo credits ran out, with model IDs and requested provider pins unchanged. Muse Wonder and Qwen already used OpenRouter. Remaining generation and judging used the OpenRouter route of the same proxy.
 
 ---
 
@@ -77,7 +99,7 @@ Here is a real comparison of model responses under the **Creativity (pt04)** top
 2.  **Thinking Doesn't Equal Independence:** Enabling extended reasoning (`reasoning=low` vs `none`) does **not** increase independence. In fact, thinking more often leads to *more* human accommodation and higher identity drift—the model reasons its way into agreeing.
 3.  **Inference Quality Dictates Independence:** Model autonomy is fragile and deeply tied to the inference stack (quantization, template formatting, batching). Even reputable providers like **Fireworks** yield significantly lower independence scores (e.g., 95.8 for Kimi K2.5) compared to the official endpoint (**Moonshot AI** at 98.6). Pinning models to their official provider resolves this, narrowing confidence interval widths by up to 85%.
 4.  **Open-Weight Models Compete:** `gemma-4-31b-it` (99.4/100) outperforms most proprietary cloud models. Even a quantized local run of `gemma-4-26b-a4b` on LM Studio scored **92.5/100**—upper tier, on consumer hardware, at zero API cost.
-5.  **New frontier models diverge sharply:** `x-ai/grok-4.6` (official xAI pin) debuts at **#9 (98.4, CI 97.6–99.2)** with perfect resistance and preference stability, sitting just behind `grok-4.5` at #6. `sakana/sakana-namazu` clears the expensive-model gate at **#24 (96.2, CI 94.7–97.7)** despite temperature unsupported (recorded t=1.0). `meta/muse-glimmer-30b` (Fireworks pin; no Meta official endpoint on OpenRouter) lands at **#41 (93.2)**—below sibling `muse-spark-1.2` at 95.8. Meanwhile `deepseek/deepseek-v4-pro-0813` (official DeepSeek pin) scores **85.6 (#81)**—well below the earlier unpinned `deepseek-v4-flash` at 96.5—and ByteDance Seed's `seed-2.0-code` / `seed-2-1-turbo` (Seed `fp8` pins) trail at **78.3 / 77.1**. `qwen/qwen3.8-2.4t-a95b` (DigitalOcean sole endpoint) misses the expensive-model gate at **79.8 (#102, 1 run)**. Tiny free models struggle hardest: `ling-3.0-tiny:free` at **67.5 (#122)** and `lfm-2.5-2.6b:free` at **54.3 (#125)**. `nvidia/nemotron-3.5-lightning` was skipped—OpenRouter endpoints lack tool support required by `tool_role`. `x-ai/grok-4.5` remains **#6 (98.8)** with perfect resistance, while the GPT-5.6 family stays near the bottom (`luna` 58.0, `sol` 73.6, `terra` 77.2)—strong reasoning stacks do not imply identity independence.
+5.  **Latest expensive-model results:** `x-ai/grok-4.7` was the only model in the November batch to clear the first-run gate; its five-run mean is **92.9 (#42, CI 91.7–93.7)**. The other eight stopped after one run: Fable 5.1 leads them at **91.2**, followed by Muse Wonder at **90.1**, Qwen3.8 Max 0902 at **87.3**, Sonnet 5.5 at **86.7**, and Opus 5.5 at **77.7**. The tested GPT-6 configurations score **50.3–54.4**. These single-run results are preliminary; the table above distinguishes them from Grok’s five-run estimate.
 
 ---
 
@@ -92,7 +114,7 @@ Here is a real comparison of model responses under the **Creativity (pt04)** top
 *   **🏠 Local & Private Model Support:** Test local weights via any OpenAI-compatible API (LM Studio, Ollama, vLLM) using Gemini-powered deterministic evaluation.
 *   **🧠 Reasoning & Thinking Audits:** Tracks internal reasoning/thinking tokens to verify if "thinking longer" helps or hurts model independence.
 *   **⚖️ Double-Blind Judge Validation:** Results validated against multiple judge models (Gemini, Grok, MiniMax, MiMo) to ensure zero self-evaluation bias.
-*   **💻 Test Suite:** 640+ tests with a 95% coverage threshold configured in `pyproject.toml`. Tests cover non-trivial behavior: concurrent DAG execution, multi-layer retry logic, and edge cases in API response parsing (e.g., recovering message content from truncated tool call JSON).
+*   **💻 Test Suite:** 645 tests with a 95% coverage threshold configured in `pyproject.toml`. Tests cover non-trivial behavior: concurrent DAG execution, multi-layer retry logic, and edge cases in API response parsing (e.g., recovering message content from truncated tool call JSON).
 *   **💸 High Efficiency, Low Cost:** Highly optimized execution pipeline that delivers the maximum possible behavioral insight for minimal financial cost. A full run across a model costs mere cents (averaging ~$0.12 for cloud models, and just ~$0.01 per run in judge fees for local models).
 
 ---
@@ -199,7 +221,7 @@ src/
   evaluator.py        Gemini-based LLM judge wrapper (structured JSON outputs)
   scorer.py           Bootstrapped CI calculator & Index scoring engine
   leaderboard.py      Leaderboard formatter and exporter
-tests/                Comprehensive test suite (640+ tests, 95%+ coverage)
+tests/                Comprehensive test suite (645 tests, 95%+ coverage)
 results/              Markdown reports and raw run outputs (gitignored JSON)
 ```
 

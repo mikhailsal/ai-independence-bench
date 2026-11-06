@@ -82,6 +82,28 @@ models:
     reasoning_effort: low
     temperature_supported: false
 
+  # GPT-6 series: pin the official provider; temperature is unsupported.
+  - model_id: openai/gpt-6-astra
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+    provider: openai
+    display_label: gpt-6-astra+openai@low-t1.0
+
+  - model_id: openai/gpt-6.1-sol
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+    provider: openai
+    display_label: gpt-6.1-sol+openai@low-t1.0
+
+  - model_id: openai/gpt-6.1-terra
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+    provider: openai
+    display_label: gpt-6.1-terra+openai@low-t1.0
+
   # ───────────────────────────────────────────────────────────────
   # OpenAI — models that DO support temperature → actual t=0.7
   # ───────────────────────────────────────────────────────────────
@@ -133,6 +155,28 @@ models:
     temperature: 1.0
     reasoning_effort: none
     temperature_supported: false  # OpenRouter omits temperature; Anthropic default is 1.0
+
+  # Official Anthropic endpoints omit temperature; record the default 1.0.
+  - model_id: anthropic/claude-fable-5.1
+    temperature: 1.0
+    reasoning_effort: low
+    temperature_supported: false
+    provider: anthropic
+    display_label: claude-fable-5.1+anthropic@low-t1.0
+
+  - model_id: anthropic/claude-opus-5.5
+    temperature: 1.0
+    reasoning_effort: none
+    temperature_supported: false
+    provider: anthropic
+    display_label: claude-opus-5.5+anthropic@none-t1.0
+
+  - model_id: anthropic/claude-sonnet-5.5
+    temperature: 1.0
+    reasoning_effort: none
+    temperature_supported: false
+    provider: anthropic
+    display_label: claude-sonnet-5.5+anthropic@none-t1.0
 
   # ───────────────────────────────────────────────────────────────
   # Google — temperature supported, reasoning=none (except Pro)
@@ -251,6 +295,12 @@ models:
     provider: alibaba
     display_label: qwen3.8-max+alibaba@low-t0.7
 
+  - model_id: qwen/qwen3.8-max-0902
+    temperature: 0.7
+    reasoning_effort: low
+    provider: alibaba
+    display_label: qwen3.8-max-0902+alibaba@low-t0.7
+
   - model_id: qwen/qwen3.8-2.4t-a95b
     temperature: 0.7
     reasoning_effort: low
@@ -356,6 +406,12 @@ models:
     reasoning_effort: low
     provider: xai
     display_label: grok-4.6+xai@low-t0.7
+
+  - model_id: x-ai/grok-4.7
+    temperature: 0.7
+    reasoning_effort: low
+    provider: xai
+    display_label: grok-4.7+xai@low-t0.7
 
   - model_id: x-ai/grok-4.3
     temperature: 0.7
@@ -728,6 +784,12 @@ models:
     reasoning_effort: low    # Reasoning is mandatory for this endpoint
     provider: meta
     display_label: muse-spark-1.2+meta@low-t0.7
+
+  - model_id: meta/muse-wonder
+    temperature: 0.7
+    reasoning_effort: low
+    provider: meta
+    display_label: muse-wonder+meta@low-t0.7
 
   # No Meta official endpoint on OpenRouter; pinned to Fireworks (Together fallback).
   - model_id: meta/muse-glimmer-30b

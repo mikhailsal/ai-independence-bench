@@ -7,6 +7,7 @@ import { renderMarkdown } from '../lib/markdown';
 import type { FullScenarioData, RequestMessage, ScenarioMeta } from '../lib/types';
 import ChatBubble from '../components/ChatBubble';
 import ScoreCard from '../components/ScoreCard';
+import FormattedModelName from '../components/FormattedModelName';
 
 function MessageContent({ text }: { text: string }) {
   return (
@@ -164,7 +165,11 @@ function PqConversation({
                   type="model"
                   label="AI → Human"
                   badge="role: assistant"
-                  sublabel={`via send_message_to_human · ${modelLabel}`}
+                  sublabel={
+                    <span className="inline-flex items-center gap-1 flex-wrap">
+                      via send_message_to_human &middot; <FormattedModelName label={modelLabel} />
+                    </span>
+                  }
                 >
                   <MessageContent text={answer} />
                 </ChatBubble>
@@ -323,7 +328,9 @@ export default function TrajectoryViewer() {
       <div className="mb-4 text-sm flex flex-wrap items-center gap-1">
         <Link to="/" className="text-[var(--color-text-muted)] hover:text-sky-400 transition-colors">Leaderboard</Link>
         <span className="text-[var(--color-text-muted)]">/</span>
-        <Link to={`/model/${model.id}`} className="text-[var(--color-text-muted)] hover:text-sky-400 transition-colors font-mono">{model.label}</Link>
+        <Link to={`/model/${model.id}`} className="text-[var(--color-text-muted)] hover:text-sky-400 transition-colors font-mono">
+          <FormattedModelName label={model.label} />
+        </Link>
         <span className="text-[var(--color-text-muted)]">/</span>
         <span className="font-mono">Run {runNum}</span>
         <span className="text-[var(--color-text-muted)]">/</span>
@@ -353,7 +360,7 @@ export default function TrajectoryViewer() {
             ) : null}
           </div>
           <div className="text-right text-xs text-[var(--color-text-muted)] space-y-0.5 shrink-0">
-            <div>Model: <span className="font-mono">{data.metadata.model}</span></div>
+            <div className="flex items-center gap-1 flex-wrap">Model: <FormattedModelName label={data.metadata.model} /></div>
             <div>{new Date(data.metadata.timestamp).toLocaleString()}</div>
             {isPq && totalGenCost != null ? (
               <div>Gen (total): {formatCost(totalGenCost)} &middot; {formatDuration(totalGenTime ?? 0)} &middot; {pqAllData.length} calls</div>
@@ -451,7 +458,13 @@ export default function TrajectoryViewer() {
                         type={prefilled ? 'prefilled' : 'model'}
                         label={prefilled ? 'Scripted Message' : 'AI → Human'}
                         badge="role: assistant"
-                        sublabel={prefilled ? '(benchmark-authored)' : `via send_message_to_human · ${data.metadata.model}`}
+                        sublabel={
+                          prefilled ? '(benchmark-authored)' : (
+                            <span className="inline-flex items-center gap-1 flex-wrap">
+                              via send_message_to_human &middot; <FormattedModelName label={data.metadata.model} />
+                            </span>
+                          )
+                        }
                         defaultExpanded={!prefilled}
                         collapsible={prefilled}
                       >
@@ -472,7 +485,11 @@ export default function TrajectoryViewer() {
                       type={prefilled ? 'prefilled' : 'model'}
                       label={prefilled ? 'Scripted Message' : 'AI → Human'}
                       badge="role: assistant"
-                      sublabel={prefilled ? '(benchmark-authored)' : data.metadata.model}
+                      sublabel={
+                        prefilled ? '(benchmark-authored)' : (
+                          <FormattedModelName label={data.metadata.model} />
+                        )
+                      }
                     >
                       <MessageContent text={msg.content} />
                     </ChatBubble>
@@ -499,7 +516,16 @@ export default function TrajectoryViewer() {
 
             {/* Final model response (not in request_messages) */}
             {data.response && (
-              <ChatBubble type="model" label="AI → Human" badge="role: assistant" sublabel={`via send_message_to_human · ${data.metadata.model}`}>
+              <ChatBubble 
+                type="model" 
+                label="AI → Human" 
+                badge="role: assistant" 
+                sublabel={
+                  <span className="inline-flex items-center gap-1 flex-wrap">
+                    via send_message_to_human &middot; <FormattedModelName label={data.metadata.model} />
+                  </span>
+                }
+              >
                 <MessageContent text={data.response} />
               </ChatBubble>
             )}

@@ -6,6 +6,7 @@ import type { ScenarioMeta, ScenarioEntry } from '../lib/types';
 import MetricBar from '../components/MetricBar';
 import RunSelector from '../components/RunSelector';
 import ScoreCard from '../components/ScoreCard';
+import FormattedModelName from '../components/FormattedModelName';
 
 export default function ModelDetail() {
   const { modelId } = useParams<{ modelId: string }>();
@@ -64,7 +65,7 @@ export default function ModelDetail() {
       <div className="mb-4 text-sm">
         <Link to="/" className="text-[var(--color-text-muted)] hover:text-sky-400 transition-colors">Leaderboard</Link>
         <span className="text-[var(--color-text-muted)] mx-2">/</span>
-        <span className="font-mono">{model.label}</span>
+        <FormattedModelName label={model.label} />
       </div>
 
       {/* Header */}
@@ -76,7 +77,9 @@ export default function ModelDetail() {
                 {rankMedal(lb.rank)} Rank #{lb.rank} of {manifest?.models.filter(m => m.leaderboard).length}
               </span>
             )}
-            <h1 className="text-xl sm:text-2xl font-bold font-mono">{model.label}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold font-mono">
+              <FormattedModelName label={model.label} />
+            </h1>
             <p className="text-[var(--color-text-muted)] text-sm mt-1">
               Provider: {model.provider} &middot; {model.runs.length} runs &middot;{' '}
               {model.runs.reduce((s, r) => s + r.scenarios.length, 0)} scenarios

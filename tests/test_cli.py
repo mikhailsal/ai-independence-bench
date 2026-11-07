@@ -1045,6 +1045,21 @@ class TestExpandModelConfigs:
         labels = {e[0] for e in entries}
         assert labels == {"test/expand-b@x", "test/expand-b@y"}
 
+    def test_raw_model_id_uses_replacement_but_explicit_historical_label_is_kept(self) -> None:
+        retired = ModelConfig(
+            model_id="test/provider-migration", display_label="migration+old",
+            provider="old/bf16", active=False,
+        )
+        current = ModelConfig(
+            model_id=retired.model_id, display_label="migration+new",
+            provider="new/bf16",
+        )
+        register_config(retired)
+        register_config(current)
+
+        assert _expand_model_configs([retired.model_id]) == [(current.label, current)]
+        assert _expand_model_configs([retired.label]) == [(retired.label, retired)]
+
     def test_no_duplicates(self) -> None:
         entries = _expand_model_configs(["openai/gpt-5-nano", "openai/gpt-5-nano"])
         assert len(entries) == 1

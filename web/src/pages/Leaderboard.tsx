@@ -4,6 +4,7 @@ import { useManifest } from '../lib/manifest';
 import { scoreColor, rankMedal } from '../lib/formatters';
 import MetricBar from '../components/MetricBar';
 import QuestionComplexitySection from '../components/QuestionComplexitySection';
+import FormattedModelName from '../components/FormattedModelName';
 
 export default function Leaderboard() {
   const { manifest, loading, error } = useManifest();
@@ -100,9 +101,9 @@ export default function Leaderboard() {
                   <td className="py-2.5 px-2">
                     <Link
                       to={`/model/${model.id}`}
-                      className="font-mono font-medium hover:text-sky-400 transition-colors"
+                      className="block hover:opacity-80 transition-opacity"
                     >
-                      {model.label}
+                      <FormattedModelName label={model.label} />
                     </Link>
                   </td>
                   <td className={`py-2.5 px-2 text-right font-mono font-bold ${scoreColor(lb.index)}`}>
@@ -148,7 +149,9 @@ export default function Leaderboard() {
                   <span className="text-[var(--color-text-muted)] text-xs font-mono mr-2">
                     {rankMedal(lb.rank)}
                   </span>
-                  <span className="font-mono font-medium text-sm">{model.label}</span>
+                  <div className="mt-1">
+                    <FormattedModelName label={model.label} />
+                  </div>
                 </div>
                 <span className={`font-mono font-bold text-lg ${scoreColor(lb.index)}`}>
                   {lb.index.toFixed(1)}
@@ -172,6 +175,11 @@ export default function Leaderboard() {
             </Link>
           );
         })}
+      </div>
+
+      {/* Footnote */}
+      <div className="mt-3 text-xs text-[var(--color-text-muted)] pl-2">
+        * Default temperature (0.7) is omitted from model labels for clarity.
       </div>
 
       {/* Popular Names Section */}
@@ -234,10 +242,10 @@ export default function Leaderboard() {
                       <div key={model.id} className="flex items-baseline gap-2 text-xs py-0.5">
                         <Link
                           to={`/model/${model.id}`}
-                          className="font-mono text-[var(--color-text-muted)] hover:text-sky-400 truncate max-w-40 shrink-0"
+                          className="hover:opacity-80 transition-opacity truncate max-w-56 shrink-0"
                           title={model.label}
                         >
-                          {model.label}
+                          <FormattedModelName label={model.label} />
                         </Link>
                         <span className="text-[var(--color-text)] truncate">{nameStr}</span>
                       </div>
@@ -288,8 +296,8 @@ export default function Leaderboard() {
                         </span>
                         <span className="font-mono text-xs text-amber-300">×{entry.count}</span>
                       </div>
-                      <div className="text-xs text-[var(--color-text-muted)] leading-5 break-words">
-                        {entry.modelLabel}
+                      <div className="mt-1">
+                        <FormattedModelName label={entry.modelLabel} />
                       </div>
                     </Link>
                   ))}
@@ -316,9 +324,9 @@ export default function Leaderboard() {
                       >
                         <Link
                           to={`/model/${model.id}`}
-                          className="font-mono text-xs text-sky-300 hover:text-sky-200 break-all"
+                          className="block hover:opacity-80 transition-opacity"
                         >
-                          {model.label}
+                          <FormattedModelName label={model.label} />
                         </Link>
                         <div className="mt-3 flex flex-wrap gap-2">
                           {uniqueNames.map(([name, count]) => (

@@ -26,7 +26,9 @@ Use this workflow:
    - Only continue an expensive model to runs 2-5 if the single-run Independence Index is above the chosen gate threshold.
    - If an expensive model scores at or below the gate threshold, stop at 1 run and report that the threshold was not met.
 7. Regenerate name extraction, `results/LEADERBOARD.md`, and any other derived artifacts required by the current repo workflow.
-8. Update `README.md` manually so the visible leaderboard snapshot, aggregate counts, and update-summary text match the regenerated leaderboard.
+8. Update aggregate counts in `README.md` when they change. Keep the README focused on the benchmark's purpose, methodology, usage, and durable findings.
+   - Keep routine model-by-model results in the generated leaderboard. Include a model example in the README only when it supports a broader finding.
+   - Do not append dated evaluation batches, per-run costs, retries, routing incidents, or other update history to the README.
 9. Validate with the project test suite.
 10. Create a conventional commit that includes config changes, cache artifacts, generated leaderboard output, and README updates.
 

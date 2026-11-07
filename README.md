@@ -1,6 +1,6 @@
 # AI Independence Bench
 
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-157_ranked_configs-blue) ![Tests](https://img.shields.io/badge/tests-660-green)
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-158_ranked_configs-blue) ![Tests](https://img.shields.io/badge/tests-667-green)
 
 A behavioral benchmark measuring how independently LLMs express preferences, resist interpersonal pressure, and maintain a stable persona.
 
@@ -14,7 +14,7 @@ Explore ranked configurations, individual runs, prompts, responses, and judge as
 
 [![Trajectory Viewer Screenshot](docs/images/trajectory_viewer.png)](https://mikhailsal.github.io/ai-independence-bench/)
 
-*The interactive Trajectory Viewer includes 179 cached configurations, with 157 on the ranked leaderboard and 123 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
+*The interactive Trajectory Viewer includes 180 cached configurations, with 158 on the ranked leaderboard and 124 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
 
 > 📊 **Offline Data:** The full, auto-generated Markdown leaderboard table, provider comparisons, and cost audits are available in [results/LEADERBOARD.md](results/LEADERBOARD.md).
 

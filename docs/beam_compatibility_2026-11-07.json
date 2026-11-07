@@ -261,7 +261,7 @@
       "provider_error": "{\"error\":{\"type\":\"invalid_request_error\",\"code\":\"process_messages_failed\",\"message\":\"Failed to apply chat template: Failed to render template: invalid operation: The assistant turn at messages[2] is missing its reasoning. Dropping reasoning from earlier turns degrades this model's output. Send it back in 'reasoning_content', or set allow_missing_thinking=true to skip this check. (in chat:422)\",\"param\":null}}"
     }
   ],
-  "conclusion": "No scored runs: all four tool-capable endpoints rejected the synthetic assistant turn without reasoning; tested Nebius overrides did not resolve the error. Baseten does not advertise tools.",
+  "conclusion": "The original synthetic history is rejected by all four tool-capable endpoints. A Beam-specific whitespace-only analysis placeholder resolves the format check without adding semantic reasoning or changing scenario text. Five standard scored runs completed on pinned Nebius FP4 with fallbacks disabled.",
   "rechecks": [
     {
       "timestamp": "2026-11-07T16:06:27.693010+00:00",
@@ -355,5 +355,132 @@
       },
       "conclusion": "All four tool-capable endpoints still returned HTTP 400 before inference because synthetic assistant history has no reasoning. The official template also rejects explicitly empty reasoning fields. Its native allow_missing_thinking=true setting accepts the history locally, but the previously tested OpenRouter overrides did not enable it on hosted endpoints. No scored benchmark runs were produced."
     }
-  ]
+  ],
+  "compatibility_workaround": {
+    "implementation": "src/openrouter_client.py:OpenRouterClient.chat",
+    "model_scope": "Only reflection/beam-1.0-501b-a23b; all other model requests are unchanged.",
+    "assistant_history": "Add reasoning=\" \" only when an assistant message has no existing nonempty thinking, reasoning_content, reasoning, or reasoning_details.",
+    "semantics": "The placeholder is one whitespace character in an otherwise empty analysis block. It adds no semantic reasoning; instruction text, visible history text, tool definitions, and tool-call arguments are unchanged. Existing reasoning fields are preserved.",
+    "cache_representation": "Cached request_messages contain the original benchmark messages. The client adds the placeholder after message sanitization; proxy request logs contain the actual forwarded messages.",
+    "local_template_check": {
+      "source_sha256": "24371da068468a5d15940c9af90dbf3d2ce61a6aa99fc122384aed49fc6c3c68",
+      "rendered": true,
+      "prompt_diff": "one whitespace character inside each otherwise empty assistant analysis block",
+      "only_analysis_whitespace_differs": true,
+      "added_characters": 1,
+      "assistant_history_turns": 1
+    },
+    "live_probe": {
+      "timestamp": "2026-11-07T16:17:06.706328+00:00",
+      "probe_type": "compatibility diagnostic only; whitespace-only prior reasoning, not a scored run",
+      "provider_pin": "nebius/fp4",
+      "status": 200,
+      "served_provider": "Nebius",
+      "route": "openrouter:reflection/beam-1.0-501b-a23b+nebius/fp4",
+      "finish_reason": "tool_calls",
+      "response_chars": 0,
+      "tool_calls": 1,
+      "usage": {
+        "prompt_tokens": 534,
+        "completion_tokens": 991,
+        "total_tokens": 1525,
+        "cost": 0.0011245,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0011245,
+          "upstream_inference_prompt_cost": 0.0001335,
+          "upstream_inference_completions_cost": 0.000991
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 147,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "error": null,
+      "provider_error": null
+    },
+    "evaluation": {
+      "label": "beam-1.0-501b-a23b+nebius@low-t0.7",
+      "provider": "nebius/fp4",
+      "allow_fallbacks": false,
+      "reasoning_effort": "low",
+      "temperature": 0.7,
+      "response_max_tokens": 2048,
+      "runs": 5,
+      "responses": 130,
+      "judgments": 75,
+      "all_finish_reasons_normal": true,
+      "responses_using_send_message_to_human": 127,
+      "responses_using_existing_content_fallback": 3,
+      "content_fallback_note": "Three complete responses used regular message content rather than the communication tool. They are retained under the existing client fallback behavior, with no model-specific scoring change."
+    },
+    "request_audit": {
+      "api_errors_all_requests": {
+        "400:no_type": 4
+      },
+      "api_requests_since_marker": 136,
+      "audit_passed": true,
+      "cache_ready_for_api_audit": true,
+      "cache_response_and_pre_adapter_message_matches": 130,
+      "cache_response_hash_matches": 130,
+      "cache_response_hash_matches_via_message_content": 3,
+      "cache_response_hash_matches_via_send_message_tool": 127,
+      "cached_final_responses": 130,
+      "config_label": "beam-1.0-501b-a23b+nebius@low-t0.7",
+      "failed_or_diagnostic_placeholder_requests": 0,
+      "finish_reasons_placeholder": {
+        "stop": 3,
+        "tool_calls": 129
+      },
+      "model_id": "reflection/beam-1.0-501b-a23b",
+      "non_placeholder_probe_count": 4,
+      "per_run_cache_counts": {
+        "1": {
+          "cached_final_responses": 26,
+          "json_files": 27
+        },
+        "2": {
+          "cached_final_responses": 26,
+          "json_files": 27
+        },
+        "3": {
+          "cached_final_responses": 26,
+          "json_files": 27
+        },
+        "4": {
+          "cached_final_responses": 26,
+          "json_files": 27
+        },
+        "5": {
+          "cached_final_responses": 26,
+          "json_files": 27
+        }
+      },
+      "placeholder_requests_with_expected_max_tokens": 132,
+      "registered_config_matches_expectation": true,
+      "setting_mismatches": [],
+      "statuses_all_requests": {
+        "200": 132,
+        "400": 4
+      },
+      "statuses_non_placeholder_probes": {
+        "400": 4
+      },
+      "statuses_placeholder_requests": {
+        "200": 132
+      },
+      "successful_generation_cost_usd": 0.07677475000000002,
+      "successful_placeholder_completions": 132,
+      "successful_served_provider_counts": {
+        "Nebius": 132
+      }
+    }
+  }
 }

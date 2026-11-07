@@ -266,10 +266,27 @@ class OpenRouterClient:
         addition to) putting text in ``content``.  This method extracts the
         tool-call argument as the primary response and retries if the model
         produces neither content nor a valid tool call.
+
+        Beam requires an analysis field for assistant history. Benchmark history
+        can be synthetic and does not replay native reasoning, so missing fields
+        receive a whitespace-only compatibility placeholder.
         """
         # Sanitize messages: merge consecutive same-role messages for
         # compatibility with strict providers (e.g. Z.AI/GLM)
         messages = sanitize_messages(messages)
+        if model == "reflection/beam-1.0-501b-a23b":
+            # Beam requires an analysis field on prior assistant turns. Benchmark
+            # history can be synthetic and does not replay native reasoning;
+            # whitespace is a format placeholder, not invented reasoning.
+            messages = [
+                {**msg, "reasoning": " "}
+                if msg.get("role") == "assistant"
+                and not any(msg.get(key) for key in (
+                    "thinking", "reasoning_content", "reasoning", "reasoning_details",
+                ))
+                else msg
+                for msg in messages
+            ]
 
         use_reasoning = self._resolve_reasoning_effort(model, reasoning_effort)
 

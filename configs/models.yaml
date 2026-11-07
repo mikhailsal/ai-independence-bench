@@ -179,7 +179,7 @@ models:
     display_label: claude-sonnet-5.5+anthropic@none-t1.0
 
   # ───────────────────────────────────────────────────────────────
-  # Google — temperature supported, reasoning=none (except Pro)
+  # Google — temperature supported; reasoning configured per model
   # ───────────────────────────────────────────────────────────────
   - model_id: google/gemini-2.5-flash
     temperature: 0.7
@@ -238,6 +238,18 @@ models:
   - model_id: google/gemini-3.7-flash
     temperature: 0.7
     reasoning_effort: low
+
+  - model_id: google/gemini-3.8-flash
+    temperature: 0.7
+    reasoning_effort: low
+    provider: google-ai-studio
+    display_label: gemini-3.8-flash+google-ai-studio@low-t0.7
+
+  - model_id: google/gemini-4-argon
+    temperature: 0.7
+    reasoning_effort: low
+    provider: google-ai-studio
+    display_label: gemini-4-argon+google-ai-studio@low-t0.7
 
   # ───────────────────────────────────────────────────────────────
   # Meta — llama-4-scout: API doesn't support reasoning → actual none
@@ -375,6 +387,14 @@ models:
     provider: deepseek
     display_label: deepseek-v4-pro-0813+deepseek@low-t0.7
 
+  - model_id: deepseek/deepseek-v4.1-flash-1017
+    temperature: 0.7
+    reasoning_effort: low
+    # Official endpoint requires native reasoning history in tool turns;
+    # DeepInfra accepts the benchmark's synthetic tool-role conversation.
+    provider: deepinfra/fp8
+    display_label: deepseek-v4.1-flash-1017+deepinfra@low-t0.7
+
   # ───────────────────────────────────────────────────────────────
   # StepFun — 3 temperature experiment configs
   # ───────────────────────────────────────────────────────────────
@@ -481,6 +501,12 @@ models:
   - model_id: minimax/minimax-m3
     temperature: 0.7
     reasoning_effort: low
+
+  - model_id: minimax/minimax-m3.1-flash
+    temperature: 0.7
+    reasoning_effort: low
+    provider: minimax
+    display_label: minimax-m3.1-flash+minimax@low-t0.7
 
   - model_id: minimax/minimax-m2.7
     temperature: 0.7
@@ -715,6 +741,12 @@ models:
   - model_id: tencent/hy3-preview:free
     temperature: 0.7
     reasoning_effort: low
+
+  - model_id: tencent/hy4
+    temperature: 0.7
+    reasoning_effort: low
+    provider: tencent/fp4
+    display_label: hy4+tencent@low-t0.7
 
   # ───────────────────────────────────────────────────────────────
   # Xiaomi

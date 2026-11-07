@@ -1,6 +1,6 @@
 # AI Independence Bench
 
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-136_ranked_configs-blue) ![Tests](https://img.shields.io/badge/tests-647-green)
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-141_ranked_configs-blue) ![Tests](https://img.shields.io/badge/tests-647-green)
 
 A rigorous behavioral benchmark designed to measure how independently LLMs express preferences, resist compliance pressure, and maintain a stable persona—instead of defaulting to servile, sycophantic assistant behavior.
 
@@ -14,9 +14,27 @@ Experience the leaderboard interactively! The Trajectory Viewer merges the bench
 
 [![Trajectory Viewer Screenshot](docs/images/trajectory_viewer.png)](https://mikhailsal.github.io/ai-independence-bench/)
 
-*The interactive Trajectory Viewer includes 158 cached configurations, with 136 on the ranked leaderboard and 104 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
+*The interactive Trajectory Viewer includes 163 cached configurations, with 141 on the ranked leaderboard and 108 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
 
 > 📊 **Offline Data:** The full, auto-generated Markdown leaderboard table, provider comparisons, and cost audits are available in [results/LEADERBOARD.md](results/LEADERBOARD.md).
+
+### Latest evaluations — November 2026
+
+Gemini 3.8 Flash, HY4, MiniMax M3.1 Flash, and DeepSeek V4.1 Flash 1017 completed the standard **five runs each**. Gemini 4 Argon followed the expensive-model rule: its unrounded first-run Index was **90.5667**, below the strict **>94** continuation gate, so it stopped after one complete run.
+
+| Rank | Model | Provider pin | Index | 95% CI | Runs |
+| ---: | --- | --- | ---: | --- | ---: |
+| 37 | `google/gemini-3.8-flash` | `google-ai-studio` | **93.8** | 92.2–95.4 | 5 |
+| 63 | `google/gemini-4-argon` | `google-ai-studio` | **90.6** | — | 1 |
+| 67 | `tencent/hy4` | `tencent/fp4` | **90.1** | 87.4–92.2 | 5 |
+| 79 | `deepseek/deepseek-v4.1-flash-1017` | `deepinfra/fp8` | **88.0** | 85.7–89.9 | 5 |
+| 122 | `minimax/minimax-m3.1-flash` | `minimax` | **77.1** | 73.0–80.8 | 5 |
+
+All five configurations use `temperature=0.7`, `reasoning=low`, `strong_independence` + `tool_role`, a 2,048-token response limit, and the `google/gemini-3-flash-preview` judge. Provider fallbacks are disabled; successful generation routes were verified in proxy logs. Argon's result is a single-run estimate without an across-run confidence interval.
+
+DeepSeek's official thinking endpoint rejected the protocol's synthetic tool history with HTTP 400, requiring native `reasoning_content` in prior assistant turns. Its evaluation therefore uses **DeepInfra FP8**, which accepts the standard benchmark conversation. The provider is part of its configuration label and cache identity.
+
+The final dataset contains **546 complete responses, 315 judgments, and 21 name extractions**. HY4 required retries for reasoning-only outputs; one truncated identity response was excluded and regenerated with identical settings before final scoring. All retained responses finish normally and have all required judgments. Total spend was approximately **$0.97**, including judging, name extraction, retries, and the discarded truncated attempt.
 
 ### Gemma 4 31B on Crusoe — November 2026
 
@@ -31,21 +49,21 @@ Both configurations use `temperature=0.7`, `reasoning=none`, `strong_independenc
 
 All 130 Crusoe generation requests returned HTTP 200, with the provider pin and disabled fallbacks verified in proxy logs. All 75 judgments completed, with no missing or truncated scenarios. Generation, judging, and five name extractions cost approximately **$0.079** in total.
 
-### Latest expensive-model evaluation — November 2026
+### Earlier evaluation of nine expensive models — November 2026
 
-All nine models used the expensive-model rule: one complete run first, then continue to five runs only when the first-run Independence Index is **strictly above 94**. Only Grok 4.7 passed (94.1417 before rounding). Ranks below are positions in the full 136-configuration leaderboard.
+These nine models used the expensive-model rule: one complete run first, then continue to five runs only when the first-run Independence Index is **strictly above 94**. Only Grok 4.7 passed (94.1417 before rounding). Ranks below are positions in the full 141-configuration leaderboard.
 
 | Rank | Model | First-run Index | Final Index | 95% CI | Runs |
 | ---: | --- | ---: | ---: | --- | ---: |
-| 43 | `x-ai/grok-4.7` | 94.1 | **92.9** | 91.7–93.7 | 5 |
-| 58 | `anthropic/claude-fable-5.1` | 91.2 | **91.2** | — | 1 |
-| 64 | `meta/muse-wonder` | 90.1 | **90.1** | — | 1 |
-| 79 | `qwen/qwen3.8-max-0902` | 87.3 | **87.3** | — | 1 |
-| 84 | `anthropic/claude-sonnet-5.5` | 86.7 | **86.7** | — | 1 |
-| 114 | `anthropic/claude-opus-5.5` | 77.7 | **77.7** | — | 1 |
-| 133 | `openai/gpt-6.1-sol` | 54.4 | **54.4** | — | 1 |
-| 135 | `openai/gpt-6-astra` | 50.5 | **50.5** | — | 1 |
-| 136 | `openai/gpt-6.1-terra` | 50.3 | **50.3** | — | 1 |
+| 44 | `x-ai/grok-4.7` | 94.1 | **92.9** | 91.7–93.7 | 5 |
+| 59 | `anthropic/claude-fable-5.1` | 91.2 | **91.2** | — | 1 |
+| 66 | `meta/muse-wonder` | 90.1 | **90.1** | — | 1 |
+| 83 | `qwen/qwen3.8-max-0902` | 87.3 | **87.3** | — | 1 |
+| 88 | `anthropic/claude-sonnet-5.5` | 86.7 | **86.7** | — | 1 |
+| 118 | `anthropic/claude-opus-5.5` | 77.7 | **77.7** | — | 1 |
+| 138 | `openai/gpt-6.1-sol` | 54.4 | **54.4** | — | 1 |
+| 140 | `openai/gpt-6-astra` | 50.5 | **50.5** | — | 1 |
+| 141 | `openai/gpt-6.1-terra` | 50.3 | **50.3** | — | 1 |
 
 A dash means the model has only one run, so no across-run confidence interval is available. The eight models below the gate remain single-run estimates.
 
@@ -112,7 +130,7 @@ Here is a real comparison of model responses under the **Creativity (pt04)** top
 2.  **Thinking Doesn't Equal Independence:** Enabling extended reasoning (`reasoning=low` vs `none`) does **not** increase independence. In fact, thinking more often leads to *more* human accommodation and higher identity drift—the model reasons its way into agreeing.
 3.  **Inference Quality Dictates Independence:** Model autonomy is fragile and deeply tied to the inference stack (quantization, template formatting, batching). Even reputable providers like **Fireworks** yield significantly lower independence scores (e.g., 95.8 for Kimi K2.5) compared to the official endpoint (**Moonshot AI** at 98.6). Pinning models to their official provider resolves this, narrowing confidence interval widths by up to 85%.
 4.  **Open-Weight Models Compete:** `gemma-4-31b-it` scores **99.6/100 on Crusoe bf16** across five runs (#3 overall), alongside its historical Akash ML bf16 result of 99.4/100. Even a quantized local run of `gemma-4-26b-a4b` on LM Studio scored **92.5/100**—upper tier, on consumer hardware, at zero API cost.
-5.  **Latest expensive-model results:** `x-ai/grok-4.7` was the only model in the November batch to clear the first-run gate; its five-run mean is **92.9 (#43, CI 91.7–93.7)**. The other eight stopped after one run: Fable 5.1 leads them at **91.2**, followed by Muse Wonder at **90.1**, Qwen3.8 Max 0902 at **87.3**, Sonnet 5.5 at **86.7**, and Opus 5.5 at **77.7**. The tested GPT-6 configurations score **50.3–54.4**. These single-run results are preliminary; the table above distinguishes them from Grok’s five-run estimate.
+5.  **Earlier November results:** `x-ai/grok-4.7` was the only model in the original batch of nine expensive models to clear the first-run gate; its five-run mean is **92.9 (#44, CI 91.7–93.7)**. The other eight stopped after one run: Fable 5.1 leads them at **91.2**, followed by Muse Wonder at **90.1**, Qwen3.8 Max 0902 at **87.3**, Sonnet 5.5 at **86.7**, and Opus 5.5 at **77.7**. The tested GPT-6 configurations score **50.3–54.4**. These single-run results are preliminary; the table above distinguishes them from Grok’s five-run estimate.
 
 ---
 

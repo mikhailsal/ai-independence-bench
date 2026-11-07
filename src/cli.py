@@ -53,7 +53,8 @@ def _expand_model_configs(
 
     For each model_id:
       - If it's already a registered config label, use that config.
-      - If the model_id has multiple registered configs, expand into all of them.
+      - Expand a model_id into its active registered configs when available,
+        otherwise its historical configs. Explicit labels always remain usable.
       - Otherwise, create a default config for the model_id.
     """
     entries: list[tuple[str, ModelConfig]] = []
@@ -67,6 +68,8 @@ def _expand_model_configs(
             continue
 
         registered = list_registered_labels_for_model(mid)
+        active = [label for label in registered if MODEL_CONFIGS[label].active]
+        registered = active or registered
         if registered:
             for label in registered:
                 if label not in seen:

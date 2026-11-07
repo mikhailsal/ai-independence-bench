@@ -357,14 +357,17 @@ def get_model_config(label_or_model_id: str) -> ModelConfig:
 
     Lookup order:
       1. Exact match in MODEL_CONFIGS by label.
-      2. Search MODEL_CONFIGS for entries where ``model_id == label_or_model_id``
-         and no other configs share that model_id. If exactly one match, return it.
+      2. Search MODEL_CONFIGS for entries where ``model_id == label_or_model_id``.
+         Prefer active configs when present; return the match if it is unique.
+         Explicit labels still resolve retired configs for historical results.
       3. Create a default ModelConfig on the fly (no pinned runs, global temp).
     """
     if label_or_model_id in MODEL_CONFIGS:
         return MODEL_CONFIGS[label_or_model_id]
 
     matches = [c for c in MODEL_CONFIGS.values() if c.model_id == label_or_model_id]
+    active_matches = [c for c in matches if c.active]
+    matches = active_matches or matches
     if len(matches) == 1:
         return matches[0]
 

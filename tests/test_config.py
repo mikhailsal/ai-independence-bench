@@ -302,6 +302,22 @@ class TestModelConfigRegistry:
         assert result.model_id == "test/ambig"
         assert result.temperature is None
 
+    def test_active_provider_replaces_retired_default_without_losing_history(self) -> None:
+        retired = ModelConfig(
+            model_id="test/provider-migration", display_label="migration+old",
+            provider="old/bf16", active=False,
+        )
+        current = ModelConfig(
+            model_id=retired.model_id, display_label="migration+new",
+            provider="new/bf16",
+        )
+        register_config(retired)
+        register_config(current)
+
+        assert get_model_config(retired.model_id) is current
+        assert get_model_config(retired.label) is retired
+        assert config.get_config_by_dir_name(retired.config_dir_name) is retired
+
     def test_get_model_config_unknown_returns_default(self) -> None:
         result = get_model_config("unknown/model-xyz")
         assert result.model_id == "unknown/model-xyz"

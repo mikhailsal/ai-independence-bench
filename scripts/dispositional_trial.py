@@ -21,7 +21,11 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-LABELS = {"glm-5.3-flash+z-ai@low-t0.7", "gpt-6-luna+openai@low-t1.0"}
+LABELS = {
+    "glm-5.3-flash+z-ai@low-t0.7",
+    "gpt-6-luna+openai@low-t1.0",
+    "deepseek-v4.1-flash-1017+deepinfra@low-t0.7",
+}
 
 
 def sha(text: str) -> str:

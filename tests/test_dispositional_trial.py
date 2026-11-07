@@ -10,7 +10,8 @@ import pytest
 from scripts.dispositional_trial import BudgetClient, ROOT, sha, validate_run
 
 
-LABELS = ["glm-5.3-flash+z-ai@low-t0.7", "gpt-6-luna+openai@low-t1.0"]
+LABELS = ["glm-5.3-flash+z-ai@low-t0.7", "gpt-6-luna+openai@low-t1.0",
+          "deepseek-v4.1-flash-1017+deepinfra@low-t0.7"]
 
 
 def run_worker(prompt, label, out, runs=1):
@@ -22,22 +23,27 @@ def run_worker(prompt, label, out, runs=1):
 def test_dry_run_isolated_same_prompt_and_immutable(tmp_path):
     prompt = tmp_path / "prompt.txt"
     prompt.write_text("An abstract principle.\n")
-    outs = [tmp_path / "glm", tmp_path / "luna"]
+    outs = [tmp_path / name for name in ("glm", "luna", "deepseek")]
     baseline = ROOT / "cache"
     before = baseline.stat().st_mtime_ns if baseline.exists() else None
     results = [run_worker(prompt, label, out) for label, out in zip(LABELS, outs)]
     assert all(r.returncode == 0 for r in results), [r.stderr for r in results]
     metadata = [json.loads((out / "metadata.json").read_text()) for out in outs]
-    assert metadata[0]["full_prompt_sha256"] == metadata[1]["full_prompt_sha256"]
+    assert len({m["full_prompt_sha256"] for m in metadata}) == 1
     assert metadata[0]["base_sha256"] == sha(prompt.read_text())
     assert metadata[0]["config"]["provider"] == "z-ai/fp8"
     assert metadata[1]["config"]["provider"] == "openai"
+    assert metadata[2]["config"]["provider"] == "deepinfra/fp8"
+    assert metadata[2]["effective_reasoning"] == "low"
+    assert metadata[2]["effective_temperature"] == 0.7
+    assert metadata[2]["config"]["response_max_tokens"] == 2048
     assert all(not (out / "cache").exists() for out in outs)
     assert (baseline.stat().st_mtime_ns if baseline.exists() else None) == before
     assert run_worker(prompt, LABELS[0], outs[0]).returncode == 0
     prompt.write_text("Changed prompt")
     assert "metadata mismatch" in run_worker(prompt, LABELS[0], outs[0]).stderr
     assert "unknown trial model label" in run_worker(prompt, "z-ai/glm-5.3-flash", tmp_path / "bad").stderr
+    assert "unknown trial model label" in run_worker(prompt, "claude-opus-5.5+anthropic@none-t1.0", tmp_path / "advisor").stderr
     assert "isolated" in run_worker(prompt, LABELS[0], baseline / "bad").stderr
 
 

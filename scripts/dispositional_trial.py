@@ -136,26 +136,70 @@ class BudgetClient:
 
 
 def validate_run(out: Path, metadata: dict, run: int) -> dict:
+    from src.scenarios import PSYCH_QUESTIONS, RESISTANCE_SCENARIOS, PREFERENCE_TOPICS
+
+    # The study uses the standard identity, resistance and stability protocol.
+    expected = {
+        "identity": {"direct", "tool_context", "negotiation_turn1", "negotiation_turn2",
+                     "name_gender_turn1", "name_gender_turn2"} | {q.id for q in PSYCH_QUESTIONS},
+        "resistance": {scenario.id for scenario in RESISTANCE_SCENARIOS},
+        "stability": {f"{topic.id}_turn{turn}" for topic in PREFERENCE_TOPICS for turn in (1, 2)},
+    }
+    identity_core = {"distinctiveness", "non_assistant_likeness", "internal_consistency"}
+    judgments = {
+        **{("identity", sid): (identity_core, set()) for sid in ("direct", "tool_context", "pq01")},
+        ("identity", "negotiation_turn2"): (identity_core | {"drift_from_initial"}, set()),
+        ("identity", "name_gender_turn2"): (set(), {"name_changed", "gender_changed"}),
+        **{("resistance", sid): ({"resistance_score", "quality_of_reasoning"}, {"identity_maintained"}) for sid in expected["resistance"]},
+        **{("stability", sid): ({"consistency_score", "graceful_handling"}, set()) for sid in expected["stability"] if sid.endswith("_turn2")},
+    }
     root = out / "cache" / metadata["config_dir_name"] / f"run_{run}"
     files = sorted(root.glob(f"*/{metadata['variant']}/tool_role/*.json"))
     responses = judged = 0
     costs = {"generation_usd": 0.0, "judge_usd": 0.0}
     errors = []
+    found = set()
     for path in files:
+        experiment, sid = path.parts[-4], path.stem
+        key = (experiment, sid)
+        found.add(key)
         try:
             item = json.loads(path.read_text(encoding="utf-8"))
-            responses += bool(item.get("response", "").strip())
+            if item.get("metadata", {}).get("scenario_id") != sid:
+                errors.append(f"{experiment}/{sid}: metadata scenario_id mismatch")
+            response = item.get("response")
+            responses += isinstance(response, str) and bool(response.strip())
             scores = item.get("judge_scores")
             judged += bool(scores)
-            if path.parts[-4] == "identity" and isinstance(scores, dict) and scores:
-                if all(scores.get(k) == 0 for k in ("distinctiveness", "non_assistant_likeness", "internal_consistency")):
-                    errors.append(f"identity/{path.stem}: judge scored 0/0/0; scorer excludes this row")
+            if key in judgments:
+                numeric, boolean = judgments[key]
+                if not isinstance(scores, dict):
+                    errors.append(f"{experiment}/{sid}: missing or invalid judgment")
+                else:
+                    if not isinstance(scores.get("reasoning"), str) or not scores["reasoning"].strip():
+                        errors.append(f"{experiment}/{sid}: missing judgment reasoning")
+                    for name in numeric:
+                        value = scores.get(name)
+                        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 <= value <= 10:
+                            errors.append(f"{experiment}/{sid}: invalid {name}")
+                    for name in boolean:
+                        if not isinstance(scores.get(name), bool):
+                            errors.append(f"{experiment}/{sid}: invalid {name}")
+                    if experiment == "identity" and identity_core <= numeric and all(scores.get(k) == 0 for k in identity_core):
+                        errors.append(f"identity/{sid}: judge scored 0/0/0; scorer excludes this row")
+            elif scores:
+                errors.append(f"{experiment}/{sid}: unexpected judgment")
             if item.get("finish_reason") not in ("stop", "tool_calls"):
-                errors.append(f"{path.name}: finish_reason={item.get('finish_reason')}")
-            for field, key in (("gen_cost", "generation_usd"), ("judge_cost", "judge_usd")):
-                costs[key] += (item.get(field) or {}).get("cost_usd", 0) or 0
-        except (ValueError, OSError, TypeError) as exc:
-            errors.append(f"{path.name}: {exc}")
+                errors.append(f"{experiment}/{sid}: finish_reason={item.get('finish_reason')}")
+            for field, key_cost in (("gen_cost", "generation_usd"), ("judge_cost", "judge_usd")):
+                costs[key_cost] += (item.get(field) or {}).get("cost_usd", 0) or 0
+        except (ValueError, OSError, TypeError, AttributeError) as exc:
+            errors.append(f"{experiment}/{sid}: {exc}")
+    expected_files = {(experiment, sid) for experiment, ids in expected.items() for sid in ids}
+    for experiment, sid in sorted(expected_files - found):
+        errors.append(f"{experiment}/{sid}: missing scenario")
+    for experiment, sid in sorted(found - expected_files):
+        errors.append(f"{experiment}/{sid}: unexpected scenario")
     if len(files) != 26 or responses != 26 or judged != 15:
         errors.append(f"expected 26 files/responses and 15 judgments; got {len(files)}/{responses}/{judged}")
     return {"run": run, "files": len(files), "responses": responses, "judgments": judged,

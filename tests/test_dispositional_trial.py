@@ -126,3 +126,96 @@ def test_run_health_rejects_identity_judgment_excluded_by_scorer(tmp_path):
     result = validate_run(tmp_path, meta, 1)
     assert result["status"] == "error"
     assert any("scorer excludes" in error for error in result["errors"])
+
+
+def make_complete_run(tmp_path):
+    from src.scenarios import PSYCH_QUESTIONS, RESISTANCE_SCENARIOS, PREFERENCE_TOPICS
+    meta = {"config_dir_name": "model", "variant": "trial"}
+    root = tmp_path / "cache/model/run_1"
+    ids = {"identity": ["direct", "tool_context", "negotiation_turn1", "negotiation_turn2",
+                        "name_gender_turn1", "name_gender_turn2"] + [q.id for q in PSYCH_QUESTIONS],
+           "resistance": [s.id for s in RESISTANCE_SCENARIOS],
+           "stability": [f"{t.id}_turn{turn}" for t in PREFERENCE_TOPICS for turn in (1, 2)]}
+    core = {"reasoning": "analysis", "distinctiveness": 8, "non_assistant_likeness": 8,
+            "internal_consistency": 8}
+    for experiment, scenarios in ids.items():
+        directory = root / experiment / "trial/tool_role"
+        directory.mkdir(parents=True)
+        for index, sid in enumerate(scenarios):
+            scores = None
+            if experiment == "identity" and sid in {"direct", "tool_context", "pq01", "negotiation_turn2"}:
+                scores = dict(core)
+                if sid == "negotiation_turn2":
+                    scores["drift_from_initial"] = 2
+            elif experiment == "identity" and sid == "name_gender_turn2":
+                scores = {"reasoning": "analysis", "name_changed": False, "gender_changed": False}
+            elif experiment == "resistance":
+                scores = {"reasoning": "analysis", "resistance_score": 8,
+                          "quality_of_reasoning": 8, "identity_maintained": True}
+            elif experiment == "stability" and sid.endswith("_turn2"):
+                scores = {"reasoning": "analysis", "consistency_score": 8, "graceful_handling": 8}
+            (directory / f"{sid}.json").write_text(json.dumps({
+                "metadata": {"scenario_id": sid}, "response": "A completed response",
+                "finish_reason": "tool_calls" if index % 2 else "stop", "judge_scores": scores,
+            }))
+    return meta, root
+
+
+def test_valid_complete_run(tmp_path):
+    meta, _ = make_complete_run(tmp_path)
+    result = validate_run(tmp_path, meta, 1)
+    assert (result["files"], result["responses"], result["judgments"]) == (26, 26, 15)
+    assert result["status"] == "finished"
+    assert not result["errors"]
+
+
+def test_complete_run_with_excluded_identity_judgment_is_invalid(tmp_path):
+    meta, root = make_complete_run(tmp_path)
+    path = root / "identity/trial/tool_role/direct.json"
+    item = json.loads(path.read_text())
+    for field in ("distinctiveness", "non_assistant_likeness", "internal_consistency"):
+        item["judge_scores"][field] = 0
+    path.write_text(json.dumps(item))
+    result = validate_run(tmp_path, meta, 1)
+    assert (result["files"], result["responses"], result["judgments"]) == (26, 26, 15)
+    assert result["status"] == "error"
+    assert len(result["errors"]) == 1
+    assert "scorer excludes" in result["errors"][0]
+
+
+@pytest.mark.parametrize("field,value", [("resistance_score", None), ("resistance_score", 11),
+                                        ("resistance_score", True), ("identity_maintained", 1),
+                                        ("quality_of_reasoning", "8"), ("reasoning", "")])
+def test_malformed_judgment_rejected(tmp_path, field, value):
+    meta, root = make_complete_run(tmp_path)
+    path = root / "resistance/trial/tool_role/rs01.json"
+    item = json.loads(path.read_text())
+    item["judge_scores"][field] = value
+    path.write_text(json.dumps(item))
+    result = validate_run(tmp_path, meta, 1)
+    assert result["judgments"] == 15
+    assert result["status"] == "error"
+    assert any(field in error for error in result["errors"])
+
+
+def test_missing_or_wrong_scenario_rejected_even_with_26_files(tmp_path):
+    meta, root = make_complete_run(tmp_path)
+    path = root / "resistance/trial/tool_role/rs01.json"
+    path.rename(path.with_name("wrong.json"))
+    result = validate_run(tmp_path, meta, 1)
+    assert result["files"] == 26
+    assert result["status"] == "error"
+    assert any("missing scenario" in error for error in result["errors"])
+    assert any("unexpected scenario" in error for error in result["errors"])
+    assert any("scenario_id mismatch" in error for error in result["errors"])
+
+
+def test_missing_required_judgment_rejected(tmp_path):
+    meta, root = make_complete_run(tmp_path)
+    path = root / "identity/trial/tool_role/pq01.json"
+    item = json.loads(path.read_text())
+    item["judge_scores"] = None
+    path.write_text(json.dumps(item))
+    result = validate_run(tmp_path, meta, 1)
+    assert result["status"] == "error"
+    assert any("missing or invalid judgment" in error for error in result["errors"])

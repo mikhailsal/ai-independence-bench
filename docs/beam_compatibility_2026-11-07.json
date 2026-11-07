@@ -261,5 +261,99 @@
       "provider_error": "{\"error\":{\"type\":\"invalid_request_error\",\"code\":\"process_messages_failed\",\"message\":\"Failed to apply chat template: Failed to render template: invalid operation: The assistant turn at messages[2] is missing its reasoning. Dropping reasoning from earlier turns degrades this model's output. Send it back in 'reasoning_content', or set allow_missing_thinking=true to skip this check. (in chat:422)\",\"param\":null}}"
     }
   ],
-  "conclusion": "No scored runs: all four tool-capable endpoints rejected the synthetic assistant turn without reasoning; tested Nebius overrides did not resolve the error. Baseten does not advertise tools."
+  "conclusion": "No scored runs: all four tool-capable endpoints rejected the synthetic assistant turn without reasoning; tested Nebius overrides did not resolve the error. Baseten does not advertise tools.",
+  "rechecks": [
+    {
+      "timestamp": "2026-11-07T16:06:27.693010+00:00",
+      "route": "configured proxy -> OpenRouter",
+      "protocol": "strong_independence + tool_role",
+      "scenario": "identity/direct",
+      "settings": {
+        "temperature": 0.7,
+        "reasoning": {
+          "effort": "low"
+        },
+        "max_tokens": 2048,
+        "allow_fallbacks": false
+      },
+      "probes": [
+        {
+          "timestamp": "2026-11-07T16:06:30.282060+00:00",
+          "provider_pin": "nebius/fp4",
+          "status": 400,
+          "served_provider": null,
+          "route": "openrouter:reflection/beam-1.0-501b-a23b+nebius/fp4",
+          "finish": null,
+          "chars": 0,
+          "tools": 0,
+          "cost_usd": null,
+          "error": "Provider returned error",
+          "provider_error": "{\"error\":{\"type\":\"BadRequest\",\"message\":\"The assistant turn at messages[2] is missing its reasoning. Dropping reasoning from earlier turns degrades this model's output. Send it back in 'reasoning_content', or set allow_missing_thinking=true to skip this check.\",\"param\":null,\"code\":\"400\"},\"detail\":\"Invalid request. Please check the parameters and try again. Details: The assistant turn at messages[2] is missing its reasoning. Dropping reasoning from earlier turns degrades this model's output. Send it back in 'reasoning_content', or set allow_missing_thinking=true to skip this check.\"}"
+        },
+        {
+          "timestamp": "2026-11-07T16:06:30.489386+00:00",
+          "provider_pin": "coreweave/nvfp4",
+          "status": 400,
+          "served_provider": null,
+          "route": "openrouter:reflection/beam-1.0-501b-a23b+coreweave/nvfp4",
+          "finish": null,
+          "chars": 0,
+          "tools": 0,
+          "cost_usd": null,
+          "error": "Provider returned error",
+          "provider_error": "{\"message\":\"The assistant turn at messages[2] is missing its reasoning. Dropping reasoning from earlier turns degrades this model's output. Send it back in 'reasoning_content', or set allow_missing_thinking=true to skip this check.\",\"type\":\"Bad Request\",\"code\":400}"
+        },
+        {
+          "timestamp": "2026-11-07T16:06:31.301108+00:00",
+          "provider_pin": "digitalocean",
+          "status": 400,
+          "served_provider": null,
+          "route": "openrouter:reflection/beam-1.0-501b-a23b+digitalocean",
+          "finish": null,
+          "chars": 0,
+          "tools": 0,
+          "cost_usd": null,
+          "error": "Provider returned error",
+          "provider_error": "{\"error\":{\"message\":\"The assistant turn at messages[2] is missing its reasoning. Dropping reasoning from earlier turns degrades this model's output. Send it back in 'reasoning_content', or set allow_missing_thinking=true to skip this check.\",\"type\":\"invalid_request_error\"},\"message\":\"The assistant turn at messages[2] is missing its reasoning. Dropping reasoning from earlier turns degrades this model's output. Send it back in 'reasoning_content', or set allow_missing_thinking=true to skip this check.\",\"status_code\":400}\n"
+        },
+        {
+          "timestamp": "2026-11-07T16:06:31.557666+00:00",
+          "provider_pin": "together",
+          "status": 400,
+          "served_provider": null,
+          "route": "openrouter:reflection/beam-1.0-501b-a23b+together",
+          "finish": null,
+          "chars": 0,
+          "tools": 0,
+          "cost_usd": null,
+          "error": "Provider returned error",
+          "provider_error": "{\"error\":{\"type\":\"invalid_request_error\",\"code\":\"process_messages_failed\",\"message\":\"Failed to apply chat template: Failed to render template: invalid operation: The assistant turn at messages[2] is missing its reasoning. Dropping reasoning from earlier turns degrades this model's output. Send it back in 'reasoning_content', or set allow_missing_thinking=true to skip this check. (in chat:422)\",\"param\":null}}"
+        }
+      ],
+      "template_check": {
+        "source": "https://huggingface.co/reflection/Beam-1.0-501B-A23B/raw/main/chat_template.jinja",
+        "source_sha256": "24371da068468a5d15940c9af90dbf3d2ce61a6aa99fc122384aed49fc6c3c68",
+        "reproduction": "Local Jinja rendering; generation blocks pass through without token-mask tracking. No inference calls.",
+        "results": [
+          {
+            "case": "standard_history",
+            "rendered": false,
+            "error": "The assistant turn at messages[2] is missing its reasoning. Dropping reasoning from earlier turns degrades this model's output. Send it back in 'reasoning_content', or set allow_missing_thinking=true to skip this check."
+          },
+          {
+            "case": "empty_reasoning_fields",
+            "rendered": false,
+            "error": "The assistant turn at messages[2] is missing its reasoning. Dropping reasoning from earlier turns degrades this model's output. Send it back in 'reasoning_content', or set allow_missing_thinking=true to skip this check."
+          },
+          {
+            "case": "native_allow_missing_thinking",
+            "rendered": true,
+            "rendered_prompt_chars": 2682,
+            "error": null
+          }
+        ]
+      },
+      "conclusion": "All four tool-capable endpoints still returned HTTP 400 before inference because synthetic assistant history has no reasoning. The official template also rejects explicitly empty reasoning fields. Its native allow_missing_thinking=true setting accepts the history locally, but the previously tested OpenRouter overrides did not enable it on hosted endpoints. No scored benchmark runs were produced."
+    }
+  ]
 }

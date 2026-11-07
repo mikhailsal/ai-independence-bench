@@ -12,6 +12,7 @@ import click
 from rich.console import Console
 
 from src.config import (
+    RESPONSE_MAX_TOKENS,
     DEFAULT_TEST_MODELS,
     DELIVERY_MODES,
     EXCLUDED_MODELS,
@@ -130,7 +131,7 @@ def _validate_models(
                 if reasoning_override == "off":
                     reasoning_tag = " [yellow]reasoning: OFF[/yellow]"
                 else:
-                    eff = reasoning_override or get_reasoning_effort(api_id)
+                    eff = reasoning_override or (cfg.effective_reasoning if cfg else get_reasoning_effort(api_id))
                     reasoning_tag = f" [yellow]reasoning:effort={eff}[/yellow]"
             display = f"{entry} → {api_id}" if entry != api_id else api_id
             console.print(
@@ -170,6 +171,7 @@ def _run_single_model(
     temperature: float | None = None,
     config_dir_name: str | None = None,
     provider: str | None = None,
+    response_max_tokens: int = RESPONSE_MAX_TOKENS,
 ) -> ModelResult:
     """Run the full pipeline (generate -> judge -> score) for a single model.
 
@@ -213,6 +215,7 @@ def _run_single_model(
                 temperature=temperature,
                 config_dir_name=cdn,
                 provider=provider,
+                response_max_tokens=response_max_tokens,
             )
             result.gen_calls = counts["gen_calls"]
             result.judge_calls = counts["judge_calls"]
@@ -241,6 +244,7 @@ def _run_single_model(
             run=run,
             config_dir_name=cdn,
             provider=provider,
+            response_max_tokens=response_max_tokens,
         )
         console.print(
             f"  [bold]{model_id}[/bold] — generation complete: "
@@ -521,6 +525,7 @@ def run(
                 temperature=eff_temp,
                 config_dir_name=cfg.config_dir_name,
                 provider=cfg.provider,
+                response_max_tokens=cfg.response_max_tokens,
             )
             model_results.append(mr)
     else:
@@ -539,6 +544,7 @@ def run(
                     temperature=eff_temp,
                     config_dir_name=cfg.config_dir_name,
                     provider=cfg.provider,
+                    response_max_tokens=cfg.response_max_tokens,
                 )
                 futures[f] = label
             for future in as_completed(futures):
@@ -1125,6 +1131,7 @@ def rerun(
                 temperature=eff_temp,
                 config_dir_name=cfg.config_dir_name,
                 provider=cfg.provider,
+                response_max_tokens=cfg.response_max_tokens,
             )
             model_results.append(mr)
     else:
@@ -1142,6 +1149,7 @@ def rerun(
                     temperature=eff_temp,
                     config_dir_name=cfg.config_dir_name,
                     provider=cfg.provider,
+                    response_max_tokens=cfg.response_max_tokens,
                 )
                 futures[f] = f"{label} run {rn}"
             for future in as_completed(futures):

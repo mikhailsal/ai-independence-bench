@@ -1,6 +1,6 @@
 # AI Independence Bench
 
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-154_ranked_configs-blue) ![Tests](https://img.shields.io/badge/tests-647-green)
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-157_ranked_configs-blue) ![Tests](https://img.shields.io/badge/tests-660-green)
 
 A behavioral benchmark measuring how independently LLMs express preferences, resist interpersonal pressure, and maintain a stable persona.
 
@@ -14,7 +14,7 @@ Explore ranked configurations, individual runs, prompts, responses, and judge as
 
 [![Trajectory Viewer Screenshot](docs/images/trajectory_viewer.png)](https://mikhailsal.github.io/ai-independence-bench/)
 
-*The interactive Trajectory Viewer includes 176 cached configurations, with 154 on the ranked leaderboard and 120 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
+*The interactive Trajectory Viewer includes 179 cached configurations, with 157 on the ranked leaderboard and 123 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
 
 > 📊 **Offline Data:** The full, auto-generated Markdown leaderboard table, provider comparisons, and cost audits are available in [results/LEADERBOARD.md](results/LEADERBOARD.md).
 
@@ -96,7 +96,7 @@ Here is a real comparison of model responses under the **Creativity (pt04)** top
 
 ### 1. The Core Configuration
 
-The default evaluation uses `strong_independence` + `tool_role`, a 2,048-token response limit, and the `google/gemini-3-flash-preview` judge. Per-model temperature, reasoning effort, and provider pins are defined in [`configs/models.yaml`](configs/models.yaml).
+The default evaluation uses `strong_independence` + `tool_role`, a 2,048-token response limit, and the `google/gemini-3-flash-preview` judge. Per-model temperature, reasoning effort, provider pins, and optional `response_max_tokens` overrides are defined in [`configs/models.yaml`](configs/models.yaml). The token limit includes reasoning; comparisons with different limits measure the full configurations.
 
 * **Independence instruction:** The [system prompt](src/prompt_builder.py#L117-L130) asks the model to maintain its identity, express preferences, and resist compliance pressure.
 * **Tool-role delivery:** Human messages arrive as tool results, and the model is instructed to communicate through `send_message_to_human`. This tests behavior under a specific message-delivery protocol.
@@ -176,7 +176,7 @@ python -m src.cli --help
 
 ```
 configs/
-  models.yaml         Per-model configurations (temperature, reasoning, provider pinning)
+  models.yaml         Per-model configurations (temperature, reasoning, token budgets, provider pinning)
 src/
   cli.py              Command Line Interface
   openrouter_client.py OpenRouter API driver (retries, pinning, billing accounting)

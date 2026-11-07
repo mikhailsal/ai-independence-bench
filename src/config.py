@@ -301,6 +301,7 @@ class ModelConfig:
             prefix-based default from ``get_reasoning_effort()``.
         temperature_supported: False if the provider ignores the temperature
             parameter and uses its own default.
+        response_max_tokens: Maximum tokens for each generated response.
         active: Whether this config should be included in default benchmark runs.
         provider: OpenRouter provider slug to pin requests to a specific
             provider (e.g. ``"moonshotai/int4"``).  When set, the request
@@ -315,6 +316,7 @@ class ModelConfig:
     temperature_supported: bool = True
     active: bool = True
     provider: str | None = None
+    response_max_tokens: int = RESPONSE_MAX_TOKENS
 
     @property
     def label(self) -> str:
@@ -414,6 +416,9 @@ def load_model_configs(path: Path | None = None) -> list[ModelConfig]:
         temp_supported = entry.get("temperature_supported", True)
         active = entry.get("active", True)
         provider = entry.get("provider") or None
+        response_max_tokens = entry.get("response_max_tokens", RESPONSE_MAX_TOKENS)
+        if isinstance(response_max_tokens, bool) or not isinstance(response_max_tokens, int) or response_max_tokens <= 0:
+            raise ValueError("response_max_tokens must be a positive integer")
 
         label = entry.get("display_label") or generate_display_label(
             model_id, reasoning, temperature,
@@ -427,6 +432,7 @@ def load_model_configs(path: Path | None = None) -> list[ModelConfig]:
             temperature_supported=temp_supported,
             active=active,
             provider=provider,
+            response_max_tokens=response_max_tokens,
         )
         if cfg.label not in MODEL_CONFIGS:
             register_config(cfg)

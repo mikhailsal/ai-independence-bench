@@ -90,6 +90,14 @@ models:
     provider: openai
     display_label: gpt-6-luna+openai@low-t1.0
 
+  - model_id: openai/gpt-6-luna
+    temperature: 1.0
+    reasoning_effort: max
+    temperature_supported: false
+    response_max_tokens: 32768
+    provider: openai
+    display_label: gpt-6-luna+openai@max-t1.0
+
   - model_id: openai/gpt-6-astra
     temperature: 1.0
     reasoning_effort: low
@@ -212,6 +220,14 @@ models:
     temperature_supported: false
     provider: anthropic
     display_label: claude-haiku-5.5+anthropic@none-t1.0
+
+  - model_id: anthropic/claude-haiku-5.5
+    temperature: 1.0
+    reasoning_effort: max
+    temperature_supported: false
+    response_max_tokens: 32768
+    provider: anthropic
+    display_label: claude-haiku-5.5+anthropic@max-t1.0
 
   # ───────────────────────────────────────────────────────────────
   # Google — temperature supported; reasoning configured per model
@@ -627,6 +643,15 @@ models:
   - model_id: tngtech/deepseek-r1t2-chimera
     temperature: 0.7
     reasoning_effort: low
+
+  # ───────────────────────────────────────────────────────────────
+  # Stealth — reasoning is mandatory; pin the evaluation endpoint.
+  # ───────────────────────────────────────────────────────────────
+  - model_id: stealth/crouton-alpha
+    temperature: 0.7
+    reasoning_effort: low
+    provider: stealth
+    display_label: crouton-alpha+stealth@low-t0.7
 
   # ───────────────────────────────────────────────────────────────
   # OpenRouter custom models (retired)

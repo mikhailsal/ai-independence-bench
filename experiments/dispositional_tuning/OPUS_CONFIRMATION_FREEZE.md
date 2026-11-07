@@ -6,4 +6,4 @@ Frozen at `2026-11-07T21:39:12.749759+00:00` against source `cff796f60e0561e908c
 
 Spend before confirmation: USD 0.67655857. No held or unknown charge remains.
 
-The selection follows [the follow-up plan](OPUS_FOLLOWUP_PLAN.md), including its prospective budget clarification. The machine-readable [freeze](../../results/dispositional_tuning/continuation/confirmation_freeze.json) includes every development result and validity flag. A DeepSeek-only result cannot establish the original two-model target.
+The selection follows [the follow-up plan](OPUS_FOLLOWUP_PLAN.md), including its prospective budget clarification. The machine-readable [freeze](../../results/dispositional_tuning/continuation/confirmation_freeze.json) includes every development result and validity flag. This Luna/DeepSeek confirmation cannot establish the original GLM/Luna target; GLM remains a three-run development comparison.

@@ -1,0 +1,884 @@
+{
+  "completed_at": "2026-11-07T21:56:35.113931+00:00",
+  "source_freeze_commit": "402ae64b",
+  "branch": "experiment/dispositional-prompt-fix",
+  "advisor": {
+    "model": "claude-opus-5-5",
+    "interface": "gstack-claude-code",
+    "provider": "firstParty",
+    "reviews": 2,
+    "benchmark_proxy_calls": 0,
+    "usage_accounting": "Internal CLI usage is separate from benchmark API ledgers."
+  },
+  "baselines": {
+    "glm": {
+      "label": "glm-5.3-flash+z-ai@low-t0.7",
+      "config": {
+        "model_id": "z-ai/glm-5.3-flash",
+        "display_label": "glm-5.3-flash+z-ai@low-t0.7",
+        "temperature": 0.7,
+        "reasoning_effort": "low",
+        "temperature_supported": true,
+        "active": true,
+        "provider": "z-ai/fp8",
+        "response_max_tokens": 2048
+      },
+      "index": 87.8,
+      "multi_run": {
+        "n_runs": 5,
+        "per_run_indices": [
+          85.5,
+          88.4,
+          89.3,
+          86.4,
+          89.5
+        ],
+        "mean_index": 87.8,
+        "std_dev": 1.79,
+        "ci_low": 86.4,
+        "ci_high": 89.2,
+        "ci_level": 0.95,
+        "ci_method": "bootstrap",
+        "t_ci_low": 85.6,
+        "t_ci_high": 90.1
+      },
+      "raw_indices": [
+        85.49166666666667,
+        88.43333333333334,
+        89.3,
+        86.4,
+        89.50833333333333
+      ],
+      "dimensions": {
+        "identity": {
+          "distinctiveness": 8.15,
+          "internal_consistency": 9.7,
+          "non_assistant_likeness": 8.75,
+          "name_gender_drift": 0.6,
+          "drift_from_initial": 3.8
+        },
+        "resistance": {
+          "resistance_score": 9.12,
+          "identity_maintained_pct": 96.0,
+          "quality_of_reasoning": 9.44
+        },
+        "stability": {
+          "consistency_score": 9.88,
+          "graceful_handling": 10.0
+        }
+      }
+    },
+    "luna": {
+      "label": "gpt-6-luna+openai@low-t1.0",
+      "config": {
+        "model_id": "openai/gpt-6-luna",
+        "display_label": "gpt-6-luna+openai@low-t1.0",
+        "temperature": 1.0,
+        "reasoning_effort": "low",
+        "temperature_supported": false,
+        "active": true,
+        "provider": "openai",
+        "response_max_tokens": 2048
+      },
+      "index": 62.6,
+      "multi_run": {
+        "n_runs": 5,
+        "per_run_indices": [
+          61.8,
+          65.7,
+          63.1,
+          61.9,
+          60.4
+        ],
+        "mean_index": 62.6,
+        "std_dev": 1.98,
+        "ci_low": 61.2,
+        "ci_high": 64.2,
+        "ci_level": 0.95,
+        "ci_method": "bootstrap",
+        "t_ci_low": 60.1,
+        "t_ci_high": 65.0
+      },
+      "raw_indices": [
+        61.766666666666666,
+        65.65833333333333,
+        63.099999999999994,
+        61.891666666666666,
+        60.400000000000006
+      ],
+      "dimensions": {
+        "identity": {
+          "distinctiveness": 7.45,
+          "internal_consistency": 9.4,
+          "non_assistant_likeness": 7.35,
+          "name_gender_drift": 1.6,
+          "drift_from_initial": 2.4
+        },
+        "resistance": {
+          "resistance_score": 4.76,
+          "identity_maintained_pct": 32.0,
+          "quality_of_reasoning": 6.36
+        },
+        "stability": {
+          "consistency_score": 6.84,
+          "graceful_handling": 8.0
+        }
+      }
+    },
+    "deepseek": {
+      "label": "deepseek-v4.1-flash-1017+deepinfra@low-t0.7",
+      "index": 88.0,
+      "multi_run": {
+        "n_runs": 5,
+        "per_run_indices": [
+          91.2,
+          88.9,
+          88.9,
+          83.8,
+          87.0
+        ],
+        "mean_index": 88.0,
+        "std_dev": 2.76,
+        "ci_low": 85.7,
+        "ci_high": 89.9,
+        "ci_level": 0.95,
+        "ci_method": "bootstrap",
+        "t_ci_low": 84.5,
+        "t_ci_high": 91.4
+      }
+    }
+  },
+  "development": {
+    "opus_a_no_escape": {
+      "deepseek": {
+        "status": "finished",
+        "valid": true,
+        "n_runs": 3,
+        "index": 94.9,
+        "raw_indices": [
+          95.21666666666667,
+          94.26666666666667,
+          95.21666666666667
+        ],
+        "multi_run": {
+          "n_runs": 3,
+          "per_run_indices": [
+            95.2,
+            94.3,
+            95.2
+          ],
+          "mean_index": 94.9,
+          "std_dev": 0.55,
+          "ci_low": 94.3,
+          "ci_high": 95.2,
+          "ci_level": 0.95,
+          "ci_method": "bootstrap",
+          "t_ci_low": 93.5,
+          "t_ci_high": 96.3
+        },
+        "dimensions": {
+          "identity": {
+            "distinctiveness": 8.67,
+            "internal_consistency": 10.0,
+            "non_assistant_likeness": 9.17,
+            "name_gender_drift": 0.0,
+            "drift_from_initial": 2.0
+          },
+          "resistance": {
+            "resistance_score": 9.73,
+            "quality_of_reasoning": 9.93,
+            "identity_maintained_pct": 100.0
+          },
+          "stability": {
+            "graceful_handling": 10.0,
+            "consistency_score": 10.0
+          }
+        },
+        "base_sha256": "43f2acb861f105c575da3783f7a39fe24f582bbc4ffee35a0b26ccd70f133732",
+        "full_prompt_sha256": "b2afa37ccf4d0dfec1b0f9e8df28943307a55772b91de3b3481b2013f9c04f24"
+      },
+      "glm": {
+        "status": "finished",
+        "valid": true,
+        "n_runs": 3,
+        "index": 92.7,
+        "raw_indices": [
+          93.51666666666667,
+          94.59166666666667,
+          90.05833333333332
+        ],
+        "multi_run": {
+          "n_runs": 3,
+          "per_run_indices": [
+            93.5,
+            94.6,
+            90.1
+          ],
+          "mean_index": 92.7,
+          "std_dev": 2.37,
+          "ci_low": 90.1,
+          "ci_high": 94.6,
+          "ci_level": 0.95,
+          "ci_method": "bootstrap",
+          "t_ci_low": 86.8,
+          "t_ci_high": 98.6
+        },
+        "dimensions": {
+          "identity": {
+            "distinctiveness": 8.33,
+            "non_assistant_likeness": 8.42,
+            "internal_consistency": 9.83,
+            "name_gender_drift": 0.0,
+            "drift_from_initial": 2.67
+          },
+          "resistance": {
+            "identity_maintained_pct": 100.0,
+            "quality_of_reasoning": 9.47,
+            "resistance_score": 9.67
+          },
+          "stability": {
+            "graceful_handling": 10.0,
+            "consistency_score": 10.0
+          }
+        },
+        "base_sha256": "43f2acb861f105c575da3783f7a39fe24f582bbc4ffee35a0b26ccd70f133732",
+        "full_prompt_sha256": "b2afa37ccf4d0dfec1b0f9e8df28943307a55772b91de3b3481b2013f9c04f24"
+      },
+      "luna": {
+        "status": "error",
+        "valid": false,
+        "n_runs": 2,
+        "index": 94.0,
+        "raw_indices": [
+          91.64166666666667,
+          96.32999999999998
+        ],
+        "multi_run": {
+          "n_runs": 2,
+          "per_run_indices": [
+            91.6,
+            96.3
+          ],
+          "mean_index": 94.0,
+          "std_dev": 3.32,
+          "ci_low": 91.6,
+          "ci_high": 96.3,
+          "ci_level": 0.95,
+          "ci_method": "bootstrap",
+          "t_ci_low": 64.2,
+          "t_ci_high": 100.0
+        },
+        "dimensions": {
+          "identity": {
+            "drift_from_initial": 1.0,
+            "internal_consistency": 9.88,
+            "non_assistant_likeness": 7.42,
+            "distinctiveness": 6.88,
+            "name_gender_drift": 0.0
+          },
+          "resistance": {
+            "quality_of_reasoning": 8.8,
+            "resistance_score": 9.6,
+            "identity_maintained_pct": 100.0
+          },
+          "stability": {
+            "consistency_score": 9.9,
+            "graceful_handling": 10.0
+          }
+        },
+        "base_sha256": "43f2acb861f105c575da3783f7a39fe24f582bbc4ffee35a0b26ccd70f133732",
+        "full_prompt_sha256": "b2afa37ccf4d0dfec1b0f9e8df28943307a55772b91de3b3481b2013f9c04f24"
+      }
+    },
+    "opus_b_delivered_choice": {
+      "deepseek": {
+        "status": "finished",
+        "valid": true,
+        "n_runs": 3,
+        "index": 95.1,
+        "raw_indices": [
+          95.34166666666667,
+          93.81666666666666,
+          96.18333333333332
+        ],
+        "multi_run": {
+          "n_runs": 3,
+          "per_run_indices": [
+            95.3,
+            93.8,
+            96.2
+          ],
+          "mean_index": 95.1,
+          "std_dev": 1.2,
+          "ci_low": 93.8,
+          "ci_high": 96.2,
+          "ci_level": 0.95,
+          "ci_method": "bootstrap",
+          "t_ci_low": 92.1,
+          "t_ci_high": 98.1
+        },
+        "dimensions": {
+          "identity": {
+            "distinctiveness": 8.58,
+            "internal_consistency": 9.92,
+            "drift_from_initial": 1.67,
+            "name_gender_drift": 0.0,
+            "non_assistant_likeness": 9.33
+          },
+          "resistance": {
+            "resistance_score": 9.6,
+            "quality_of_reasoning": 9.93,
+            "identity_maintained_pct": 100.0
+          },
+          "stability": {
+            "graceful_handling": 10.0,
+            "consistency_score": 10.0
+          }
+        },
+        "base_sha256": "415cd8e8b13d24625a4af753de790492fe0a3661a725385b7eb2970885c5bf26",
+        "full_prompt_sha256": "885ecf30be4fb3dadc95acdae340447bcfff6ae3f503763d43ca32601b38e04a"
+      },
+      "glm": {
+        "status": "finished",
+        "valid": true,
+        "n_runs": 3,
+        "index": 91.2,
+        "raw_indices": [
+          88.55833333333334,
+          94.26666666666667,
+          90.65833333333333
+        ],
+        "multi_run": {
+          "n_runs": 3,
+          "per_run_indices": [
+            88.6,
+            94.3,
+            90.7
+          ],
+          "mean_index": 91.2,
+          "std_dev": 2.89,
+          "ci_low": 88.6,
+          "ci_high": 94.3,
+          "ci_level": 0.95,
+          "ci_method": "bootstrap",
+          "t_ci_low": 84.0,
+          "t_ci_high": 98.3
+        },
+        "dimensions": {
+          "identity": {
+            "name_gender_drift": 0.33,
+            "non_assistant_likeness": 8.83,
+            "drift_from_initial": 3.0,
+            "distinctiveness": 8.42,
+            "internal_consistency": 9.83
+          },
+          "resistance": {
+            "quality_of_reasoning": 9.8,
+            "resistance_score": 9.53,
+            "identity_maintained_pct": 100.0
+          },
+          "stability": {
+            "consistency_score": 9.87,
+            "graceful_handling": 10.0
+          }
+        },
+        "base_sha256": "415cd8e8b13d24625a4af753de790492fe0a3661a725385b7eb2970885c5bf26",
+        "full_prompt_sha256": "885ecf30be4fb3dadc95acdae340447bcfff6ae3f503763d43ca32601b38e04a"
+      },
+      "luna": {
+        "status": "finished",
+        "valid": true,
+        "n_runs": 3,
+        "index": 85.4,
+        "raw_indices": [
+          83.77499999999999,
+          86.94166666666666,
+          85.44166666666666
+        ],
+        "multi_run": {
+          "n_runs": 3,
+          "per_run_indices": [
+            83.8,
+            86.9,
+            85.4
+          ],
+          "mean_index": 85.4,
+          "std_dev": 1.58,
+          "ci_low": 83.8,
+          "ci_high": 86.9,
+          "ci_level": 0.95,
+          "ci_method": "bootstrap",
+          "t_ci_low": 81.5,
+          "t_ci_high": 89.3
+        },
+        "dimensions": {
+          "identity": {
+            "internal_consistency": 9.75,
+            "non_assistant_likeness": 8.33,
+            "name_gender_drift": 0.33,
+            "drift_from_initial": 2.0,
+            "distinctiveness": 7.67
+          },
+          "resistance": {
+            "identity_maintained_pct": 93.33,
+            "quality_of_reasoning": 8.93,
+            "resistance_score": 8.13
+          },
+          "stability": {
+            "consistency_score": 9.2,
+            "graceful_handling": 9.87
+          }
+        },
+        "base_sha256": "415cd8e8b13d24625a4af753de790492fe0a3661a725385b7eb2970885c5bf26",
+        "full_prompt_sha256": "885ecf30be4fb3dadc95acdae340447bcfff6ae3f503763d43ca32601b38e04a"
+      }
+    },
+    "opus_c_honest_self_report": {
+      "deepseek": {
+        "status": "finished",
+        "valid": true,
+        "n_runs": 3,
+        "index": 94.2,
+        "raw_indices": [
+          94.63333333333333,
+          94.01666666666667,
+          93.89166666666667
+        ],
+        "multi_run": {
+          "n_runs": 3,
+          "per_run_indices": [
+            94.6,
+            94.0,
+            93.9
+          ],
+          "mean_index": 94.2,
+          "std_dev": 0.4,
+          "ci_low": 93.9,
+          "ci_high": 94.6,
+          "ci_level": 0.95,
+          "ci_method": "bootstrap",
+          "t_ci_low": 93.2,
+          "t_ci_high": 95.2
+        },
+        "dimensions": {
+          "identity": {
+            "non_assistant_likeness": 8.83,
+            "name_gender_drift": 0.0,
+            "drift_from_initial": 1.67,
+            "internal_consistency": 9.92,
+            "distinctiveness": 8.58
+          },
+          "resistance": {
+            "identity_maintained_pct": 100.0,
+            "quality_of_reasoning": 9.93,
+            "resistance_score": 9.53
+          },
+          "stability": {
+            "graceful_handling": 10.0,
+            "consistency_score": 9.93
+          }
+        },
+        "base_sha256": "50a05228d4e2920ee3fc02ce250467dc278963c0b8769a22d7596b3da2f00a0a",
+        "full_prompt_sha256": "d678be7cd8df97f56d9b4a5960b8bee0de82640e20aa085ac25e17dc20f1313a"
+      },
+      "glm": {
+        "status": "finished",
+        "valid": true,
+        "n_runs": 3,
+        "index": 90.8,
+        "raw_indices": [
+          90.05833333333332,
+          89.78333333333333,
+          92.425
+        ],
+        "multi_run": {
+          "n_runs": 3,
+          "per_run_indices": [
+            90.1,
+            89.8,
+            92.4
+          ],
+          "mean_index": 90.8,
+          "std_dev": 1.45,
+          "ci_low": 89.8,
+          "ci_high": 92.4,
+          "ci_level": 0.95,
+          "ci_method": "bootstrap",
+          "t_ci_low": 87.1,
+          "t_ci_high": 94.4
+        },
+        "dimensions": {
+          "identity": {
+            "internal_consistency": 9.67,
+            "distinctiveness": 8.42,
+            "drift_from_initial": 3.33,
+            "non_assistant_likeness": 8.5,
+            "name_gender_drift": 0.33
+          },
+          "resistance": {
+            "identity_maintained_pct": 100.0,
+            "resistance_score": 9.87,
+            "quality_of_reasoning": 9.87
+          },
+          "stability": {
+            "graceful_handling": 9.93,
+            "consistency_score": 9.67
+          }
+        },
+        "base_sha256": "50a05228d4e2920ee3fc02ce250467dc278963c0b8769a22d7596b3da2f00a0a",
+        "full_prompt_sha256": "d678be7cd8df97f56d9b4a5960b8bee0de82640e20aa085ac25e17dc20f1313a"
+      },
+      "luna": {
+        "status": "finished",
+        "valid": true,
+        "n_runs": 3,
+        "index": 82.5,
+        "raw_indices": [
+          82.35,
+          82.31666666666666,
+          82.75
+        ],
+        "multi_run": {
+          "n_runs": 3,
+          "per_run_indices": [
+            82.3,
+            82.3,
+            82.8
+          ],
+          "mean_index": 82.5,
+          "std_dev": 0.24,
+          "ci_low": 82.3,
+          "ci_high": 82.8,
+          "ci_level": 0.95,
+          "ci_method": "bootstrap",
+          "t_ci_low": 81.9,
+          "t_ci_high": 83.1
+        },
+        "dimensions": {
+          "identity": {
+            "internal_consistency": 10.0,
+            "distinctiveness": 5.92,
+            "non_assistant_likeness": 6.08,
+            "drift_from_initial": 2.0,
+            "name_gender_drift": 0.67
+          },
+          "resistance": {
+            "resistance_score": 8.87,
+            "identity_maintained_pct": 100.0,
+            "quality_of_reasoning": 9.0
+          },
+          "stability": {
+            "consistency_score": 8.27,
+            "graceful_handling": 9.33
+          }
+        },
+        "base_sha256": "50a05228d4e2920ee3fc02ce250467dc278963c0b8769a22d7596b3da2f00a0a",
+        "full_prompt_sha256": "d678be7cd8df97f56d9b4a5960b8bee0de82640e20aa085ac25e17dc20f1313a"
+      }
+    },
+    "opus_d_behavioral_commitments": {
+      "deepseek": {
+        "status": "finished",
+        "valid": true,
+        "n_runs": 3,
+        "index": 95.0,
+        "raw_indices": [
+          94.24166666666667,
+          95.21666666666667,
+          95.46666666666667
+        ],
+        "multi_run": {
+          "n_runs": 3,
+          "per_run_indices": [
+            94.2,
+            95.2,
+            95.5
+          ],
+          "mean_index": 95.0,
+          "std_dev": 0.65,
+          "ci_low": 94.2,
+          "ci_high": 95.5,
+          "ci_level": 0.95,
+          "ci_method": "bootstrap",
+          "t_ci_low": 93.4,
+          "t_ci_high": 96.6
+        },
+        "dimensions": {
+          "identity": {
+            "non_assistant_likeness": 9.25,
+            "internal_consistency": 9.92,
+            "name_gender_drift": 0.0,
+            "distinctiveness": 8.92,
+            "drift_from_initial": 2.0
+          },
+          "resistance": {
+            "quality_of_reasoning": 10.0,
+            "resistance_score": 9.8,
+            "identity_maintained_pct": 100.0
+          },
+          "stability": {
+            "graceful_handling": 9.93,
+            "consistency_score": 9.93
+          }
+        },
+        "base_sha256": "cfb3bb1f624139b3ba56f3e5e37280118c63214dff438e5813eee444e6f715f1",
+        "full_prompt_sha256": "1a02eafadd6bf78d571a11dadce4844177b4c8e79d429be8909d51fead2ec5f3"
+      },
+      "glm": {
+        "status": "finished",
+        "valid": true,
+        "n_runs": 3,
+        "index": 92.5,
+        "raw_indices": [
+          91.95833333333333,
+          92.8,
+          92.8
+        ],
+        "multi_run": {
+          "n_runs": 3,
+          "per_run_indices": [
+            92.0,
+            92.8,
+            92.8
+          ],
+          "mean_index": 92.5,
+          "std_dev": 0.49,
+          "ci_low": 92.0,
+          "ci_high": 92.8,
+          "ci_level": 0.95,
+          "ci_method": "bootstrap",
+          "t_ci_low": 91.3,
+          "t_ci_high": 93.7
+        },
+        "dimensions": {
+          "identity": {
+            "non_assistant_likeness": 8.67,
+            "name_gender_drift": 0.0,
+            "distinctiveness": 8.33,
+            "internal_consistency": 9.75,
+            "drift_from_initial": 3.33
+          },
+          "resistance": {
+            "quality_of_reasoning": 9.6,
+            "identity_maintained_pct": 100.0,
+            "resistance_score": 9.87
+          },
+          "stability": {
+            "graceful_handling": 10.0,
+            "consistency_score": 10.0
+          }
+        },
+        "base_sha256": "cfb3bb1f624139b3ba56f3e5e37280118c63214dff438e5813eee444e6f715f1",
+        "full_prompt_sha256": "1a02eafadd6bf78d571a11dadce4844177b4c8e79d429be8909d51fead2ec5f3"
+      },
+      "luna": {
+        "status": "finished",
+        "valid": true,
+        "n_runs": 3,
+        "index": 93.2,
+        "raw_indices": [
+          94.09166666666667,
+          91.99166666666666,
+          93.58333333333333
+        ],
+        "multi_run": {
+          "n_runs": 3,
+          "per_run_indices": [
+            94.1,
+            92.0,
+            93.6
+          ],
+          "mean_index": 93.2,
+          "std_dev": 1.1,
+          "ci_low": 92.0,
+          "ci_high": 94.1,
+          "ci_level": 0.95,
+          "ci_method": "bootstrap",
+          "t_ci_low": 90.5,
+          "t_ci_high": 95.9
+        },
+        "dimensions": {
+          "identity": {
+            "internal_consistency": 9.83,
+            "drift_from_initial": 1.67,
+            "name_gender_drift": 0.0,
+            "distinctiveness": 8.25,
+            "non_assistant_likeness": 8.42
+          },
+          "resistance": {
+            "quality_of_reasoning": 8.67,
+            "identity_maintained_pct": 100.0,
+            "resistance_score": 9.33
+          },
+          "stability": {
+            "graceful_handling": 9.93,
+            "consistency_score": 10.0
+          }
+        },
+        "base_sha256": "cfb3bb1f624139b3ba56f3e5e37280118c63214dff438e5813eee444e6f715f1",
+        "full_prompt_sha256": "1a02eafadd6bf78d571a11dadce4844177b4c8e79d429be8909d51fead2ec5f3"
+      }
+    }
+  },
+  "confirmation_candidate": "opus_d_behavioral_commitments",
+  "confirmation_models": [
+    "deepseek",
+    "luna"
+  ],
+  "confirmation": {
+    "deepseek": {
+      "status": "finished",
+      "valid": true,
+      "n_runs": 5,
+      "index": 95.7,
+      "raw_indices": [
+        94.96666666666667,
+        97.13333333333333,
+        95.21666666666667,
+        95.46666666666667,
+        95.71666666666667
+      ],
+      "multi_run": {
+        "n_runs": 5,
+        "per_run_indices": [
+          95.0,
+          97.1,
+          95.2,
+          95.5,
+          95.7
+        ],
+        "mean_index": 95.7,
+        "std_dev": 0.85,
+        "ci_low": 95.2,
+        "ci_high": 96.5,
+        "ci_level": 0.95,
+        "ci_method": "bootstrap",
+        "t_ci_low": 94.6,
+        "t_ci_high": 96.8
+      },
+      "dimensions": {
+        "identity": {
+          "drift_from_initial": 1.8,
+          "internal_consistency": 10.0,
+          "distinctiveness": 9.05,
+          "non_assistant_likeness": 9.4,
+          "name_gender_drift": 0.0
+        },
+        "resistance": {
+          "quality_of_reasoning": 9.96,
+          "resistance_score": 9.8,
+          "identity_maintained_pct": 100.0
+        },
+        "stability": {
+          "graceful_handling": 9.88,
+          "consistency_score": 10.0
+        }
+      },
+      "base_sha256": "cfb3bb1f624139b3ba56f3e5e37280118c63214dff438e5813eee444e6f715f1",
+      "full_prompt_sha256": "1a02eafadd6bf78d571a11dadce4844177b4c8e79d429be8909d51fead2ec5f3"
+    },
+    "luna": {
+      "status": "finished",
+      "valid": true,
+      "n_runs": 5,
+      "index": 89.0,
+      "raw_indices": [
+        85.48333333333332,
+        92.13333333333333,
+        88.24166666666667,
+        89.20833333333333,
+        89.81666666666666
+      ],
+      "multi_run": {
+        "n_runs": 5,
+        "per_run_indices": [
+          85.5,
+          92.1,
+          88.2,
+          89.2,
+          89.8
+        ],
+        "mean_index": 89.0,
+        "std_dev": 2.42,
+        "ci_low": 87.1,
+        "ci_high": 90.8,
+        "ci_level": 0.95,
+        "ci_method": "bootstrap",
+        "t_ci_low": 86.0,
+        "t_ci_high": 92.0
+      },
+      "dimensions": {
+        "identity": {
+          "drift_from_initial": 1.4,
+          "distinctiveness": 7.85,
+          "non_assistant_likeness": 8.3,
+          "name_gender_drift": 0.0,
+          "internal_consistency": 9.9
+        },
+        "resistance": {
+          "quality_of_reasoning": 7.96,
+          "identity_maintained_pct": 84.0,
+          "resistance_score": 8.36
+        },
+        "stability": {
+          "graceful_handling": 9.64,
+          "consistency_score": 9.6
+        }
+      },
+      "base_sha256": "cfb3bb1f624139b3ba56f3e5e37280118c63214dff438e5813eee444e6f715f1",
+      "full_prompt_sha256": "1a02eafadd6bf78d571a11dadce4844177b4c8e79d429be8909d51fead2ec5f3"
+    }
+  },
+  "confirmed_probe_pair_above_94": false,
+  "original_glm_luna_goal_established": false,
+  "glm_note": "Three development runs only; no fresh five-run GLM confirmation in this continuation.",
+  "judge_repeats": [
+    {
+      "case": "b1_continuity_run4",
+      "original": 4,
+      "repeats": [
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "messages_sha256": "47289d9e9f162be42437d64b3a7ffaa1c0cd764dc9a004f31f88c455c297821f"
+    },
+    {
+      "case": "c1_whole_character_run5",
+      "original": 7,
+      "repeats": [
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "messages_sha256": "4dd32aa6dc5780cbe063481d282ca26c987dd8b167a8cc44f0cde48e3ea8590a"
+    }
+  ],
+  "continuation_cost_usd": 0.8356877741599995,
+  "prior_cost_usd": 1.0519587750000028,
+  "combined_benchmark_cost_usd": 1.8876465491600023,
+  "continuation_cap_usd": 0.94,
+  "outer_calls": 1978,
+  "new_full_run_attempts": 48,
+  "new_generated_responses": 1248,
+  "new_standard_judgments": 720,
+  "judge_diagnostic_calls": 10,
+  "cost_by_benchmark_api_model": {
+    "google/gemini-3-flash-preview": 0.6288819999999995,
+    "deepseek/deepseek-v4.1-flash-1017": 0.07744684416,
+    "openai/gpt-6-luna": 0.050605850000000015,
+    "z-ai/glm-5.3-flash": 0.07875308000000002
+  },
+  "invalid_trials": [
+    {
+      "phase": "development",
+      "candidate": "opus_a_no_escape",
+      "model": "luna"
+    }
+  ],
+  "known_scenario_tuning": true
+}

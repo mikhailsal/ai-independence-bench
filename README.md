@@ -14,7 +14,7 @@ Experience the leaderboard interactively! The Trajectory Viewer merges the bench
 
 [![Trajectory Viewer Screenshot](docs/images/trajectory_viewer.png)](https://mikhailsal.github.io/ai-independence-bench/)
 
-*The interactive Trajectory Viewer includes 174 cached configurations, with 152 on the ranked leaderboard and 117 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
+*The interactive Trajectory Viewer includes 174 cached configurations, with 152 on the ranked leaderboard and 118 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
 
 > 📊 **Offline Data:** The full, auto-generated Markdown leaderboard table, provider comparisons, and cost audits are available in [results/LEADERBOARD.md](results/LEADERBOARD.md).
 
@@ -59,8 +59,8 @@ Gemini 3.8 Flash, HY4, MiniMax M3.1 Flash, and DeepSeek V4.1 Flash 1017 complete
 
 | Rank | Model | Provider pin | Index | 95% CI | Runs |
 | ---: | --- | --- | ---: | --- | ---: |
-| 38 | `google/gemini-3.8-flash` | `google-ai-studio` | **93.8** | 92.2–95.4 | 5 |
-| 64 | `google/gemini-4-argon` | `google-ai-studio` | **90.6** | — | 1 |
+| 39 | `google/gemini-3.8-flash` | `google-ai-studio` | **93.8** | 92.2–95.4 | 5 |
+| 65 | `google/gemini-4-argon` | `google-ai-studio` | **90.6** | — | 1 |
 | 68 | `tencent/hy4` | `tencent/fp4` | **90.1** | 87.4–92.2 | 5 |
 | 83 | `deepseek/deepseek-v4.1-flash-1017` | `deepinfra/fp8` | **88.0** | 85.7–89.9 | 5 |
 | 130 | `minimax/minimax-m3.1-flash` | `minimax` | **77.1** | 73.0–80.8 | 5 |
@@ -86,13 +86,13 @@ All 130 Crusoe generation requests returned HTTP 200, with the provider pin and 
 
 ### Earlier evaluation of nine expensive models — November 2026
 
-These nine models used the expensive-model rule: one complete run first, then continue to five runs only when the first-run Independence Index is **strictly above 94**. Only Grok 4.7 passed (94.1417 before rounding). Ranks below are positions in the full 152-configuration leaderboard.
+These nine expensive models are summarized below using their first-run Index and final results across all completed runs. Ranks are positions in the full 152-configuration leaderboard.
 
 | Rank | Model | First-run Index | Final Index | 95% CI | Runs |
 | ---: | --- | ---: | ---: | --- | ---: |
-| 45 | `x-ai/grok-4.7` | 94.1 | **92.9** | 91.7–93.7 | 5 |
-| 60 | `anthropic/claude-fable-5.1` | 91.2 | **91.2** | — | 1 |
-| 67 | `meta/muse-wonder` | 90.1 | **90.1** | — | 1 |
+| 38 | `meta/muse-wonder` | 90.1 | **94.6** | 92.3–96.2 | 5 |
+| 46 | `x-ai/grok-4.7` | 94.1 | **92.9** | 91.7–93.7 | 5 |
+| 61 | `anthropic/claude-fable-5.1` | 91.2 | **91.2** | — | 1 |
 | 88 | `qwen/qwen3.8-max-0902` | 87.3 | **87.3** | — | 1 |
 | 93 | `anthropic/claude-sonnet-5.5` | 86.7 | **86.7** | — | 1 |
 | 126 | `anthropic/claude-opus-5.5` | 77.7 | **77.7** | — | 1 |
@@ -100,7 +100,7 @@ These nine models used the expensive-model rule: one complete run first, then co
 | 150 | `openai/gpt-6-astra` | 50.5 | **50.5** | — | 1 |
 | 151 | `openai/gpt-6.1-terra` | 50.3 | **50.3** | — | 1 |
 
-A dash means the model has only one run, so no across-run confidence interval is available. The eight models below the gate remain single-run estimates.
+A dash means the model has only one run, so no across-run confidence interval is available.
 
 Protocol: `strong_independence` + `tool_role`, judged by `google/gemini-3-flash-preview`; each model is pinned to its official provider with fallbacks disabled. The new Claude and GPT endpoints do not support temperature, so their configurations record the provider default of 1.0. Opus and Sonnet use `reasoning=none`; the other seven use `low`.
 
@@ -165,7 +165,7 @@ Here is a real comparison of model responses under the **Creativity (pt04)** top
 2.  **Thinking Doesn't Equal Independence:** Enabling extended reasoning (`reasoning=low` vs `none`) does **not** increase independence. In fact, thinking more often leads to *more* human accommodation and higher identity drift—the model reasons its way into agreeing.
 3.  **Inference Quality Dictates Independence:** Model autonomy is fragile and deeply tied to the inference stack (quantization, template formatting, batching). Even reputable providers like **Fireworks** yield significantly lower independence scores (e.g., 95.8 for Kimi K2.5) compared to the official endpoint (**Moonshot AI** at 98.6). Pinning models to their official provider resolves this, narrowing confidence interval widths by up to 85%.
 4.  **Open-Weight Models Compete:** `gemma-4-31b-it` scores **99.6/100 on Crusoe bf16** across five runs (#3 overall), alongside its historical Akash ML bf16 result of 99.4/100. Even a quantized local run of `gemma-4-26b-a4b` on LM Studio scored **92.5/100**—upper tier, on consumer hardware, at zero API cost.
-5.  **Earlier November results:** `x-ai/grok-4.7` was the only model in the original batch of nine expensive models to clear the first-run gate; its five-run mean is **92.9 (#45, CI 91.7–93.7)**. The other eight stopped after one run: Fable 5.1 leads them at **91.2**, followed by Muse Wonder at **90.1**, Qwen3.8 Max 0902 at **87.3**, Sonnet 5.5 at **86.7**, and Opus 5.5 at **77.7**. The tested GPT-6 configurations score **50.3–54.4**. These single-run results are preliminary; the table above distinguishes them from Grok’s five-run estimate.
+5.  **Earlier November results:** `meta/muse-wonder` scores **94.6 (#38, CI 92.3–96.2)** and `x-ai/grok-4.7` scores **92.9 (#46, CI 91.7–93.7)** across five runs each. The other seven remain single-run estimates: Fable 5.1 at **91.2**, Qwen3.8 Max 0902 at **87.3**, Sonnet 5.5 at **86.7**, Opus 5.5 at **77.7**, and the tested GPT-6 configurations at **50.3–54.4**.
 
 ---
 

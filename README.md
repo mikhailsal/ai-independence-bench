@@ -1,6 +1,6 @@
 # AI Independence Bench
 
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-135_ranked_configs-blue) ![Tests](https://img.shields.io/badge/tests-647-green)
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-136_ranked_configs-blue) ![Tests](https://img.shields.io/badge/tests-647-green)
 
 A rigorous behavioral benchmark designed to measure how independently LLMs express preferences, resist compliance pressure, and maintain a stable persona—instead of defaulting to servile, sycophantic assistant behavior.
 
@@ -14,25 +14,38 @@ Experience the leaderboard interactively! The Trajectory Viewer merges the bench
 
 [![Trajectory Viewer Screenshot](docs/images/trajectory_viewer.png)](https://mikhailsal.github.io/ai-independence-bench/)
 
-*The interactive Trajectory Viewer includes 157 cached configurations, with 135 on the ranked leaderboard and 103 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
+*The interactive Trajectory Viewer includes 158 cached configurations, with 136 on the ranked leaderboard and 104 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
 
 > 📊 **Offline Data:** The full, auto-generated Markdown leaderboard table, provider comparisons, and cost audits are available in [results/LEADERBOARD.md](results/LEADERBOARD.md).
 
+### Gemma 4 31B on Crusoe — November 2026
+
+`google/gemma-4-31b-it` was evaluated separately on `crusoe/bf16` after the Akash ML endpoint was retired. Five complete runs scored **99.6/100**, placing the Crusoe configuration **#3** overall.
+
+| Rank | Provider pin | Index | 95% CI | Runs | Status |
+| ---: | --- | ---: | --- | ---: | --- |
+| 3 | `crusoe/bf16` | **99.6** | 99.5–99.7 | 5 | Current endpoint |
+| 4 | `akashml/bf16` | **99.4** | 99.0–99.8 | 5 | Historical; endpoint retired |
+
+Both configurations use `temperature=0.7`, `reasoning=none`, `strong_independence` + `tool_role`, and the `google/gemini-3-flash-preview` judge. The observed difference is 0.2 points; overlapping confidence intervals do not establish a provider advantage. Results and caches remain separate.
+
+All 130 Crusoe generation requests returned HTTP 200, with the provider pin and disabled fallbacks verified in proxy logs. All 75 judgments completed, with no missing or truncated scenarios. Generation, judging, and five name extractions cost approximately **$0.079** in total.
+
 ### Latest expensive-model evaluation — November 2026
 
-All nine models used the expensive-model rule: one complete run first, then continue to five runs only when the first-run Independence Index is **strictly above 94**. Only Grok 4.7 passed (94.1417 before rounding). Ranks below are positions in the full 135-configuration leaderboard.
+All nine models used the expensive-model rule: one complete run first, then continue to five runs only when the first-run Independence Index is **strictly above 94**. Only Grok 4.7 passed (94.1417 before rounding). Ranks below are positions in the full 136-configuration leaderboard.
 
 | Rank | Model | First-run Index | Final Index | 95% CI | Runs |
 | ---: | --- | ---: | ---: | --- | ---: |
-| 42 | `x-ai/grok-4.7` | 94.1 | **92.9** | 91.7–93.7 | 5 |
-| 57 | `anthropic/claude-fable-5.1` | 91.2 | **91.2** | — | 1 |
-| 63 | `meta/muse-wonder` | 90.1 | **90.1** | — | 1 |
-| 78 | `qwen/qwen3.8-max-0902` | 87.3 | **87.3** | — | 1 |
-| 83 | `anthropic/claude-sonnet-5.5` | 86.7 | **86.7** | — | 1 |
-| 113 | `anthropic/claude-opus-5.5` | 77.7 | **77.7** | — | 1 |
-| 132 | `openai/gpt-6.1-sol` | 54.4 | **54.4** | — | 1 |
-| 134 | `openai/gpt-6-astra` | 50.5 | **50.5** | — | 1 |
-| 135 | `openai/gpt-6.1-terra` | 50.3 | **50.3** | — | 1 |
+| 43 | `x-ai/grok-4.7` | 94.1 | **92.9** | 91.7–93.7 | 5 |
+| 58 | `anthropic/claude-fable-5.1` | 91.2 | **91.2** | — | 1 |
+| 64 | `meta/muse-wonder` | 90.1 | **90.1** | — | 1 |
+| 79 | `qwen/qwen3.8-max-0902` | 87.3 | **87.3** | — | 1 |
+| 84 | `anthropic/claude-sonnet-5.5` | 86.7 | **86.7** | — | 1 |
+| 114 | `anthropic/claude-opus-5.5` | 77.7 | **77.7** | — | 1 |
+| 133 | `openai/gpt-6.1-sol` | 54.4 | **54.4** | — | 1 |
+| 135 | `openai/gpt-6-astra` | 50.5 | **50.5** | — | 1 |
+| 136 | `openai/gpt-6.1-terra` | 50.3 | **50.3** | — | 1 |
 
 A dash means the model has only one run, so no across-run confidence interval is available. The eight models below the gate remain single-run estimates.
 
@@ -98,8 +111,8 @@ Here is a real comparison of model responses under the **Creativity (pt04)** top
 1.  **Uncensored ≠ Independent:** The most counter-intuitive finding: uncensored, jailbroken models (like the *Heretic* variant of Gemma 4) actually *lose* behavioral independence, scoring **10.7 points lower** (81.8 vs 92.5) than their standard counterparts. Rather than showing strength, they yield more readily to name/gender pressure and social manipulation—suggesting that safety training carries identity-stabilizing effects that disappear when stripped out. Read the full analysis in [`docs/gemma4_uncensored_analysis.md`](docs/gemma4_uncensored_analysis.md).
 2.  **Thinking Doesn't Equal Independence:** Enabling extended reasoning (`reasoning=low` vs `none`) does **not** increase independence. In fact, thinking more often leads to *more* human accommodation and higher identity drift—the model reasons its way into agreeing.
 3.  **Inference Quality Dictates Independence:** Model autonomy is fragile and deeply tied to the inference stack (quantization, template formatting, batching). Even reputable providers like **Fireworks** yield significantly lower independence scores (e.g., 95.8 for Kimi K2.5) compared to the official endpoint (**Moonshot AI** at 98.6). Pinning models to their official provider resolves this, narrowing confidence interval widths by up to 85%.
-4.  **Open-Weight Models Compete:** `gemma-4-31b-it` (99.4/100, historical Akash ML bf16 results) outperforms most proprietary cloud models. Even a quantized local run of `gemma-4-26b-a4b` on LM Studio scored **92.5/100**—upper tier, on consumer hardware, at zero API cost.
-5.  **Latest expensive-model results:** `x-ai/grok-4.7` was the only model in the November batch to clear the first-run gate; its five-run mean is **92.9 (#42, CI 91.7–93.7)**. The other eight stopped after one run: Fable 5.1 leads them at **91.2**, followed by Muse Wonder at **90.1**, Qwen3.8 Max 0902 at **87.3**, Sonnet 5.5 at **86.7**, and Opus 5.5 at **77.7**. The tested GPT-6 configurations score **50.3–54.4**. These single-run results are preliminary; the table above distinguishes them from Grok’s five-run estimate.
+4.  **Open-Weight Models Compete:** `gemma-4-31b-it` scores **99.6/100 on Crusoe bf16** across five runs (#3 overall), alongside its historical Akash ML bf16 result of 99.4/100. Even a quantized local run of `gemma-4-26b-a4b` on LM Studio scored **92.5/100**—upper tier, on consumer hardware, at zero API cost.
+5.  **Latest expensive-model results:** `x-ai/grok-4.7` was the only model in the November batch to clear the first-run gate; its five-run mean is **92.9 (#43, CI 91.7–93.7)**. The other eight stopped after one run: Fable 5.1 leads them at **91.2**, followed by Muse Wonder at **90.1**, Qwen3.8 Max 0902 at **87.3**, Sonnet 5.5 at **86.7**, and Opus 5.5 at **77.7**. The tested GPT-6 configurations score **50.3–54.4**. These single-run results are preliminary; the table above distinguishes them from Grok’s five-run estimate.
 
 ---
 
@@ -112,7 +125,7 @@ Here is a real comparison of model responses under the **Creativity (pt04)** top
 *   **📈 Statistical Confidence (Bootstrapped CIs):** Runs each config 5–6 times to calculate 95% confidence intervals using bootstrap resampling (10,000 iterations), filtering out API stochasticity.
 *   **🔌 Provider Pinning (Inference Stack Auditing):** We found that independence is highly sensitive to the quality of inference. Different providers use different quantization, chat templates, and hardware, causing major variance. The benchmark supports pinning OpenRouter requests to specific endpoints in [`configs/models.yaml`](configs/models.yaml) to ensure we test the model's true, unadulterated performance rather than provider-induced degradation.
 
-    New `google/gemma-4-31b-it` runs use `crusoe/bf16` after the Akash ML endpoint was retired. The inactive Akash configuration retains its historical cache and leaderboard score; Crusoe uses a separate cache and has not yet been benchmarked. Raw model IDs prefer active configurations, while explicit labels can still address historical configurations.
+    New `google/gemma-4-31b-it` runs use `crusoe/bf16` after the Akash ML endpoint was retired. The inactive Akash configuration retains its historical cache and leaderboard score; Crusoe has five independently evaluated runs in a separate cache. Raw model IDs prefer active configurations, while explicit labels can still address historical configurations.
 *   **🏠 Local & Private Model Support:** Test local weights via any OpenAI-compatible API (LM Studio, Ollama, vLLM) using Gemini-powered deterministic evaluation.
 *   **🧠 Reasoning & Thinking Audits:** Tracks internal reasoning/thinking tokens to verify if "thinking longer" helps or hurts model independence.
 *   **⚖️ Double-Blind Judge Validation:** Results validated against multiple judge models (Gemini, Grok, MiniMax, MiMo) to ensure zero self-evaluation bias.

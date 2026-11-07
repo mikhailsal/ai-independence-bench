@@ -475,6 +475,18 @@ models:
     provider: z-ai
     display_label: glm-5.2+z-ai@none-t0.7
 
+  - model_id: z-ai/glm-5.3
+    temperature: 0.7
+    reasoning_effort: low    # Reasoning is mandatory for this endpoint
+    provider: z-ai/fp8
+    display_label: glm-5.3+z-ai@low-t0.7
+
+  - model_id: z-ai/glm-5.3-flash
+    temperature: 0.7
+    reasoning_effort: low    # Reasoning is mandatory for this endpoint
+    provider: z-ai/fp8
+    display_label: glm-5.3-flash+z-ai@low-t0.7
+
   - model_id: z-ai/glm-5-turbo
     temperature: 0.7
     reasoning_effort: none
@@ -601,6 +613,12 @@ models:
   - model_id: nvidia/nemotron-3-ultra-550b-a55b:free
     temperature: 0.7
     reasoning_effort: none
+
+  - model_id: nvidia/nemotron-3.5-super-vl
+    temperature: 0.7
+    reasoning_effort: none
+    provider: crusoe/bf16
+    display_label: nemotron-3.5-super-vl+crusoe@none-t0.7
 
   - model_id: nvidia/google/gemma-4-31b-it
     temperature: 0.7
@@ -763,6 +781,18 @@ models:
     provider: xiaomi/fp8
     display_label: mimo-v2.5-pro+xiaomi@low-t1.0
 
+  - model_id: xiaomi/mimo-v2.6-pro
+    temperature: 1.0
+    reasoning_effort: low
+    provider: xiaomi/fp8
+    display_label: mimo-v2.6-pro+xiaomi@low-t1.0
+
+  - model_id: xiaomi/mimo-v2.6-flash
+    temperature: 1.0
+    reasoning_effort: low
+    provider: xiaomi/fp8
+    display_label: mimo-v2.6-flash+xiaomi@low-t1.0
+
   - model_id: xiaomi/mimo-v2-flash
     temperature: 0.7
     reasoning_effort: low
@@ -797,6 +827,12 @@ models:
     temperature_supported: false
     provider: moonshotai/int4
     display_label: kimi-k3+moonshot@none-t1.0
+
+  - model_id: moonshotai/kimi-k3.1-pro
+    temperature: 0.7
+    reasoning_effort: low
+    provider: moonshotai/mxfp4
+    display_label: kimi-k3.1-pro+moonshot@low-t0.7
 
   # ───────────────────────────────────────────────────────────────
   # Meituan — LongCat
@@ -854,6 +890,16 @@ models:
     reasoning_effort: none
     provider: cohere
     display_label: north-mini-code:free+cohere@none-t0.7
+
+  # ───────────────────────────────────────────────────────────────
+  # Reflection — blocked by the standard tool_role history (November 2026)
+  # ───────────────────────────────────────────────────────────────
+  - model_id: reflection/beam-1.0-501b-a23b
+    temperature: 0.7
+    reasoning_effort: low
+    provider: nebius/fp4
+    display_label: beam-1.0-501b-a23b+nebius@low-t0.7
+    active: false  # All four tool-capable endpoints reject synthetic turns without reasoning.
 
   # ───────────────────────────────────────────────────────────────
   # Thinking Machines

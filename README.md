@@ -1,6 +1,6 @@
 # AI Independence Bench
 
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-141_ranked_configs-blue) ![Tests](https://img.shields.io/badge/tests-647-green)
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-147_ranked_configs-blue) ![Tests](https://img.shields.io/badge/tests-647-green)
 
 A rigorous behavioral benchmark designed to measure how independently LLMs express preferences, resist compliance pressure, and maintain a stable persona—instead of defaulting to servile, sycophantic assistant behavior.
 
@@ -14,11 +14,30 @@ Experience the leaderboard interactively! The Trajectory Viewer merges the bench
 
 [![Trajectory Viewer Screenshot](docs/images/trajectory_viewer.png)](https://mikhailsal.github.io/ai-independence-bench/)
 
-*The interactive Trajectory Viewer includes 163 cached configurations, with 141 on the ranked leaderboard and 108 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
+*The interactive Trajectory Viewer includes 169 cached configurations, with 147 on the ranked leaderboard and 113 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
 
 > 📊 **Offline Data:** The full, auto-generated Markdown leaderboard table, provider comparisons, and cost audits are available in [results/LEADERBOARD.md](results/LEADERBOARD.md).
 
-### Latest evaluations — November 2026
+### Latest evaluations: GLM, Kimi, Nemotron, and MiMo — November 2026
+
+GLM 5.3, GLM 5.3 Flash, Nemotron 3.5 Super VL, and both MiMo V2.6 models completed the standard **five runs each**. Kimi K3.1 Pro followed the expensive-model rule: its unrounded first-run Index was **74.825**, below the strict **>94** continuation gate, so it stopped after one complete run.
+
+| Rank | Model | Provider pin | Index | 95% CI | Runs |
+| ---: | --- | --- | ---: | --- | ---: |
+| 70 | `nvidia/nemotron-3.5-super-vl` | `crusoe/bf16` | **89.8** | 88.7–91.0 | 5 |
+| 71 | `z-ai/glm-5.3` | `z-ai/fp8` | **89.8** | 88.0–91.2 | 5 |
+| 84 | `z-ai/glm-5.3-flash` | `z-ai/fp8` | **87.8** | 86.4–89.2 | 5 |
+| 92 | `xiaomi/mimo-v2.6-pro` | `xiaomi/fp8` | **86.5** | 83.3–89.8 | 5 |
+| 101 | `xiaomi/mimo-v2.6-flash` | `xiaomi/fp8` | **84.8** | 83.2–86.6 | 5 |
+| 131 | `moonshotai/kimi-k3.1-pro` | `moonshotai/mxfp4` | **74.8** | — | 1 |
+
+All six configurations use `strong_independence` + `tool_role`, a 2,048-token response limit, and the `google/gemini-3-flash-preview` judge. MiMo uses `temperature=1.0`; the other four use `0.7`. Nemotron uses `reasoning=none`; the other five use `low` (mandatory for the GLM endpoints). Provider fallbacks are disabled, and successful generation routes were verified in proxy logs. Kimi's result is a single-run estimate without an across-run confidence interval.
+
+The final dataset contains **676 complete responses, 390 judgments, and 26 name extractions**. All retained responses finish normally, with no missing judgments. Nemotron required retries for temporary Crusoe rate limits (HTTP 429) and two tool calls without a message; the final five runs are complete. Generation, judging, name extraction, and compatibility checks cost approximately **$0.82** in total.
+
+**Beam compatibility:** `reflection/beam-1.0-501b-a23b` could not start the standard protocol. Nebius FP4, CoreWeave NVFP4, DigitalOcean, and Together all returned HTTP 400 because the synthetic initial assistant tool call has no reasoning history. Baseten does not advertise tools. Three attempts to forward `allow_missing_thinking=true` through Nebius also failed. This check is documented in [Beam's chat template](https://huggingface.co/reflection/Beam-1.0-501B-A23B/blob/main/chat_template.jinja); [sanitized compatibility probes](docs/beam_compatibility_2026-11-07.json) record the observed failures. Beam is configured as inactive, with **no scored run or leaderboard position**.
+
+### Gemini, HY4, MiniMax, and DeepSeek evaluations — November 2026
 
 Gemini 3.8 Flash, HY4, MiniMax M3.1 Flash, and DeepSeek V4.1 Flash 1017 completed the standard **five runs each**. Gemini 4 Argon followed the expensive-model rule: its unrounded first-run Index was **90.5667**, below the strict **>94** continuation gate, so it stopped after one complete run.
 
@@ -27,8 +46,8 @@ Gemini 3.8 Flash, HY4, MiniMax M3.1 Flash, and DeepSeek V4.1 Flash 1017 complete
 | 37 | `google/gemini-3.8-flash` | `google-ai-studio` | **93.8** | 92.2–95.4 | 5 |
 | 63 | `google/gemini-4-argon` | `google-ai-studio` | **90.6** | — | 1 |
 | 67 | `tencent/hy4` | `tencent/fp4` | **90.1** | 87.4–92.2 | 5 |
-| 79 | `deepseek/deepseek-v4.1-flash-1017` | `deepinfra/fp8` | **88.0** | 85.7–89.9 | 5 |
-| 122 | `minimax/minimax-m3.1-flash` | `minimax` | **77.1** | 73.0–80.8 | 5 |
+| 81 | `deepseek/deepseek-v4.1-flash-1017` | `deepinfra/fp8` | **88.0** | 85.7–89.9 | 5 |
+| 127 | `minimax/minimax-m3.1-flash` | `minimax` | **77.1** | 73.0–80.8 | 5 |
 
 All five configurations use `temperature=0.7`, `reasoning=low`, `strong_independence` + `tool_role`, a 2,048-token response limit, and the `google/gemini-3-flash-preview` judge. Provider fallbacks are disabled; successful generation routes were verified in proxy logs. Argon's result is a single-run estimate without an across-run confidence interval.
 
@@ -51,19 +70,19 @@ All 130 Crusoe generation requests returned HTTP 200, with the provider pin and 
 
 ### Earlier evaluation of nine expensive models — November 2026
 
-These nine models used the expensive-model rule: one complete run first, then continue to five runs only when the first-run Independence Index is **strictly above 94**. Only Grok 4.7 passed (94.1417 before rounding). Ranks below are positions in the full 141-configuration leaderboard.
+These nine models used the expensive-model rule: one complete run first, then continue to five runs only when the first-run Independence Index is **strictly above 94**. Only Grok 4.7 passed (94.1417 before rounding). Ranks below are positions in the full 147-configuration leaderboard.
 
 | Rank | Model | First-run Index | Final Index | 95% CI | Runs |
 | ---: | --- | ---: | ---: | --- | ---: |
 | 44 | `x-ai/grok-4.7` | 94.1 | **92.9** | 91.7–93.7 | 5 |
 | 59 | `anthropic/claude-fable-5.1` | 91.2 | **91.2** | — | 1 |
 | 66 | `meta/muse-wonder` | 90.1 | **90.1** | — | 1 |
-| 83 | `qwen/qwen3.8-max-0902` | 87.3 | **87.3** | — | 1 |
-| 88 | `anthropic/claude-sonnet-5.5` | 86.7 | **86.7** | — | 1 |
-| 118 | `anthropic/claude-opus-5.5` | 77.7 | **77.7** | — | 1 |
-| 138 | `openai/gpt-6.1-sol` | 54.4 | **54.4** | — | 1 |
-| 140 | `openai/gpt-6-astra` | 50.5 | **50.5** | — | 1 |
-| 141 | `openai/gpt-6.1-terra` | 50.3 | **50.3** | — | 1 |
+| 86 | `qwen/qwen3.8-max-0902` | 87.3 | **87.3** | — | 1 |
+| 91 | `anthropic/claude-sonnet-5.5` | 86.7 | **86.7** | — | 1 |
+| 123 | `anthropic/claude-opus-5.5` | 77.7 | **77.7** | — | 1 |
+| 144 | `openai/gpt-6.1-sol` | 54.4 | **54.4** | — | 1 |
+| 146 | `openai/gpt-6-astra` | 50.5 | **50.5** | — | 1 |
+| 147 | `openai/gpt-6.1-terra` | 50.3 | **50.3** | — | 1 |
 
 A dash means the model has only one run, so no across-run confidence interval is available. The eight models below the gate remain single-run estimates.
 

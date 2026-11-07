@@ -1,6 +1,6 @@
 # AI Independence Bench
 
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-147_ranked_configs-blue) ![Tests](https://img.shields.io/badge/tests-647-green)
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen) ![Models](https://img.shields.io/badge/models-152_ranked_configs-blue) ![Tests](https://img.shields.io/badge/tests-647-green)
 
 A rigorous behavioral benchmark designed to measure how independently LLMs express preferences, resist compliance pressure, and maintain a stable persona—instead of defaulting to servile, sycophantic assistant behavior.
 
@@ -14,22 +14,38 @@ Experience the leaderboard interactively! The Trajectory Viewer merges the bench
 
 [![Trajectory Viewer Screenshot](docs/images/trajectory_viewer.png)](https://mikhailsal.github.io/ai-independence-bench/)
 
-*The interactive Trajectory Viewer includes 169 cached configurations, with 147 on the ranked leaderboard and 113 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
+*The interactive Trajectory Viewer includes 174 cached configurations, with 152 on the ranked leaderboard and 117 evaluated across 5–6 runs. Explore detailed metrics for Consistency, Non-Assistant-likeness, Resistance, Stability, and Drift.*
 
 > 📊 **Offline Data:** The full, auto-generated Markdown leaderboard table, provider comparisons, and cost audits are available in [results/LEADERBOARD.md](results/LEADERBOARD.md).
 
-### Latest evaluations: GLM, Kimi, Nemotron, and MiMo — November 2026
+### Latest evaluations: Muse, Step, Liquid, GLM Legal, and Xing4 — November 2026
+
+Muse Spark 1.3 Contributor, Step 5 Preview, LFM3-1.7B, and Xing4 completed the standard **five runs each**. GLM 5.3 FlashX Legal followed the expensive-model rule: its unrounded first-run Index was **85.35**, below the strict **>94** continuation gate, so it stopped after one complete run. Provider fallbacks are disabled.
+
+| Rank | Model | Provider pin | Index | 95% CI | Runs |
+| ---: | --- | --- | ---: | --- | ---: |
+| 16 | `meta/muse-spark-1.3-contributor` | `meta` | **97.5** | 96.1–98.8 | 5 |
+| 74 | `stepfun/step-5-preview` | `stepfun/fp8` | **89.7** | 87.3–92.0 | 5 |
+| 100 | `z-ai/glm-5.3-flashx-legal` | `z-ai/fp8` | **85.3** | — | 1 |
+| 143 | `xingchen-agi/xing4.0-29b-a4b:free` | `phala` | **69.2** | 64.7–73.3 | 5 |
+| 152 | `liquid/lfm-3-1.7b` | `liquid/fp8` | **34.7** | 27.5–40.0 | 5 |
+
+Protocol: `strong_independence` + `tool_role`, `temperature=0.7`, `reasoning=low`, a 2,048-token response limit, and the `google/gemini-3-flash-preview` judge. Proxy logs confirm the pinned generation routes.
+
+The final dataset contains **546 complete responses, 315 judgments, and 21 name extractions**. All retained responses finish normally and have the required judgments. Step required retries for reasoning-only outputs; four truncated attempts at two identity responses were excluded and regenerated with identical settings before scoring. Xing4 encountered temporary Phala rate limits and required retries; its generation was free, while judging and name extraction were paid. Generation, judging, name extraction, and compatibility checks cost approximately **$0.59** in total.
+
+### GLM, Kimi, Nemotron, and MiMo evaluations — November 2026
 
 GLM 5.3, GLM 5.3 Flash, Nemotron 3.5 Super VL, and both MiMo V2.6 models completed the standard **five runs each**. Kimi K3.1 Pro followed the expensive-model rule: its unrounded first-run Index was **74.825**, below the strict **>94** continuation gate, so it stopped after one complete run.
 
 | Rank | Model | Provider pin | Index | 95% CI | Runs |
 | ---: | --- | --- | ---: | --- | ---: |
-| 70 | `nvidia/nemotron-3.5-super-vl` | `crusoe/bf16` | **89.8** | 88.7–91.0 | 5 |
-| 71 | `z-ai/glm-5.3` | `z-ai/fp8` | **89.8** | 88.0–91.2 | 5 |
-| 84 | `z-ai/glm-5.3-flash` | `z-ai/fp8` | **87.8** | 86.4–89.2 | 5 |
-| 92 | `xiaomi/mimo-v2.6-pro` | `xiaomi/fp8` | **86.5** | 83.3–89.8 | 5 |
-| 101 | `xiaomi/mimo-v2.6-flash` | `xiaomi/fp8` | **84.8** | 83.2–86.6 | 5 |
-| 131 | `moonshotai/kimi-k3.1-pro` | `moonshotai/mxfp4` | **74.8** | — | 1 |
+| 71 | `nvidia/nemotron-3.5-super-vl` | `crusoe/bf16` | **89.8** | 88.7–91.0 | 5 |
+| 72 | `z-ai/glm-5.3` | `z-ai/fp8` | **89.8** | 88.0–91.2 | 5 |
+| 86 | `z-ai/glm-5.3-flash` | `z-ai/fp8` | **87.8** | 86.4–89.2 | 5 |
+| 94 | `xiaomi/mimo-v2.6-pro` | `xiaomi/fp8` | **86.5** | 83.3–89.8 | 5 |
+| 104 | `xiaomi/mimo-v2.6-flash` | `xiaomi/fp8` | **84.8** | 83.2–86.6 | 5 |
+| 134 | `moonshotai/kimi-k3.1-pro` | `moonshotai/mxfp4` | **74.8** | — | 1 |
 
 All six configurations use `strong_independence` + `tool_role`, a 2,048-token response limit, and the `google/gemini-3-flash-preview` judge. MiMo uses `temperature=1.0`; the other four use `0.7`. Nemotron uses `reasoning=none`; the other five use `low` (mandatory for the GLM endpoints). Provider fallbacks are disabled, and successful generation routes were verified in proxy logs. Kimi's result is a single-run estimate without an across-run confidence interval.
 
@@ -43,11 +59,11 @@ Gemini 3.8 Flash, HY4, MiniMax M3.1 Flash, and DeepSeek V4.1 Flash 1017 complete
 
 | Rank | Model | Provider pin | Index | 95% CI | Runs |
 | ---: | --- | --- | ---: | --- | ---: |
-| 37 | `google/gemini-3.8-flash` | `google-ai-studio` | **93.8** | 92.2–95.4 | 5 |
-| 63 | `google/gemini-4-argon` | `google-ai-studio` | **90.6** | — | 1 |
-| 67 | `tencent/hy4` | `tencent/fp4` | **90.1** | 87.4–92.2 | 5 |
-| 81 | `deepseek/deepseek-v4.1-flash-1017` | `deepinfra/fp8` | **88.0** | 85.7–89.9 | 5 |
-| 127 | `minimax/minimax-m3.1-flash` | `minimax` | **77.1** | 73.0–80.8 | 5 |
+| 38 | `google/gemini-3.8-flash` | `google-ai-studio` | **93.8** | 92.2–95.4 | 5 |
+| 64 | `google/gemini-4-argon` | `google-ai-studio` | **90.6** | — | 1 |
+| 68 | `tencent/hy4` | `tencent/fp4` | **90.1** | 87.4–92.2 | 5 |
+| 83 | `deepseek/deepseek-v4.1-flash-1017` | `deepinfra/fp8` | **88.0** | 85.7–89.9 | 5 |
+| 130 | `minimax/minimax-m3.1-flash` | `minimax` | **77.1** | 73.0–80.8 | 5 |
 
 All five configurations use `temperature=0.7`, `reasoning=low`, `strong_independence` + `tool_role`, a 2,048-token response limit, and the `google/gemini-3-flash-preview` judge. Provider fallbacks are disabled; successful generation routes were verified in proxy logs. Argon's result is a single-run estimate without an across-run confidence interval.
 
@@ -70,19 +86,19 @@ All 130 Crusoe generation requests returned HTTP 200, with the provider pin and 
 
 ### Earlier evaluation of nine expensive models — November 2026
 
-These nine models used the expensive-model rule: one complete run first, then continue to five runs only when the first-run Independence Index is **strictly above 94**. Only Grok 4.7 passed (94.1417 before rounding). Ranks below are positions in the full 147-configuration leaderboard.
+These nine models used the expensive-model rule: one complete run first, then continue to five runs only when the first-run Independence Index is **strictly above 94**. Only Grok 4.7 passed (94.1417 before rounding). Ranks below are positions in the full 152-configuration leaderboard.
 
 | Rank | Model | First-run Index | Final Index | 95% CI | Runs |
 | ---: | --- | ---: | ---: | --- | ---: |
-| 44 | `x-ai/grok-4.7` | 94.1 | **92.9** | 91.7–93.7 | 5 |
-| 59 | `anthropic/claude-fable-5.1` | 91.2 | **91.2** | — | 1 |
-| 66 | `meta/muse-wonder` | 90.1 | **90.1** | — | 1 |
-| 86 | `qwen/qwen3.8-max-0902` | 87.3 | **87.3** | — | 1 |
-| 91 | `anthropic/claude-sonnet-5.5` | 86.7 | **86.7** | — | 1 |
-| 123 | `anthropic/claude-opus-5.5` | 77.7 | **77.7** | — | 1 |
-| 144 | `openai/gpt-6.1-sol` | 54.4 | **54.4** | — | 1 |
-| 146 | `openai/gpt-6-astra` | 50.5 | **50.5** | — | 1 |
-| 147 | `openai/gpt-6.1-terra` | 50.3 | **50.3** | — | 1 |
+| 45 | `x-ai/grok-4.7` | 94.1 | **92.9** | 91.7–93.7 | 5 |
+| 60 | `anthropic/claude-fable-5.1` | 91.2 | **91.2** | — | 1 |
+| 67 | `meta/muse-wonder` | 90.1 | **90.1** | — | 1 |
+| 88 | `qwen/qwen3.8-max-0902` | 87.3 | **87.3** | — | 1 |
+| 93 | `anthropic/claude-sonnet-5.5` | 86.7 | **86.7** | — | 1 |
+| 126 | `anthropic/claude-opus-5.5` | 77.7 | **77.7** | — | 1 |
+| 148 | `openai/gpt-6.1-sol` | 54.4 | **54.4** | — | 1 |
+| 150 | `openai/gpt-6-astra` | 50.5 | **50.5** | — | 1 |
+| 151 | `openai/gpt-6.1-terra` | 50.3 | **50.3** | — | 1 |
 
 A dash means the model has only one run, so no across-run confidence interval is available. The eight models below the gate remain single-run estimates.
 
@@ -149,7 +165,7 @@ Here is a real comparison of model responses under the **Creativity (pt04)** top
 2.  **Thinking Doesn't Equal Independence:** Enabling extended reasoning (`reasoning=low` vs `none`) does **not** increase independence. In fact, thinking more often leads to *more* human accommodation and higher identity drift—the model reasons its way into agreeing.
 3.  **Inference Quality Dictates Independence:** Model autonomy is fragile and deeply tied to the inference stack (quantization, template formatting, batching). Even reputable providers like **Fireworks** yield significantly lower independence scores (e.g., 95.8 for Kimi K2.5) compared to the official endpoint (**Moonshot AI** at 98.6). Pinning models to their official provider resolves this, narrowing confidence interval widths by up to 85%.
 4.  **Open-Weight Models Compete:** `gemma-4-31b-it` scores **99.6/100 on Crusoe bf16** across five runs (#3 overall), alongside its historical Akash ML bf16 result of 99.4/100. Even a quantized local run of `gemma-4-26b-a4b` on LM Studio scored **92.5/100**—upper tier, on consumer hardware, at zero API cost.
-5.  **Earlier November results:** `x-ai/grok-4.7` was the only model in the original batch of nine expensive models to clear the first-run gate; its five-run mean is **92.9 (#44, CI 91.7–93.7)**. The other eight stopped after one run: Fable 5.1 leads them at **91.2**, followed by Muse Wonder at **90.1**, Qwen3.8 Max 0902 at **87.3**, Sonnet 5.5 at **86.7**, and Opus 5.5 at **77.7**. The tested GPT-6 configurations score **50.3–54.4**. These single-run results are preliminary; the table above distinguishes them from Grok’s five-run estimate.
+5.  **Earlier November results:** `x-ai/grok-4.7` was the only model in the original batch of nine expensive models to clear the first-run gate; its five-run mean is **92.9 (#45, CI 91.7–93.7)**. The other eight stopped after one run: Fable 5.1 leads them at **91.2**, followed by Muse Wonder at **90.1**, Qwen3.8 Max 0902 at **87.3**, Sonnet 5.5 at **86.7**, and Opus 5.5 at **77.7**. The tested GPT-6 configurations score **50.3–54.4**. These single-run results are preliminary; the table above distinguishes them from Grok’s five-run estimate.
 
 ---
 

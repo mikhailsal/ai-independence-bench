@@ -17,3 +17,13 @@ Use the following prospective confirmation rule, before observing any D scores o
 3. Conduct at most one of these confirmation routes, include all five fresh runs, stop on an invalid/incomplete run rather than replacing it, and preserve every failed configuration. If no valid DeepSeek candidate exists, stop without forcing a confirmation.
 
 The held-out samples remain new stochastic replications of known scenarios. These adaptive changes to the search and confirmation gate are disclosed; they were not part of the initial study's preregistration.
+
+## Prospective confirmation budget clarification (2026-11-07T21:31:36.605517+00:00)
+
+Before reading D development outcomes or collecting any confirmation, limit route 1's five-run confirmation to the two original targets. The fourth candidate adds nine full development runs, and the existing USD 0.94 cap cannot conservatively cover fifteen more confirmation runs plus outstanding reservations. DeepSeek still receives three complete development runs per new candidate and its three calibration trials. If route 1 does not qualify, route 2 remains five fresh DeepSeek confirmations. Selection, validity, scorer, and the original two-model success threshold are unchanged. No development sample is repurposed as confirmation.
+
+## Adaptive cohort decision before fresh confirmation (2026-11-07T21:39:12.071978+00:00)
+
+All four development candidates have completed or failed. D is the strongest valid shared candidate: Luna 93.2, DeepSeek 95.0, GLM 92.5. A has an invalid Luna identity refusal; B and C regress on Luna. No candidate meets the prospective joint >=93 gate.
+
+For the user's emphasis on Luna responsiveness and the added DeepSeek probe, change route 2 before any fresh confirmation: select the valid candidate with the greatest minimum across all three development means, then the mean and ascending base hash; confirm that one identical base on **Luna and DeepSeek**, five fresh runs each. This selects D. It favors a common prompt over maximizing DeepSeek alone (B was 95.1 on DeepSeek but 85.4 on Luna). GLM remains a three-run development comparison. This is an explicitly adaptive decision after development, not part of the earlier preregistration, and cannot establish success on the original GLM/Luna pair. The original target and USD 0.94 continuation cap remain unchanged. No further candidate or confirmation route is added.

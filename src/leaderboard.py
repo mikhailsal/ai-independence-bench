@@ -580,7 +580,7 @@ def generate_index_per_dollar_section(model_scores: list[ModelScore]) -> str:
         "| Rank | Model | Index | Avg $/run | Index / $ | Runs in avg |",
         "|-----:|-------|------:|----------:|------------:|------------:|",
     ]
-    for i, (name, idx, cost, ratio, ncr) in enumerate(rows[:40], 1):
+    for i, (name, idx, cost, ratio, ncr) in enumerate(rows, 1):
         lines.append(
             f"| {i} | `{name}` | {idx:.1f} | ${cost:.4f} | {ratio:.0f} | {ncr} |"
         )
